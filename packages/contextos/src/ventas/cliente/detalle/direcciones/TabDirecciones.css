@@ -1,0 +1,10 @@
+.TabDireccionesLista {
+    align-items: center;
+}
+
+.TarjetaDireccion-marcas {
+    display: inline-flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}

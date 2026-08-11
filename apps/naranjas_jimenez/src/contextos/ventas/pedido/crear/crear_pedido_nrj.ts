@@ -1,4 +1,4 @@
-import { metaNuevoPedido } from "#/ventas/pedido/crear/dominio.ts";
+import { metaNuevoPedido } from "#/ventas/pedido/crear/crear.ts";
 import ApiUrls from "#/ventas/comun/urls.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { MetaModelo } from "@olula/lib/dominio.js";

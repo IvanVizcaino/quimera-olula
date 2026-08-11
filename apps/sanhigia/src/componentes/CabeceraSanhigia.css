@@ -3,13 +3,14 @@
  */
 
 .logo-app {
-    transform: scale(0.7);
+    /* margin-top: 10px; */
+    /* transform: scale(0.8); */
     transition: all 0.4s ease-in-out;
     filter: brightness(0) invert(1);
 }
 
 .logo-app:hover {
-    transform: scale(0.85);
+    transform: scale(1.2);
 }
 
 .cabecera-nombre-pagina {

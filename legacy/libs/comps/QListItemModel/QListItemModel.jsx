@@ -1,16 +1,17 @@
 import { makeStyles } from "@quimera/styles";
 import { useStateValue, util } from "quimera";
-import React from "react";
 
 import { Collapse, ListItem } from "../";
 
 const useStyles = makeStyles(theme => ({
   card: {
     borderBottom: `1px solid ${theme.palette.grey[400]}`,
+    paddingLeft: "5px", paddingRight: "5px"
   },
   cardSelected: {
     borderBottom: `2px solid ${theme.palette.secondary.main}`,
     borderTop: `2px solid ${theme.palette.secondary.main}`,
+    paddingLeft: "5px", paddingRight: "5px"
   },
 }));
 

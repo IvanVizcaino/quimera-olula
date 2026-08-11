@@ -5,6 +5,7 @@ import {
     actualizarTramo,
     actualizarTramos,
     albaranarPedido,
+    aprobarLinea,
     cambiarLinea,
     cancelarSeleccion,
     cargarDatos,
@@ -26,6 +27,8 @@ export const getMaquina: () => Maquina<EstadoAlbaranarPedido, ContextoAlbaranarP
 
             linea_cambiada: cambiarLinea,
 
+            linea_aprobada: aprobarLinea,
+
             tramos_actualizados: actualizarTramos,
 
             tramo_actualizado: actualizarTramo,
@@ -42,14 +45,12 @@ export const getMaquina: () => Maquina<EstadoAlbaranarPedido, ContextoAlbaranarP
 
             albaranado_confirmado: [
                 albaranarPedido,
-                "ALBARANADO_COMPLETADO"
+                "ALBARAN_CREADO"
             ],
         },
 
-        ALBARANADO_COMPLETADO: {
+        ALBARAN_CREADO: {
             albaranado_completado_cerrado: "LISTO",
         },
-
-        ALBARANANDO: {},
     };
 };

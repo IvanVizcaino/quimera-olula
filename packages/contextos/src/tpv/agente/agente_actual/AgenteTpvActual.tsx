@@ -15,7 +15,6 @@ export const AgenteTpvActual = () => {
   const [agente, setAgente] = useState<AgenteTpv | null>(miAgenteActivo);
 
   const cambiarAgente = async (agente: AgenteTpv) => {
-    console.log("Cambiando agente", agente);
     agenteActivo.actualizar(agente);
     setAgente(agente);
     setCambiando(false);

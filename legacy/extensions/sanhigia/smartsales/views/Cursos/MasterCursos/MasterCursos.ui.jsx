@@ -1,6 +1,6 @@
 import { Box, QBox, QListItem } from "@quimera/comps";
 import { List } from "@quimera/thirdparty";
-import Quimera, { PropValidation, useStateValue, useWidth, util } from "quimera";
+import Quimera, { useStateValue, useWidth, util } from "quimera";
 import { ACL } from "quimera/lib";
 import { useCallback } from "react";
 

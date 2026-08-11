@@ -1,3 +1,4 @@
+import { DocAgente } from "@quimera-extension/base-ventas";
 import {
   Box,
   Column,
@@ -14,9 +15,8 @@ import {
   Typography,
 } from "@quimera/comps";
 import { List } from "@quimera/thirdparty";
-import { DocAgente } from "@quimera-extension/base-ventas";
-import Quimera, { getSchemas, PropValidation, useStateValue, useWidth, util } from "quimera";
-import React, { useEffect } from "react";
+import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
+import React, { useEffect, useState } from "react";
 
 import {
   ListItemLineaPedidoCompra,
@@ -104,10 +104,24 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
   ] = useStateValue();
   const classes = useStyles();
   const width = useWidth();
+  const [anchoDescripcionCalculado, setAnchoDescripcionCalculado] = useState(600);
+  const mobile = ["xs", "sm"].includes(width);
+
+  const dataLineas = lineas.idList.map(id => lineas.dict[id]);
 
   useEffect(() => {
     util.publishEvent(pedido.event, callbackChanged);
   }, [pedido.event.serial]);
+
+  useEffect(() => {
+    if (mobile && dataLineas.length > 0) {
+      const maxChars = Math.max(...dataLineas.map(l => (l.descripcion || "").length));
+      const anchoEstimado = Math.min(Math.max(150, maxChars * 8.5 + 40), 900);
+      setAnchoDescripcionCalculado(anchoEstimado);
+    } else {
+      setAnchoDescripcionCalculado(600);
+    }
+  }, [dataLineas, mobile]);
 
   const onKeyPressed = (event, initPedido) => {
     (event.key === "Enter" || event.key === "Tab") &&
@@ -165,7 +179,6 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
     });
   };
 
-  const mobile = ["xs", "sm"].includes(width);
   const anchoDetalle = mobile ? "1" : "0.5";
   const schema = getSchemas().pedidosCompra;
   const editable = logic.pedidoEditable(pedido.data);
@@ -310,7 +323,7 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
                     order="cantidad"
                     pl={1}
                     value={linea => parseFloat(linea.cantidad)}
-                    width={50}
+                    width={65}
                   />
                   <Column.Action
                     id="recibir"
@@ -341,7 +354,7 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
                     order="descripcion"
                     pl={2}
                     value={linea => linea.descripcion}
-                    width={550}
+                    width={anchoDescripcionCalculado}
                   />
                   {/* <Column.Text
                     id="ubicacion"
@@ -352,7 +365,7 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
                   /> */}
                   <Column.Action
                     id="actioncodubicacion"
-                    width={80}
+                    width={110}
                     header="Ubic."
                     order="sh_codubicacionarticulo"
                     value={(linea, idx) => (
@@ -381,7 +394,7 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
                     order="refprov"
                     pl={2}
                     value={linea => linea.referenciaProv}
-                    width={160}
+                    width={180}
                   />
                   <Column.Decimal
                     id="totalenalbaran"
@@ -402,10 +415,10 @@ function PedidoCompra({ callbackChanged, idPedido, initPedido, useStyles }) {
                   <Column.Text
                     id="referencia"
                     header="Referencia"
-                    order="refrencia"
+                    order="referencia"
                     pl={2}
                     value={linea => linea.referencia}
-                    width={160}
+                    width={180}
                   />
                 </Table>
               </Box>

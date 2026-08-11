@@ -5,6 +5,12 @@ import { criteriaAQueryString, criteriaQuery } from "@olula/lib/infraestructura.
 import { agenteActivo, puntoVentaLocal } from "../comun/infraestructura.ts";
 import { ArqueoTpv, CabeceraArqueoTpv, DeleteArqueoTpv, GetArqueosTpv, GetArqueoTpv, GetPagosArqueoTpv, GetReportArqueo, MovimientoArqueoTpv, PagoArqueoTpv, PatchArqueo, PatchBorrarMovimiento, PatchCerrarArqueo, PatchCrearMovimiento, PatchReabrirArqueo, PatchRecuentoArqueo, PostArqueoTpv } from "./diseño.ts";
 
+type RecuentoTipoTarjetaApi = {
+    tipo_tarjeta_id: string;
+    calculado: number;
+    contado: number;
+}
+
 interface CabeceraArqueoTpvApi {
     id: string;
     fechahora_apertura: string;
@@ -19,6 +25,7 @@ interface CabeceraArqueoTpvApi {
     recuento_tarjeta: number;
     recuento_vales: number;
     recuento_caja: Record<string, number>;
+    recuento_tipo_tarjeta: RecuentoTipoTarjetaApi[];
     movimiento_cierre: number;
     efectivo_inicial: number
 }
@@ -64,7 +71,12 @@ export const movimientoArqueoDesdeApi = (m: MovimientoArqueoTpvApi): MovimientoA
 
 export const arqueoDesdeApi = (a: ArqueoTpvApi): ArqueoTpv => ({
     ...cabeceraArqueoDesdeApi(a),
-    movimientos: a.movimientos.map(movimientoArqueoDesdeApi)
+    movimientos: a.movimientos.map(movimientoArqueoDesdeApi),
+    recuentoTipoTarjeta: a.recuento_tipo_tarjeta.map(rt => ({
+        idTipoTarjeta: rt.tipo_tarjeta_id,
+        calculado: rt.calculado,
+        contado: rt.contado
+    }))
 });
 
 export const getArqueos: GetArqueosTpv = async (
@@ -73,16 +85,19 @@ export const getArqueos: GetArqueosTpv = async (
     paginacion: Paginacion
 ) => {
     const miPuntoVentaLocal = puntoVentaLocal.obtenerSeguro();
-    const filtroPuntoVenta: ClausulaFiltro = [
+    const clausulaFiltroPuntoVenta: ClausulaFiltro = [
         "punto_venta_id",
         miPuntoVentaLocal?.id ?? "",
     ];
 
-    const q = criteriaQuery(
-        [...filtro, filtroPuntoVenta],
-        orden,
-        paginacion
-    );
+    const esListaDeClausulas =
+        Array.isArray(filtro) && (filtro.length === 0 || Array.isArray(filtro[0]));
+
+    const filtroCombinado: Filtro = esListaDeClausulas
+        ? [...(filtro as ClausulaFiltro[]), clausulaFiltroPuntoVenta]
+        : { and: [filtro, [clausulaFiltroPuntoVenta]] };
+
+    const q = criteriaQuery(filtroCombinado, orden, paginacion);
 
     const respuesta = await RestAPI.get<{ datos: CabeceraArqueoTpvApi[]; total: number }>(`${baseUrl}_items` + q);
     return { datos: respuesta.datos.map(cabeceraArqueoDesdeApi), total: respuesta.total };
@@ -131,7 +146,12 @@ export const patchRecuentoArqueo: PatchRecuentoArqueo = async (arqueo) => {
         {
             recuento_tarjeta: arqueo.recuentoTarjeta,
             recuento_vales: arqueo.recuentoVales,
-            recuento_efectivo: arqueo.recuentoCaja
+            recuento_efectivo: arqueo.recuentoCaja,
+            recuento_tipo_tarjeta: arqueo.recuentoTipoTarjeta.map(rt => ({
+                tipo_tarjeta_id: rt.idTipoTarjeta,
+                calculado: rt.calculado,
+                contado: rt.contado
+            }))
         },
         "Error al cambiar el arqueo"
     );
@@ -141,7 +161,9 @@ export const patchArqueo: PatchArqueo = async (anterior, arqueo) => {
 
     const cambios: {
         agente_apertura_id?: string,
-        efectivo_inicial?: number
+        efectivo_inicial?: number,
+        fechahora_apertura?: string,
+        fechahora_cierre?: string,
     } = {};
 
     if (anterior.idAgenteApertura !== arqueo.idAgenteApertura) {
@@ -149,6 +171,12 @@ export const patchArqueo: PatchArqueo = async (anterior, arqueo) => {
     }
     if (anterior.efectivoInicial !== arqueo.efectivoInicial) {
         cambios["efectivo_inicial"] = arqueo.efectivoInicial;
+    }
+    if (anterior.fechahoraApertura.toISOString() !== arqueo.fechahoraApertura.toISOString()) {
+        cambios["fechahora_apertura"] = arqueo.fechahoraApertura.toISOString();
+    }
+    if ((anterior.fechahoraCierre?.toISOString() ?? null) !== (arqueo.fechahoraCierre?.toISOString() ?? null) && arqueo.fechahoraCierre) {
+        cambios["fechahora_cierre"] = arqueo.fechahoraCierre.toISOString();
     }
 
     await RestAPI.patch(

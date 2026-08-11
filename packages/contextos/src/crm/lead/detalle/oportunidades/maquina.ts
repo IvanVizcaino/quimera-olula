@@ -5,11 +5,30 @@ import { Oportunidades, recargarOportunidades } from "./oportunidades.ts";
 export const getMaquina: () => Maquina<EstadoOportunidadesLead, ContextoOportunidadesLead> = () => {
     return {
         INICIAL: {
+            oportunidad_cambiada: [Oportunidades.cambiar],
+
             oportunidad_seleccionada: [Oportunidades.activar],
+
+            oportunidad_deseleccionada: Oportunidades.desactivar,
+
+            oportunidad_borrada: Oportunidades.quitar,
 
             recarga_de_oportunidades_solicitada: [recargarOportunidades],
 
             creacion_de_oportunidad_solicitada: "CREANDO",
+
+            edicion_oportunidad_solicitada: "EDITANDO",
+
+            borrado_oportunidad_solicitado: "BORRANDO",
+        },
+        EDITANDO: {
+            oportunidad_cambiada: [Oportunidades.cambiar],
+
+            oportunidad_seleccionada: [Oportunidades.activar],
+
+            oportunidad_deseleccionada: [Oportunidades.desactivar, "INICIAL"],
+
+            oportunidad_borrada: [Oportunidades.quitar, "INICIAL"],
 
             borrado_oportunidad_solicitado: "BORRANDO",
         },

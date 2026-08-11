@@ -10,7 +10,7 @@ import { formatearMoneda, redondeaMoneda } from "@olula/lib/dominio.js";
 import { useFocus } from "@olula/lib/useFocus.js";
 import { useForm } from "@olula/lib/useForm.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { postPago } from "../infraestructura.ts";
 import "./PagoValeVentaTpv.css";
 import { metaNuevoPagoVale, nuevoPagoValeInicial } from "./pagar_con_vale.ts";
@@ -23,12 +23,16 @@ export const PagoValeVentaTpv = ({
   venta: VentaTpv;
 }) => {
   const pendiente = redondeaMoneda(venta.total - venta.pagado, venta.divisa_id);
-  console.log("pendiente", pendiente);
 
-  const { modelo, uiProps, valido, set, init } = useModelo(metaNuevoPagoVale, {
-    ...nuevoPagoValeInicial,
-    pendiente,
-  });
+  const pagoInicial = useMemo(
+      () => ({
+        ...nuevoPagoValeInicial,
+        pendiente,
+      }),
+      [pendiente]
+    );
+
+  const { modelo, uiProps, valido, set, init } = useModelo(metaNuevoPagoVale, pagoInicial);
 
   const { intentar } = useContext(ContextoError);
 
@@ -55,6 +59,7 @@ export const PagoValeVentaTpv = ({
     setVale(vale);
 
     const saldoPendiente = vale.saldo_pendiente;
+    console.log("saldoPendiente", saldoPendiente, "pendiente", pendiente);
     const importe = Math.min(saldoPendiente, pendiente);
 
     set({

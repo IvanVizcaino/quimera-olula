@@ -1,0 +1,17 @@
+/*
+ * TabGeneral.css — posicionado de campos en el grid de 12 columnas.
+ * Ver _plantilla/modulo/detalle/TabGeneral.css para la estrategia general.
+ */
+
+.TabGeneral {
+
+    /* Título: ancho completo */
+    quimera-input[nombre="titulo"] {
+        grid-column: span 12;
+    }
+
+    /* Contenido: ancho completo */
+    quimera-textarea[nombre="contenido"] {
+        grid-column: span 12;
+    }
+}

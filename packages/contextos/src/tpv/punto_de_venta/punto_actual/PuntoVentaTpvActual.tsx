@@ -19,7 +19,7 @@ export const PuntoVentaTpvActual = ({
   const [punto, setPunto] = useState<PuntoVentaTpv | null>(miPuntoVentaLocal);
 
   const cambiarPuntoVenta = async (punto: PuntoVentaTpv) => {
-    console.log("Cambiando punto", punto);
+
     const puntoAnterior = puntoVentaLocal.obtenerSeguro();
     puntoVentaLocal.actualizar(punto);
     setPunto(punto);

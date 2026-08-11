@@ -1,0 +1,5 @@
+.CrearIaMemoria {
+    quimera-textarea[nombre="contenido"] {
+        grid-column: span 12;
+    }
+}

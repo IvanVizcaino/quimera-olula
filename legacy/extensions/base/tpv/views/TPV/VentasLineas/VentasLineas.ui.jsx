@@ -128,7 +128,7 @@ function VentasLineas({ useStyles }) {
         </Grid>
 
         {!venta.cerrada && (
-          <Grid container size={12} justify="center">
+          <Grid container size={12} justifyContent="center">
             <Grid size={4}>
               <QSection
                 actionPrefix="eliminarLinea"

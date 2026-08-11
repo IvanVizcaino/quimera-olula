@@ -2,11 +2,11 @@ import { Articulo } from "#/ventas/comun/componentes/articulo.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
-import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useFocus } from "@olula/lib/useFocus.js";
+import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback } from "react";
 import { postLinea } from "../infraestructura.ts";
 import "./CrearLinea.css";
 import { metaNuevaLinea, nuevaLineaVacia } from "./dominio.ts";
@@ -18,23 +18,23 @@ export const CrearLinea = ({
   presupuestoId: string;
   publicar: EmitirEvento;
 }) => {
-  const { intentar } = useContext(ContextoError);
   const { modelo, uiProps, valido } = useModelo(
     metaNuevaLinea,
     nuevaLineaVacia
   );
-  const [creando, setCreando] = useState(false);
   const focus = useFocus();
 
-  const crear = useCallback(async () => {
-    const idLinea = await intentar(() => postLinea(presupuestoId, modelo));
-    setCreando(true);
+  const crear_ = useCallback(async () => {
+    const idLinea = await postLinea(presupuestoId, modelo);
     publicar("linea_creada", idLinea);
-  }, [modelo, publicar, presupuestoId, intentar]);
+  }, [modelo, publicar, presupuestoId]);
 
-  const cancelar = useCallback(() => {
-    if (!creando) publicar("crear_linea_cancelado");
-  }, [creando, publicar]);
+  const cancelar_ = useCallback(
+    () => publicar("crear_linea_cancelado"),
+    [publicar]
+  );
+
+  const [crear, cancelar] = useForm(crear_, cancelar_);
 
   return (
     <QModal

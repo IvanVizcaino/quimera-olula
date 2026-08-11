@@ -1,0 +1,18 @@
+.TabComercial {
+
+    quimera-select[nombre="empresa/divisa_id"] {
+        grid-column: span 6;
+    }
+
+    quimera-select[nombre="empresa/forma_pago_id"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="empresa/serie_id"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="empresa/almacen_id"] {
+        grid-column: span 6;
+    }
+}

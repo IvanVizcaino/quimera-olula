@@ -1,0 +1,34 @@
+.DetalleIncidencia {
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: 1 / span 12;
+    }
+
+    quimera-input[nombre="nombre"] {
+        grid-column: 1 / span 12;
+    }
+
+    quimera-date[nombre="fecha"] {
+        grid-column: span 4;
+    }
+
+    quimera-select[nombre="prioridad"] {
+        grid-column: span 4;
+    }
+
+    quimera-select[nombre="estado"] {
+        grid-column: span 4;
+    }
+
+    quimera-autocompletar[nombre="responsable_id"] {
+        grid-column: span 8;
+    }
+
+    quimera-textarea[nombre="descripcion_larga"] {
+        grid-column: span 12;
+    }
+
+    .Tabs {
+        grid-column: 1 / span 12;
+    }
+}

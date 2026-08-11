@@ -16,7 +16,7 @@ import {
     crearLinea,
     getContextoVacio,
     refrescarPedido
-} from "./dominio.ts";
+} from "./detalle.ts";
 
 
 export const getMaquina = (): Maquina<EstadoPedido, ContextoPedido> => {

@@ -1,3 +1,56 @@
+/* ─── Utilidades de layout ───────────────────────────────────────────────── */
+
+/* Fila flex con gap estándar y alineación vertical centrada */
+.q-fila {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-s);
+    align-items: center;
+}
+
+/* Fila flex que empuja el último elemento a la derecha */
+.q-fila-entre {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-s);
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Columna flex con gap estándar */
+.q-columna {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+}
+
+/* Contenido centrado horizontal y verticalmente */
+.q-centrado {
+    display: grid;
+    place-items: center;
+}
+
+/* Separador visual horizontal con margen vertical */
+.q-separador {
+    border: none;
+    border-top: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    margin: var(--espaciado-m) 0;
+}
+
+/* ─── Utilidades de texto ────────────────────────────────────────────────── */
+
+.q-texto-secundario {
+    color: var(--color-texto-secundario);
+    font-size: var(--tamaño-letra-s);
+}
+
+.q-texto-error {
+    color: var(--color-error);
+    font-size: var(--tamaño-letra-s);
+}
+
+/* ─── App principal ──────────────────────────────────────────────────────── */
+
 .fondo-inicio {
     display: grid;
     place-items: center;

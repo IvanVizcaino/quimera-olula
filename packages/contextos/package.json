@@ -15,6 +15,13 @@
     "dependencies": {
         "@olula/componentes": "workspace:*",
         "@olula/lib": "workspace:*",
-        "recharts": "^3.8.0"
+        "recharts": "^3.8.0",
+        "@simplewebauthn/browser": "^13.3.0",
+        "@tabler/icons-react": "^3.44.0",
+        "@assistant-ui/react": "^0.10.0",
+        "@a2ui/react": "^0.9.1",
+        "@a2ui/web_core": "^0.9.2",
+        "@a2ui/markdown-it": "^0.0.4",
+        "zod": "^3.25.76"
     }
 }

@@ -54,6 +54,21 @@ export const transformarLineasAlbaran = (lineas: LineaAlbaranarPedido[]): Lineas
         .filter(linea => linea.cantidad > 0);
 }
 
+export const calcularAEnviar = (linea: LineaAlbaranarPedido): number => {
+    const tramos = linea.tramos ?? [];
+    return tramos.length > 0
+        ? tramos.reduce((total, tramo) => total + (Number(tramo.cantidad) || 0), 0)
+        : (linea.a_enviar || 0);
+};
+
+export const calcularDisponible = (linea: LineaAlbaranarPedido): number =>
+    linea.cantidad - (linea.servida || 0) - calcularAEnviar(linea);
+
+export const lineaAprobadaCompleta = (linea: LineaAlbaranarPedido): boolean => {
+    const aEnviar = calcularAEnviar(linea);
+    return linea.cantidad > 0 && aEnviar + (linea.servida || 0) >= linea.cantidad;
+};
+
 export const obtenerClaseEstadoAlbaranado = (linea: LineaAlbaranarPedido) => {
     const aEnviar = linea.a_enviar || 0;
     const servida = linea.servida || 0;

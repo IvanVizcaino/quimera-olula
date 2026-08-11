@@ -1,0 +1,46 @@
+menu-usuario {
+    #menu-usuario {
+        background: #072146;
+
+        details {
+            margin: 0 0 5%;
+
+            summary {
+                color: white;
+                font-weight: bold;
+            }
+
+            hr {
+                border-color: #64b5f6;
+                margin: 0.5em 0;
+            }
+
+            ul {
+                margin: 0 0 5%;
+                padding: 0;
+
+                li {
+                    padding: 2% 3%;
+                    box-sizing: border-box;
+                    border-radius: 5px 5px 5px 5px;
+
+                    &:hover {
+                        background-color: white;
+                        
+                        a {
+                            color: #072146;
+
+                            quimera-icono {
+                                fill: #072146;
+                            }
+                        }
+                    }
+
+                    quimera-icono {
+                        fill: white;
+                    }
+                }
+            }
+        }
+    }
+}

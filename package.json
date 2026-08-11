@@ -5,17 +5,18 @@
   "scripts": {
     "lint": "pnpm -r run lint",
     "type-check": "pnpm -r run type-check",
-    "ci": "pnpm -r run ci",
+    "ci": "pnpm -r --reporter=append-only run ci",
     "test": "pnpm -r run --filter @olula/* test"
   },
   "dependencies": {
+    "@microsoft/fetch-event-source": "^2.0.1",
+    "d3": "^7.6.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router": "^7.10.1",
-    "tslib": "^2.8.1",
     "react-infinite-scroll-component": "^5.1.0",
+    "react-router": "^7.10.1",
     "react-swipeable-list": "^1.5.0",
-    "d3": "^7.6.1"
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -23,9 +24,9 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",
+    "@types/d3": "^7.4.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@types/d3": "^7.4.3",
     "@vitejs/plugin-react": "^4.7.0",
     "baseline-browser-mapping": "^2.10.0",
     "eslint": "^9.39.2",
@@ -39,5 +40,19 @@
     "vite": "^6.4.1",
     "vite-plugin-pwa": "^0.21.2",
     "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "core-js",
+      "es5-ext",
+      "esbuild"
+    ],
+    "allowBuilds": [
+      "@parcel/watcher",
+      "core-js",
+      "es5-ext",
+      "esbuild"
+    ]
   }
 }

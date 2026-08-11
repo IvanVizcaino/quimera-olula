@@ -4,6 +4,7 @@ import { ContextoCliente, EstadoCliente } from "./diseño.ts";
 import {
     abiertoContexto,
     actualizarCuentaDomiciliada,
+    asignarCuentaRemesaProceso,
     borrarCliente,
     cambiarCliente,
     cancelarCambioCliente,
@@ -48,6 +49,8 @@ export const getMaquina: () => Maquina<EstadoCliente, ContextoCliente> = () => {
             cuenta_domiciliada: actualizarCuentaDomiciliada,
 
             cuenta_domiciliacion_desmarcada: limpiarCuentaDomiciliada,
+
+            cuenta_remesa_seleccionada: asignarCuentaRemesaProceso,
         },
 
         BAJANDO_CLIENTE: {
@@ -60,18 +63,6 @@ export const getMaquina: () => Maquina<EstadoCliente, ContextoCliente> = () => {
             borrado_de_cliente_listo: borrarCliente,
 
             borrado_cancelado: "ABIERTO",
-        },
-
-        EDITANDO_CLIENTE: {
-            edicion_de_cliente_lista: [cambiarCliente],
-
-            edicion_de_cliente_cancelada: [cancelarCambioCliente],
-        },
-
-        GUARDANDO_CLIENTE: {
-            cliente_guardado: [refrescarCliente, "ABIERTO"],
-
-            guardado_cancelado: "ABIERTO",
         },
     };
 };

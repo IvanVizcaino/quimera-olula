@@ -1,7 +1,0 @@
-*.test.*
-rest/
-vite.config.ts
-.vscode/
-.github/
-.prettierrc
-apps/

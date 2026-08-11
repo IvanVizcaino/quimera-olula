@@ -53,7 +53,7 @@ function CalendarioGuardado({ useStyles, hash }) {
     <Quimera.Template id="CalendarioGuardado">
       <QBox width={1} titulo={`Calendario eventos`} className="CalendarioEventos" maxWidth>
         <Grid container alignItems="center" style={{ marginBottom: "10px" }}>
-          <Grid container size={12} alignItems="center" justify="center">
+          <Grid container size={12} alignItems="center" justifyContent="center">
             <Box>
               <Typography color="primary" variant="h5">
                 {modo === "mes" ? mesYAnyo : anyo}
@@ -78,7 +78,7 @@ function CalendarioGuardado({ useStyles, hash }) {
                   <Box width="100%" style={{ borderRight: "1px solid lightgrey" }}>
                     <Grid container>
                       {diasSemana.map((nombreDia, index) => (
-                        <Grid style={{ width: "14.2857%" }} key={`${nombreDia}-${index}`} justify="center">
+                        <Grid style={{ width: "14.2857%" }} key={`${nombreDia}-${index}`} justifyContent="center">
                           {
                             <Box
                               width={1}
@@ -98,8 +98,8 @@ function CalendarioGuardado({ useStyles, hash }) {
                         {semana.map((dia, indexDia) =>
                           dia.ocultar ? null : (
                             <Grid className={
-                                dia?.objetosDia?.length > 0 ? "cajaDiaConDatos" : "cajaDia"
-                              } key={`${indexDia}-${dia.fecha}diasDeSemana`}>
+                              dia?.objetosDia?.length > 0 ? "cajaDiaConDatos" : "cajaDia"
+                            } key={`${indexDia}-${dia.fecha}diasDeSemana`}>
                               <Box
                                 minWidth={1}
                                 display="flex"
@@ -144,7 +144,7 @@ function CalendarioGuardado({ useStyles, hash }) {
                                     style={{ minHeight: `calc((80vh - 255px)/5)` }}
                                   >
                                     {dia.estaCargando ? (
-                                      <Grid container justify="center" alignItems="center">
+                                      <Grid container justifyContent="center" alignItems="center">
                                         <CircularProgress />
                                       </Grid>
                                     ) : (
@@ -161,7 +161,7 @@ function CalendarioGuardado({ useStyles, hash }) {
                                                     variant="subtitle1"
                                                     wrap
                                                     align="center"
-                                                    justify="center"
+                                                    justifyContent="center"
                                                     style={{
                                                       overflow: "hidden",
                                                       textOverflow: "ellipsis",
@@ -194,7 +194,7 @@ function CalendarioGuardado({ useStyles, hash }) {
           </Box>
         )}
         {dibujandoCalendario && (
-          <Grid container justify="center" alignItems="center">
+          <Grid container justifyContent="center" alignItems="center">
             <CircularProgress size={30} />
           </Grid>
         )}
@@ -224,7 +224,7 @@ function CalendarioGuardado({ useStyles, hash }) {
                     variant="subtitle1"
                     wrap
                     align="center"
-                    justify="center"
+                    justifyContent="center"
                     style={{
                       overflow: "hidden",
                       textOverflow: "ellipsis",

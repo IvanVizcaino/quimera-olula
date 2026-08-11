@@ -19,7 +19,7 @@ export const Categoria = ({
     const criteria: Criteria = {
       filtro: [["descripcion", "~", texto]],
       orden: ["id"],
-      paginacion: { limite: 10, pagina: 1 },
+      paginacion: { limite: 1000, pagina: 1 },
     };
 
     const categoriaes = await getItemsListaCategoria(

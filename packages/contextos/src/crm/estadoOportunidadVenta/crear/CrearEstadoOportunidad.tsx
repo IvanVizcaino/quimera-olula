@@ -1,10 +1,10 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
-import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback } from "react";
 import {
   getEstadoOportunidad,
   postEstadoOportunidad,
@@ -20,24 +20,22 @@ export const CrearEstadoOportunidad = ({
 }: {
   publicar: EmitirEvento;
 }) => {
-  const { intentar } = useContext(ContextoError);
-
-  const [creando, setCreando] = useState(false);
   const { modelo, uiProps, valido } = useModelo(
     metaNuevoEstadoOportunidad,
     nuevoEstadoOportunidadVacio
   );
 
-  const crear = useCallback(async () => {
-    setCreando(true);
-    const id = await intentar(() => postEstadoOportunidad(modelo));
-    const estado_oportunidad = await intentar(() => getEstadoOportunidad(id));
+  const crear_ = useCallback(async () => {
+    const id = await postEstadoOportunidad(modelo);
+    const estado_oportunidad = await getEstadoOportunidad(id);
     publicar("estado_oportunidad_creado", estado_oportunidad);
-  }, [modelo, publicar, intentar]);
+  }, [modelo, publicar]);
 
-  const cancelar = useCallback(() => {
-    if (!creando) publicar("creacion_estado_oportunidad_cancelada");
-  }, [creando, publicar]);
+  const cancelar_ = useCallback(() => {
+    publicar("creacion_estado_oportunidad_cancelada");
+  }, [publicar]);
+
+  const [crear, cancelar] = useForm(crear_, cancelar_);
 
   return (
     <QModal
@@ -48,6 +46,7 @@ export const CrearEstadoOportunidad = ({
     >
       <div className="CrearEstadoOportunidad">
         <quimera-formulario>
+          <QInput label="Código" maxLength={10} {...uiProps("id")} />
           <QInput label="Descripción" {...uiProps("descripcion")} />
           <QInput label="Probabilidad (%)" {...uiProps("probabilidad")} />
         </quimera-formulario>

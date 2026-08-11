@@ -1,0 +1,38 @@
+.Cronometro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--espaciado-xs);
+    padding: var(--espaciado-l) 0;
+}
+
+.Cronometro-empleado {
+    font-size: var(--tamaño-letra-l);
+    font-weight: var(--grosor-letra-5);
+    color: var(--color-texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: var(--espaciado-letra-mayusculas);
+}
+
+.Cronometro-tiempo {
+    font-size: clamp(3rem, 15vw, 5rem);
+    font-weight: var(--grosor-letra-6);
+    /* font-variant-numeric: tabular-nums; */
+    letter-spacing: var(--espaciado-letra-compacto);
+    color: var(--color-texto-primario);
+    line-height: 1;
+}
+
+.Cronometro-pausa {
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-xs);
+    color: var(--color-advertencia);
+    font-size: var(--tamaño-letra-l);
+    font-weight: var(--grosor-letra-5);
+
+    quimera-icono svg {
+        color: var(--color-advertencia);
+    }
+}

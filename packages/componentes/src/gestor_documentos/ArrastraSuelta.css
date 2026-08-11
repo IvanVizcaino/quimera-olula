@@ -1,0 +1,54 @@
+.ArrastraSuelta {
+    padding: 20px;
+}
+
+.ArrastraSuelta-zona {
+    border: 2px dashed var(--color-borde-fuerte);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: var(--color-superficie-sunken);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ArrastraSuelta-zona:hover {
+    border-color: var(--color-primario-hover);
+    background-color: var(--color-superficie-elevada);
+}
+
+.ArrastraSuelta-zona.activo {
+    border-color: var(--color-primario);
+    background-color: var(--color-primario-claro);
+    border-width: 3px;
+}
+
+.ArrastraSuelta-contenido {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.ArrastraSuelta-icono {
+    display: flex;
+    color: var(--color-texto-secundario);
+    opacity: 0.6;
+}
+
+.ArrastraSuelta-titulo {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-texto-primario);
+    margin: 0;
+}
+
+.ArrastraSuelta-subtitulo {
+    color: var(--color-texto-secundario);
+    margin: 0;
+    font-size: 14px;
+}

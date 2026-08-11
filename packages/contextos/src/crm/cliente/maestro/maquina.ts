@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroClientes, EstadoMaestroClientes } from "./diseño.ts";
-import { Clientes, recargarClientes } from "./maestro.ts";
+import { ampliarClientes, Clientes, recargarClientes } from "./maestro.ts";
 
 export const getMaquina: () => Maquina<EstadoMaestroClientes, ContextoMaestroClientes> = () => {
     return {
@@ -16,6 +16,8 @@ export const getMaquina: () => Maquina<EstadoMaestroClientes, ContextoMaestroCli
             recarga_de_clientes_solicitada: recargarClientes,
 
             criteria_cambiado: [Clientes.filtrar, recargarClientes],
+
+            siguiente_pagina: [Clientes.filtrar, ampliarClientes],
         }
     }
 }

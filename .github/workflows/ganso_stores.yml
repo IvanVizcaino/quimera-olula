@@ -1,0 +1,62 @@
+name: Ganso
+
+
+on:
+  push:
+    branches:
+      - Deploy_Ganso
+
+jobs:
+  Docker:
+    if: ${{ github.ref_name == 'Deploy_Ganso' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: "yeboyebo/quimera-olula"
+          
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Make envfile
+        run: |
+          echo "VITE_API_URL=https://apiolula.elganso.world" > .env
+          echo "VITE_LEGACY_API_URL=https://apistore.elganso.world/api/" >> .env
+
+          echo "VITE_API_URL=https://apiolula.elganso.world" > ./apps/elganso_stores/.env
+          echo "VITE_LEGACY_API_URL=https://apistore.elganso.world/api/" >> ./apps/elganso_stores/.env
+
+      - name: Install Dependecies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run --filter @olula/elganso_stores build
+
+      - name: Mover dist
+        run: mv ./apps/elganso_stores/dist ./dist
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.YB_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.YB_DOCKERHUB_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./
+          file: Dockerfile
+          push: true
+          tags: yeboyebohub/olula_cli_ganso:${{ github.sha }}

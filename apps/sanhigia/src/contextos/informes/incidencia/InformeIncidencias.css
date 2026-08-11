@@ -1,0 +1,56 @@
+/* InformeIncidencias.css */
+.InformeIncidencias {
+
+    /* Línea 1: agente */
+    quimera-autocompletar[nombre="agente_id"] {
+        grid-column: 1 / span 3;
+    }
+
+    /* Línea 2: periodo, fecha desde, fecha hasta */
+    quimera-select[nombre="periodo"] {
+        grid-column: 1 / span 2;
+    }
+
+    quimera-input[nombre="fecha_desde"],
+    quimera-input[nombre="fecha_hasta"] {
+        grid-column: span 2;
+        width: 100%;
+    }
+
+    /* Línea 3: prioridad, estado, tipo */
+    quimera-select[nombre="prioridad"] {
+        grid-column: 1 / span 2;
+    }
+
+    quimera-select[nombre="estado"],
+    quimera-select[nombre="tipo_incidencia"] {
+        grid-column: span 2;
+    }
+
+    /* Línea 4: categoría, subcategoría */
+    quimera-select[nombre="categoria_incidencia"] {
+        grid-column: 1 / span 3;
+    }
+
+    quimera-select[nombre="subcategoria_incidencia"] {
+        grid-column: span 3;
+    }
+
+    /* Línea 5: causante, cliente, artículo */
+    quimera-autocompletar[nombre="proveedor_id"] {
+        grid-column: 1 / span 6;
+    }
+
+    quimera-autocompletar[nombre="cliente_id"],
+    quimera-autocompletar[nombre="referencia"] {
+        grid-column: 1 / span 6;
+    }
+
+    quimera-formulario>quimera-boton {
+        display: none;
+    }
+
+    .botones {
+        justify-content: flex-start;
+    }
+}

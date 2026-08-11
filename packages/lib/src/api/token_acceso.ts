@@ -1,3 +1,5 @@
+import { notifyAuthStorageChanged } from "./auth_storage_events.ts";
+
 const MINUTOS_REFRESCO = 15;
 const MINUTOS = 60 * 1000;
 
@@ -8,6 +10,7 @@ export const tokenAcceso = {
 
         localStorage.setItem("token-acceso", tokenAcceso);
         localStorage.setItem("fecha-refresco", fechaRefresco.toString());
+        notifyAuthStorageChanged();
     },
     obtener: () => localStorage.getItem("token-acceso"),
     validez: () => {
@@ -25,5 +28,6 @@ export const tokenAcceso = {
     eliminar: () => {
         localStorage.removeItem("fecha-refresco");
         localStorage.removeItem("token-acceso");
+        notifyAuthStorageChanged();
     },
 }

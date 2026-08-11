@@ -45,6 +45,7 @@ const lineaPedidoDesdeApi = (l: LineaPedidoApiNrj): LineaPedidoNrj => {
         categoria: l.categoria,
         categoriaFormateada: l.categoria + "ª",
         cantidadPalet: l.num_palets,
+        iva_incluido: l.iva_incluido,
 
         observaciones: l.observaciones,
         cantidadEnvasesAsignados: l.cantidad_envases_asignados,

@@ -46,7 +46,7 @@ const useAppStyles = makeStyles(theme => ({
     "transition": "all .2s ease-in-out",
     "&:hover": {
       transform: "scale(1.2)",
-      fontWeight: "bold",
+      // fontWeight: "bold",
     },
   },
   appItemContent: {

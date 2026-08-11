@@ -71,13 +71,11 @@ export function MenuAccionesMovil({
 
   // Función toggle: abre si está cerrado, cierra si está abierto
   const toggleMenu = () => {
-    console.log("mimensaje_toogleMenu", ignoreNextClick.current);
 
     if (ignoreNextClick.current) {
       ignoreNextClick.current = false;
       return;
     }
-    console.log("mimensaje_PASA", ignoreNextClick.current);
     setAbierto((prev) => !prev);
   };
 

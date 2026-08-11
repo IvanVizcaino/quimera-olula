@@ -15,7 +15,7 @@ function Confirmacion({ useStyles }) {
         minWidth="sm" fullWidth
       >
         <DialogTitle>
-          <Grid container alignItems="center" justify="space-between">
+          <Grid container alignItems="center" justifyContent="space-between">
             {t("pedidoConfirmado.titulo")}
           </Grid>
         </DialogTitle>

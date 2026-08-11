@@ -157,3 +157,7 @@ export const Hidden = ({ mdUp, smDown, children }: { mdUp?: boolean; smDown?: bo
 
   return hidden ? null : children;
 };
+
+export { default as createCache } from "@emotion/cache";
+export { CacheProvider } from "@emotion/react";
+

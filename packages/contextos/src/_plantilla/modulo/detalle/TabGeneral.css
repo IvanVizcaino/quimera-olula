@@ -1,0 +1,34 @@
+/*
+ * TabGeneral.css — posicionado de campos en el grid de 12 columnas.
+ *
+ * Estrategia:
+ *   - <quimera-formulario> es un grid de 12 columnas.
+ *   - Cada componente (QInput, QSelect, QDate…) renderiza un elemento custom
+ *     (quimera-input, quimera-select, quimera-date…) con el atributo `nombre`
+ *     que llega del spread de uiProps("campo").
+ *   - Aquí apuntamos a esos elementos por atributo para controlar su anchura.
+ *   - Todo dentro de `.TabGeneral` para evitar conflictos con otros tabs.
+ *
+ * Referencia de anchos:
+ *   span 2  → 17%   (códigos, horas)
+ *   span 3  → 25%   (estados, importes)
+ *   span 4  → 33%   (campos medianos)
+ *   span 6  → 50%   (campos estándar)
+ *   span 9  → 75%   (nombres largos)
+ *   span 12 → 100%  (descripciones, notas; es el ancho por defecto)
+ */
+
+.TabGeneral {
+
+    /* Fila 1: Nombre (9 cols) + Estado (3 cols) = 12 */
+    quimera-input[nombre="campoString"] {
+        grid-column: span 9;
+    }
+
+    quimera-select[nombre="campoOpcion"] {
+        grid-column: span 3;
+    }
+
+    /* campoNumero: ancho completo (12 cols es el valor por defecto, no hace falta declararlo) */
+    /* quimera-input[nombre="campoNumero"] { grid-column: span 12; } */
+}

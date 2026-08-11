@@ -143,13 +143,13 @@ function DetalleTiposTrato({ useStyles }) {
               </QSection>
             </Grid>
           </Grid>
-          <Grid container size={12} justify="center">
-            <Grid container size={12} justify="flex-start">
+          <Grid container size={12} justifyContent="center">
+            <Grid container size={12} justifyContent="flex-start">
               <Typography variant="overline" align="left" className={classes.labelEdicion}>
                 Causas de pérdida de trato
               </Typography>
             </Grid>
-            <Grid container size={12} justify="space-between">
+            <Grid container size={12} justifyContent="space-between">
               <Grid container size={12}>
                 <Grid size={{ xs: 12, md: 10 }} className={classes.borde}>
                   <Field.Text

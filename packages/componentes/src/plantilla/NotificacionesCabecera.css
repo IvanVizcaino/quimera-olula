@@ -1,0 +1,29 @@
+.accion-cabecera-notificaciones {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+
+    quimera-icono {
+        fill: var(--blanco);
+    }
+}
+
+.accion-cabecera-notificaciones-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background-color: #d73352;
+    color: var(--blanco);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    pointer-events: none;
+}

@@ -5,11 +5,12 @@ import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { plugin } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useContext, useEffect } from "react";
 import { useParams } from "react-router";
 import { Almacen } from "../../diseño.ts";
-import { patchAlmacen } from "../../infraestructura.ts";
+import { almacenLocal, patchAlmacen } from "../../infraestructura.ts";
 import { BorrarAlmacen } from "./BorrarAlmacen.tsx";
 import "./DetalleAlmacen.css";
 import { almacenVacio, metaAlmacen } from "./dominio.ts";
@@ -39,6 +40,8 @@ export const DetalleAlmacen = ({
   );
 
   const almacen = useModelo(metaAlmacen, ctx.almacen);
+  const pluginMultiAlmacenActivo = plugin("multi_almacen") === "activo";
+  const mostrarCambiarAlmacen = pluginMultiAlmacenActivo || true;
 
   useEffect(() => {
     emitir("almacen_id_cambiado", almacenId, true);
@@ -54,6 +57,14 @@ export const DetalleAlmacen = ({
     emitir("cancelar_edicion");
   }, [emitir]);
 
+  const handleCambiarAlmacenLocal = useCallback(() => {
+    if (!ctx.almacen.id) return;
+    almacenLocal.actualizar({
+      id: ctx.almacen.id,
+      nombre_almacen: ctx.almacen.nombre,
+    });
+  }, [ctx.almacen.id, ctx.almacen.nombre]);
+
   if (!ctx.almacen.id) return;
 
   return (
@@ -68,6 +79,11 @@ export const DetalleAlmacen = ({
         <>
           <div className="maestro-botones ">
             <QBoton onClick={() => emitir("borrar")}>Borrar</QBoton>
+            {mostrarCambiarAlmacen && (
+              <QBoton onClick={handleCambiarAlmacenLocal}>
+                Cambiar almacén
+              </QBoton>
+            )}
           </div>
           <div className="DetalleAlmacen">
             <Tabs

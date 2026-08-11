@@ -164,7 +164,7 @@ export default parent => ({
             message: "Campo requerido",
           }
           : trato.idTipotrato === util.getUser().tratolicenciafarma &&
-          !ACL.can("TratosFarma:visit") && {
+          !ACL.can("crm.trato.farma") && {
             error: true,
             message: "No tienes permisos para usar este tipo de trato",
           },
@@ -253,7 +253,7 @@ export default parent => ({
             message: "Campo requerido",
           }
           : trato.idTipotrato === util.getUser().tratolicenciafarma &&
-          !ACL.can("TratosFarma:visit") && {
+          !ACL.can("crm.trato.farma") && {
             error: true,
             message: "No tienes permisos para usar este tipo de trato",
           },
@@ -322,7 +322,7 @@ export default parent => ({
             message: "Campo requerido",
           }
           : trato.idTipotrato === util.getUser().tratolicenciafarma &&
-          !ACL.can("TratosFarma:visit") && {
+          !ACL.can("crm.trato.farma") && {
             error: true,
             message: "No tienes permisos para usar este tipo de trato",
           },
@@ -392,7 +392,7 @@ export default parent => ({
           message: "Campo requerido",
         }
         : trato.idTipotrato === util.getUser().tratolicenciafarma &&
-        !ACL.can("TratosFarma:visit") && {
+        !ACL.can("crm.trato.farma") && {
           error: true,
           message: "No tienes permisos para usar este tipo de trato",
         },
@@ -466,6 +466,7 @@ export default parent => ({
       codAgenteObservador: Field.Text("codagenteobservador", "Agente obervador trato").dump(false),
       codContacto: Field.Text("codcontacto", "Contacto").dump(false),
       codCliente: Field.Text("codcliente", "Contacto").dump(false),
+      codClienteIncidencia: Field.Text("codclienteincidencia", "Cliente incidencia"),
       nombreAgente: Field.Text("nombreagente", "Nombre Agente").dump(false),
       tituloTrato: Field.Text("titulotrato", "Título Trato").dump(false),
       nombreContacto: Field.Text("nombrecontacto", "Nombre Contacto").dump(false),
@@ -519,6 +520,7 @@ export default parent => ({
       codAgente: Field.Text("codagente", "Agente").dump(
         _ => util.getGlobalSetting("user_data").user.agente,
       ),
+      codIncidencia: Field.Text("codincidencia", "Incidencia"),
     })
     .filter(data => (data?.idTrato ? ["idtrato", "eq", data?.idTrato] : null))
     .order(() => ({ field: "fecha", direction: "DESC" })),

@@ -270,13 +270,15 @@ export const bunch = parent => {
           // Actualizamos las lineas modificadas en el inventario
           let nuevasLineasModificadas = [];
 
-          // Comprobamos que sea un objeto o un array para tratarlo correctamente
-          if (inventario.lineasModificadas.length === undefined) {
-            nuevasLineasModificadas = Object.values(inventario.lineasModificadas).filter(
-              lm => lm.id !== idLinea,
-            );
-          } else {
-            nuevasLineasModificadas = inventario.lineasModificadas.filter(lm => lm.id !== idLinea);
+          if (inventario.lineasModificadas) {
+            // Comprobamos que sea un objeto o un array para tratarlo correctamente
+            if (inventario.lineasModificadas.length === undefined) {
+              nuevasLineasModificadas = Object.values(inventario.lineasModificadas).filter(
+                lm => lm.id !== idLinea,
+              );
+            } else {
+              nuevasLineasModificadas = inventario.lineasModificadas.filter(lm => lm.id !== idLinea);
+            }
           }
 
           // Si quedan lineas modificadas las dejamos, si no borramos la propiedad

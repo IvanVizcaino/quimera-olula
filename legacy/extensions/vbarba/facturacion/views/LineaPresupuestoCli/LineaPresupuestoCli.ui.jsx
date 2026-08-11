@@ -1,3 +1,4 @@
+import { QProveedor } from "@quimera-extension/base-almacen";
 import { Totales } from "@quimera-extension/base-area_clientes";
 import {
   Box,
@@ -13,7 +14,7 @@ import {
 import Quimera, { getSchemas, useStateValue, util } from "quimera";
 import { useEffect } from "react";
 
-import { ProveedorArticulo, QArticuloVbarba } from "../../comps";
+import { QArticuloVbarba } from "../../comps";
 
 function LineaPresupuestoCli({ callbackGuardada, disabled, lineaInicial, useStyles }) {
   const [{ linea, sections }, dispatch] = useStateValue();
@@ -86,12 +87,11 @@ function LineaPresupuestoCli({ callbackGuardada, disabled, lineaInicial, useStyl
                     <Quimera.Block id="afterDescripcion" />
                   </Grid>
                   <Grid size={12}>
-                    <ProveedorArticulo
+                    <QProveedor
                       id="linea.buffer/codProveedor"
                       label={`Proveedor`}
-                      referencia={linea.buffer.referencia}
+                      disableClearable
                       fullWidth
-                      async
                     />
                   </Grid>
                 </Grid>

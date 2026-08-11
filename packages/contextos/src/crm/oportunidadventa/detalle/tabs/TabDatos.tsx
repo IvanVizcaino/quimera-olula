@@ -1,7 +1,4 @@
-import { Cliente } from "#/crm/comun/componentes/cliente_con_nombre.tsx";
 import { EstadoOportunidad } from "#/crm/comun/componentes/estado_oportunidad_venta.tsx";
-import { LeadSelector } from "#/crm/comun/componentes/lead.tsx";
-import { ContactoSelector } from "#/ventas/comun/componentes/contacto.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { OportunidadVenta } from "../../diseño.ts";
@@ -13,33 +10,46 @@ export const TabDatos = ({
   oportunidad: HookModelo<OportunidadVenta>;
 }) => {
   const { uiProps, modelo } = oportunidad;
+  const tieneCliente = Boolean(modelo.cliente_id);
+  const tieneTarjeta = Boolean(modelo.tarjeta_id);
+  const tieneContacto = Boolean(modelo.contacto_id);
 
   return (
     <div className="TabDatos">
       <quimera-formulario>
         <QInput label="Descripción" {...uiProps("descripcion")} />
 
-        {modelo.cliente_id && (
-          <Cliente
-            {...uiProps("cliente_id", "nombre_cliente")}
-            label="Seleccionar cliente"
-            deshabilitado
+        {tieneCliente && (
+          <QInput
+            label="Cliente"
+            nombre="cliente"
+            soloTexto
+            valor={modelo.nombre_cliente ?? modelo.cliente_id ?? ""}
           />
         )}
 
-        <QInput label="Cliente" {...uiProps("nombre_cliente")} />
+        {tieneTarjeta && (
+          <QInput
+            label="Lead"
+            nombre="lead"
+            soloTexto
+            valor={
+              modelo.nombre_cliente ??
+              modelo.nombre_tarjeta ??
+              modelo.tarjeta_id ??
+              ""
+            }
+          />
+        )}
 
-        <LeadSelector
-          {...uiProps("tarjeta_id")}
-          label="Lead"
-          valor={oportunidad.modelo.tarjeta_id ?? ""}
-          descripcion={oportunidad.modelo.tarjeta_id ?? ""}
-        />
-        <ContactoSelector
-          {...uiProps("contacto_id")}
-          label="Contacto"
-          descripcion={oportunidad.modelo.nombre_contacto ?? undefined}
-        />
+        {tieneContacto && (
+          <QInput
+            label="Contacto"
+            nombre="contacto"
+            soloTexto
+            valor={modelo.nombre_contacto ?? modelo.contacto_id ?? ""}
+          />
+        )}
 
         <EstadoOportunidad label="Estado" {...uiProps("estado_id")} />
 

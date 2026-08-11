@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "composite": true,
-    "baseUrl": ".",
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -34,6 +33,7 @@
   "include": [
     "packages/**/*",
     "apps/**/*",
+    "doc/**/*",
   ],
   "exclude": [
     "**/dev-dist/**",

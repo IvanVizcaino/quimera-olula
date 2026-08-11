@@ -3,6 +3,7 @@ import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo, publicar } from "@olula/lib/dominio.js";
 import { Cliente } from "../diseño.ts";
 import {
+    asignarCuentaRemesa,
     darDeAltaCliente,
     darDeBajaCliente,
     getCliente,
@@ -54,6 +55,8 @@ export const clienteVacio = (): Cliente => ({
     contacto_id: '',
     cuenta_domiciliada: '',
     descripcion_cuenta: '',
+    cuenta_remesa: '',
+    descripcion_cuenta_remesa: '',
     debaja: false,
     forma_pago: '',
     divisa: '',
@@ -143,7 +146,6 @@ export const cambiarCliente: ProcesarCliente = async (contexto, payload) => {
 }
 
 export const borrarCliente: ProcesarCliente = async (contexto, payload) => {
-    // await deleteCliente(contexto.cliente.id);
     const { clienteId } = payload as { clienteId: string } ?? { clienteId: contexto.cliente.id };
 
     return pipeCliente(contexto, [
@@ -184,6 +186,24 @@ export const actualizarCuentaDomiciliada: ProcesarCliente = async (contexto, pay
             ...contexto.clienteInicial,
             cuenta_domiciliada: cuenta_id,
             descripcion_cuenta: descripcion,
+        },
+    };
+}
+
+export const asignarCuentaRemesaProceso: ProcesarCliente = async (contexto, payload) => {
+    const { cuenta_id, descripcion } = payload as { cuenta_id: string; descripcion: string };
+    await asignarCuentaRemesa(contexto.cliente.id, cuenta_id);
+    return {
+        ...contexto,
+        cliente: {
+            ...contexto.cliente,
+            cuenta_remesa: cuenta_id,
+            descripcion_cuenta_remesa: descripcion,
+        },
+        clienteInicial: {
+            ...contexto.clienteInicial,
+            cuenta_remesa: cuenta_id,
+            descripcion_cuenta_remesa: descripcion,
         },
     };
 }

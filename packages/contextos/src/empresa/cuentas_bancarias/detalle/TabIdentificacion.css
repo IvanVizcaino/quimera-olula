@@ -1,0 +1,26 @@
+.TabIdentificacion {
+
+    quimera-input[nombre="codigoCuenta"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="paisId"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="digitoControl"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="cuenta"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="empresaId"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="obsoleta"] {
+        grid-column: span 12;
+    }
+}

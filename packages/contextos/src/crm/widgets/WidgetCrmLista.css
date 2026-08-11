@@ -1,0 +1,159 @@
+.widget-crm-lista {
+    display: grid;
+    gap: var(--espaciado-s);
+}
+
+.widget-crm-lista__cabecera {
+    display: grid;
+    gap: var(--espaciado-xs);
+}
+
+.widget-crm-lista__titulo {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.widget-crm-lista__subtitulo {
+    font-size: 0.875rem;
+    color: var(--color-texto-secundario);
+}
+
+.widget-acciones-situacion {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-xs);
+}
+
+.widget-situacion-item {
+    font-size: var(--tamaño-letra-sm, 0.75rem);
+    font-weight: var(--grosor-letra-medium, 500);
+    padding: 2px var(--espaciado-xs);
+    border-radius: var(--redondeo-borde-xs);
+    border: none;
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+button.widget-situacion-item {
+    appearance: none;
+}
+
+.widget-situacion-item:hover {
+    filter: brightness(0.97);
+}
+
+.widget-situacion-item.activo {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 35%, transparent);
+    transform: translateY(-1px);
+}
+
+.widget-situacion-pendientes {
+    background-color: var(--color-deshabilitado-claro);
+    /* color: var(--color-texto-secundario); */
+}
+
+.widget-situacion-retrasadas {
+    background-color: var(--color-error-claro);
+    /* color: var(--color-error-oscuro); */
+}
+
+.widget-situacion-hoy {
+    background-color: var(--color-advertencia-claro);
+    /* color: var(--color-advertencia-oscuro); */
+}
+
+.widget-crm-lista__lista,
+.widget-crm-lista__grupos {
+    display: grid;
+    gap: var(--espaciado-xs);
+}
+
+.widget-crm-lista__tarjeta-enlace {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.widget-crm-lista__tarjeta-enlace quimera-tarjeta,
+.widget-crm-lista__tarjeta-enlace .qtarjeta-generica {
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.widget-crm-lista__tarjeta-enlace:hover quimera-tarjeta,
+.widget-crm-lista__tarjeta-enlace:hover .qtarjeta-generica,
+.widget-crm-lista__tarjeta-enlace:focus-visible quimera-tarjeta,
+.widget-crm-lista__tarjeta-enlace:focus-visible .qtarjeta-generica {
+    transform: translateY(-1px);
+}
+
+.widget-crm-lista__tarjeta-enlace:focus-visible {
+    outline: none;
+}
+
+.widget-crm-lista__grupo {
+    display: grid;
+    gap: var(--espaciado-xs);
+}
+
+.widget-crm-lista__grupo-titulo {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-texto-secundario);
+}
+
+.widget-crm-lista__item {
+    display: grid;
+    gap: 4px;
+    padding: var(--espaciado-xs) var(--espaciado-s);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-borde-s);
+    background: var(--color-fondo-secundario);
+}
+
+.widget-crm-lista__item-principal,
+.widget-crm-lista__item-secundario {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--espaciado-xs);
+    align-items: baseline;
+}
+
+.widget-crm-lista__item-titulo {
+    font-weight: 600;
+    min-width: 0;
+}
+
+.widget-crm-lista__item-titulo,
+.widget-crm-lista__item-meta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.widget-crm-lista__item-meta,
+.widget-crm-lista__item-extra {
+    font-size: 0.875rem;
+    color: var(--color-texto-secundario);
+}
+
+.widget-crm-lista__item-valor {
+    flex-shrink: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.widget-crm-lista__acciones {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.widget-crm-lista__enlace {
+    font-weight: 400;
+}
+
+.widget-crm-lista__vacio {
+    color: var(--color-texto-secundario);
+}

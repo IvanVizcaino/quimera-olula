@@ -1,33 +1,31 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
-import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback } from "react";
 import { getFuenteLead, postFuenteLead } from "../infraestructura.ts";
 import "./CrearFuenteLead.css";
 import { metaNuevaFuenteLead, nuevaFuenteLeadVacia } from "./crear.ts";
 
 export const CrearFuenteLead = ({ publicar }: { publicar: EmitirEvento }) => {
-  const { intentar } = useContext(ContextoError);
-
-  const [creando, setCreando] = useState(false);
   const { modelo, uiProps, valido } = useModelo(
     metaNuevaFuenteLead,
     nuevaFuenteLeadVacia
   );
 
-  const crear = useCallback(async () => {
-    setCreando(true);
-    const id = await intentar(() => postFuenteLead(modelo));
-    const fuente_lead = await intentar(() => getFuenteLead(id));
+  const crear_ = useCallback(async () => {
+    const id = await postFuenteLead(modelo);
+    const fuente_lead = await getFuenteLead(id);
     publicar("fuente_lead_creada", fuente_lead);
-  }, [modelo, publicar, intentar]);
+  }, [modelo, publicar]);
 
-  const cancelar = useCallback(() => {
-    if (!creando) publicar("creacion_fuente_lead_cancelada");
-  }, [creando, publicar]);
+  const cancelar_ = useCallback(() => {
+    publicar("creacion_fuente_lead_cancelada");
+  }, [publicar]);
+
+  const [crear, cancelar] = useForm(crear_, cancelar_);
 
   return (
     <QModal
@@ -38,6 +36,7 @@ export const CrearFuenteLead = ({ publicar }: { publicar: EmitirEvento }) => {
     >
       <div className="CrearFuenteLead">
         <quimera-formulario>
+          <QInput label="Código" maxLength={20} {...uiProps("id")} />
           <QInput label="Descripción" {...uiProps("descripcion")} />
         </quimera-formulario>
 

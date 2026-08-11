@@ -2,12 +2,12 @@ import "./menu-usuario.css";
 
 import { puede } from "@olula/lib/dominio.ts";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
+import { ElementoMenu, ElementoMenuPadre } from "@olula/lib/menu.ts";
 import { useContext } from "react";
 import { Link } from "react-router";
 import { QIcono } from "../atomos/qicono.tsx";
 import { estaAutentificado } from "../plantilla/autenticacion";
 import { useMenuControl } from "../plantilla/useMenuControl";
-import { ElementoMenu, ElementoMenuPadre } from "./menu.ts";
 
 // Tipo exportado para que las apps puedan usarlo en sus factories
 export type MenuUsuarioElementos = ElementoMenu[];

@@ -19,23 +19,7 @@ const useStyles = makeStyles(theme => ({
   selected: {
     borderBottom: `2px solid ${theme.palette.secondary.main}`,
     borderTop: `2px solid ${theme.palette.secondary.main}`,
-  },
-  chipAviso: {
-    borderRadius: 4,
-    marginRight: theme.spacing(1),
-    fontSize: "0.8rem",
-    backgroundColor: "#ff7f50",
-    textTransform: "uppercase",
-  },
-  chipAvisoSoloIcono: {
-    backgroundColor: "transparent",
-  },
-  iconChip: {
-    padding: 0,
-    margin: 0,
-    color: "#ff7f50",
-    fontSize: "1.5rem",
-  },
+  }
 }));
 
 function QListItem({ alignActions = "center", selected, badge, avatar, chip, tl, tr, ml, mr, bl, br, acciones, onClick, ...props }) {
@@ -69,9 +53,12 @@ function QListItem({ alignActions = "center", selected, badge, avatar, chip, tl,
             {chip && (
               <Chip
                 label={chip.texto}
-                icon={<Icon className={classes.iconChip}>{chip.icon}</Icon>}
+                icon={<Icon sx={{ padding: 0, margin: 0, color: "#ff7f50 !important", fontSize: "1.5rem" }}>{chip.icon}</Icon>}
                 size="small"
-                className={chip.soloIcono ? classes.chipAvisoSoloIcono : classes.chipAviso}
+                sx={chip.soloIcono
+                  ? { backgroundColor: "transparent", color: "#ff7f50" }
+                  : { borderRadius: "4px", mr: 1, fontSize: "0.8rem", backgroundColor: "#ff7f50", textTransform: "uppercase", color: "white" }
+                }
               />
             )}
             <ListItemText

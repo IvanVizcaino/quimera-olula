@@ -21,6 +21,7 @@ export const getRecuentoInicial = (arqueo: ArqueoTpv): RecuentoArqueoTpv => {
         m005: arqueo.recuentoCaja.m005,
         m002: arqueo.recuentoCaja.m002,
         m001: arqueo.recuentoCaja.m001,
+        recuentoEfectivo: arqueo.recuentoEfectivo,
         recuentoTarjeta: arqueo.recuentoTarjeta,
         recuentoVales: arqueo.recuentoVales
     };
@@ -48,7 +49,8 @@ export const recuentoEfectivo = (recuento: RecuentoArqueoTpv): number => {
 
 export const guardarRecuento = async (
     arqueo: ArqueoTpv,
-    recuento: RecuentoArqueoTpv
+    recuento: RecuentoArqueoTpv,
+    recuentoTipoTarjeta: Record<string, number>
 ): Promise<void> => {
 
     const arqueoRecontado = {
@@ -71,7 +73,12 @@ export const guardarRecuento = async (
             m001: recuento.m001
         },
         recuentoTarjeta: recuento.recuentoTarjeta,
-        recuentoVales: recuento.recuentoVales
+        recuentoVales: recuento.recuentoVales,
+        recuentoTipoTarjeta: arqueo.recuentoTipoTarjeta.map(datos => ({
+            idTipoTarjeta: datos.idTipoTarjeta,
+            calculado: datos.calculado,
+            contado: recuentoTipoTarjeta[datos.idTipoTarjeta] ?? datos.contado
+        }))
     }
     await patchRecuentoArqueo(arqueoRecontado);
 }

@@ -14,6 +14,7 @@ interface ClienteProps {
   label?: string;
   deshabilitado?: boolean;
   onChange?: (opcion: { valor: string; descripcion: string } | null) => void;
+  [key: string]: unknown;
 }
 
 interface ClienteConNombreProps {

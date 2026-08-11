@@ -1,3 +1,4 @@
+import { Cliente } from "@quimera-extension/base-ventas";
 import {
   Box,
   Field,
@@ -8,8 +9,7 @@ import {
   QTitleBox,
   Typography,
 } from "@quimera/comps";
-import { Cliente } from "@quimera-extension/base-ventas";
-import Quimera, { getSchemas, PropValidation, useStateValue, useWidth, util } from "quimera";
+import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
 import { ACL } from "quimera/lib";
 import { useEffect } from "react";
 

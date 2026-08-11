@@ -1,5 +1,4 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { ClienteVentaNoRegistrado } from "@olula/ctx/ventas/comun/componentes/moleculas/ClienteVenta/ClienteVentaNoRegistrado.tsx";
 import { ClienteVentaRegistrado } from "@olula/ctx/ventas/comun/componentes/moleculas/ClienteVenta/ClienteVentaRegistrado.tsx";
@@ -134,7 +133,6 @@ const FormAltaFactura = ({
         ) : (
           <ClienteVentaRegistrado cliente={facturaRegistrada} />
         )}
-        <QInput label="Empresa" {...actual.uiProps("idEmpresa")} />
       </quimera-formulario>
       <div className="botones">
         <QBoton onClick={crear} deshabilitado={!actual.valido}>

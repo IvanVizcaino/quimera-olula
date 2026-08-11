@@ -19,6 +19,7 @@ export const CabeceraSanhigia = (props: CabeceraProps) => {
       {...props}
       logoSrc="/logo.png"
       logoAlt="Sanhigia"
+      Logo={null}
       Titulo={
         nombrePagina
           ? () => <span className="cabecera-nombre-pagina">{nombrePagina}</span>

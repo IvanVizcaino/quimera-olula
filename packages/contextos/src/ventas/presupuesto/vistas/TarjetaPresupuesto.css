@@ -1,0 +1,15 @@
+.TarjetaPresupuesto .tarjeta-presupuesto-codigo {
+    font-size: var(--tamaño-letra-m);
+    font-weight: var(--grosor-letra-7);
+    color: var(--color-texto-primario);
+}
+
+.TarjetaPresupuesto .tarjeta-presupuesto-total {
+    white-space: nowrap;
+    font-size: var(--tamaño-letra-m);
+}
+
+.TarjetaPresupuesto .tarjeta-presupuesto-cliente {
+    font-size: var(--tamaño-letra-m);
+    color: var(--color-texto-secundario);
+}

@@ -1,5 +1,6 @@
 import { Box, Column, Table } from "@quimera/comps";
 import Quimera, { PropValidation, useStateValue } from "quimera";
+import { useRef } from "react";
 
 function ComparativaArticulos({ useStyles }) {
   const [
@@ -16,10 +17,19 @@ function ComparativaArticulos({ useStyles }) {
     dispatch,
   ] = useStateValue();
   const classes = useStyles();
-  const nombreCliente =
-    cliComparativa.length > 0
-      ? cliComparativa.filter(c => c.codCliente === idCliente)[0].nombreCliente
-      : "";
+  const ultimaLongitudPaginada = useRef(-1);
+
+  const onScrollTablaArticulos = event => {
+    if (paginaArt.next === null) return;
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    const cercaDelFinal = scrollHeight - scrollTop - clientHeight < 100;
+    if (cercaDelFinal && ultimaLongitudPaginada.current !== artiComparativa.length) {
+      ultimaLongitudPaginada.current = artiComparativa.length;
+      dispatch({ type: "onMostrarSiguienteArtClicked" });
+    }
+  };
+
+  const nombreCliente = cliComparativa.find(c => c.codCliente === idCliente)?.nombreCliente ?? "";
   const cabecera = `Cliente: ${nombreCliente ? nombreCliente : ""}; Año 1: ${
     anyoUno ? anyoUno : ""
   }; Año 2: ${anyoDos ? anyoDos : ""}; ${
@@ -31,7 +41,11 @@ function ComparativaArticulos({ useStyles }) {
       <Box m={1} className={classes.cajaInfo}>
         {cabecera}
       </Box>
-      <Box id="scrollableTablaArticulosComparativa">
+      <Box
+        id="scrollableTablaArticulosComparativa"
+        style={{ height: `calc(100vh - 350px)`, overflow: "auto" }}
+        onScroll={onScrollTablaArticulos}
+      >
         <Table
           id="tdbArticulosComparativa"
           idField="referencia"
@@ -40,7 +54,6 @@ function ComparativaArticulos({ useStyles }) {
           orderColumn={ordenArtComparativa}
           next={() => dispatch({ type: "onMostrarSiguienteArtClicked" })}
           hasMore={paginaArt.next !== null}
-          scrollableTarget="scrollableTablaArticulosComparativa"
           bgcolorRowFunction={cliente =>
             cliente.cantidadDos > cliente.cantidadUno ? "#ace1af" : "#fa8072"
           }

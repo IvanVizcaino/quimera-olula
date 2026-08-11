@@ -1,0 +1,62 @@
+.QArbolDocumentos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.QArbolDocumentos-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+}
+
+.QArbolDocumentos-titulo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.QArbolDocumentos-chevron-espaciador {
+    width: 1rem;
+    flex-shrink: 0;
+}
+
+.QArbolDocumentos-raiz {
+    color: var(--color-texto-primario);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.QArbolDocumentos-botones {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.QArbolDocumentos-cargando,
+.QArbolDocumentos-vacio {
+    padding: 20px;
+    text-align: center;
+    background-color: var(--color-superficie-sunken);
+    border-radius: 8px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.QArbolDocumentos-cargando p,
+.QArbolDocumentos-vacio p {
+    margin: 0;
+    color: var(--color-texto-primario);
+    font-size: 16px;
+}
+
+.QArbolDocumentos-arbol {
+    display: flex;
+    flex-direction: column;
+}

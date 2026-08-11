@@ -5,6 +5,7 @@ type Opcion = { valor: string; descripcion: string };
 
 export type QSelectProps = Omit<FormFieldProps, "onChange" | "onBlur"> & {
   opciones: Opcion[] | Opcion[][];
+  soloTexto?: boolean;
   onChange?: (
     opcion: Opcion | null,
     evento: React.ChangeEvent<HTMLElement>
@@ -29,11 +30,25 @@ export const QSelect = ({
   valido,
   opcional,
   condensado,
+  soloTexto,
   ref,
   onChange,
   onBlur,
   evaluarCambio,
 }: QSelectProps) => {
+  if (soloTexto) {
+    const descripcion = opciones
+      .flat()
+      .find((o) => o.valor === valor)?.descripcion;
+    return (
+      <quimera-select solo-texto="" nombre={nombre} condensado={condensado}>
+        <label>
+          <Etiqueta label={label} />
+          <span className="valor-solo-texto">{descripcion || "—"}</span>
+        </label>
+      </quimera-select>
+    );
+  }
   const attrs = {
     nombre,
     erroneo,

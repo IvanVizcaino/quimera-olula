@@ -3,6 +3,18 @@
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     color-scheme: light;
+
+    --color-fondo-header: #072146;
+    --color-texto-primario: #072146;
+    /* --color-deshabilitado: #072146; */
+    --color-texto: white;
+    --color-button-primary: #3f51b5;
+    --color-button-secondary: #f50057;
+    --sincro-green-color: green;
+    --sincro-yellow-color: #ffcc00;
+    --action-button-active: black;
+    --action-button-inactive: rgba(0, 0, 0, 0.54);
+    --alto-header: 60px;
 }
 
 #root {
@@ -12,4 +24,98 @@
     scroll-behavior: smooth;
     scrollbar-width: auto;
     scrollbar-color: #bdbdbd #e0e0e0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+#HeaderContainer {
+    display: none;
+}
+
+#root section[role=main] .MuiBox-root:not(menu-lateral):not(menu-usuario) {
+    padding: 0;
+}
+
+h2 {
+    margin: 0.83rem 0;
+}
+
+.main {
+    color: var(--color-texto-primario);
+}
+
+body .MuiDialogTitle-root {
+    font-weight: bold;
+}
+
+body .MuiButton-colorPrimary {
+    color: var(--color-button-primary);
+    font-weight: bold;
+}
+
+body .MuiButton-colorSecondary {
+    color: var(--color-button-secondary);
+    font-weight: bold;
+}
+
+body .controlHorario .MuiButton-colorPrimary {
+    color: black;
+}
+
+body .MuiGrid-root {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0;
+}
+
+body .MuiGrid-grid-xs-6 {
+    flex-grow: 0;
+    max-width: 50%;
+    flex-basis: 50%;
+}
+
+body .MuiDataGrid-row {
+    display: flex;
+    align-items: stretch;
+}
+
+#NewInventario .MuiTextField-root {
+    width: 100%;
+}
+
+body .MuiIcon-root {
+    cursor: pointer;
+}
+
+body .buttonSincro {
+    display: inline-table;
+    padding: 12px;
+    color: var(--action-button-inactive);
+}
+
+body .buttonSincro-green {
+    color: var(--sincro-green-color) !important;
+}
+
+body .buttonSincro-black {
+    color: var(--action-button-active) !important;
+}
+
+.buttonAcciones {
+    display: flex;
+    padding: 12px;
+    color: var(--action-button-inactive);
+}
+
+.buttonAcciones-active {
+    color: var(--action-button-active) !important;
+}
+
+.botonActualizar {
+    border: 1px solid;
+    width: fit-content;
+    margin: 10px auto;
+}
+
+.qtarjeta-metatabla-campo .qtarjeta-metatabla-valor {
+    color: var(--color-texto-primario);
 }

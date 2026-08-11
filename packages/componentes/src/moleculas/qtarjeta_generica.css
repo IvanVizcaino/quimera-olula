@@ -3,12 +3,14 @@
     flex-direction: column;
     gap: var(--espaciado-s);
     width: 100%;
+    min-width: 0;
 }
 
 .qtarjeta-generica-principal {
     display: flex;
     gap: var(--espaciado-l);
     align-items: center;
+    min-width: 0;
 }
 
 .qtarjeta-generica-avatar {
@@ -27,19 +29,36 @@
     display: flex;
     flex-direction: column;
     gap: var(--espaciado-s);
+    min-width: 0;
 
     >section {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: var(--espaciado-s);
+        min-width: 0;
+
+        >div {
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        >div:first-child {
+            overflow: visible;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
 
         >div:nth-child(2n) {
             text-align: right;
+            overflow: visible;
+            white-space: nowrap;
         }
     }
 
     .qtarjeta-generica-grid-arriba {
         font-size: large;
-        font-weight: bold;
+        font-weight: var(--grosor-letra-5);
     }
 }
 

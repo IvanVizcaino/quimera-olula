@@ -18,6 +18,16 @@ function DateField({ value, onChange, ...props }) {
     if (!isValidDate(value)) {
       return;
     }
+
+    // Validación adicional: ignorar años obviamente incorrectos (< 1900)
+    // Esto previene que se ejecute onChange mientras el usuario está escribiendo el año
+    if (value instanceof Date) {
+      const year = value.getFullYear();
+      if (year < 1900) {
+        return;
+      }
+    }
+
     // convertir a timestamp, agregar timezone offset, después convertir de nuevo a date object y por útimo usar toISOString()
     const localDateTime = value
       ? new Date(value.getTime() - value.getTimezoneOffset() * 60000).toISOString().substr(0, 10)

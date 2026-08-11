@@ -37,7 +37,7 @@ function Login({ onLogin, useStyles, ...props }) {
     <Quimera.Template id="Login">
       {!!autenticando && <div>{"Autenticando..."}</div>}
       {!autenticando && !autenticado && (
-        <Grid container justify="center" className={classes.root}>
+        <Grid container justifyContent="center" className={classes.root}>
           <Grid size={12} className={classes.logo}>
             <img alt="Project logo" src="/img/logo_url_oscuro.png" width={mobile ? "90%" : "15%"} />
           </Grid>

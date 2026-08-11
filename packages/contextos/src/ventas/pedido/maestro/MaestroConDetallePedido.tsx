@@ -10,6 +10,7 @@ import { CrearPedido } from "../crear/CrearPedido.tsx";
 import { DetallePedido } from "../detalle/DetallePedido.tsx";
 import { Pedido } from "../diseño.ts";
 import "./MaestroConDetallePedido.css";
+import { TarjetaDocumentoVenta } from "#/ventas/comun/componentes/TarjetaDocumentoVenta.tsx";
 import { getMaquina } from "./maquina.ts";
 import { getMetaTablaPedido } from "./metatabla_pedido.tsx";
 
@@ -38,12 +39,15 @@ export const MaestroConDetallePedido = () => {
             <h2>Pedidos</h2>
             <Listado<Pedido>
               metaTabla={metaTablaPedido}
-              // tarjeta={(pedido) => (
-              //   <QTarjetaGenerica
-              //     entidad={pedido}
-              //     metaTabla={metaTablaPedido}
-              //   />
-              // )}
+              tarjeta={(pedido) => (
+                <TarjetaDocumentoVenta
+                  codigo={pedido.codigo}
+                  nombreCliente={pedido.cliente.nombre_cliente}
+                  fecha={pedido.fecha}
+                  total={pedido.total}
+                  estado={pedido.servido === "TOTAL" ? "cerrado" : "pendiente"}
+                />
+              )}
               criteria={ctx.pedidos.criteria}
               entidades={ctx.pedidos.lista}
               totalEntidades={ctx.pedidos.total}

@@ -22,9 +22,9 @@ export const getItemsListaVariedad: GetItemsListaVariedad = async (filtro, orden
     ).then((respuesta) => respuesta.datos.map(itemListaVariedadDesdeApi));
 }
 
-export const getItemsListaSeleccionVariedad: GetItemsListaSeleccionVariedad = async () => {
+export const getItemsListaSeleccionVariedad: GetItemsListaSeleccionVariedad = async (filtro, orden, paginacion) => {
 
     return RestAPI.get<{ datos: ItemListaVariedadApi[] }>(
-        `${baseUrl}/items_lista`
+        `${baseUrl}/items_lista` + criteriaQuery(filtro, orden, paginacion)
     ).then((respuesta) => respuesta.datos.map(itemListaVariedadDesdeApi));
 }

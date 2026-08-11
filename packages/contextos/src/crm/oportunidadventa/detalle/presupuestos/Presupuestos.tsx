@@ -1,15 +1,17 @@
-// import { BorrarPresupuesto } from "#/crm/presupuesto/borrar/BorrarPresupuesto.tsx";
-// import { nuevaPresupuestoVacia } from "#/crm/presupuesto/crear/crear.ts";
-// import { CrearPresupuesto } from "#/crm/presupuesto/crear/CrearPresupuesto.tsx";
+import { BorrarPresupuesto } from "#/ventas/presupuesto/borrar/BorrarPresupuesto.tsx";
 import { Presupuesto } from "#/ventas/presupuesto/diseño.ts";
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { getPresupuesto } from "#/ventas/presupuesto/infraestructura.ts";
+import { TarjetaPresupuesto } from "#/ventas/presupuesto/vistas/TarjetaPresupuesto.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
+import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { listaEntidadesInicial } from "@olula/lib/ListaEntidades.js";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { OportunidadVenta } from "../../diseño.ts";
+import { crearPresupuestoOportunidad } from "../../infraestructura.ts";
 import { getMaquina } from "./maquina.ts";
 import { metaTablaPresupuesto } from "./presupuestos.ts";
 
@@ -18,6 +20,7 @@ export const Presupuestos = ({
 }: {
   oportunidad: HookModelo<OportunidadVenta>;
 }) => {
+  const navigate = useNavigate();
   const [cargando, setCargando] = useState(false);
 
   const { ctx, emitir } = useMaquina(getMaquina, {
@@ -26,6 +29,15 @@ export const Presupuestos = ({
   });
 
   const { modelo } = oportunidad;
+
+  const crearPresupuesto = async () => {
+    const nuevoPresupuestoId = await crearPresupuestoOportunidad(
+      modelo.id,
+      modelo.cliente_id || ""
+    );
+    const nuevoPresupuesto = await getPresupuesto(nuevoPresupuestoId);
+    await emitir("presupuesto_creado", nuevoPresupuesto);
+  };
 
   const recargar = useCallback(async () => {
     setCargando(true);
@@ -40,43 +52,45 @@ export const Presupuestos = ({
 
   return (
     <div className="TabPresupuestos">
-      {/* {ctx.estado === "CREANDO" && (
-        <CrearPresupuesto
-          publicar={emitir}
-          modeloVacio={{
-            ...nuevaPresupuestoVacia,
-            oportunidad_id: modelo.id,
-          }}
-        />
-      )}
-
       {ctx.estado === "BORRANDO" && ctx.presupuestos.activo && (
         <BorrarPresupuesto
           publicar={emitir}
           presupuesto={ctx.presupuestos.activo}
         />
-      )} */}
+      )}
 
       <ListadoSemiControlado
         metaTabla={metaTablaPresupuesto}
+        tarjeta={TarjetaPresupuesto}
+        modosDisponibles={["tarjetas"]}
         entidades={ctx.presupuestos.lista}
         totalEntidades={ctx.presupuestos.lista.length}
         cargando={cargando}
         renderAcciones={() => (
-          <div className="maestro-botones">
-            <QBoton
-              onClick={() => emitir("creacion_de_presupuesto_solicitada")}
-            >
-              Nueva
-            </QBoton>
-
-            <QBoton
-              onClick={() => emitir("borrado_presupuesto_solicitado")}
-              deshabilitado={!ctx.presupuestos.activo}
-            >
-              Borrar
-            </QBoton>
-          </div>
+          <QuimeraAcciones
+            acciones={[
+              {
+                texto: "Nuevo",
+                onClick: () => crearPresupuesto(),
+              },
+              {
+                texto: "Editar",
+                onClick: () => {
+                  if (ctx.presupuestos.activo?.id) {
+                    navigate(
+                      `/ventas/presupuesto?id=${ctx.presupuestos.activo.id}`
+                    );
+                  }
+                },
+                deshabilitado: !ctx.presupuestos.activo,
+              },
+              {
+                texto: "Borrar",
+                onClick: () => emitir("borrado_presupuesto_solicitado"),
+                deshabilitado: !ctx.presupuestos.activo,
+              },
+            ]}
+          />
         )}
         seleccionada={ctx.presupuestos.activo ?? null}
         onSeleccion={(presupuesto) =>

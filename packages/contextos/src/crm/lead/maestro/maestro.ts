@@ -25,3 +25,10 @@ export const recargarLeads: ProcesarLeads = async (contexto, payload) => {
 
     return Leads.recargar(contexto, resultado);
 }
+
+export const ampliarLeads: ProcesarLeads = async (contexto, payload) => {
+    const criteria = payload as Criteria;
+    const resultado = await getLeads(criteria.filtro, criteria.orden, criteria.paginacion);
+
+    return Leads.ampliar(contexto, resultado);
+}

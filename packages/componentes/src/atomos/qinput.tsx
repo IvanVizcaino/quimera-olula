@@ -6,7 +6,10 @@ import {
   Validacion,
 } from "./_forminput.tsx";
 
-export type QInputProps = FormInputProps;
+export type QInputProps = FormInputProps & {
+  modificado?: boolean;
+  soloTexto?: boolean;
+};
 
 export const QInput = ({
   label,
@@ -19,8 +22,26 @@ export const QInput = ({
   opcional,
   condensado,
   tipo,
+  modificado,
+  soloTexto,
+  valor,
   ...props
 }: QInputProps) => {
+  if (soloTexto) {
+    return (
+      <quimera-input solo-texto="" nombre={nombre} tipo={tipo} condensado={condensado}>
+        <label>
+          <Etiqueta label={label} />
+          {tipo === "checkbox" ? (
+            <input type="checkbox" checked={valor === "true"} disabled readOnly />
+          ) : (
+            <span className="valor-solo-texto">{valor || "—"}</span>
+          )}
+        </label>
+      </quimera-input>
+    );
+  }
+
   const attrs = {
     nombre,
     erroneo,
@@ -29,6 +50,7 @@ export const QInput = ({
     opcional,
     condensado,
     deshabilitado,
+    modificado,
     tipo,
   };
 
@@ -37,6 +59,7 @@ export const QInput = ({
     deshabilitado,
     opcional,
     tipo,
+    valor,
     ...props,
   };
 

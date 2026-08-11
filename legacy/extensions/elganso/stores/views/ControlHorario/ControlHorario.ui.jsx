@@ -1,6 +1,5 @@
 import Quimera, { PropValidation } from "quimera";
 
-// import { Grid, Button, Column, Field, Table, Dialog, DialogContent, IconButton, Icon, Typography } from '@quimera/comps'
 import { ControlHorarioComp, SemanaControlHorasComp } from "../../comps";
 
 function ControlHorario() {

@@ -1,0 +1,69 @@
+.asistente-historial__estado {
+    padding: 2rem 1.25rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    color: #9ca3af;
+}
+
+.asistente-historial__lista {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem;
+    overflow-y: auto;
+}
+
+.asistente-historial__fila {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.asistente-historial__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    border-radius: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.8125rem;
+    color: #374151;
+    text-align: left;
+    cursor: pointer;
+}
+
+.asistente-historial__item:hover {
+    background: #f3f4f6;
+}
+
+.asistente-historial__item--activo {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.asistente-historial__titulo {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.asistente-historial__borrar {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    height: 1.75rem;
+    width: 1.75rem;
+    border-radius: 9999px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+}
+
+.asistente-historial__borrar:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}

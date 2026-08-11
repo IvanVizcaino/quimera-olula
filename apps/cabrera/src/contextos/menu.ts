@@ -10,7 +10,7 @@ export const MenuUsuarioElementosCabrera: MenuUsuarioElementos = [
         subelementos: [
             {
                 nombre: "Mi usuario",
-                icono: "user",
+                icono: "usuario",
                 url: "/user",
                 color: "success",
                 variant: "main",
@@ -22,7 +22,7 @@ export const MenuUsuarioElementosCabrera: MenuUsuarioElementos = [
         subelementos: [
             {
                 nombre: "Desconectar",
-                icono: "exit",
+                icono: "cerrar_sesion",
                 url: "/logout",
             },
         ],

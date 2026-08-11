@@ -8,14 +8,14 @@ import { ContextoDetalleFuenteLead, EstadoDetalleFuenteLead } from "./diseño.ts
 export const fuenteLeadVacia: FuenteLead = {
     id: '',
     descripcion: '',
-    valor_defecto: false,
+    valorDefecto: false,
 };
 
 export const metaFuenteLead: MetaModelo<FuenteLead> = {
     campos: {
         id: { requerido: true },
         descripcion: { requerido: true, validacion: (fuente: FuenteLead) => stringNoVacio(fuente.descripcion), },
-        valor_defecto: { requerido: true, tipo: "checkbox" },
+        valorDefecto: { requerido: true, tipo: "checkbox" },
     },
 };
 

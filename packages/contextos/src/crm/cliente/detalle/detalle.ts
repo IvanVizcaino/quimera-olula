@@ -11,6 +11,8 @@ export const clienteVacio = {
     nombre: '',
     nombre_comercial: null,
     id_fiscal: '',
+    agente_id: null,
+    nombre_agente: null,
     tipo_id_fiscal: '',
     grupo_iva_negocio_id: '',
     grupo_id: '',

@@ -1,4 +1,4 @@
-import { Filtro, Orden } from "@olula/lib/diseño.js";
+import { Filtro, Orden, Paginacion } from "@olula/lib/diseño.js";
 
 export type ItemListaVariedad = {
     id: string;
@@ -7,4 +7,4 @@ export type ItemListaVariedad = {
 
 
 export type GetItemsListaVariedad = (filtro: Filtro, orden: Orden) => Promise<ItemListaVariedad[]>;
-export type GetItemsListaSeleccionVariedad = () => Promise<ItemListaVariedad[]>;
+export type GetItemsListaSeleccionVariedad = (filtro: Filtro, orden: Orden, paginacion?: Paginacion) => Promise<ItemListaVariedad[]>;

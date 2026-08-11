@@ -1,0 +1,170 @@
+.quimera-editor-enriquecido {
+    display: block;
+
+    .qeditor-wrapper {
+        border: 1px solid var(--color-borde, #d5d7da);
+        border-radius: var(--radio-m, 8px);
+        background: var(--color-fondo, #fff);
+        overflow: hidden;
+    }
+
+    .qeditor-toolbar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--espaciado-xs, 0.4rem);
+        padding: var(--espaciado-xs, 0.4rem);
+        border-bottom: 1px solid var(--color-borde, #d5d7da);
+        background: var(--color-fondo-suave, #f7f8f9);
+    }
+
+    .qeditor-separador {
+        width: 1px;
+        height: 1.4rem;
+        background: var(--color-borde, #d5d7da);
+        margin: 0 0.15rem;
+    }
+
+    .qeditor-boton {
+        border: 1px solid var(--color-borde, #d5d7da);
+        background: var(--color-fondo, #fff);
+        color: var(--color-texto, #222);
+        border-radius: var(--radio-s, 6px);
+        padding: 0.3rem 0.55rem;
+        font-size: 0.85rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: background-color 120ms ease, border-color 120ms ease;
+    }
+
+    .qeditor-boton:hover {
+        background: var(--color-fondo-suave, #f3f4f6);
+    }
+
+    .qeditor-boton.activo {
+        border-color: var(--color-primario, #0056d6);
+        background: color-mix(in srgb, var(--color-primario, #0056d6) 10%, white);
+    }
+
+    .qeditor-boton:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .qeditor-contenido {
+        padding: var(--espaciado-s, 0.8rem);
+        min-height: 8rem;
+    }
+
+    .qeditor-contenido .ProseMirror {
+        outline: none;
+        min-height: 7rem;
+        line-height: 1.4;
+        color: var(--color-texto, #222);
+    }
+
+    .qeditor-contenido .ProseMirror strong,
+    .qeditor-contenido .ProseMirror b {
+        font-weight: 700;
+    }
+
+    .qeditor-contenido .ProseMirror em,
+    .qeditor-contenido .ProseMirror i {
+        font-style: italic;
+    }
+
+    .qeditor-contenido .ProseMirror u {
+        text-decoration: underline;
+    }
+
+    .qeditor-contenido .ProseMirror p {
+        margin: 0;
+    }
+
+    .qeditor-contenido .ProseMirror p+p {
+        margin-top: 0.6rem;
+    }
+
+    .qeditor-contenido .ProseMirror .is-editor-empty:first-child::before {
+        color: var(--color-texto-secundario, #8f959d);
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+    }
+
+    .qeditor-modal-enlace {
+        display: grid;
+        gap: var(--espaciado-s);
+        min-width: min(90vw, 28rem);
+
+        label {
+            display: grid;
+            gap: 0.35rem;
+            font-size: 0.92rem;
+            color: var(--color-texto);
+        }
+
+        input {
+            border: 1px solid var(--color-borde, #d5d7da);
+            border-radius: var(--radio-s, 6px);
+            padding: 0.5rem 0.65rem;
+            font-size: 0.92rem;
+            color: var(--color-texto);
+            background: var(--color-fondo);
+        }
+
+        input:focus {
+            outline: 2px solid color-mix(in srgb, var(--color-primario, #0056d6) 30%, transparent);
+            outline-offset: 0;
+            border-color: var(--color-primario, #0056d6);
+        }
+    }
+
+    .qeditor-modal-enlace-acciones {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--espaciado-xs);
+    }
+}
+
+.quimera-texto-enriquecido-json {
+    display: block;
+
+    .qtexto-json-wrapper {
+        border: 1px solid var(--color-borde, #d5d7da);
+        border-radius: var(--radio-m, 8px);
+        background: var(--color-fondo, #fff);
+    }
+
+    .qtexto-json-contenido {
+        padding: var(--espaciado-s, 0.8rem);
+    }
+
+    .qtexto-json-contenido .ProseMirror {
+        min-height: 2.5rem;
+        outline: none;
+    }
+
+    .qtexto-json-contenido .ProseMirror strong,
+    .qtexto-json-contenido .ProseMirror b {
+        font-weight: 700;
+    }
+
+    .qtexto-json-contenido .ProseMirror em,
+    .qtexto-json-contenido .ProseMirror i {
+        font-style: italic;
+    }
+
+    .qtexto-json-contenido .ProseMirror u {
+        text-decoration: underline;
+    }
+
+    .qtexto-json-contenido .ProseMirror p {
+        margin: 0;
+    }
+
+    .qtexto-json-contenido .ProseMirror p+p {
+        margin-top: 0.6rem;
+    }
+}

@@ -10,9 +10,12 @@ export interface Presupuesto extends Venta {
 }
 
 export type NuevoPresupuesto = {
-  cliente_id: string;
-  direccion_id: string;
+  cliente: {
+    cliente_id: string;
+    direccion_id: string;
+  };
   empresa_id: string;
+  oportunidad_id?: string | null;
 }
 
 export type NuevoPresupuestoClienteNoRegistrado = {
@@ -90,18 +93,18 @@ export type ContextoMaestroPresupuesto = {
 };
 
 export type EstadoPresupuesto = (
-    'INICIAL' | 'ABIERTO' | 'APROBADO'
-    | 'BORRANDO_PRESUPUESTO'
-    | 'APROBANDO_PRESUPUESTO'
-    | 'CAMBIANDO_DIVISA'
-    | 'CAMBIANDO_CLIENTE'
-    | 'CAMBIANDO_DESCUENTO'
-    | 'CREANDO_LINEA' | 'BORRANDO_LINEA' | 'CAMBIANDO_LINEA'
+  'INICIAL' | 'ABIERTO' | 'APROBADO'
+  | 'BORRANDO_PRESUPUESTO'
+  | 'APROBANDO_PRESUPUESTO'
+  | 'CAMBIANDO_DIVISA'
+  | 'CAMBIANDO_CLIENTE'
+  | 'CAMBIANDO_DESCUENTO'
+  | 'CREANDO_LINEA' | 'BORRANDO_LINEA' | 'CAMBIANDO_LINEA'
 );
 
 export type ContextoPresupuesto = {
-    estado: EstadoPresupuesto;
-    presupuesto: Presupuesto;
-    presupuestoInicial: Presupuesto;
-    lineaActiva: LineaPresupuesto | null;
+  estado: EstadoPresupuesto;
+  presupuesto: Presupuesto;
+  presupuestoInicial: Presupuesto;
+  lineaActiva: LineaPresupuesto | null;
 };

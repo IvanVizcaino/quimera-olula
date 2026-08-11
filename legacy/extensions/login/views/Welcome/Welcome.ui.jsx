@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@quimera/comps";
 import { clsx, makeStyles } from "@quimera/styles";
-import Quimera, { PropValidation, useStateValue, util } from "quimera";
-import React, { useEffect } from "react";
+import Quimera, { useStateValue, util } from "quimera";
+import { useEffect } from "react";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -86,7 +86,7 @@ function Welcome({ onLogin, ...props }) {
 
   return (
     <Quimera.Template id="Welcome">
-      <Grid container justify="center" className={classes.root}>
+      <Grid container justifyContent="center" className={classes.root}>
         <Grid size={12}>
           <Grid container direction="column">
             <Grid className={clsx(classes.gridItems, classes.header)}>

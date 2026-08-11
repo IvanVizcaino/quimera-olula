@@ -14,24 +14,13 @@
     quimera-input[nombre="fecha"] {
         grid-column: span 3;
     }
-}
-
-.DetalleAccion .TabDatos {
-
-    quimera-autocompletar[nombre="cliente_id"] {
-        grid-column: 1 / span 4;
-    }
 
     quimera-autocompletar[nombre="contacto_id"] {
-        grid-column: span 4;
+        grid-column: span 6;
     }
 
-    quimera-input[nombre="responsable_id"] {
-        grid-column: 1 / span 12;
-    }
-
-    quimera-autocompletar[nombre="oportunidad_id"] {
-        grid-column: span 4;
+    quimera-input[nombre="origen"] {
+        grid-column: span 6;
     }
 }
 
@@ -39,4 +28,56 @@
     quimera-textarea[nombre="observaciones"] {
         grid-column: span 12;
     }
+}
+
+.DetalleAccion .cliente-resumen {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+}
+
+.DetalleAccion .cliente-resumen h4 {
+    margin: var(--espaciado-s) 0;
+}
+
+.DetalleAccion .contactos-vacio {
+    margin: 0;
+    color: var(--color-texto-secundario);
+}
+
+.DetalleAccion .contacto-tarjeta {
+    background: linear-gradient(180deg, var(--color-superficie) 0%, var(--color-superficie-elevada) 100%);
+    border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-m);
+    box-shadow: var(--sombra-xs);
+    padding: var(--espaciado-s) var(--espaciado-m);
+}
+
+.DetalleAccion .contacto-acciones {
+    display: flex;
+    gap: var(--espaciado-xs);
+    justify-content: flex-end;
+}
+
+.DetalleAccion .contacto-acciones a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    color: var(--color-texto-primario);
+}
+
+.DetalleAccion .contacto-acciones a:hover {
+    background: var(--color-superficie-elevada);
+}
+
+.DetalleAccion .accion-finalizada {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-exito);
+    font-weight: var(--grosor-letra-4, 600);
 }

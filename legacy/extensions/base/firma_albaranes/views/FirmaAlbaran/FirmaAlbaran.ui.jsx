@@ -79,7 +79,7 @@ function FirmaAlbaran({
             >{`Firma albarán  ${albaran.buffer.codigo}`}</Box>
           </Box>
           <Box m={2}>
-            <Grid container direction="column" justify="space-around" spacing={1}>
+            <Grid container direction="column" justifyContent="space-around" spacing={1}>
               <Grid size={12}>
                 <Contacto
                   id="firmaAlbaran.codContacto"

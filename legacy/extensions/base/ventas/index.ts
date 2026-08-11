@@ -57,6 +57,6 @@ export default {
     app: AppMenu,
   },
   rules: {
-    "PedidosCli:visit": (check: (rule: string) => boolean) => check("pedidoscli"),
+    "PedidosCli:visit": (check: (rule: string) => boolean) => check("ventas.pedido"),
   },
 };

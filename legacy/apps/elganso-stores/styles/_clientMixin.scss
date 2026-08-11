@@ -21,9 +21,6 @@ $bblue-color: rgba(149, 236, 250, 0.4);
 .MuiAppBar-root a img {
   max-height: 30px;
 }
-.MuiIcon-root {
-  cursor: pointer;
-}
 *::-webkit-scrollbar-thumb {
   background-color: $primary-color !important;
 }
@@ -47,27 +44,28 @@ $bblue-color: rgba(149, 236, 250, 0.4);
   padding: 0px 15px 15px;
 }
 
-.main {
-  color: $primary-color;
-}
+.page-container {
+  .toolbarContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    line-height: 40px;
+    padding: 4px 15px !important;
+    min-height: max-content;
 
-.toolbarContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  line-height: 40px;
-  padding: 4px 15px !important;
-
-  &-subcontainer {
     @include mobile {
-      display: flex;
       flex-direction: column;
       align-items: flex-start;
     }
-  }
 
-  .toolbarContainer-quickFilter {
-    align-items: flex-end;
+    .toolbarContainer-subcontainer {
+      display: flex;
+      height: stretch;
+    }
+    
+    .toolbarContainer-quickFilter {
+      align-items: flex-end;
+    }
   }
 }
 
@@ -85,42 +83,13 @@ $bblue-color: rgba(149, 236, 250, 0.4);
   }
 }
 
-.buttonSincro {
-  display: flex;
-  padding: 12px;
-  color: $action-button-inactive;
-
-  &-green {
-    color: $sincro-green-color !important;
-  }
-
-  &-black {
-    color: $action-button-active !important;
-  }
-}
-
-.buttonAcciones {
-  display: flex;
-  padding: 12px;
-  color: $action-button-inactive;
-
-  &-active {
-    color: $action-button-active !important;
-  }
-}
-
-.botonActualizar {
-  border: 1px solid;
-  width: fit-content;
-  margin: 10px auto;
-}
-
 .tableGrid {
   display: grid;
 }
 
 .text-actualizar {
   padding: 10px 10px 20px 10px;
+  text-align: center;
 }
 
 .main-edit {

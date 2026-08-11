@@ -1,0 +1,39 @@
+.q-etiqueta {
+    display: inline-block;
+    border-radius: var(--redondeo-borde-xs);
+    font-weight: var(--grosor-letra-5);
+    color: var(--color-texto-primario);
+    white-space: nowrap;
+    transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.q-etiqueta.sm {
+    padding: var(--espaciado-xs) var(--espaciado-s);
+    font-size: var(--tamaño-letra-xs);
+}
+
+.q-etiqueta.md {
+    padding: var(--espaciado-s) var(--espaciado-m);
+    font-size: var(--tamaño-letra-s);
+}
+
+.q-etiqueta.exito {
+    background-color: var(--color-exito-claro);
+}
+
+.q-etiqueta.error {
+    background-color: var(--color-error-claro);
+}
+
+.q-etiqueta.advertencia {
+    background-color: var(--color-advertencia-claro);
+}
+
+.q-etiqueta.primario {
+    background-color: var(--color-primario-claro);
+}
+
+.q-etiqueta:hover {
+    filter: saturate(1.15) brightness(0.98);
+    transform: translateY(-1px);
+}

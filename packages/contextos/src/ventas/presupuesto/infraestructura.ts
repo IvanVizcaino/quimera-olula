@@ -37,7 +37,6 @@ const baseUrl = new ApiUrls().PRESUPUESTO;
 
 type LineaPresupuestoAPI = LineaPresupuesto;
 
-// export const presupuestoFromAPI = (p: PresupuestoAPI): Presupuesto => p;
 export const presupuestoFromAPI = (p: PresupuestoAPI): Presupuesto => ({
   ...p,
   fecha: new Date(Date.parse(p.fecha)),
@@ -91,8 +90,8 @@ export const postPresupuesto: PostPresupuesto = async (presupuesto): Promise<str
 
   if (esClienteRegistrado(presupuesto)) {
     clientePayload = {
-      cliente_id: presupuesto.cliente_id,
-      direccion_id: presupuesto.direccion_id
+      cliente_id: presupuesto.cliente.cliente_id,
+      direccion_id: presupuesto.cliente.direccion_id
     };
   } else {
     clientePayload = {

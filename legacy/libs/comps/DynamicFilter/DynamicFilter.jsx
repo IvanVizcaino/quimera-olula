@@ -1,6 +1,6 @@
 import { Autocomplete, Box, Chip, TextField } from "@quimera/thirdparty";
 import { useStateValue, util } from "quimera";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Icon, IconButton } from "../";
 import { ChipAPIField, ChipDate } from "./Chips";
@@ -27,6 +27,7 @@ function DynamicFilter({ id, propiedades = [], valores, filtrosPredefinidos = []
   const [autocompleteValue, setAutocompleteValue] = useState([]);
   const [opcionesAutocomplete, setOpcionesAutocomplete] = useState(propiedades);
   const [textFieldAutocompleteValue, setTextFieldAutocompleteValue] = useState("");
+
 
   const handleChipClick = (event, option) => {
     setAnchorEl(event.currentTarget);
@@ -187,6 +188,14 @@ function DynamicFilter({ id, propiedades = [], valores, filtrosPredefinidos = []
     return nonSelectedOptions;
   };
 
+  // Crear un mapa de opciones para recuperar los datos originales en renderOption
+  const opcionesMap = {};
+  opcionesAutocomplete.forEach((opt, index) => {
+    opcionesMap[index] = opt; // Indexar por el índice (0, 1, 2, etc)
+    opcionesMap[opt.nombreCampo] = opt;
+    opcionesMap[opt.labelNombre] = opt; // También indexar por labelNombre
+  });
+
   useEffect(() => {
     // convertimos los filtros predefinidos de la tabla sisfilter (solo para dailyjob)
     const filtrosPredefinidosAdaptados = filtrosPredAFiltrosAdaptados(
@@ -253,24 +262,21 @@ function DynamicFilter({ id, propiedades = [], valores, filtrosPredefinidos = []
                   } ${textFieldAutocompleteValue} (Pulsa intro)`
                 : ""
             }
-            getOptionLabel={option => option.labelNombre}
-            renderOption={option =>
-              option.tipo === "filtroDeFiltros" ? (
-                <div
-                  style={
-                    option.labelNombre.substring(0, 1) !== "*"
-                      ? { color: "black", fontStyle: "italic" }
-                      : { color: "black", fontWeight: 1000 }
+            getOptionLabel={option => option.labelNombre || 'SIN LABEL'}
+            renderOption={(props, option) => {
+              const optionOriginal = opcionesMap[option.key];
+              if (!optionOriginal) {
+                return <div {...props}>Sin datos</div>;
+              }
+              return (
+                <div {...props} style={{ color: "black" }}>
+                  {optionOriginal.tipo === "filtroDeFiltros"
+                    ? `${optionOriginal.labelNombre.substring(0, 1) !== "*" ? "*" : ""}${optionOriginal.labelNombre}`
+                    : optionOriginal.labelNombre
                   }
-                >
-                  {option.labelNombre.substring(0, 1) !== "*"
-                    ? `*${option.labelNombre}`
-                    : `${option.labelNombre}`}
                 </div>
-              ) : (
-                <div style={{ color: "black" }}>{`${option.labelNombre}`}</div>
-              )
-            }
+              );
+            }}
             filterOptions={filtrarOpcionesSeleccionadas}
             renderTags={(value, getTagProps) =>
               value.map((option, index) =>

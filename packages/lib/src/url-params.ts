@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Criteria, Filtro, Paginacion } from "./diseño.ts";
+import { ClausulaFiltro, Criteria, Paginacion } from "./diseño.ts";
 
 const formarUrl = (params: URLSearchParams) => {
     const str = params.toString();
@@ -24,9 +24,9 @@ export const setIdUrlParams = (id: string | undefined) => {
     history.replaceState({}, "", formarUrl(params));
 }
 
-const clavesReservadas = ["id", "orden", "p", "l"];
+const clavesReservadas = ["id", "modo", "orden", "p", "l"];
 
-export const filtroDefecto: Filtro = [];
+export const filtroDefecto: ClausulaFiltro[] = [];
 
 const getFiltro = (params: URLSearchParams) => {
     const filtro = [...filtroDefecto];
@@ -37,7 +37,16 @@ const getFiltro = (params: URLSearchParams) => {
         const valor = v.split("__");
 
         if (valor.length === 2) {
-            filtro.push([k, valor[0], valor[1]])
+            const operador = valor[0];
+            const valorStr = valor[1];
+
+            // Soportar arrays para operadores 'in' y '!in'
+            if ((operador === "in" || operador === "!in") && valorStr.includes(",")) {
+                const valorArray = valorStr.split(",");
+                filtro.push([k, operador, valorArray as unknown as string]);
+            } else {
+                filtro.push([k, operador, valorStr]);
+            }
         }
         else filtro.push([k, "~", v])
     }
@@ -48,15 +57,27 @@ const getFiltro = (params: URLSearchParams) => {
 const setFiltro = (criteria: Criteria, params: URLSearchParams) => {
     const { filtro } = criteria;
 
-    filtro.forEach(f => {
+    if (!Array.isArray(filtro)) return;
+
+    // `Filtro` can be either a single clause tuple or a list of tuples.
+    // Normalize to a list to avoid iterating tuple elements as strings.
+    const clausulas: ClausulaFiltro[] =
+        filtro.length === 0 || Array.isArray(filtro[0])
+            ? (filtro as ClausulaFiltro[])
+            : [filtro as ClausulaFiltro];
+
+    clausulas.forEach(f => {
         const [campoFiltro, operador, valor] = f;
 
         if (valor === undefined) {
-            params.set(campoFiltro, operador)
+            params.append(campoFiltro, operador)
         } else if (operador === "~") {
-            params.set(campoFiltro, valor ?? "");
+            params.append(campoFiltro, valor ?? "");
+        } else if ((operador === "in" || operador === "!in") && Array.isArray(valor)) {
+            // Para operadores 'in' y '!in' con arrays, serializar como valores separados por comas
+            params.append(campoFiltro, operador + "__" + (valor as string[]).join(","));
         } else {
-            params.set(campoFiltro, operador + "__" + valor);
+            params.append(campoFiltro, operador + "__" + valor);
         }
     });
 }
@@ -84,7 +105,7 @@ const setOrden = (criteria: Criteria, params: URLSearchParams) => {
     params.set("orden", partes.join(","));
 }
 
-export const paginacionDefecto = { pagina: 1, limite: 10 };
+export const paginacionDefecto = { pagina: 1, limite: 100 };
 
 const getPaginacion = (params: URLSearchParams): Paginacion => {
     const p = parseInt(params.get("p") ?? paginacionDefecto.pagina.toString());
@@ -116,9 +137,11 @@ export const getCriteriaUrlParams = () => {
 export const setCriteriaUrlParams = (criteria: Criteria) => {
     const previo = new URLSearchParams(window.location.search);
     const id = previo.get("id");
+    const modo = previo.get("modo");
 
     const params = new URLSearchParams();
     if (id) params.set("id", id);
+    if (modo) params.set("modo", modo);
 
     setFiltro(criteria, params);
     setOrden(criteria, params);

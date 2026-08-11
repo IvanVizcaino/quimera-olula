@@ -1,5 +1,5 @@
 .DetalleOportunidad .TabObservaciones {
     quimera-textarea[nombre="observaciones"] {
-        grid-column: span 12;
+        grid-column: 1/ span 12;
     }
 }

@@ -34,3 +34,10 @@ export const recargarClientes: ProcesarClientes = async (contexto, payload) => {
 
     return Clientes.recargar(contexto, resultado);
 }
+
+export const ampliarClientes: ProcesarClientes = async (contexto, payload) => {
+    const criteria = payload as Criteria;
+    const resultado = await getClientes(criteria.filtro, criteria.orden, criteria.paginacion);
+
+    return Clientes.ampliar(contexto, resultado);
+}

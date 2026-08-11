@@ -1,23 +1,21 @@
-.tarjeta-incidencia {
-    display: flex;
-    flex-direction: row;
-    gap: var(--espaciado-l);
-    padding: var(--espaciado-s) 0;
-
-    .columna {
-        width: max-content;
-        display: block;
-        float: left;
-    }
+.TarjetaIncidencia .q-avatar.baja {
+    background-color: var(--color-exito-claro);
 }
 
-.tarjeta-titulo {
-    font-size: var(--tamaño-letra-l);
-    font-weight: var(--grosor-letra-6);
-    color: var(--color-texto-principal);
+.TarjetaIncidencia .q-avatar.media {
+    background-color: var(--color-advertencia-claro);
 }
 
-.tarjeta-detalle {
+.TarjetaIncidencia .q-avatar.alta {
+    background-color: var(--color-error-claro);
+}
+
+.TarjetaIncidencia .tarjeta-incidencia-cliente {
     font-size: var(--tamaño-letra-m);
+    color: var(--color-texto-secundario);
+}
+
+.TarjetaIncidencia .tarjeta-incidencia-fecha {
+    font-size: var(--tamaño-letra-s);
     color: var(--color-texto-secundario);
 }

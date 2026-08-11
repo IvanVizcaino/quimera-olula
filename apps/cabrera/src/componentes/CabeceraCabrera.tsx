@@ -13,10 +13,10 @@ import "./CabeceraCabrera.css";
 export const CabeceraCabrera = (props: CabeceraProps) => {
   return (
     <CabeceraBase
-      //   logoSrc="/smartsales-logo.png"
+      {...props}
       logoSrc="/logo.png"
       logoAlt="Cabrera"
-      {...props}
+      Logo={null}
     />
   );
 };

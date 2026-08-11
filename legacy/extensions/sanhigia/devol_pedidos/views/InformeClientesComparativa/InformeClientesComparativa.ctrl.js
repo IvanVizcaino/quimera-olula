@@ -64,10 +64,10 @@ export const bunch = parent => ({
     },
   ],
   cargarClientes: [
-    {
-      type: "setStateKey",
-      plug: () => ({ path: "estadoVista", value: "lanzando" }),
-    },
+    // {
+    //   type: "setStateKey",
+    //   plug: () => ({ path: "estadoVista", value: "lanzando" }),
+    // },
     {
       type: "function",
       function: ({ page }, { paginaCli }) => {
@@ -131,16 +131,24 @@ export const bunch = parent => ({
   ],
   onDatosRecibidos: [
     {
-      // log: ({ response }, { cliComparativa }) => ["mimensaje290", response],
+      // log: ({ response }, { cliComparativa }) => ["mimensaje280", cliComparativa.length, response.data.length],
+      condition: ({ response }, { cliComparativa }) => cliComparativa.length === 0,
+      type: "setStateKey",
+      plug: ({ response }, { cliComparativa }) => ({
+        path: "estadoVista",
+        value:
+          cliComparativa.length > 0 || response.data.length > 0
+            ? "lanzadoConResultados"
+            : "lanzadoSinResultados",
+      }),
+    },
+    {
+      // log: ({ response }, { cliComparativa }) => ["mimensaje290", cliComparativa.length, response.data.length],
       type: "setStateKeys",
       plug: ({ response }, { cliComparativa }) => ({
         keys: {
           cliComparativa: [...cliComparativa, ...response.data],
           paginaCli: response.page,
-          estadoVista:
-            cliComparativa.length > 0 || response.data.length > 0
-              ? "lanzadoConResultados"
-              : "lanzadoSinResultados",
         },
       }),
     },
@@ -320,8 +328,25 @@ export const bunch = parent => ({
   ],
   onTdbClientesComparativaRowClicked: [
     {
-      type: "navigate",
-      url: ({ codCliente }) => `/informe-clientes-comparativa/${codCliente}`,
+      type: "setStateKey",
+      plug: ({ codCliente }) => ({ path: "idCliente", value: codCliente }),
+    },
+    {
+      type: "grape",
+      name: "cargarDatosCliente",
+    },
+  ],
+  onCerrarComparativaArticulos: [
+    {
+      type: "setStateKeys",
+      plug: () => ({
+        keys: {
+          idCliente: null,
+          artiComparativa: [],
+          ordenArtComparativa: { field: "referencia", direction: "ASC" },
+          paginaArt: { limit: 25, next: null, previous: null },
+        },
+      }),
     },
   ],
   onTdbArticulosComparativaColumnClicked: [

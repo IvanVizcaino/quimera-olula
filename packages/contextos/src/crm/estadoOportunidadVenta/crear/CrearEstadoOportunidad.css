@@ -1,13 +1,20 @@
 .CrearEstadoOportunidad {
+    quimera-input[nombre="id"] {
+        grid-column: 1 / span 4;
+        grid-row: 1;
+    }
+
     quimera-input[nombre="descripcion"] {
-        grid-column: 1 / span 6;
+        grid-column: 5 / span 8;
+        grid-row: 1;
     }
 
     quimera-input[nombre="probabilidad"] {
-        grid-column: span 6;
+        grid-column: 1 / span 6;
+        grid-row: 2;
     }
 
-    quimera-checkbox[nombre="valor_defecto"] {
+    quimera-checkbox[nombre="valorDefecto"] {
         grid-column: 1 / span 6;
     }
 }

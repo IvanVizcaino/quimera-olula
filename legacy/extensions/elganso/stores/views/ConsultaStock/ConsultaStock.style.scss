@@ -1,58 +1,104 @@
 #consultaStock {
   .main-edit-container {
-    @include desktop {
-      align-items: baseline;
+    .loading-wrapper {
+      padding-block-start: 40px;
     }
-  }
-  .loading-wrapper {
-    padding-block-start: 40px;
-  }
-  .rowTienda {
-    padding-block-start: 0px;
-    padding-block-end: 10px;
-  }
-  .inputBarcodeScanner {
-    margin-block-start: 10px;
-    padding-inline: 10px;
-    box-sizing: border-box;
-    font-family: inherit;
-    font-size: 18px;
-    vertical-align: baseline;
-    font-weight: 400;
-    line-height: 1.29;
-    border-radius: 0;
-    outline: 2px solid transparent;
-    outline-offset: -2px;
-    width: 90%;
-    height: 36px;
-    border: none;
-    border-bottom: 1px solid #8d8d8d;
-    background-color: #f4f4f4;
-    color: #161616;
-  }
 
-  .msg-success {
-    padding-block-start: 10px;
-    color: green;
-    font-size: 16px;
-    font-style: italic;
-  }
+    .box-consulta-stock {
+      .header-consulta-stock {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
 
-  .msg-error {
-    padding-block-start: 10px;
-    color: red;
-    font-size: 16px;
-    font-style: italic;
-  }
-  .Accordion-Tienda {
-    width: 100%;
-  }
-  .bodyAccordion {
-    width: 100%;
-    margin-inline-start: 10px;
-    margin-block-end: 10px;
-  }
-  .row-select-talla {
-    margin-block-start: 15px;
+        .block-search {
+          width: 100%;
+        }
+
+        @include desktop {
+          justify-content: center;
+          align-items: baseline;
+
+          &.opened {
+            .block-search {
+              width: calc(100% - 300px);
+            }
+          }
+        }
+
+        @include mobile {
+          flex-direction: column-reverse;
+          align-items: center
+        }
+
+        .inputBarcodeScanner {
+          margin-block-start: 10px;
+          padding-inline: 10px;
+          box-sizing: border-box;
+          font-family: inherit;
+          font-size: 18px;
+          vertical-align: baseline;
+          font-weight: 400;
+          line-height: 1.29;
+          border-radius: 0;
+          outline: 2px solid transparent;
+          outline-offset: -2px;
+          width: 92%;
+          height: 36px;
+          border: none;
+          border-bottom: 1px solid #8d8d8d;
+          background-color: #f4f4f4;
+          color: #161616;
+        }
+
+        #button-reader-barcode {
+          width: 8%;
+        }
+
+        .msg-success {
+          padding-block-start: 10px;
+          color: green;
+          font-size: 16px;
+          font-style: italic;
+        }
+
+        .msg-error {
+          padding-block-start: 10px;
+          color: red;
+          font-size: 16px;
+          font-style: italic;
+        }
+
+        #barcodeScanner {
+          max-width: 300px;
+        }
+      }
+
+      .row-select-talla {
+        width: 100%;
+        margin-block-start: 15px;
+      }
+
+      .rowTienda {
+        padding-block-start: 0px;
+        padding-block-end: 10px;
+
+        .Accordion-Tienda {
+          width: 100%;
+
+          .bodyAccordion {
+            width: 100%;
+            margin-inline-start: 10px;
+            margin-block-end: 10px;
+          }
+        }
+
+        .disponibilidadStockContainer {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+      }
+    }
   }
 }

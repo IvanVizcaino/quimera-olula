@@ -1,0 +1,22 @@
+.TabGeneral {
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="iban"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="bic"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="entidad"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="agencia"] {
+        grid-column: span 6;
+    }
+}

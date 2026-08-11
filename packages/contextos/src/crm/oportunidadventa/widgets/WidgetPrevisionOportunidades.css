@@ -1,0 +1,67 @@
+.widget-prevision-oportunidades {
+    display: grid;
+    gap: var(--espaciado-s);
+}
+
+.widget-prevision-oportunidades__titulo {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.widget-prevision-oportunidades__valor {
+    font-size: 1.125rem;
+    line-height: 1.35;
+}
+
+.widget-prevision-oportunidades__acciones {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.widget-prevision-oportunidades__enlace {
+    font-weight: 400;
+}
+
+.widget-prevision-oportunidades__serie {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) max-content;
+    column-gap: var(--espaciado-s);
+    row-gap: var(--espaciado-xs);
+    align-items: center;
+}
+
+.widget-prevision-oportunidades__fila {
+    display: contents;
+}
+
+.widget-prevision-oportunidades__estado {
+    min-width: 0;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+}
+
+.widget-prevision-oportunidades__barra-fondo {
+    height: 0.65rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-principal, #2e76d0) 16%, #ffffff);
+    overflow: hidden;
+}
+
+.widget-prevision-oportunidades__barra-valor {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--color-principal, #2e76d0), color-mix(in srgb, var(--color-principal, #2e76d0) 70%, #ffffff));
+}
+
+.widget-prevision-oportunidades__importe {
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+    font-size: 0.875rem;
+    text-align: right;
+    white-space: nowrap;
+    text-align: left;
+}

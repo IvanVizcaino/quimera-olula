@@ -1,6 +1,6 @@
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
-import { ContextoError } from "@olula/lib/contexto.ts";
-import { useContext } from "react";
+import { useForm } from "@olula/lib/useForm.js";
+import { useCallback } from "react";
 import { Presupuesto } from "../diseño.ts";
 import { borrarPresupuesto } from "../infraestructura.ts";
 
@@ -11,14 +11,19 @@ export const BorrarPresupuesto = ({
   publicar: (evento: string, payload?: unknown) => void;
   presupuesto: Presupuesto;
 }) => {
-  const { intentar } = useContext(ContextoError);
-
-  const borrar = async () => {
+  const borrar_ = useCallback(async () => {
     if (presupuesto.id) {
-      await intentar(() => borrarPresupuesto(presupuesto.id));
+      await borrarPresupuesto(presupuesto.id);
     }
     publicar("borrado_de_presupuesto_listo");
-  };
+  }, [presupuesto.id, publicar]);
+
+  const cancelar_ = useCallback(
+    () => publicar("borrar_presupuesto_cancelado"),
+    [publicar]
+  );
+
+  const [borrar, cancelar] = useForm(borrar_, cancelar_);
 
   return (
     <QModalConfirmacion
@@ -26,7 +31,7 @@ export const BorrarPresupuesto = ({
       abierto={true}
       titulo="Confirmar borrar"
       mensaje="¿Está seguro de que desea borrar este presupuesto?"
-      onCerrar={() => publicar("borrar_presupuesto_cancelado")}
+      onCerrar={cancelar}
       onAceptar={borrar}
     />
   );

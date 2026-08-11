@@ -1,0 +1,33 @@
+.LecturaOrden {
+    /* quimera-autocompletar {
+        grid-column: span 6;
+    } */
+
+    quimera-input[nombre="sku-lote"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="cantidad"] {
+        grid-column: span 2;
+    }
+
+    quimera-autocompletar[nombre="sku"] {
+        grid-column: span 6;
+    }
+
+    quimera-autocompletar[nombre="idLote"] {
+        grid-column: span 6;
+    }
+
+    quimera-autocompletar[nombre="idUbicacionOrigen"] {
+        grid-column: span 4;
+    }
+
+    quimera-autocompletar[nombre="idUbicacionDestino"] {
+        grid-column: span 4;
+    }
+
+    quimera-autocompletar[nombre="idCajaDestino"] {
+        grid-column: span 4;
+    }
+}

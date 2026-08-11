@@ -1,0 +1,68 @@
+/* .TarjetaOportunidadVenta {
+    background-color: var(--color-superficie);
+    padding: var(--espaciado-m);
+} */
+
+.TarjetaOportunidadVenta .qtarjeta-generica-grid {
+    gap: 0;
+}
+
+.TarjetaOportunidadVenta .tarjeta-descripcion {
+    color: var(--color-texto-primario);
+    line-height: 1.3;
+}
+
+.TarjetaOportunidadVenta .tarjeta-descripcion::first-letter {
+    text-transform: uppercase;
+}
+
+.TarjetaOportunidadVenta .tarjeta-linea-secundaria {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--espaciado-xs);
+}
+
+.TarjetaOportunidadVenta .tarjeta-avisos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--espaciado-s);
+}
+
+.TarjetaOportunidadVenta .tarjeta-probabilidad {
+    font-size: var(--tamaño-letra-m);
+    font-weight: var(--grosor-letra-7);
+    color: var(--color-texto-primario);
+}
+
+.TarjetaOportunidadVenta .tarjeta-cliente {
+    font-size: var(--tamaño-letra-m);
+    color: var(--color-texto-secundario);
+}
+
+.TarjetaOportunidadVenta .tarjeta-aviso-cliente {
+    font-size: var(--tamaño-letra-m);
+}
+
+.TarjetaOportunidadVenta .tarjeta-fecha {
+    font-size: var(--tamaño-letra-m);
+    color: var(--color-texto-secundario);
+}
+
+.TarjetaOportunidadVenta .tarjeta-total {
+    white-space: nowrap;
+    font-size: var(--tamaño-letra-m);
+}
+
+.TarjetaOportunidadVenta .q-etiqueta.tarjeta-total.importe-grande {
+    background-color: var(--color-exito-claro);
+}
+
+.TarjetaOportunidadVenta .q-etiqueta.tarjeta-total.importe-medio {
+    background-color: var(--color-advertencia-claro);
+}
+
+.TarjetaOportunidadVenta .q-etiqueta.tarjeta-total.importe-pequeño {
+    background-color: var(--color-deshabilitado-claro);
+}

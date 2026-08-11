@@ -1,5 +1,5 @@
 import { Box, DeleteButton, Field, Grid, Icon, QBox, QSection, Typography } from "@quimera/comps";
-import Quimera, { PropValidation, useStateValue, useWidth } from "quimera";
+import Quimera, { useStateValue, useWidth } from "quimera";
 
 import AccessRule from "../../../comps/AccessRule";
 import schemas from "../../../static/schemas";
@@ -85,7 +85,7 @@ function DetalleGroups({ useStyles }) {
               </details>
             ))}
 
-          <Grid container size={12} justify="center">
+          <Grid container size={12} justifyContent="center">
             <Grid size={4}>
               <QSection
                 actionPrefix="eliminarGrupo"

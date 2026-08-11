@@ -1,9 +1,9 @@
+import { TarjetaConfiguracionCrm } from "#/crm/comun/componentes/TarjetaConfiguracionCrm.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
-import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect } from "react";
 import { CrearFuenteLead } from "../crear/CrearFuenteLead.tsx";
 import { DetalleFuenteLead } from "../detalle/DetalleFuenteLead.tsx";
@@ -13,14 +13,10 @@ import "./MaestroFuentesLead.css";
 import { getMaquina } from "./maquina.ts";
 
 export const MaestroFuentesLead = () => {
-  const { id, criteria } = getUrlParams();
-
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "INICIAL",
-    fuentes_lead: listaActivaEntidadesInicial<FuenteLead>(id, criteria),
+    fuentes_lead: listaActivaEntidadesInicial<FuenteLead>(),
   });
-
-  useUrlParams(ctx.fuentes_lead.activo, ctx.fuentes_lead.criteria);
 
   useEffect(() => {
     emitir("recarga_de_fuentes_lead_solicitada", ctx.fuentes_lead.criteria);
@@ -36,6 +32,13 @@ export const MaestroFuentesLead = () => {
 
             <Listado<FuenteLead>
               metaTabla={metaTablaFuenteLead}
+              tarjeta={(fuente) => (
+                <TarjetaConfiguracionCrm
+                  codigo={fuente.id}
+                  descripcion={fuente.descripcion}
+                  valorDefecto={fuente.valorDefecto}
+                />
+              )}
               criteria={ctx.fuentes_lead.criteria}
               modo={"tarjetas"}
               entidades={ctx.fuentes_lead.lista}

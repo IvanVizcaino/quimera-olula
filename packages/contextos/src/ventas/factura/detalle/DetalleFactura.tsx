@@ -40,8 +40,14 @@ export const DetalleFactura = ({
     publicar
   );
 
-  const factura = useModelo(metaFactura, ctx.factura);
-  const { modificado, valido } = factura;
+  const autoGuardar = useCallback(
+    async (modelo: Factura) => {
+      emitir("edicion_de_factura_lista", modelo);
+    },
+    [emitir]
+  );
+
+  const factura = useModelo(metaFactura, ctx.factura, autoGuardar);
 
   useEffect(() => {
     emitir("factura_id_cambiado", facturaId, true);
@@ -54,14 +60,6 @@ export const DetalleFactura = ({
 
   const handleBorrar = useCallback(() => {
     emitir("borrar_solicitado");
-  }, [emitir]);
-
-  const handleGuardar = useCallback(() => {
-    emitir("edicion_de_factura_lista", factura.modelo);
-  }, [emitir, factura]);
-
-  const handleCancelar = useCallback(() => {
-    emitir("edicion_de_factura_cancelada");
   }, [emitir]);
 
   if (!ctx.factura.id) return;
@@ -95,17 +93,6 @@ export const DetalleFactura = ({
           <TabObservaciones factura={factura} />
         </Tab>
       </Tabs>
-
-      {editable(ctx.factura) && modificado && (
-        <div className="botones maestro-botones">
-          <QBoton onClick={handleGuardar} deshabilitado={!valido}>
-            Guardar Cambios
-          </QBoton>
-          <QBoton tipo="reset" variante="texto" onClick={handleCancelar}>
-            Cancelar
-          </QBoton>
-        </div>
-      )}
 
       <TotalesVenta modeloVenta={factura} publicar={emitir} />
 

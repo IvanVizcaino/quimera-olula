@@ -21,6 +21,10 @@ export interface LineasAlabaranPatch {
     lotes?: [];
 }
 
-export type PatchAlbaranarPedido = (id: string, lineas: LineaAlbaranarPedido[]) => Promise<void>;
+export type AlbaranCreado = {
+    id: string;
+};
+
+export type PatchAlbaranarPedido = (id: string, lineas: LineaAlbaranarPedido[]) => Promise<AlbaranCreado>;
 
 export type PatchCerrarLineaPedido = (pedidoId: string, lineaId: string, cerrada: boolean) => Promise<void>;

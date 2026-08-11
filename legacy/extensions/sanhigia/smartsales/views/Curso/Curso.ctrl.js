@@ -17,7 +17,7 @@ export const bunch = parent => {
         type: "setStateKey",
         plug: ({ initCurso }) => ({
           path: "lineaseventos.filter.and",
-          value: [["codevento", "eq", `${initCurso?.codCurso}`]],
+          value: [["codcurso", "eq", `${initCurso?.codCurso}`]],
         }),
       },
       {

@@ -3,7 +3,7 @@ import { Filtro, Orden } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import { Empresa } from "./diseño.ts";
 
-const baseUrlEmpresa = `@olula/lib/empresa`;
+const baseUrlEmpresa = `/crm/empresa`;
 
 export const getEmpresa = async (id: string): Promise<Empresa> =>
     await RestAPI.get<{ datos: Empresa }>(`${baseUrlEmpresa}/${id}`).then((respuesta) => respuesta.datos);

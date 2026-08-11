@@ -85,7 +85,7 @@ function Login({ onLogin, useStyles, ...props }) {
     <Quimera.Template id="Login">
       {!!autenticando && <div>{"Autenticando..."}</div>}
       {!autenticando && !autenticado && (
-        <Grid container justify="center" className={`${classes.root} loginPage`}>
+        <Grid container justifyContent="center" className={`${classes.root} loginPage`}>
           <Grid size={{ xs: 11, sm: 8, md: 4, lg: 3, xl: 2 }}>
             <div className="logo-container">
               <div className="content">

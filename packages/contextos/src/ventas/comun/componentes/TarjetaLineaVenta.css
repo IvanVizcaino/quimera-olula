@@ -1,0 +1,14 @@
+.linea-venta-stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-xs);
+}
+
+.linea-venta-stepper-input {
+    width: 4rem;
+}
+
+/* El input del stepper no lleva etiqueta; ocultamos el hueco vacío. */
+.linea-venta-stepper-input quimera-input .etiqueta {
+    display: none;
+}

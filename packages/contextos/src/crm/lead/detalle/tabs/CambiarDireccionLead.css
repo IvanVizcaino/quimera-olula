@@ -1,0 +1,21 @@
+.CambiarDireccionLead {
+    quimera-input[nombre="direccion"] {
+        grid-column: 1 / span 12;
+    }
+
+    quimera-input[nombre="ciudad"] {
+        grid-column: 1 / span 4;
+    }
+
+    quimera-input[nombre="cod_postal"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="provincia"] {
+        grid-column: span 5;
+    }
+
+    quimera-autocompletar[nombre="pais_id"] {
+        grid-column: 1 / span 12;
+    }
+}

@@ -1,45 +1,53 @@
+import { empresaActual } from "#/valores/empresaActual.ts";
+import { getDireccion, getDirecciones } from "#/ventas/cliente/infraestructura.ts";
 import UrlsVentasClass from "#/ventas/comun/urls.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
-import { Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
+import { Filtro, Orden, RespuestaLista } from "@olula/lib/diseño.ts";
 import { criteriaQuery, criteriaQueryUrl } from "@olula/lib/infraestructura.ts";
 import { NuevoPresupuesto, Presupuesto } from "../../ventas/presupuesto/diseño.ts";
 import { Accion } from "../accion/diseño.ts";
+import { AccionAPI, accionDesdeAPI } from "../accion/infraestructura.ts";
 import UrlsCrmClass from "../comun/urls.ts";
-import { NuevaOportunidadVenta } from "./crear/diseño.ts";
-import { EstadoOportunidad, OportunidadVenta } from "./diseño.ts";
+import {
+    DeleteOportunidadVenta,
+    EstadoOportunidad,
+    GetOportunidadesVenta,
+    GetOportunidadVenta,
+    OportunidadVenta,
+    PatchOportunidadVenta,
+    PostOportunidadVenta,
+} from "./diseño.ts";
 
 const UrlsCrm = new UrlsCrmClass();
 const UrlsVentas = new UrlsVentasClass();
 
-type OportunidadVentaAPI = OportunidadVenta & { fecha_cierre?: string };
+export type OportunidadVentaAPI = OportunidadVenta & {
+    fecha_cierre?: string | null;
+};
 
-const oportunidadDesdeAPI = (oportunidadAPI: OportunidadVentaAPI): OportunidadVenta => ({
+export const oportunidadDesdeAPI = (oportunidadAPI: OportunidadVentaAPI): OportunidadVenta => ({
     ...oportunidadAPI,
     fecha_cierre: oportunidadAPI.fecha_cierre ? new Date(Date.parse(oportunidadAPI.fecha_cierre)) : null,
 })
 
-export const getOportunidadVenta = async (id: string): Promise<OportunidadVenta> =>
+export const getOportunidadVenta: GetOportunidadVenta = async (id) =>
     await RestAPI.get<{ datos: OportunidadVentaAPI }>(`${UrlsCrm.OPORTUNIDAD_VENTA}/${id}`).then((respuesta) => oportunidadDesdeAPI(respuesta.datos));
 
-export const getOportunidadesVenta = async (
-    filtro: Filtro,
-    orden: Orden,
-    paginacion: Paginacion
-): RespuestaLista<OportunidadVenta> => {
+export const getOportunidadesVenta: GetOportunidadesVenta = async (filtro, orden, paginacion) => {
     const q = criteriaQuery(filtro, orden, paginacion);
 
     const respuesta = await RestAPI.get<{ datos: OportunidadVentaAPI[]; total: number }>(UrlsCrm.OPORTUNIDAD_VENTA + q);
     return { datos: respuesta.datos.map(oportunidadDesdeAPI), total: respuesta.total };
 };
 
-export const postOportunidadVenta = async (oportunidad: NuevaOportunidadVenta): Promise<string> => {
+export const postOportunidadVenta: PostOportunidadVenta = async (oportunidad) => {
     const oportunidadAPI = {
         ...oportunidad,
     }
     return await RestAPI.post(UrlsCrm.OPORTUNIDAD_VENTA, oportunidadAPI, "Error al guardar oportunidad de venta").then((respuesta) => respuesta.id);
 };
 
-export const patchOportunidadVenta = async (id: string, oportunidad: Partial<OportunidadVenta>): Promise<void> => {
+export const patchOportunidadVenta: PatchOportunidadVenta = async (id, oportunidad) => {
     const oportunidadAPI = {
         ...oportunidad,
         fecha_cierre: oportunidad.fecha_cierre?.toISOString().slice(0, 10),
@@ -47,7 +55,7 @@ export const patchOportunidadVenta = async (id: string, oportunidad: Partial<Opo
     await RestAPI.patch(`${UrlsCrm.OPORTUNIDAD_VENTA}/${id}`, oportunidadAPI, "Error al guardar oportunidad de venta");
 };
 
-export const deleteOportunidadVenta = async (id: string): Promise<void> =>
+export const deleteOportunidadVenta: DeleteOportunidadVenta = async (id) =>
     await RestAPI.delete(`${UrlsCrm.OPORTUNIDAD_VENTA}/${id}`, "Error al borrar oportunidad de venta");
 
 export const getEstadosOportunidadVenta = async (filtro: Filtro, orden: Orden): Promise<EstadoOportunidad[]> => {
@@ -60,7 +68,12 @@ export const getAccionesOportunidad = async (oportunidadId: string): RespuestaLi
     const orden = [] as Orden;
 
     const q = criteriaQueryUrl(filtro, orden);
-    return RestAPI.get<{ datos: Accion[], total: number }>(UrlsCrm.ACCION + q).then((respuesta) => respuesta);
+    return RestAPI
+        .get<{ datos: AccionAPI[], total: number }>(UrlsCrm.ACCION + q)
+        .then((respuesta) => ({
+            ...respuesta,
+            datos: respuesta.datos.map(accionDesdeAPI),
+        }));
 };
 
 export const getPresupuestosOportunidad = async (oportunidadId: string): RespuestaLista<Presupuesto> => {
@@ -72,10 +85,26 @@ export const getPresupuestosOportunidad = async (oportunidadId: string): Respues
 };
 
 export const crearPresupuestoOportunidad = async (oportunidadId: string, cliente_id: string): Promise<string> => {
+    if (!cliente_id) {
+        throw new Error("No se puede crear presupuesto sin cliente");
+    }
+
+    const direcciones = await getDirecciones(cliente_id);
+    const direccionFacturacion = direcciones.find((direccion) => direccion.dir_facturacion) ?? direcciones[0];
+
+    if (!direccionFacturacion) {
+        throw new Error("El cliente no tiene direcciones disponibles");
+    }
+
+    const direccion = await getDireccion(cliente_id, direccionFacturacion.id);
+
     const nuevoPresupuesto: Partial<NuevoPresupuesto> = {
-        cliente_id: oportunidadId,
-        direccion_id: cliente_id,
-        empresa_id: "1",
+        oportunidad_id: oportunidadId,
+        cliente: {
+            cliente_id: cliente_id,
+            direccion_id: direccion.id,
+        },
+        empresa_id: empresaActual(),
     };
 
     return await RestAPI.post(UrlsVentas.PRESUPUESTO, nuevoPresupuesto, "Error al crear presupuesto").then((respuesta) => respuesta.id);

@@ -1,5 +1,5 @@
 import { ContextoError } from "@olula/lib/contexto.js";
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
 import { QBoton } from "../atomos/qboton.tsx";
 import { QModal } from "./qmodal.tsx";
 
@@ -29,12 +29,25 @@ export const QModalConfirmacion = ({
   pantallaCompletaMovil = false,
 }: QModalConfirmacionProps) => {
   const { intentar } = useContext(ContextoError);
+  const [guardando, setGuardando] = useState(false);
+  const bloqueadoRef = useRef(false);
 
   const aceptar = async () => {
-    await intentar(onAceptar);
+    if (bloqueadoRef.current) return;
+
+    bloqueadoRef.current = true;
+    setGuardando(true);
+
+    try {
+      await intentar(onAceptar);
+    } finally {
+      bloqueadoRef.current = false;
+      setGuardando(false);
+    }
   };
 
   const cancelar = () => {
+    if (guardando) return;
     onCerrar();
   };
 
@@ -43,17 +56,28 @@ export const QModalConfirmacion = ({
       nombre={nombre}
       abierto={abierto}
       onCerrar={cancelar}
+      bloquearCierre={guardando}
+      mostrarBotonCerrar={!guardando}
       pantallaCompletaMovil={pantallaCompletaMovil}
     >
       <h2>{titulo}</h2>
-      <div className="mensaje">{mensaje}</div>
+      <div className="mensaje" style={{ whiteSpace: "pre-line" }}>
+        {mensaje}
+      </div>
       <div className="botones">
         {mostrarCancelar && (
-          <QBoton tipo="reset" variante="texto" onClick={cancelar}>
+          <QBoton
+            tipo="reset"
+            variante="texto"
+            onClick={cancelar}
+            deshabilitado={guardando}
+          >
             {labelCancelar}
           </QBoton>
         )}
-        <QBoton onClick={aceptar}>{labelAceptar}</QBoton>
+        <QBoton onClick={aceptar} deshabilitado={guardando}>
+          {guardando ? "Procesando..." : labelAceptar}
+        </QBoton>
       </div>
     </QModal>
   );

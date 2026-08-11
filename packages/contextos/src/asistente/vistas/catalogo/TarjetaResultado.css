@@ -1,0 +1,51 @@
+.asistente-resultado {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 0.875rem 1rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.asistente-resultado__titulo {
+    margin: 0 0 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.asistente-resultado__detalles {
+    margin: 0 0 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.asistente-resultado__fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.8125rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.asistente-resultado__fila:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.asistente-resultado__fila dt {
+    color: #6b7280;
+}
+
+.asistente-resultado__fila dd {
+    margin: 0;
+    color: #111827;
+    font-weight: 500;
+    text-align: right;
+}
+
+.asistente-resultado__acciones {
+    display: flex;
+    justify-content: flex-end;
+}

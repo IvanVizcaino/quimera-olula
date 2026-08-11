@@ -1,7 +1,6 @@
 import { Avatar, Backdrop, Box, CircularProgress, QBox, Typography } from "@quimera/comps";
 import { Grid, List, ListItem, ListItemAvatar, ListItemText } from "@quimera/thirdparty";
-import Quimera, { PropValidation, useStateValue, useWidth, util } from "quimera";
-import React from "react";
+import Quimera, { useStateValue, useWidth, util } from "quimera";
 
 function StocksMaster({ useStyles }) {
   const [{ cargandoDatos, stocks, stocksPedido }, dispatch] = useStateValue();
@@ -46,7 +45,7 @@ function StocksMaster({ useStyles }) {
                 }
               >
                 <ListItemAvatar>
-                  <Grid container justify="center" spacing={1}>
+                  <Grid container justifyContent="center" spacing={1}>
                     <Grid size="grow">
                       <Avatar className={classes.greenBox}>
                         {stocks.dict[idStock].canterminadas}

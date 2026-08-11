@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroPedido, EstadoMaestroPedido } from "./diseño.ts";
-import { Pedidos, ampliarPedidos, recargarPedidos } from "./dominio.ts";
+import { Pedidos, ampliarPedidos, recargarPedidos } from "./maestro.ts";
 
 
 export const getMaquina: () => Maquina<EstadoMaestroPedido, ContextoMaestroPedido> = () => {

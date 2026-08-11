@@ -1,6 +1,4 @@
 .q-avatar {
-    font-weight: bold;
-
     &.muyprobable {
         background-color: var(--color-exito-claro);
     }

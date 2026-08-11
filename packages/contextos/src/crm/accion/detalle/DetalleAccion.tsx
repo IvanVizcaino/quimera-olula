@@ -1,14 +1,8 @@
-import { EstadoAccion } from "#/crm/comun/componentes/estado_accion.tsx";
-import { TipoAccion } from "#/crm/comun/componentes/tipo_accion.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
-import {
-  Detalle,
-  QBoton,
-  QInput,
-  Tab,
-  Tabs,
-} from "@olula/componentes/index.js";
+import { Detalle, QBoton, Tab, Tabs } from "@olula/componentes/index.js";
+import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento, Entidad } from "@olula/lib/diseño.js";
+import { formatearFechaDate } from "@olula/lib/dominio.js";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useEffect } from "react";
 import { useParams } from "react-router";
@@ -42,7 +36,7 @@ export const DetalleAccion = ({
   );
 
   const accion = useModelo(metaAccion, ctx.accion);
-  const { modelo, modificado, uiProps, valido } = accion;
+  const { modelo, modificado, valido } = accion;
 
   useEffect(() => {
     if (accionId) {
@@ -61,28 +55,31 @@ export const DetalleAccion = ({
     >
       {!!accionId && (
         <div className="DetalleAccion">
-          <div className="maestro-botones ">
-            <QBoton onClick={() => emitir("finalizacion_accion_solicitada")}>
-              Finalizar
-            </QBoton>
-            <QBoton onClick={() => emitir("borrado_accion_solicitado")}>
-              Borrar
-            </QBoton>
+          <div className="maestro-botones">
+            {modelo.estado === "Hecha" ? (
+              <span className="accion-finalizada">
+                Finalizada
+                {modelo.fecha_fin ? ` ${formatearFechaDate(modelo.fecha_fin)}` : ""}
+              </span>
+            ) : (
+              <QBoton onClick={() => emitir("finalizacion_accion_solicitada")}>
+                Finalizar
+              </QBoton>
+            )}
+            <QuimeraAcciones
+              vertical
+              acciones={[
+                {
+                  texto: "Borrar",
+                  onClick: () => emitir("borrado_accion_solicitado"),
+                  advertencia: true,
+                },
+              ]}
+            />
           </div>
 
           <Tabs>
             <Tab label="Datos">
-              <div className="TabDatos">
-                <quimera-formulario>
-                  <QInput label="Descripción" {...uiProps("descripcion")} />
-                  <QInput label="Fecha" {...uiProps("fecha")} />
-                  <EstadoAccion {...uiProps("estado")} />
-                  <TipoAccion {...uiProps("tipo")} />
-                </quimera-formulario>
-              </div>
-            </Tab>
-
-            <Tab label="Más datos">
               <TabDatos accion={accion} />
             </Tab>
 

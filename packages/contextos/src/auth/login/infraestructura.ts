@@ -1,3 +1,4 @@
+import { notifyAuthStorageChanged } from "@olula/lib/api/auth_storage_events.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { RespuestaLista } from "@olula/lib/diseño.ts";
 import { Permiso } from "../grupos/diseño.ts";
@@ -45,6 +46,7 @@ export const tokenAcceso = {
 
         localStorage.setItem("token-acceso", tokenAcceso);
         localStorage.setItem("fecha-refresco", fechaRefresco.toString());
+        notifyAuthStorageChanged();
     },
     obtener: () => localStorage.getItem("token-acceso"),
     validez: () => {
@@ -62,19 +64,32 @@ export const tokenAcceso = {
     eliminar: () => {
         localStorage.removeItem("fecha-refresco");
         localStorage.removeItem("token-acceso");
+        notifyAuthStorageChanged();
     },
 }
 
 export const tokenRefresco = {
-    actualizar: (tokenRefresco: string) => localStorage.setItem("token-refresco", tokenRefresco),
+    actualizar: (tokenRefresco: string) => {
+        localStorage.setItem("token-refresco", tokenRefresco);
+        notifyAuthStorageChanged();
+    },
     obtener: () => localStorage.getItem("token-refresco"),
-    eliminar: () => localStorage.removeItem("token-refresco"),
+    eliminar: () => {
+        localStorage.removeItem("token-refresco");
+        notifyAuthStorageChanged();
+    },
 }
 
 export const whoAmIStorage = {
-    actualizar: (whoAmI: RespuestaWhoAmI) => localStorage.setItem("whoami", JSON.stringify(whoAmI)),
+    actualizar: (whoAmI: RespuestaWhoAmI) => {
+        localStorage.setItem("whoami", JSON.stringify(whoAmI));
+        notifyAuthStorageChanged();
+    },
     obtener: () => localStorage.getItem("whoami"),
-    eliminar: () => localStorage.removeItem("whoami"),
+    eliminar: () => {
+        localStorage.removeItem("whoami");
+        notifyAuthStorageChanged();
+    },
 }
 
 export const misPermisos = async (): RespuestaLista<Permiso> => {
@@ -83,4 +98,12 @@ export const misPermisos = async (): RespuestaLista<Permiso> => {
 
 export const whoAmI = async (): Promise<RespuestaWhoAmI> => {
     return await RestAPI.get<RespuestaWhoAmI>(baseUrl + '/permiso/whoami');
+};
+
+export const solicitarResetPasswordAPI = async (email: string): Promise<void> => {
+    await RestAPI.post(`${baseUrl}/reset-password/solicitar`, { email });
+};
+
+export const resetPasswordAPI = async (token: string, nueva_password: string): Promise<void> => {
+    await RestAPI.post(`${baseUrl}/reset-password/verificar`, { token, nueva_password });
 };

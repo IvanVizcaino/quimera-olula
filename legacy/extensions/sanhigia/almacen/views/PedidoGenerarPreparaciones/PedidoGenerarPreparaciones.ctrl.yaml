@@ -34,6 +34,7 @@ state:
     fechaAnadir: null
     urlEnviadoPda: null
     anadiendoCantidadLote: false
+    lineasConDto: false
     # codBarras: null
 bunch:
   # En sanhigia cargamos siempre todas las líneas por la revisión
@@ -196,6 +197,9 @@ bunch:
         - key: codtarifa
           value:
             statePath: pedido.buffer.codProductoAgt
+        - key: codalmacen
+          value:
+            statePath: pedido.buffer.codAlmacen            
       success: onPedidoEnviadoPDA
       error: onEnviarPDAError
   onPedidoEnviado:
@@ -257,6 +261,11 @@ bunch:
     - _type: alert
       text: Error al enviar el pedido
       severity: error
+    - _type: grape
+      name: mostrarMensajeError
+    # - _type: alert
+    #   text: Error al enviar el pedido
+    #   severity: error      
   onPedidoEnviadoPDA:
     # - _type: grape
     #   name: compruebaAniadirTrabajador
@@ -309,6 +318,8 @@ bunch:
   onGetLineasSucceded:
     - _type: grape
       name: onCerrarModalLotesAlmacen
+    - _type: grape
+      name: compruebaLineasConDescuento      
   onMostrarModalEditarLinea:
     - _type: set
       path: modalEditarLinea

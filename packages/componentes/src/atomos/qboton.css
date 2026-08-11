@@ -13,6 +13,22 @@ quimera-boton {
         --color-primario-oscuro: var(--color-advertencia-oscuro);
     }
 
+    &[exito] {
+        --color-primario: var(--color-exito);
+        --color-primario-claro: var(--color-exito-claro);
+        --color-primario-oscuro: var(--color-exito-oscuro);
+    }
+
+    &[ancho] {
+        display: flex;
+        width: 100%;
+
+        button {
+            flex: 1;
+            width: 100%;
+        }
+    }
+
     &[deshabilitado] {
         --color-primario: var(--color-deshabilitado);
 
@@ -62,7 +78,7 @@ quimera-boton {
         background-color: var(--color-primario);
         color: var(--blanco);
 
-        border: 0;
+        border: var(--tamaño-borde-m) solid transparent;
         border-radius: var(--redondeo-borde-xs);
 
         padding: var(--espaciado-s);

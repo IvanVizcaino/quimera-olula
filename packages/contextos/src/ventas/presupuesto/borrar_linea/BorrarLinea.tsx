@@ -1,24 +1,30 @@
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
-import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.js";
-import { useCallback, useContext } from "react";
+import { useForm } from "@olula/lib/useForm.js";
+import { useCallback } from "react";
+import { LineaPresupuesto } from "../diseño.ts";
 import { deleteLinea } from "../infraestructura.ts";
 
 export const BorrarLinea = ({
   presupuestoId,
   publicar,
-  idLinea,
+  linea,
 }: {
   presupuestoId: string;
   publicar: EmitirEvento;
-  idLinea: string;
+  linea: LineaPresupuesto;
 }) => {
-  const { intentar } = useContext(ContextoError);
+  const borrar_ = useCallback(async () => {
+    await deleteLinea(presupuestoId, linea.id);
+    publicar("linea_borrada", linea.id);
+  }, [presupuestoId, linea, publicar]);
 
-  const borrar = useCallback(async () => {
-    await intentar(() => deleteLinea(presupuestoId, idLinea));
-    publicar("linea_borrada");
-  }, [presupuestoId, idLinea, publicar, intentar]);
+  const cancelar_ = useCallback(
+    () => publicar("borrar_linea_cancelado"),
+    [publicar]
+  );
+
+  const [borrar, cancelar] = useForm(borrar_, cancelar_);
 
   return (
     <QModalConfirmacion
@@ -26,7 +32,7 @@ export const BorrarLinea = ({
       abierto={true}
       titulo="Borrar línea"
       mensaje="¿Está seguro de que desea borrar esta línea?"
-      onCerrar={() => publicar("borrar_linea_cancelado")}
+      onCerrar={cancelar}
       onAceptar={borrar}
     />
   );

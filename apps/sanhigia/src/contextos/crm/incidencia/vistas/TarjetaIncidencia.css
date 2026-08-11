@@ -1,0 +1,23 @@
+.tarjeta-incidencia {
+    display: flex;
+    flex-direction: row;
+    gap: var(--espaciado-l);
+    padding: var(--espaciado-s) 0;
+
+    .columna {
+        width: max-content;
+        display: block;
+        float: left;
+    }
+}
+
+.tarjeta-titulo {
+    font-size: var(--tamaño-letra-l);
+    font-weight: var(--grosor-letra-6);
+    color: var(--color-texto-principal);
+}
+
+.tarjeta-detalle {
+    font-size: var(--tamaño-letra-m);
+    color: var(--color-texto-secundario);
+}

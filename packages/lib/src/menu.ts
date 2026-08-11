@@ -1,15 +1,20 @@
-export interface ElementoMenuPadre {
+export interface ElementoMenuBase {
     nombre: string;
     icono?: string;
-    subelementos: ElementoMenu[];
     regla?: string;
+    color?: string;
+    variant?: string;
+    posicion?: number;
 }
 
-export interface ElementoMenuHijo {
-    nombre: string;
-    icono?: string;
+export interface ElementoMenuPadre extends ElementoMenuBase {
+    subelementos: ElementoMenuHijo[];
+}
+
+export interface ElementoMenuHijo extends ElementoMenuBase {
     url: string;
-    regla?: string;
+    descripcionIA?: string;
+    parametrosIA?: Record<string, string>;
 }
 
 export type ElementoMenu = ElementoMenuPadre | ElementoMenuHijo;
@@ -24,6 +29,8 @@ export const crearMenu = (factory: Record<string, MenuContextFactory>) => {
     const menus = factorias.map(v => (v as MenuContextFactory)?.menu).filter(Boolean).flat();
     const items = menus.map(m => Object.entries(m).map(([k, v]) => ({ nombre: k, ...v }))).flat();
     const itemsAgrupados = Object.entries(Object.groupBy(items, agruparPorNombre)).map(([k, v]) => ({ ...((v ?? []).filter(i => i.nombre === k)[0]), subelementos: (v ?? []).filter(i => i.nombre !== k).map(formatearNombre) }));
+
+    itemsAgrupados.sort((a, b) => (a.posicion ?? Infinity) - (b.posicion ?? Infinity));
 
     return itemsAgrupados as ElementoMenu[];
 };

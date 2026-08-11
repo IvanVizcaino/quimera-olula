@@ -1,6 +1,6 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
-import { QModal } from "@olula/componentes/index.js";
+import { QCheckbox, QModal } from "@olula/componentes/index.js";
 import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
@@ -58,6 +58,10 @@ export const CambiarLineaTpv = ({
           <QInput label="Precio" {...uiProps("pvp_unitario")} />
 
           <QInput label="% Descuento" {...uiProps("dto_porcentual")} />
+
+          <QInput label="Dto. Lineal" {...uiProps("dto_lineal")} />
+
+          <QCheckbox label="IVA incluido" {...uiProps("iva_incluido")} />
         </quimera-formulario>
 
         <div className="botones maestro-botones ">

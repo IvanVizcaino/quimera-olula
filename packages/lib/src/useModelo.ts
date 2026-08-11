@@ -19,7 +19,7 @@ export function useModelo<T extends Modelo>(
         const modeloAUsar = nuevoModelo || modeloInicialProp;
         setModelo(modeloAUsar);
         setModeloInicial(modeloAUsar);
-    }, [setModelo, setModeloInicial]);
+    }, [modeloInicialProp]);
 
     const onModeloListoConError = useCallback(
         async (modelo: T) => {
@@ -63,7 +63,7 @@ type ParamOpcion = {
     descripcion?: string
 };
 
-export type ValorControl = null | string | ParamOpcion;
+export type ValorControl = null | boolean | string | ParamOpcion;
 
 export type UiProps = {
     nombre: string;
@@ -73,7 +73,10 @@ export type UiProps = {
     deshabilitado: boolean;
     erroneo: boolean;
     advertido: boolean;
+    opcional: boolean;
     valido: boolean;
+    modificado: boolean;
+    soloTexto: boolean;
     onChange: (valor: ValorControl) => void;
     evaluarCambio: () => void;
     descripcion?: string;

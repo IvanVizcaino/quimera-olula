@@ -22,7 +22,12 @@ export const Articulo = ({
 }: ArticuloProps) => {
   const obtenerOpciones = async (texto: string) => {
     const criteria = {
-      filtro: ["descripcion", "~", texto],
+      filtro: {
+        or: [
+          ["descripcion", "~", texto],
+          ["id", "~", texto],
+        ],
+      },
       orden: ["id"],
     };
 
@@ -34,13 +39,14 @@ export const Articulo = ({
     return articulos.map((articulo) => ({
       valor: articulo.id,
       descripcion: articulo.descripcion,
+      descripcionOpcion: `${articulo.id} - ${articulo.descripcion}`,
       datos: articulo,
     }));
   };
 
   return (
     <QAutocompletar
-      label={label}
+      label={`${label} ${valor}`}
       nombre={nombre}
       onChange={onChange}
       valor={valor}

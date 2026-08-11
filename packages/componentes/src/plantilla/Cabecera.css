@@ -26,12 +26,35 @@
     }
 }
 
+.logo-app {
+    height: 22px;
+    width: auto;
+    display: block;
+}
+
 #etiqueta-menu-usuario-abierto {
     margin-left: 0;
     order: 99;
     display: flex;
     align-items: center;
-    padding-top: 7px;
+    height: 100%;
+
+    quimera-icono {
+        fill: var(--blanco);
+    }
+}
+
+#boton-asistente {
+    display: none;
+}
+
+#etiqueta-asistente-abierto {
+    margin-left: 0;
+    order: 98;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    cursor: pointer;
 
     quimera-icono {
         fill: var(--blanco);
@@ -45,8 +68,15 @@
     pointer-events: none;
 }
 
-#cabecera-acciones-extra {
+#cabecera-acciones {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#cabecera-acciones-globales,
+#cabecera-acciones-extra {
     display: flex;
     align-items: center;
     gap: 0.75rem;

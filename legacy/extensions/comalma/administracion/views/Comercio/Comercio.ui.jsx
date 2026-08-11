@@ -149,7 +149,7 @@ function Comercio({ callbackChanged, idComercio, initComercio, useStyles }) {
         >
           <Grid container>
             <QModelBox id="comercio.buffer" disabled={!editable} schema={schema}>
-              <Grid size={{ xs: 12, sm: 12, md: 12 }} * justify="center">
+              <Grid size={{ xs: 12, sm: 12, md: 12 }} * justifyContent="center">
                 <QSection
                   title="Nombre"
                   actionPrefix="comercio.buffer/idComercio"
@@ -171,7 +171,7 @@ function Comercio({ callbackChanged, idComercio, initComercio, useStyles }) {
                   </Box>
                 </QSection>
               </Grid>
-              <Grid size={{ xs: 12, sm: 12, md: 12 }} * justify="center">
+              <Grid size={{ xs: 12, sm: 12, md: 12 }} * justifyContent="center">
                 <QSection
                   title="Email"
                   actionPrefix="comercio.buffer/idComercio"
@@ -259,8 +259,8 @@ function Comercio({ callbackChanged, idComercio, initComercio, useStyles }) {
                 </Box>
               </Grid>
             </QModelBox>
-          </Grid>
-          {/* <Box>
+          </Grid >
+  {/* <Box>
             <Grid container spacing={1} direction="column" >
               <Grid size={{ xs: 6, sm: 6, md: 3, lg: 2 }}>
                 <Box component="div" className={classes.mediaContainer}>
@@ -270,7 +270,7 @@ function Comercio({ callbackChanged, idComercio, initComercio, useStyles }) {
               </Grid>
             </Grid>
           </Box> */}
-          {/* <Box mt={6}>
+  {/* <Box mt={6}>
             <Box width={1} display="flex" justifyContent="flex-end" mt={1}>
               <Button
                 id="irACampanasComercio"
@@ -297,53 +297,54 @@ function Comercio({ callbackChanged, idComercio, initComercio, useStyles }) {
               disabled={false}
             />
           </Box> */}
-          <Dialog open={modalCambiarPassword} maxWidth="xs">
-            <DialogTitle id="form-dialog-title">Cambiar contraseña</DialogTitle>
-            <DialogContent>
-              {/* <DialogContentText id="form-dialog-description">AAAAAAAA</DialogContentText> */}
-              <Grid container>
-                <Grid size={12}>
-                  <Field.Password
-                    id={"nuevoPassword"}
-                    label={t(`${TR_PREFIX}campoPass1`)}
-                    fullWidth
-                    startAdornment={<Icon>lockrounded</Icon>}
-                    error={passwordStatus.pass1Msg}
-                    helperText={passwordStatus.pass1Msg}
-                  />
-                </Grid>
-                {/* <Grid size={mobile ? 0 : 2} /> */}
-                <Grid size={12}>
-                  <Field.Password
-                    id="repeatedPassword"
-                    label={t(`${TR_PREFIX}campoPass2`)}
-                    fullWidth
-                    startAdornment={<Icon>lockrounded</Icon>}
-                    error={passwordStatus.pass2Msg}
-                    helperText={passwordStatus.pass2Msg}
-                  />
-                </Grid>
-              </Grid>
-              <DialogActions>
-                <Button id="cancelarCambioPassword" text="Cancelar" color="primary" />
-                <Button
-                  id="confirmarCambioPassword"
-                  text="Confirmar"
-                  variant="text"
-                  color="primary"
-                  disabled={
-                    !nuevoPassword ||
-                    !repeatedPassword ||
-                    passwordStatus.pass1Msg ||
-                    passwordStatus.pass2Msg
-                  }
-                />
-              </DialogActions>
-            </DialogContent>
-          </Dialog>
-        </QBox>
-      )}
-    </Quimera.Template>
+  <Dialog open={modalCambiarPassword} maxWidth="xs">
+    <DialogTitle id="form-dialog-title">Cambiar contraseña</DialogTitle>
+    <DialogContent>
+      {/* <DialogContentText id="form-dialog-description">AAAAAAAA</DialogContentText> */}
+      <Grid container>
+        <Grid size={12}>
+          <Field.Password
+            id={"nuevoPassword"}
+            label={t(`${TR_PREFIX}campoPass1`)}
+            fullWidth
+            startAdornment={<Icon>lockrounded</Icon>}
+            error={passwordStatus.pass1Msg}
+            helperText={passwordStatus.pass1Msg}
+          />
+        </Grid>
+        {/* <Grid size={mobile ? 0 : 2} /> */}
+        <Grid size={12}>
+          <Field.Password
+            id="repeatedPassword"
+            label={t(`${TR_PREFIX}campoPass2`)}
+            fullWidth
+            startAdornment={<Icon>lockrounded</Icon>}
+            error={passwordStatus.pass2Msg}
+            helperText={passwordStatus.pass2Msg}
+          />
+        </Grid>
+      </Grid>
+      <DialogActions>
+        <Button id="cancelarCambioPassword" text="Cancelar" color="primary" />
+        <Button
+          id="confirmarCambioPassword"
+          text="Confirmar"
+          variant="text"
+          color="primary"
+          disabled={
+            !nuevoPassword ||
+            !repeatedPassword ||
+            passwordStatus.pass1Msg ||
+            passwordStatus.pass2Msg
+          }
+        />
+      </DialogActions>
+    </DialogContent>
+  </Dialog>
+        </QBox >
+      )
+}
+    </Quimera.Template >
   );
 }
 

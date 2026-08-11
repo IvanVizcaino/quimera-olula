@@ -1,0 +1,7 @@
+.DetalleArticulo {
+    /* Posiciona aquí campos del formulario principal (fuera de tabs).
+     * Ejemplo:
+     *   quimera-input[nombre="id"] { grid-column: span 3; }
+     *   quimera-input[nombre="descripcion"] { grid-column: span 9; }
+     */
+}

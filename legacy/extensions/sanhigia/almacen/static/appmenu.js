@@ -8,7 +8,7 @@ export default parent => ({
         icons: ["receipt", "outlined_flag"],
         color: "warning",
         variant: "main",
-        rule: "Inventarios:visit",
+        rule: "almacen.inventario",
         url: "/almacen/inventarios",
       },
       prepraciones: {
@@ -16,7 +16,7 @@ export default parent => ({
         icons: ["receipt", "outlined_flag"],
         color: "warning",
         variant: "main",
-        rule: "sh_preparaciondepedidos:visit",
+        rule: "almacen.preparacion_salida",
         url: "/sh_preparaciondepedidos",
       },
       pedVenta: {
@@ -24,7 +24,7 @@ export default parent => ({
         icons: ["receipt", "outlined_flag"],
         color: "warning",
         variant: "main",
-        rule: "sh_preparaciondepedidos:visit",
+        rule: "almacen.preparacion_salida",
         url: "/generarpreparaciones",
       },
       pedCompra: {
@@ -32,7 +32,7 @@ export default parent => ({
         icons: ["receipt", "outlined_flag"],
         color: "warning",
         variant: "main",
-        rule: "sh_preparaciondepedidos:visit",
+        rule: "almacen.preparacion_salida",
         url: "/pedidosdecompra",
       },
     },

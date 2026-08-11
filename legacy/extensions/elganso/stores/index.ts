@@ -62,7 +62,7 @@ export default {
     "/year": { type: "view", view: "SelectorFecha" },
     "/planificador_semanal": { type: "view", view: "PlanificadorSemanal" },
     "/planificador_semanal_resumen": { type: "view", view: "PlanificadorSemanalResumen" },
-    "/resumen_semanal": { type: "view", view: "ResumenAgente" },
+    "/resumen_agente": { type: "view", view: "ResumenAgente" },
     "/control_horario": { type: "view", view: "ControlHorario" },
     "/pedidos_web": { type: "view", view: "PedidosWeb" },
     "/new_pedido": { type: "view", view: "NewPedido" },

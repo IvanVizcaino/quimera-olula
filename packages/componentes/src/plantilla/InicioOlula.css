@@ -1,0 +1,22 @@
+.intro-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    background-color: #ffffff;
+    z-index: 9999;
+    opacity: 1;
+    overflow: hidden;
+    transition: opacity 0.7s ease;
+}
+
+.intro-overlay svg {
+    width: min(480px, 80vw);
+    height: auto;
+}
+
+.intro-overlay--saliendo {
+    opacity: 0;
+}

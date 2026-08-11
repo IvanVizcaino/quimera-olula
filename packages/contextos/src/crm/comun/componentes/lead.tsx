@@ -9,6 +9,7 @@ interface LeadSelectorProps {
   label?: string;
   deshabilitado?: boolean;
   onChange: (opcion: { valor: string; descripcion: string } | null) => void;
+  [key: string]: unknown;
 }
 
 export const LeadSelector = ({
@@ -18,6 +19,7 @@ export const LeadSelector = ({
   label = "Seleccionar lead",
   deshabilitado = false,
   onChange,
+  ...props
 }: LeadSelectorProps) => {
   const obtenerOpciones = async (valor: string) => {
     if (valor.length < 3) return [];
@@ -36,12 +38,13 @@ export const LeadSelector = ({
 
     return leads.map((lead) => ({
       valor: lead.id,
-      descripcion: `${lead.id} - ${lead.nombre}`,
+      descripcion: lead.nombre,
     }));
   };
 
   return (
     <QAutocompletar
+      {...props}
       label={label}
       nombre={nombre}
       onChange={onChange}

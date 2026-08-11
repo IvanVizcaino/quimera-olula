@@ -34,6 +34,7 @@ quimera-acciones {
 
     .actions {
         position: relative;
+        z-index: 20;
     }
 
     .acciones {
@@ -43,7 +44,9 @@ quimera-acciones {
         width: max-content;
         min-width: 0;
         position: absolute;
+        top: calc(100% + 4px);
         right: 0;
+        z-index: 30;
         max-width: none;
         overflow: hidden;
         background: var(--color-fondo);

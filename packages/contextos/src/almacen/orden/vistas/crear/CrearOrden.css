@@ -1,0 +1,17 @@
+.CrearOrden {
+    quimera-formulario {
+        max-width: 500px;
+    }
+
+    quimera-select[nombre="tipoOrden"] {
+        grid-column: span 6;
+    }
+
+    quimera-select[nombre="almacenId"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="abierta"] {
+        grid-column: span 6;
+    }
+}

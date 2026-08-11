@@ -1,0 +1,56 @@
+.motivo-devolucion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--espaciado-s);
+}
+
+@media (min-width: 600px) {
+    .motivo-devolucion-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 900px) {
+    .motivo-devolucion-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.tarjeta-motivo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 4rem;
+    min-width: 0;
+    padding: var(--espaciado-s);
+    border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-s);
+    background: var(--color-superficie);
+    color: var(--color-texto-primario);
+    font-size: 0.875rem;
+    line-height: 1.3;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tarjeta-motivo:hover {
+    background: var(--color-superficie-elevada);
+    border-color: var(--color-primario);
+}
+
+.tarjeta-motivo--seleccionada {
+    background: var(--color-primario);
+    border-color: var(--color-primario);
+    color: var(--color-sobre-primario, #fff);
+    font-weight: 600;
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--color-primario) 30%, transparent);
+}
+
+.tarjeta-motivo--seleccionada:hover {
+    background: var(--color-primario-oscuro, var(--color-primario));
+    border-color: var(--color-primario-oscuro, var(--color-primario));
+}

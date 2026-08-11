@@ -11,8 +11,8 @@ import { ContextoMaestroEstadosOportunidad, EstadoMaestroEstadosOportunidad } fr
 export const metaTablaEstadoOportunidad: MetaTabla<EstadoOportunidad> = [
     { id: "id", cabecera: "Código" },
     { id: "descripcion", cabecera: "Descripción" },
+    { id: "estadobase", cabecera: "Estado Base" },
     { id: "probabilidad", cabecera: "Probabilidad", tipo: "numero" },
-    { id: "valor_defecto", cabecera: "Por defecto", tipo: "booleano" },
 ];
 
 type ProcesarEstadosOportunidad = ProcesarContexto<EstadoMaestroEstadosOportunidad, ContextoMaestroEstadosOportunidad>;

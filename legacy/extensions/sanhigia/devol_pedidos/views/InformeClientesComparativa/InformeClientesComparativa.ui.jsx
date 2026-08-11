@@ -1,6 +1,15 @@
-import { Box, Container } from "@quimera/comps";
-import Quimera, { PropValidation, useStateValue, useWidth, util } from "quimera";
-import React, { useEffect } from "react";
+import {
+  Box,
+  Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Icon,
+  IconButton,
+  Typography,
+} from "@quimera/comps";
+import Quimera, { useStateValue, useWidth, util } from "quimera";
+import { useEffect } from "react";
 
 function InformeClientesComparativa({ idClienteProp, useStyles }) {
   const [{ idCliente }, dispatch] = useStateValue();
@@ -14,7 +23,8 @@ function InformeClientesComparativa({ idClienteProp, useStyles }) {
   useEffect(() => {
     util.getSetting("appDispatch")({
       type: "setNombrePaginaActual",
-      payload: { nombre: `${idCliente ? "Comparativa artículos" : "Comparativa clientes"}` },
+      // payload: { nombre: `${idCliente ? "Comparativa artículos" : "Comparativa clientes"}` },
+      payload: { nombre: "Comparativa clientes" },
     });
 
     return () =>
@@ -24,15 +34,32 @@ function InformeClientesComparativa({ idClienteProp, useStyles }) {
   return (
     <Quimera.Template id="InformeClientesComparativa">
       <Container className={classes.container} disableGutters={width === "xs" || width === "sm"}>
-        {!idCliente ? (
-          <Box>
-            <Quimera.SubView id="InformeClientesComparativa/ComparativaClientes" />
-          </Box>
-        ) : (
-          <Box>
+        <Box>
+          <Quimera.SubView id="InformeClientesComparativa/ComparativaClientes" />
+        </Box>
+        <Dialog
+          open={!!idCliente}
+          maxWidth="lg"
+          fullWidth
+          disableScrollLock
+          onClose={() => dispatch({ type: "onCerrarComparativaArticulos" })}
+        >
+          <DialogTitle>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="body1">Comparativa artículos</Typography>
+              <IconButton
+                id="cerrarComparativaArticulos"
+                size="small"
+                onClick={() => dispatch({ type: "onCerrarComparativaArticulos" })}
+              >
+                <Icon>close</Icon>
+              </IconButton>
+            </Box>
+          </DialogTitle>
+          <DialogContent dividers>
             <Quimera.SubView id="InformeClientesComparativa/ComparativaArticulos" />
-          </Box>
-        )}
+          </DialogContent>
+        </Dialog>
       </Container>
     </Quimera.Template>
   );

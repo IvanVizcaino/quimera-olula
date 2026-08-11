@@ -36,7 +36,7 @@ function InformeConsumoCliente({ useStyles }) {
             <Cliente
               id="filtro.codCliente"
               label="Cliente"
-              todoslosagentes={ACL.can("ss_informes:todoslosagentes")}
+              todoslosagentes={ACL.can("crm.informe.todos_los_agentes")}
               fullWidth
             />
           </Grid>

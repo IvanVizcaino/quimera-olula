@@ -50,9 +50,6 @@ export const ClienteVentaTpv = ({
 
   const valido = esRegistrado ? registrado.valido : true;
 
-  // console.log('Registrado', registrado.modelo);
-  // console.log('No registrado', noRegistrado.modelo);
-
   return (
     <QModal
       abierto={true}

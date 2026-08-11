@@ -1,8 +1,8 @@
-import { Entidad, Filtro } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro, Entidad } from "@olula/lib/diseño.ts";
 
 export const filtrarEntidad = (
     entidad: Entidad,
-    conjuntoFiltros: Filtro
+    conjuntoFiltros: ClausulaFiltro[]
 ): boolean => {
     if (!conjuntoFiltros) return true;
 

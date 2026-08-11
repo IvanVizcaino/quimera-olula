@@ -1,5 +1,7 @@
+import { EstadoBaseOportunidad } from "#/crm/comun/componentes/estado_base_oportunidad.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Detalle, QBoton, QInput } from "@olula/componentes/index.js";
+import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento, Entidad } from "@olula/lib/diseño.js";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useEffect } from "react";
@@ -54,23 +56,26 @@ export const DetalleEstadoOportunidad = ({
     >
       {!!estadoOportunidadId && (
         <div className="DetalleEstadoOportunidad">
-          <div className="maestro-botones ">
-            <QBoton
-              onClick={() => emitir("marcar_estado_oportunidad_por_defecto")}
-              deshabilitado={modelo.valor_defecto}
-            >
-              Marcar por defecto
-            </QBoton>
-            <QBoton
-              onClick={() => emitir("borrado_estado_oportunidad_solicitado")}
-            >
-              Borrar
-            </QBoton>
-          </div>
+          <QuimeraAcciones
+            vertical
+            acciones={[
+              {
+                texto: "Marcar por defecto",
+                onClick: () => emitir("marcar_estado_oportunidad_por_defecto"),
+                deshabilitado: modelo.valorDefecto,
+              },
+              {
+                texto: "Borrar",
+                onClick: () => emitir("borrado_estado_oportunidad_solicitado"),
+                advertencia: true,
+              },
+            ]}
+          />
 
           <quimera-formulario>
             <QInput label="Descripción" {...uiProps("descripcion")} />
             <QInput label="Probabilidad (%)" {...uiProps("probabilidad")} />
+            <EstadoBaseOportunidad {...uiProps("estadobase")} />
           </quimera-formulario>
 
           {modificado && (

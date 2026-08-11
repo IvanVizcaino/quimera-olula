@@ -1,3 +1,5 @@
+import { getTpvConfig } from "#/tpv/comun/dominio.ts";
+import { TipoTarjetaTpv } from "#/tpv/comun/componentes/TipoTarjetaTpv.tsx";
 import { VentaTpv } from "#/tpv/venta/diseño.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -7,7 +9,7 @@ import { formatearMoneda, redondeaMoneda } from "@olula/lib/dominio.js";
 import { useFocus } from "@olula/lib/useFocus.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { postPago } from "../infraestructura.ts";
 import "./PagarTarjetaVentaTpv.css";
 import {
@@ -38,13 +40,27 @@ export const PagarTarjetaVentaTpv = ({
     pagoInicial
   );
 
+  const [hasTiposTarjeta, setHasTiposTarjeta] = useState(false);
+  const [idTipoTarjeta, setIdTipoTarjeta] = useState<string | null>(null);
+
+  useEffect(() => {
+    getTpvConfig().then((config) => {
+      if (config.tiposTarjeta.length > 0) {
+        setHasTiposTarjeta(true);
+        const porDefecto = config.tiposTarjeta.find((t) => t.defecto);
+        setIdTipoTarjeta(porDefecto?.id ?? null);
+      }
+    });
+  }, []);
+
   const pagar_ = useCallback(async () => {
     const idPago = await postPago(venta.id, {
       importe: modelo.importe,
       formaPago: "TARJETA",
+      idTipoTarjeta,
     });
     publicar("pago_con_tarjeta_hecho", idPago);
-  }, [modelo, publicar, venta.id]);
+  }, [modelo, publicar, venta.id, idTipoTarjeta]);
 
   const cancelar_ = useCallback(() => publicar("pago_cancelado"), [publicar]);
 
@@ -77,6 +93,12 @@ export const PagarTarjetaVentaTpv = ({
           </div>
 
           <QInput label="Importe" {...uiProps("importe")} ref={focus} />
+          {hasTiposTarjeta && (
+            <TipoTarjetaTpv
+              valor={idTipoTarjeta ?? ""}
+              onChange={(opcion) => setIdTipoTarjeta(opcion?.valor ?? null)}
+            />
+          )}
         </quimera-formulario>
 
         <div className="botones maestro-botones ">

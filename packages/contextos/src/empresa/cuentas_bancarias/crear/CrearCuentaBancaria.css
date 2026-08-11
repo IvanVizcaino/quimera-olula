@@ -1,0 +1,22 @@
+.CrearCuentaBancaria {
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="codigoCuenta"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="paisId"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="iban"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="bic"] {
+        grid-column: span 4;
+    }
+}

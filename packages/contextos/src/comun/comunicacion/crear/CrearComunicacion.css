@@ -1,0 +1,20 @@
+.crear-comunicacion-modal {
+    display: grid;
+    gap: var(--espaciado-s);
+    min-width: min(90vw, 52rem);
+}
+
+.crear-comunicacion-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--espaciado-xs);
+}
+
+.crear-comunicacion-preview {
+    display: grid;
+    gap: var(--espaciado-xs);
+}
+
+.crear-comunicacion-preview h4 {
+    margin: 0;
+}

@@ -1,0 +1,14 @@
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--espaciado-m);
+    padding: var(--espaciado-m);
+    align-content: start;
+}
+
+.home-widget {
+    background: var(--color-fondo-elevado);
+    border-radius: var(--radio-m);
+    padding: var(--espaciado-s);
+    border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+}

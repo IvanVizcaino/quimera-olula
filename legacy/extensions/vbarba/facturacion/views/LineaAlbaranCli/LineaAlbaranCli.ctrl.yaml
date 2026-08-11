@@ -1,0 +1,15 @@
+---
+shortcuts: []
+state: {}
+bunch:
+  onLineaBufferChanged:
+    - _type: set 
+      condition:
+          operator: A = B
+          A:
+            payloadPath: field
+          B:
+            const: codProveedor
+      path: linea.buffer.nombreProveedor
+      value:
+        payloadPath: option.nombre

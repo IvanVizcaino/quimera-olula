@@ -168,7 +168,7 @@ bunch:
           A:
             payloadPath: value
           B:
-            const: '*'
+            const: '/'
         then:
           _type: set
           path: tipoFiltroMedidaBrazo

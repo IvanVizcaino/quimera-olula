@@ -10,6 +10,7 @@
     "@quimera/comps": "workspace:*",
     "@quimera/styles": "workspace:*",
     "@quimera/thirdparty": "workspace:*",
+    "@mui/material": "^7.0.0",
     "jquery": "^3.6.0",
     "prop-types": "^15.7.2",
     "i18next-browser-languagedetector": "^7.0.1",

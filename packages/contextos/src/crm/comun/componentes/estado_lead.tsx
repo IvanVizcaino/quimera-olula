@@ -1,6 +1,6 @@
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { useEffect, useState } from "react";
-import { getEstadosLead } from "../../lead/infraestructura.ts";
+import { getEstadosLead } from "../../estadoLead/infraestructura.ts";
 
 interface EstadoLeadsProps {
   valor: string;

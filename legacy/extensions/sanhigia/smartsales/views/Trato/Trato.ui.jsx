@@ -15,8 +15,7 @@ import {
   Typography,
 } from "@quimera/comps";
 import { CircularProgress } from "@quimera/thirdparty";
-import Quimera, { getSchemas, navigate, useStateValue, util } from "quimera";
-import { ACL } from "quimera/lib";
+import Quimera, { ACL, getSchemas, navigate, useStateValue, util } from "quimera";
 import { useEffect } from "react";
 
 import {

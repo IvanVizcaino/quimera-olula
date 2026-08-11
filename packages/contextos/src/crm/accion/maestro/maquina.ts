@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroAcciones, EstadoMaestroAcciones } from "./diseño.ts";
-import { Acciones, recargarAcciones } from "./maestro.ts";
+import { Acciones, ampliarAcciones, finalizarAccionRapida, recargarAcciones } from "./maestro.ts";
 
 export const getMaquina: () => Maquina<EstadoMaestroAcciones, ContextoMaestroAcciones> = () => {
     return {
@@ -13,9 +13,13 @@ export const getMaquina: () => Maquina<EstadoMaestroAcciones, ContextoMaestroAcc
 
             accion_borrada: Acciones.quitar,
 
+            accion_finalizada_rapido: finalizarAccionRapida,
+
             recarga_de_acciones_solicitada: recargarAcciones,
 
             criteria_cambiado: [Acciones.filtrar, recargarAcciones],
+
+            siguiente_pagina: [Acciones.filtrar, ampliarAcciones],
 
             creacion_de_accion_solicitada: "CREANDO",
         },
@@ -23,6 +27,6 @@ export const getMaquina: () => Maquina<EstadoMaestroAcciones, ContextoMaestroAcc
             creacion_accion_cancelada: "INICIAL",
 
             accion_creada: [Acciones.incluir, Acciones.activar, "INICIAL"],
-        }
+        },
     }
 }

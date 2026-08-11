@@ -1,0 +1,141 @@
+quimera-radio {
+    --color-borde: var(--color-texto-secundario);
+    --color-validacion: var(--color-texto-deshabilitado);
+    display: block;
+    width: 100%;
+
+    fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+        min-inline-size: 0;
+
+        legend {
+            color: var(--color-texto-secundario);
+            padding: 0;
+            width: 100%;
+            float: left;
+
+            .etiqueta {
+                font-size: var(--tamaño-letra-s);
+                padding-left: var(--espaciado-xxs);
+
+                .etiqueta-opcional {
+                    margin-left: var(--espaciado-xxs);
+                    color: var(--color-texto-deshabilitado);
+                    font-size: var(--tamaño-letra-xs);
+                    display: none;
+                }
+            }
+        }
+
+        .radio-opciones {
+            clear: both;
+            display: flex;
+            flex-direction: row;
+            gap: var(--espaciado-xs);
+            flex-wrap: wrap;
+            margin-top: var(--espaciado-xxs);
+
+            .radio-opcion {
+                cursor: pointer;
+
+                input[type="radio"] {
+                    position: absolute;
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                    pointer-events: none;
+                }
+
+                span {
+                    display: inline-block;
+                    padding: var(--espaciado-xxs) var(--espaciado-s);
+                    border: var(--tamaño-borde-s) solid var(--color-borde);
+                    border-radius: var(--redondeo-borde-xs);
+                    font-size: var(--tamaño-letra-m);
+                    color: var(--color-texto-secundario);
+                    transition: background-color var(--transicion-rapida),
+                                border-color var(--transicion-rapida),
+                                color var(--transicion-rapida);
+                    user-select: none;
+                }
+
+                input[type="radio"]:checked + span {
+                    background-color: var(--color-primario);
+                    color: var(--color-blanco);
+                    border-color: var(--color-primario);
+                }
+
+                input[type="radio"]:focus-visible + span {
+                    outline: 2px solid var(--color-primario);
+                    outline-offset: 2px;
+                }
+
+                &:hover span {
+                    border-color: var(--color-primario);
+                    color: var(--color-texto-primario);
+                }
+            }
+        }
+
+        .texto-validacion {
+            margin-top: var(--espaciado-xxs);
+            color: var(--color-validacion);
+            font-size: var(--tamaño-letra-s);
+            margin-left: var(--espaciado-xxs);
+        }
+    }
+
+    &[erroneo] {
+        --color-borde: var(--color-error);
+        --color-validacion: var(--color-error);
+    }
+
+    &[advertido] {
+        --color-borde: var(--color-advertencia);
+        --color-validacion: var(--color-advertencia);
+    }
+
+    &[valido] {
+        --color-borde: var(--color-exito);
+    }
+
+    &[opcional] fieldset legend .etiqueta .etiqueta-opcional {
+        display: inline;
+    }
+
+    &[deshabilitado] {
+        cursor: inherit;
+        pointer-events: none;
+
+        fieldset legend {
+            color: var(--color-texto-deshabilitado);
+        }
+
+        .radio-opcion span {
+            background-color: var(--color-deshabilitado);
+            border-color: transparent;
+            color: var(--negro);
+        }
+    }
+
+    &[condensado] {
+        fieldset legend .etiqueta {
+            font-size: var(--tamaño-letra-xs);
+
+            .etiqueta-opcional {
+                font-size: var(--tamaño-letra-xxs);
+            }
+        }
+
+        .radio-opcion span {
+            font-size: var(--tamaño-letra-s);
+            color: var(--color-primario);
+        }
+
+        .texto-validacion {
+            font-size: var(--tamaño-letra-xs);
+        }
+    }
+}

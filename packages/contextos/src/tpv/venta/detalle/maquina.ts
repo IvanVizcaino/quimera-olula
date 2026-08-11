@@ -38,6 +38,8 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
 
             devolucion_solicitada: "DEVOLVIENDO_VENTA",
 
+            emision_solicitada: "EMITIENDO_VENTA",
+
             emision_de_vale_solicitada: emitirVale,
 
             pago_efectivo_solicitado: "PAGANDO_EN_EFECTIVO",
@@ -88,6 +90,14 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
             linea_seleccionada: [Lineas.activar],
 
             tique_regalo_solicitado: "GENERANDO_TIQUE_REGALO",
+
+            pago_efectivo_solicitado: "PAGANDO_EN_EFECTIVO",
+
+            pago_vale_solicitado: "PAGANDO_CON_VALE",
+
+            pago_tarjeta_solicitado: "PAGANDO_CON_TARJETA",
+
+            borrar_pago_solicitado: "BORRANDO_PAGO",
         },
 
         BORRANDO_VENTA: {
@@ -95,6 +105,13 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
             venta_borrada: onVentaBorrada,
 
             borrado_de_venta_cancelado: "ABIERTA",
+        },
+
+        EMITIENDO_VENTA: {
+
+            emision_confirmada: [refrescarCabecera, abiertaOEmitidaContexto],
+
+            emision_cancelada: "ABIERTA",
         },
 
         PAGANDO_EN_EFECTIVO: {
@@ -106,7 +123,7 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
                 abiertaOEmitidaContexto,
             ],
 
-            pago_cancelado: "ABIERTA",
+            pago_cancelado: [abiertaOEmitidaContexto],
         },
 
         PAGANDO_CON_VALE: {
@@ -118,7 +135,7 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
                 abiertaOEmitidaContexto,
             ],
 
-            pago_cancelado: "ABIERTA",
+            pago_cancelado: [abiertaOEmitidaContexto],
         },
 
         PAGANDO_CON_TARJETA: {
@@ -130,14 +147,14 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
                 abiertaOEmitidaContexto,
             ],
 
-            pago_cancelado: "ABIERTA",
+            pago_cancelado: [abiertaOEmitidaContexto],
         },
 
         BORRANDO_PAGO: {
 
-            pago_borrado: [Pagos.quitar, refrescarCabecera, "ABIERTA"],
+            pago_borrado: [Pagos.quitar, refrescarCabecera, abiertaOEmitidaContexto],
 
-            borrado_de_pago_cancelado: "ABIERTA",
+            borrado_de_pago_cancelado: [abiertaOEmitidaContexto],
         },
 
         DEVOLVIENDO_VENTA: {

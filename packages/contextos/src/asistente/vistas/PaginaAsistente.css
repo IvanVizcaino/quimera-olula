@@ -1,0 +1,7 @@
+.asistente-pagina {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--alto-header) - var(--alto-footer));
+    width: 100%;
+    overflow: hidden;
+}

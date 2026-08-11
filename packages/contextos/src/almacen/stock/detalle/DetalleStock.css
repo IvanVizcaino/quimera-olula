@@ -1,0 +1,53 @@
+/*
+ * DetalleStock.css — posicionado de campos en grid de 12 columnas.
+ *
+ * Desktop (12 columnas):
+ *   ┌─────────────────────────────────────────────┐
+ *   │ artículo                          span 12   │
+ *   ├───────────────────┬────────┬────────────────┤
+ *   │ almacén  span 6   │ fís. 3 │ disp.        3 │
+ *   └───────────────────┴────────┴────────────────┘
+ *
+ * Móvil (2 columnas, < 768px):
+ *   ┌───────────────────────────────┐
+ *   │ artículo          1 / -1     │
+ *   ├───────────────────────────────┤
+ *   │ almacén           1 / -1     │
+ *   ├────────────────┬──────────────┤
+ *   │ fís.  span 1   │ disp. span 1 │
+ *   └────────────────┴──────────────┘
+ */
+
+.DetalleStock {
+
+    quimera-input[nombre="articulo"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="almacen"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="cantidadFisica"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="cantidadDisponible"] {
+        grid-column: span 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .DetalleStock {
+        /* artículo y almacén ya son 1/-1 por defecto en móvil (qform.css) */
+
+        /* Cantidades: mitad del ancho (1 col en grid de 2 = 50%) */
+        quimera-input[nombre="cantidadFisica"] {
+            grid-column: span 1 !important;
+        }
+
+        quimera-input[nombre="cantidadDisponible"] {
+            grid-column: span 1 !important;
+        }
+    }
+}

@@ -1,7 +1,6 @@
 import { Button, Field, Grid, Icon, Paper, Typography } from "@quimera/comps";
 import { clsx, makeStyles } from "@quimera/styles";
-import Quimera, { PropValidation } from "quimera";
-import React from "react";
+import Quimera from "quimera";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -31,7 +30,7 @@ function Signup() {
 
   return (
     <Quimera.Template id="Signup">
-      <Grid container justify="center" className={classes.root}>
+      <Grid container justifyContent="center" className={classes.root}>
         <Grid size={{ xs: 11, sm: 8, md: 4, lg: 3, xl: 2 }}>
           <Paper>
             <Grid container direction="column">

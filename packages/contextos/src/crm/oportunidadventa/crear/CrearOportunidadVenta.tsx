@@ -1,11 +1,12 @@
-import { ClienteConNombre } from "#/crm/comun/componentes/cliente_con_nombre.tsx";
+import { Cliente } from "#/crm/comun/componentes/cliente_con_nombre.tsx";
+import { LeadSelector } from "#/crm/comun/componentes/lead.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
-import { ContextoError } from "@olula/lib/contexto.js";
 import { ProcesarEvento } from "@olula/lib/useMaquina.js";
+import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback } from "react";
 import {
   getOportunidadVenta,
   postOportunidadVenta,
@@ -20,28 +21,54 @@ import { NuevaOportunidadVenta } from "./diseño.ts";
 export const CrearOportunidadVenta = ({
   publicar,
   modeloVacio = nuevaOportunidadVentaVacia,
+  ocultarOrigen = false,
 }: {
   publicar: ProcesarEvento;
   modeloVacio?: NuevaOportunidadVenta;
+  ocultarOrigen?: boolean;
 }) => {
-  const { intentar } = useContext(ContextoError);
-
-  const [creando, setCreando] = useState(false);
-  const { modelo, uiProps, valido } = useModelo(
+  const { modelo, uiProps, valido, set } = useModelo(
     metaNuevaOportunidadVenta,
     modeloVacio
   );
 
-  const crear = useCallback(async () => {
-    setCreando(true);
-    const id = await intentar(() => postOportunidadVenta(modelo));
-    const oportunidad = await intentar(() => getOportunidadVenta(id));
-    publicar("oportunidad_creada", oportunidad);
-  }, [modelo, publicar, intentar]);
+  const seleccionarCliente = useCallback(
+    (opcion: { valor: string; descripcion: string } | null) => {
+      set({
+        ...modelo,
+        cliente_id: opcion?.valor ?? "",
+        nombre_cliente: opcion?.descripcion ?? "",
+        tarjeta_id: opcion?.valor ? "" : modelo.tarjeta_id,
+        nombre_tarjeta: opcion?.valor ? "" : modelo.nombre_tarjeta,
+      });
+    },
+    [modelo, set]
+  );
 
-  const cancelar = useCallback(() => {
-    if (!creando) publicar("creacion_oportunidad_cancelada");
-  }, [creando, publicar]);
+  const seleccionarTarjeta = useCallback(
+    (opcion: { valor: string; descripcion: string } | null) => {
+      set({
+        ...modelo,
+        tarjeta_id: opcion?.valor ?? "",
+        nombre_tarjeta: opcion?.descripcion ?? "",
+        cliente_id: opcion?.valor ? "" : modelo.cliente_id,
+        nombre_cliente: opcion?.valor ? "" : modelo.nombre_cliente,
+      });
+    },
+    [modelo, set]
+  );
+
+  const crear_ = useCallback(async () => {
+    const id = await postOportunidadVenta(modelo);
+    const oportunidad = await getOportunidadVenta(id);
+    publicar("oportunidad_creada", oportunidad);
+  }, [modelo, publicar]);
+
+  const cancelar_ = useCallback(() => {
+    publicar("creacion_oportunidad_cancelada");
+  }, [publicar]);
+
+  const [crear, cancelar] = useForm(crear_, cancelar_);
 
   return (
     <QModal
@@ -53,10 +80,33 @@ export const CrearOportunidadVenta = ({
       <div className="CrearOportunidadVenta">
         <quimera-formulario>
           <QInput label="Descripción" {...uiProps("descripcion")} />
-          <ClienteConNombre
-            {...uiProps("cliente_id", "nombre_cliente")}
-            label="Seleccionar cliente"
-          />
+          {!ocultarOrigen && (
+            <>
+              {!modelo.tarjeta_id && (
+                <Cliente
+                  {...uiProps("cliente_id", "nombre_cliente")}
+                  label="Cliente"
+                  valor={modelo.cliente_id ?? ""}
+                  descripcion={modelo.nombre_cliente ?? ""}
+                  onChange={seleccionarCliente}
+                  erroneo={false}
+                  opcional
+                />
+              )}
+              {!modelo.cliente_id && (
+                <LeadSelector
+                  {...uiProps("tarjeta_id")}
+                  label="Lead"
+                  valor={modelo.tarjeta_id ?? ""}
+                  descripcion={modelo.nombre_tarjeta ?? ""}
+                  onChange={seleccionarTarjeta}
+                  erroneo={false}
+                  opcional
+                />
+              )}
+            </>
+          )}
+          {/* Pendiente: permitir nombre_cliente manual para clientes no registrados. */}
           <QInput label="Total" {...uiProps("importe")} />
         </quimera-formulario>
 

@@ -43,7 +43,7 @@ function Tarea({ desdeMasterTareas, idTarea, idCampania, tipoTarea, refreshCallb
   const email = tarea?.emailContacto;
   const nombre = tarea?.nombreContacto;
   const urlCodContacto = tarea.codContacto ? "contacto" : "clientes";
-  const cod = tarea.codContacto || tarea.codCliente;
+  const cod = tarea.codContacto || tarea.codCliente || tarea.codClienteIncidencia;
   const urlContacto = `/ss/${urlCodContacto}/${cod}`;
   const historyBack = tipoTarea ? -2 : -1;
 

@@ -1,7 +1,7 @@
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
+import { formatearDireccionUnaLinea } from "@olula/lib/dominio.ts";
 import { useEffect, useState } from "react";
 import { getDirecciones } from "../../cliente/infraestructura.ts";
-
 interface DireccionesProps {
   clienteId: string | undefined;
   valor?: string;
@@ -34,7 +34,8 @@ export const DirCliente = ({
       const direcciones = await getDirecciones(clienteId);
       const opciones = direcciones.map((direccion) => ({
         valor: direccion.id,
-        descripcion: `${direccion.tipo_via} ${direccion.nombre_via}, ${direccion.ciudad}`,
+        // descripcion: `${direccion.tipo_via} ${direccion.nombre_via}, ${direccion.ciudad}`,
+        descripcion: formatearDireccionUnaLinea(direccion),
       }));
       setOpcionesDireccion(opciones);
     };

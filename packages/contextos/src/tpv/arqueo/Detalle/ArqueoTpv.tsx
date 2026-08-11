@@ -83,6 +83,16 @@ export const DetalleArqueoTpv = ({
             {...uiProps("efectivoInicial")}
             deshabilitado={estado !== "ABIERTO"}
           />
+          <QInput
+            label="Fecha/hora apertura"
+            {...uiProps("fechahoraApertura")}
+            deshabilitado={estado !== "ABIERTO"}
+          />
+          <QInput
+            label="Fecha/hora cierre"
+            {...uiProps("fechahoraCierre")}
+            soloTexto
+          />
         </quimera-formulario>
 
         {estado === "ABIERTO" && (

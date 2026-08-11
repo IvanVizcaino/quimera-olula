@@ -19,9 +19,10 @@ export default parent => {
       preparacionBOX: {
         overflow: "hidden",
       },
-      iconoCabecera: { color: 'black'},
+      iconoCabecera: { color: 'black' },
+      iconoBloqueado: { color: 'lightgrey' },
       TablaLineasPedidoCli: {
-        width: '1500px'
+        width: '1590px'
       }
     };
   };

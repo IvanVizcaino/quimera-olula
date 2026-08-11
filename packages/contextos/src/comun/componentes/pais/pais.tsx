@@ -20,7 +20,7 @@ export const PaisSelector = ({
   onChange,
 }: PaisSelectorProps) => {
   const obtenerOpciones = async (valor: string) => {
-    if (valor.length < 3) return [];
+    if (valor.length < 2) return [];
 
     const criteria = {
       filtro: ["nombre", "~", valor],

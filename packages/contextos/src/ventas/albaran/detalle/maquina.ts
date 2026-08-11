@@ -17,7 +17,7 @@ import {
     getContextoVacio,
     refrescarAlbaran,
     refrescarLineas
-} from "./dominio.ts";
+} from "./detalle.ts";
 
 
 export const getMaquina: () => Maquina<EstadoAlbaran, ContextoAlbaran> = () => {

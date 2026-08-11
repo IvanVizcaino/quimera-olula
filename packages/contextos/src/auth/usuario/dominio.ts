@@ -45,6 +45,7 @@ export const metaNuevoUsuario: MetaModelo<Partial<Usuario>> = {
 };
 
 export const metaTablaUsuario = [
-    { id: "id", cabecera: "ID" },
+    // { id: "id", cabecera: "ID" },
+    { id: "nombre", cabecera: "Nombre" },
     { id: "grupo_id", cabecera: "Grupo" },
 ];

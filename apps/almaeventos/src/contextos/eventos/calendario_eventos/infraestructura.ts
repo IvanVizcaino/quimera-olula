@@ -1,5 +1,5 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
-import { Filtro, Orden } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro, Orden } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import { EventoCalendario } from "./diseño.ts";
 
@@ -7,7 +7,7 @@ const baseUrlEvento = `/eventos/evento`;
 
 // Obtener eventos simplificados para el calendario
 export const getEventosCalendario = async (
-    filtro: Filtro = [],
+    filtro: ClausulaFiltro[] = [],
     orden: Orden = ["finicio", "ASC"],
     fechaInicio?: string,
     fechaFin?: string

@@ -4,7 +4,15 @@
     }
 
     quimera-select[nombre="idAgenteApertura"] {
-        grid-column: span 4;
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="fechahoraApertura"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="fechahoraCierre"] {
+        grid-column: span 3;
     }
 
 

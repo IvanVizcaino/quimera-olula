@@ -70,6 +70,10 @@ quimera-checkbox {
     }
 
 
+    &[modificado] {
+        --color-borde: var(--color-accion);
+    }
+
     &[erroneo] {
         --color-borde: var(--color-error);
         --color-focus: var(--color-error-claro);
@@ -86,6 +90,22 @@ quimera-checkbox {
         --color-borde: var(--color-exito);
         /* --color-focus: var(--color-exito-claro); */
         --color-validacion: var(--color-exito);
+    }
+
+    &[solo-texto] {
+        pointer-events: none;
+
+        label {
+            color: var(--color-texto-secundario);
+        }
+
+        .valor-solo-texto {
+            font-size: var(--tamaño-letra-m);
+            color: var(--color-texto-primario);
+            padding: var(--espaciado-xxs);
+            line-height: var(--altura-linea-normal);
+            min-height: 1.5em;
+        }
     }
 
     &[opcional] label .etiqueta .etiqueta-opcional {
@@ -127,6 +147,10 @@ quimera-checkbox {
         .texto-validacion {
             font-size: var(--tamaño-letra-xs);
         }
+
+        .valor-solo-texto {
+            font-size: var(--tamaño-letra-s);
+        }
     }
 }
 
@@ -149,6 +173,35 @@ quimera-select {
 
 quimera-input {
 
+    label {
+        .hora-wrapper {
+            position: relative;
+
+            input {
+                width: 100%;
+                padding-right: var(--espaciado-l);
+            }
+
+            .hora-limpiar {
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                color: var(--color-texto-secundario);
+                cursor: pointer;
+                font-size: var(--tamaño-letra-m);
+                padding: 0 var(--espaciado-xxs);
+                line-height: 1;
+
+                &:hover {
+                    color: var(--color-texto-primario);
+                }
+            }
+        }
+    }
+
     &[tipo='numero'],
     &[tipo='entero'],
     &[tipo='decimal'],
@@ -160,5 +213,15 @@ quimera-input {
         label {
             text-align: right;
         }
+
+        .valor-solo-texto {
+            text-align: right;
+        }
+    }
+
+    &[tipo='hora'],
+    &[tipo='fecha'],
+    &[tipo='fecha_hora'] {
+        width: fit-content;
     }
 }

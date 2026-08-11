@@ -1,5 +1,6 @@
 import { QSelect } from "@olula/componentes/index.js";
 import { QAutocompletarProps } from "@olula/componentes/moleculas/qautocompletar.tsx";
+import { Criteria } from "@olula/lib/diseño.js";
 import { useEffect, useState } from "react";
 import { ItemListaTipoPalet } from "../../tipo_palet/diseño.ts";
 import { getItemsListaTipoPalet } from "../../tipo_palet/infraestructura.ts";
@@ -15,13 +16,25 @@ export const TipoPalet = ({
 }: TipoPaletProps) => {
   const [items, setItems] = useState<ItemListaTipoPalet[]>([]);
 
+  const criteria: Criteria = {
+      filtro: [],
+      orden: ["descripcion", "ASC"],
+      paginacion: { limite: 1000, pagina: 1 },
+    };
+
   useEffect(() => {
-    getItemsListaTipoPalet([], []).then(setItems);
+    getItemsListaTipoPalet(criteria).then(setItems);
   }, []);
 
-  const opciones = items.map((item) => ({ valor: item.id, descripcion: item.descripcion }));
+  const opciones = items.map((item) => ({
+    valor: item.id,
+    descripcion: item.descripcion,
+  }));
 
-  const handleChange = (opcion: { valor: string; descripcion: string } | null, e: React.ChangeEvent<HTMLElement>) => {
+  const handleChange = (
+    opcion: { valor: string; descripcion: string } | null,
+    e: React.ChangeEvent<HTMLElement>
+  ) => {
     if (!opcion) {
       onChange?.(null, e);
       return;

@@ -1,15 +1,14 @@
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
 import { DirCliente } from "#/ventas/comun/componentes/dirCliente.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QInput } from "@olula/componentes/atomos/qinput.tsx";
-import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useFocus } from "@olula/lib/useFocus.js";
+import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useContext } from "react";
+import { useCallback } from "react";
 import { getPedido, postPedido } from "../infraestructura.ts";
 import "./CrearPedido.css";
-import { metaNuevoPedido, nuevoPedidoVacio } from "./dominio.ts";
+import { metaNuevoPedido, nuevoPedidoVacio } from "./crear.ts";
 
 export const CrearPedido = ({
   publicar = async () => {},
@@ -17,19 +16,20 @@ export const CrearPedido = ({
   publicar?: EmitirEvento;
 }) => {
   const nuevoPedido = useModelo(metaNuevoPedido, nuevoPedidoVacio);
-  const { intentar } = useContext(ContextoError);
   const focus = useFocus();
 
-  const guardar = async () => {
-    const id = await intentar(() => postPedido(nuevoPedido.modelo));
+  const guardar_ = useCallback(async () => {
+    const id = await postPedido(nuevoPedido.modelo);
     const pedidoCreado = await getPedido(id);
     publicar("pedido_creado", pedidoCreado);
-  };
+  }, [nuevoPedido.modelo, publicar]);
 
-  const cancelar = () => {
+  const cancelar_ = useCallback(() => {
     publicar("creacion_pedido_cancelada");
     nuevoPedido.init();
-  };
+  }, [publicar, nuevoPedido]);
+
+  const [guardar, cancelar] = useForm(guardar_, cancelar_);
 
   return (
     <div className="CrearPedido">
@@ -44,7 +44,6 @@ export const CrearPedido = ({
           clienteId={nuevoPedido.modelo.cliente_id}
           {...nuevoPedido.uiProps("direccion_id")}
         />
-        <QInput label="Empresa" {...nuevoPedido.uiProps("empresa_id")} />
       </quimera-formulario>
       <div className="botones">
         <QBoton onClick={guardar} deshabilitado={!nuevoPedido.valido}>

@@ -9,6 +9,7 @@
         /* padding: 1.5rem; */
         color: var(--color-fondo);
         height: var(--alto-header);
+        position: fixed;
 
         & a:visited {
             color: var(--color-fondo);
@@ -18,14 +19,16 @@
     &>section[role=main] {
         display: flex;
         flex-grow: 1;
+        margin-top: var(--alto-header);
+        overflow-x: hidden;
 
-        &>*:not(menu-lateral):not(menu-usuario) {
+        &>*:not(menu-lateral):not(menu-usuario):not(panel-asistente) {
             /* padding: 1rem; */
             flex-grow: 1;
         }
 
         @media screen and (max-width: 768px) {
-            &>*:not(menu-lateral):not(menu-usuario) {
+            &>*:not(menu-lateral):not(menu-usuario):not(panel-asistente) {
                 padding: 0;
             }
         }

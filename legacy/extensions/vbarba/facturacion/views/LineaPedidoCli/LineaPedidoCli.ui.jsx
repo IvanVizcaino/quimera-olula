@@ -1,3 +1,4 @@
+import { QProveedor } from "@quimera-extension/base-almacen";
 import { Totales } from "@quimera-extension/base-area_clientes";
 import {
   Box,
@@ -12,8 +13,7 @@ import {
 } from "@quimera/comps";
 import Quimera, { getSchemas, useStateValue, util } from "quimera";
 import { useEffect } from "react";
-
-import { ProveedorArticulo, QArticuloVbarba } from "../../comps";
+import { QArticuloVbarba } from "../../comps";
 
 function LineaPedidoCli({ callbackGuardada, disabled, lineaInicial, useStyles }) {
   const [{ linea, sections }, dispatch] = useStateValue();
@@ -70,7 +70,7 @@ function LineaPedidoCli({ callbackGuardada, disabled, lineaInicial, useStyles })
                 <Grid container spacing={1} direction="column" >
                   <Grid size={12}>
                     <QArticuloVbarba
-                      id="linea.buffer.referencia"
+                      id="linea.buffer/referencia"
                       label="Artículo"
                       boxStyle={classes.referencia}
                       seVende
@@ -84,12 +84,11 @@ function LineaPedidoCli({ callbackGuardada, disabled, lineaInicial, useStyles })
                     <Quimera.Block id="afterDescripcion" />
                   </Grid>
                   <Grid size={12}>
-                    <ProveedorArticulo
+                    <QProveedor
                       id="linea.buffer/codProveedor"
                       label={`Proveedor`}
-                      referencia={linea.buffer.referencia}
+                      disableClearable
                       fullWidth
-                      async
                     />
                   </Grid>
                 </Grid>
@@ -108,7 +107,7 @@ function LineaPedidoCli({ callbackGuardada, disabled, lineaInicial, useStyles })
               dynamicComp={() => (
                 <Grid container spacing={1} direction="column" >
                   <Grid size={6}>
-                    <Field.Schema id="linea.buffer.cantidad" schema={schema} fullWidth autoFocus />
+                    <Field.Schema id="linea.buffer/cantidad" schema={schema} fullWidth autoFocus />
                   </Grid>
                   <Grid size={6}>
                     {linea.data.aplicarPvpParticular
@@ -147,10 +146,10 @@ function LineaPedidoCli({ callbackGuardada, disabled, lineaInicial, useStyles })
                 dynamicComp={() => (
                   <Grid container spacing={1} direction="column" >
                     <Grid size={6}>
-                      <Field.Schema id="linea.buffer.dtoLineal" schema={schema} fullWidth />
+                      <Field.Schema id="linea.buffer/dtoLineal" schema={schema} fullWidth />
                     </Grid>
                     <Grid size={6}>
-                      <Field.Schema id="linea.buffer.dtoPor" schema={schema} fullWidth />
+                      <Field.Schema id="linea.buffer/dtoPor" schema={schema} fullWidth />
                     </Grid>
                   </Grid>
                 )}
@@ -176,16 +175,16 @@ function LineaPedidoCli({ callbackGuardada, disabled, lineaInicial, useStyles })
                 dynamicComp={() => (
                   <Grid container spacing={1} direction="column" >
                     <Grid size={6}>
-                      <Field.Schema id="linea.buffer.codImpuesto" schema={schema} fullWidth />
+                      <Field.Schema id="linea.buffer/codImpuesto" schema={schema} fullWidth />
                     </Grid>
                     <Grid size={6}>
-                      <Field.Schema id="linea.buffer.iva" schema={schema} fullWidth />
+                      <Field.Schema id="linea.buffer/iva" schema={schema} fullWidth />
                     </Grid>
                     <Grid size={6}>
-                      <Field.Schema id="linea.buffer.recargo" schema={schema} fullWidth />
+                      <Field.Schema id="linea.buffer/recargo" schema={schema} fullWidth />
                     </Grid>
                     <Grid size={6}>
-                      <Field.Schema id="linea.buffer.irpf" schema={schema} fullWidth />
+                      <Field.Schema id="linea.buffer/irpf" schema={schema} fullWidth />
                     </Grid>
                   </Grid>
                 )}

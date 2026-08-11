@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroContactos, EstadoMaestroContactos } from "./diseño.ts";
-import { Contactos, recargarContactos } from "./maestro.ts";
+import { ampliarContactos, Contactos, recargarContactos } from "./maestro.ts";
 
 export const getMaquina: () => Maquina<EstadoMaestroContactos, ContextoMaestroContactos> = () => {
     return {
@@ -16,6 +16,8 @@ export const getMaquina: () => Maquina<EstadoMaestroContactos, ContextoMaestroCo
             recarga_de_contactos_solicitada: recargarContactos,
 
             criteria_cambiado: [Contactos.filtrar, recargarContactos],
+
+            siguiente_pagina: [Contactos.filtrar, ampliarContactos],
 
             creacion_de_contacto_solicitada: "CREANDO",
         },

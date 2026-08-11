@@ -1,0 +1,10 @@
+.tarjeta-accion-fecha-vencida {
+    color: var(--color-error-oscuro);
+    font-weight: var(--grosor-letra-5);
+}
+
+.tarjeta-accion-rapida-acciones {
+    display: flex;
+    gap: var(--espaciado-xs);
+    padding-top: var(--espaciado-xs);
+}

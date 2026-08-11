@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@quimera/comps";
 import { Backdrop, CircularProgress, Divider, Hidden, List } from "@quimera/thirdparty";
-import Quimera, { getSchemas, PropValidation, useStateValue, useWidth, util } from "quimera";
+import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
 import { useEffect } from "react";
 
 function DevolucionDetalle({ idPedido, callbackCerrado, useStyles }) {
@@ -48,7 +48,7 @@ function DevolucionDetalle({ idPedido, callbackCerrado, useStyles }) {
                 <IconButton id="cerrar" size="small" onClick={() => callbackCerrado()}>
                   <Icon>close</Icon>
                 </IconButton>
-                <Grid container direction="column" justify="space-around">
+                <Grid container size={12} direction="row" justifyContent="space-around" flex={1}>
                   <Grid className={classes.codigoPedido}>
                     <Typography variant="h5">{`Devolución  ${pedido?.codigo}`}</Typography>
                   </Grid>
@@ -68,7 +68,7 @@ function DevolucionDetalle({ idPedido, callbackCerrado, useStyles }) {
                   <Button
                     id="prepararDevolucion"
                     variant="contained"
-                    color="primary"
+                    color="secondary"
                     size="large"
                     text="Confirmar devolución"
                     disabled={

@@ -4,35 +4,24 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal, QTextArea } from "@olula/componentes/index.js";
 import { useFocus } from "@olula/lib/useFocus.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useEffect } from "react";
-import { getItemsListaTipoPalet } from "../../tipo_palet/infraestructura.ts";
+import { useCallback } from "react";
 import { Calibre } from "../../comun/componentes/Calibre.tsx";
 import { Marca } from "../../comun/componentes/Marca.tsx";
 import { TipoPalet } from "../../comun/componentes/TipoPalet.tsx";
 import { Variedad } from "../../comun/componentes/Variedad.tsx";
+import { formateaCategoria } from "../dominio.ts";
 import "./CrearLinea.css";
 import {
   FormCrearLineaDefecto,
   metaCrearLinea,
   postLineaNrj,
 } from "./crear_linea.ts";
-import { formateaCategoria } from "../dominio.ts";
 
 export const CrearLineaNrj = ({ pedidoId, publicar }: CrearLineaProps) => {
-  const { modelo, uiProps, valido, set } = useModelo(
+  const { modelo, uiProps, valido } = useModelo(
     metaCrearLinea,
     FormCrearLineaDefecto
   );
-
-  useEffect(() => {
-    if (!modelo.idTipoPalet) return;
-    getItemsListaTipoPalet([], []).then((items) => {
-      const item = items.find((i) => i.id === modelo.idTipoPalet);
-      if (item && item.cantidadEnvase !== modelo.envasesPorPalet) {
-        set({ ...modelo, envasesPorPalet: item.cantidadEnvase });
-      }
-    });
-  }, [modelo, set]);
 
   const crear = useCallback(async () => {
     await postLineaNrj(pedidoId, modelo);

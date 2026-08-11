@@ -14,7 +14,7 @@ import {
 } from "@quimera/comps";
 import { navigate } from "hookrouter";
 import Quimera, { PropValidation, useStateValue } from "quimera";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDbState } from "use-db-state";
 
 import { BarcodeScanner } from "../../comps";
@@ -263,10 +263,8 @@ function EditInventario({ ...props }) {
       return (
         <div className="articuloName tableGrid">
           <span>
-            {params.row.referencia}
-            {params.row.talla ? `-${params.row.talla}` : ""}
+            {`${params.row.referencia}${params.row.talla ? `-${params.row.talla}` : ""} ${params.row.desarticulo}`}
           </span>
-          <span>{params.row.desarticulo}</span>
         </div>
       );
     };
@@ -322,7 +320,7 @@ function EditInventario({ ...props }) {
       {
         field: "referencia",
         headerName: "Artículo",
-        flex: 2,
+        flex: 1,
         renderCell: params => renderArticulo(params),
       },
       {
@@ -432,10 +430,17 @@ function EditInventario({ ...props }) {
                 printOptions: { disableToolbarButton: true },
                 csvOptions: { disableToolbarButton: true },
               },
-              pagination: {
-                labelRowsPerPage: "Líneas por página",
-                labelDisplayedRows: ({ from, to, count }) => `${from}-${to} de ${count}`,
-              },
+            }}
+            localeText={{
+              noRowsLabel: "No hay artículos",
+              toolbarQuickFilterPlaceholder: "Buscar...",
+              paginationRowsPerPage: "Líneas por página",
+              paginationDisplayedRows: ({ from, to, count }) =>
+                `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`,
+              footerRowSelected: (count) =>
+                count !== 1
+                  ? `${count} filas seleccionadas`
+                  : `${count} fila seleccionada`,
             }}
           />
           {lineaSeleccionada ? (

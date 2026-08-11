@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroIncidencias, EstadoMaestroIncidencias } from "./diseño.ts";
-import { Incidencias, recargarIncidencias } from "./maestro.ts";
+import { ampliarIncidencias, Incidencias, recargarIncidencias } from "./maestro.ts";
 
 export const getMaquina: () => Maquina<EstadoMaestroIncidencias, ContextoMaestroIncidencias> = () => {
     return {
@@ -16,6 +16,8 @@ export const getMaquina: () => Maquina<EstadoMaestroIncidencias, ContextoMaestro
             recarga_de_incidencias_solicitada: recargarIncidencias,
 
             criteria_cambiado: [Incidencias.filtrar, recargarIncidencias],
+
+            siguiente_pagina: [Incidencias.filtrar, ampliarIncidencias],
 
             creacion_de_incidencia_solicitada: "CREANDO",
         },

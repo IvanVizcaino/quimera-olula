@@ -1,0 +1,108 @@
+.ArchivosSeleccionados {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: var(--color-superficie-sunken);
+    border-radius: 8px;
+}
+
+.ArchivosSeleccionados-titulo {
+    border-bottom: 2px solid var(--color-borde-sutil);
+    padding-bottom: 0.5rem;
+}
+
+.ArchivosSeleccionados-titulo h3 {
+    margin: 0;
+    color: var(--color-texto-primario);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.ArchivosSeleccionados-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.ArchivosSeleccionados-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background-color: var(--color-superficie);
+    border: 1px solid var(--color-borde-sutil);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.ArchivosSeleccionados-item:hover {
+    background-color: var(--color-superficie-elevada);
+    border-color: var(--color-borde-fuerte);
+}
+
+.ArchivosSeleccionados-item--excede {
+    opacity: 0.6;
+}
+
+.ArchivosSeleccionados-item--excede .ArchivosSeleccionados-icono {
+    color: var(--color-error);
+}
+
+.ArchivosSeleccionados-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.ArchivosSeleccionados-icono {
+    display: flex;
+    color: var(--color-texto-secundario);
+    flex-shrink: 0;
+}
+
+.ArchivosSeleccionados-detalles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.ArchivosSeleccionados-nombre {
+    margin: 0;
+    color: var(--color-texto-primario);
+    font-size: 0.9rem;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ArchivosSeleccionados-tamaño {
+    margin: 0;
+    color: var(--color-texto-secundario);
+    font-size: 0.8rem;
+}
+
+.ArchivosSeleccionados-aviso {
+    margin: 0;
+    color: var(--color-error);
+    font-size: 0.8rem;
+}
+
+.ArchivosSeleccionados-botones {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-borde-sutil);
+}
+
+.ArchivosSeleccionados-botones button {
+    min-width: 100px;
+}

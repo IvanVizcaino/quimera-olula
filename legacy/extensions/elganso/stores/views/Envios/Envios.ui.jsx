@@ -1,6 +1,20 @@
+import { styled } from '@mui/material/styles';
 import "./Envios.style.scss";
 
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import CancelIcon from '@mui/icons-material/Cancel';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
+import {
+  DataGrid,
+  QuickFilter,
+  QuickFilterClear,
+  QuickFilterControl,
+  QuickFilterTrigger,
+  Toolbar,
+  ToolbarButton,
+} from "@mui/x-data-grid";
 import {
   Button,
   Container,
@@ -13,10 +27,34 @@ import {
 } from "@quimera/comps";
 import { navigate } from "hookrouter";
 import Quimera, { PropValidation, useStateValue, util } from "quimera";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDbState } from "use-db-state";
 
 import { YearInCurso } from "../../comps";
+
+const StyledQuickFilter = styled(QuickFilter)({
+  display: 'grid',
+  alignItems: 'center',
+  marginLeft: 'auto',
+});
+
+const StyledToolbarButton = styled(ToolbarButton)(({ theme, ownerState }) => ({
+  gridArea: '1 / 1',
+  width: 'min-content',
+  height: 'min-content',
+  zIndex: 1,
+  opacity: ownerState.expanded ? 0 : 1,
+  pointerEvents: ownerState.expanded ? 'none' : 'auto',
+  transition: theme.transitions.create(['opacity']),
+}));
+
+const StyledTextField = styled(TextField)(({ theme, ownerState }) => ({
+  gridArea: '1 / 1',
+  overflowX: 'clip',
+  width: ownerState.expanded ? 260 : 'var(--trigger-width)',
+  opacity: ownerState.expanded ? 1 : 0,
+  transition: theme.transitions.create(['width', 'opacity']),
+}));
 
 const getDbInstance = (dbName, storeName) => {
   return new Promise((resolve, reject) => {
@@ -144,9 +182,24 @@ function Envios() {
 
     const renderViajeName = params => {
       return (
-        <div className="viajeName tableGrid">
-          <span>{params.row.nombredestino}</span>
-          <span>{params.row.idviajemultitrans}</span>
+        <div className="viajeName">
+          <span>{params.row.nombredestino} - {params.row.idviajemultitrans}</span>
+        </div>
+      );
+    };
+
+    const renderViajeFecha = params => {
+      if (!params.row.fechaalta || !params.row.horaalta) {
+        return (
+          <div className="viajeFecha tableGrid">
+            <span>{params.row.fecha}</span>
+          </div>
+        );
+      }
+
+      return (
+        <div className="viajeFecha tableGrid">
+          <span>{params.row.fechaalta} {params.row.horaalta}</span>
         </div>
       );
     };
@@ -190,7 +243,7 @@ function Envios() {
     };
     function CustomToolbar() {
       return (
-        <GridToolbarContainer className="toolbarContainer">
+        <Toolbar className="toolbarContainer">
           <YearInCurso className="toolbarContainer-quickFilter" />
           <Field.CheckBox
             id="mostrarSoloMisEnvios"
@@ -198,7 +251,57 @@ function Envios() {
             checked={mostrarSoloMisEnvios}
           />
           <div className="toolbarContainer-subcontainer">
-            <GridToolbarQuickFilter className="toolbarContainer-quickFilter" />
+            <StyledQuickFilter>
+              <QuickFilterTrigger
+                render={(triggerProps, state) => (
+                  <Tooltip title="Buscar" enterDelay={0}>
+                    <StyledToolbarButton
+                      {...triggerProps}
+                      ownerState={{ expanded: state.expanded }}
+                      color="default"
+                      aria-disabled={state.expanded}
+                    >
+                      <SearchIcon fontSize="small" />
+                    </StyledToolbarButton>
+                  </Tooltip>
+                )}
+              />
+              <QuickFilterControl
+                render={({ ref, ...controlProps }, state) => (
+                  <StyledTextField
+                    {...controlProps}
+                    ownerState={{ expanded: state.expanded }}
+                    inputRef={ref}
+                    aria-label="Buscar"
+                    placeholder="Buscar..."
+                    size="small"
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon fontSize="small" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: state.value ? (
+                          <InputAdornment position="end">
+                            <QuickFilterClear
+                              edge="end"
+                              size="small"
+                              aria-label="Limpiar"
+                              material={{ sx: { marginRight: -0.75 } }}
+                            >
+                              <CancelIcon fontSize="small" />
+                            </QuickFilterClear>
+                          </InputAdornment>
+                        ) : null,
+                        ...controlProps.slotProps?.input,
+                      },
+                      ...controlProps.slotProps,
+                    }}
+                  />
+                )}
+              />
+            </StyledQuickFilter>
             <IconButton
               id="button-download"
               className="buttonDescargar buttonDescargar-green "
@@ -214,7 +317,7 @@ function Envios() {
               <Icon>sync</Icon>
             </IconButton>
           </div>
-        </GridToolbarContainer>
+        </Toolbar>
       );
     }
 
@@ -231,8 +334,14 @@ function Envios() {
         renderCell: params => renderViajeName(params),
         flex: 2,
       },
-      { field: "cantidad", headerName: "UD", flex: 1 },
-      { field: "usuarioenvio", headerName: "USER", flex: 1 },
+      {
+        field: "fecha",
+        headerName: "FECHA",
+        renderCell: params => renderViajeFecha(params),
+        flex: 1,
+      },
+      { field: "cantidad", headerName: "UD", flex: 0.5 },
+      { field: "usuarioenvio", headerName: "USER", flex: 0.5 },
       {
         field: "acciones",
         headerName: "",
@@ -291,10 +400,11 @@ function Envios() {
               <DialogTitle id="form-dialog-sincro-title">{dialogTitle}</DialogTitle>
               <DialogActions>
                 <div>
-                  <Button id="cancelarObtenerEnvios" text="Cancelar" />
+                  <Button id="cancelarObtenerEnvios" text="Cancelar" color="secondary" />
                   <Button
                     id="obtenerEnvios"
                     text="Aceptar"
+                    color="primary"
                     onClick={() => {
                       let filtroYears = [];
                       getDbValue("ElGansoApp", "Years", "yearsSelected").then(years => {
@@ -326,7 +436,7 @@ function Envios() {
 
     return (
       <div id="Envios" className="page-container">
-        <h2 className="main">Envios</h2>
+        <h2 className="main">Envíos</h2>
         <DataGrid
           rows={enviosFiltered}
           disableColumnFilter
@@ -337,7 +447,15 @@ function Envios() {
           columns={columns}
           slots={{ toolbar: CustomToolbar }}
           localeText={{
+            noRowsLabel: "No hay envíos",
             toolbarQuickFilterPlaceholder: "Buscar...",
+            paginationRowsPerPage: "Líneas por página",
+            paginationDisplayedRows: ({ from, to, count }) =>
+              `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`,
+            footerRowSelected: (count) =>
+              count !== 1
+                ? `${count} filas seleccionadas`
+                : `${count} fila seleccionada`,
           }}
           getRowId={row => row.idviajemultitrans}
           slotProps={{
@@ -345,12 +463,9 @@ function Envios() {
               showQuickFilter: true,
               printOptions: { disableToolbarButton: true },
               csvOptions: { disableToolbarButton: true },
-            },
-            pagination: {
-              labelRowsPerPage: "Líneas por página",
-              labelDisplayedRows: ({ from, to, count }) => `${from}-${to} de ${count}`,
-            },
+            }
           }}
+          showToolbar
         />
 
         <Container>
@@ -358,10 +473,11 @@ function Envios() {
             <DialogTitle id="form-dialog-title">{dialogTitle}</DialogTitle>
             <DialogActions>
               <div>
-                <Button id="cancelarAsignacion" text="No" />
+                <Button id="cancelarAsignacion" text="No" color="secondary" />
                 <Button
                   id="asignar"
                   text="Sí"
+                  color="primary"
                   onClick={() => {
                     dispatch({
                       type: "onAsignarUsuarioEnvio",
@@ -383,10 +499,11 @@ function Envios() {
             <DialogTitle id="form-dialog-sincro-title">{dialogTitle}</DialogTitle>
             <DialogActions>
               <div>
-                <Button id="cancelarAsignacionSincro" text="No" />
+                <Button id="cancelarAsignacionSincro" text="No" color="secondary" />
                 <Button
                   id="asignarSincro"
                   text="Sí"
+                  color="primary"
                   onClick={() => {
                     dispatch({
                       type: "onSincroEnvio",
@@ -407,10 +524,11 @@ function Envios() {
             <DialogTitle id="form-dialog-sincro-title">{dialogTitle}</DialogTitle>
             <DialogActions>
               <div>
-                <Button id="cancelarObtenerEnvios" text="Cancelar" />
+                <Button id="cancelarObtenerEnvios" text="Cancelar" color="secondary" />
                 <Button
                   id="obtenerEnvios"
                   text="Aceptar"
+                  color="primary"
                   onClick={() => {
                     let filtroYears = [];
                     getDbValue("ElGansoApp", "Years", "yearsSelected").then(years => {

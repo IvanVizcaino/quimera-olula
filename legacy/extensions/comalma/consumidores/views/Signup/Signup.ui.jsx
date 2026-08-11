@@ -127,7 +127,7 @@ function Signup({ hash }) {
 
   return (
     <Quimera.Template id="Signup">
-      <Grid container justify="center" className={classes.root}>
+      <Grid container justifyContent="center" className={classes.root}>
         <Grid size={12} className={classes.logo}>
           <img alt="Project logo" src="/img/logo_url_oscuro.png" width={mobile ? "90%" : "15%"} />
         </Grid>
@@ -200,10 +200,10 @@ function Signup({ hash }) {
                   </Grid>
 
                   <Grid size={mobile ? 12 : 6} style={{
-                      display: "flex",
-                      alignItems: "flex-end",
-                      paddingBottom: "4px",
-                    }}>
+                    display: "flex",
+                    alignItems: "flex-end",
+                    paddingBottom: "4px",
+                  }}>
                     <SelectorValores
                       id="consumidor.buffer/idprovincia"
                       stateField="idprovincia"
@@ -216,10 +216,10 @@ function Signup({ hash }) {
                   </Grid>
                   <Grid size={mobile ? 0 : 1} />
                   <Grid size={mobile ? 12 : 3} style={{
-                      display: "flex",
-                      alignItems: "flex-end",
-                      paddingBottom: "4px",
-                    }}>
+                    display: "flex",
+                    alignItems: "flex-end",
+                    paddingBottom: "4px",
+                  }}>
                     <SelectorValores
                       id="consumidor.buffer/genero"
                       stateField="genero"

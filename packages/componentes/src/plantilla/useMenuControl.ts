@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { MenuContext } from "./MenuContext";
+import { MenuContext } from "./menu_context";
 
 export const useMenuControl = () => {
     const context = useContext(MenuContext);

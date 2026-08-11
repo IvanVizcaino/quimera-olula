@@ -1,4 +1,3 @@
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -13,7 +12,7 @@ import { BorrarAlbaran } from "../borrar/BorrarAlbaran.tsx";
 import { Albaran } from "../diseño.ts";
 import { albaranVacio, editable, metaAlbaran } from "../dominio.ts";
 import "./DetalleAlbaran.css";
-import { Lineas } from "./Lineas/Lineas.tsx";
+import { Lineas } from "./lineas/Lineas.tsx";
 import { getMaquina } from "./maquina.ts";
 import { TabCliente } from "./TabCliente/TabCliente.tsx";
 import { TabDatos } from "./TabDatos.tsx";
@@ -40,8 +39,14 @@ export const DetalleAlbaran = ({
     publicar
   );
 
-  const albaran = useModelo(metaAlbaran, ctx.albaran);
-  const { modificado, valido } = albaran;
+  const autoGuardar = useCallback(
+    async (modelo: Albaran) => {
+      emitir("edicion_de_albaran_lista", modelo);
+    },
+    [emitir]
+  );
+
+  const albaran = useModelo(metaAlbaran, ctx.albaran, autoGuardar);
 
   useEffect(() => {
     emitir("albaran_id_cambiado", albaranId, true);
@@ -51,14 +56,6 @@ export const DetalleAlbaran = ({
   const { estado, lineaActiva } = ctx;
 
   const titulo = (albaran: Albaran) => albaran.codigo || "Nuevo Albarán";
-
-  const handleGuardar = useCallback(() => {
-    emitir("edicion_de_albaran_lista", albaran.modelo);
-  }, [emitir, albaran]);
-
-  const handleCancelar = useCallback(() => {
-    emitir("edicion_de_albaran_cancelada");
-  }, [emitir]);
 
   if (!ctx.albaran.id) return;
 
@@ -96,17 +93,6 @@ export const DetalleAlbaran = ({
           <TabObservaciones albaran={albaran} />
         </Tab>
       </Tabs>
-
-      {editable(ctx.albaran) && modificado && (
-        <div className="botones maestro-botones">
-          <QBoton onClick={handleGuardar} deshabilitado={!valido}>
-            Guardar Cambios
-          </QBoton>
-          <QBoton tipo="reset" variante="texto" onClick={handleCancelar}>
-            Cancelar
-          </QBoton>
-        </div>
-      )}
 
       <TotalesVenta modeloVenta={albaran} publicar={emitir} />
 

@@ -1,0 +1,17 @@
+.IaMemoria {
+    .tarjeta-ia-memoria {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tarjeta-ia-memoria-estado {
+        font-size: 0.85em;
+        color: var(--color-texto-secundario, #666);
+    }
+
+    .tarjeta-ia-memoria-estado.estado-inactivo {
+        opacity: 0.6;
+    }
+}

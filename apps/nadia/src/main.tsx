@@ -1,6 +1,6 @@
 import { authMiddleware } from "#/auth/middlewares.ts";
 import { useTimerRefresco } from "#/auth/useTimerRefresco.ts";
-import { Vista } from "@olula/componentes/index.ts";
+import { InicioOlula, Vista } from "@olula/componentes/index.ts";
 import "@olula/lib/comun.css";
 import { FactoryObj, FactoryProvider } from "@olula/lib/factory_ctx.tsx";
 import { crearMenu, MenuContextFactory } from "@olula/lib/menu.ts";
@@ -36,7 +36,12 @@ const App = () => {
     FactoryObj.setApp(appFactory);
   }, []);
 
-  return <RouterProvider router={rutas} />;
+  return (
+    <>
+      <RouterProvider router={rutas} />
+      <InicioOlula />
+    </>
+  );
 };
 
 root.render(

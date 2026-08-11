@@ -1,30 +1,28 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
-import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback } from "react";
 import { getLead, postLead } from "../infraestructura.ts";
 import "./CrearLead.css";
 import { metaNuevoLead, nuevoLeadVacio } from "./crear.ts";
 
 export const CrearLead = ({ publicar }: { publicar: EmitirEvento }) => {
-  const { intentar } = useContext(ContextoError);
-
   const { modelo, uiProps, valido } = useModelo(metaNuevoLead, nuevoLeadVacio);
-  const [creando, setCreando] = useState(false);
 
-  const crear = useCallback(async () => {
-    setCreando(true);
-    const id = await intentar(() => postLead(modelo));
-    const lead = await intentar(() => getLead(id));
+  const crear_ = useCallback(async () => {
+    const id = await postLead(modelo);
+    const lead = await getLead(id);
     publicar("lead_creado", lead);
-  }, [modelo, publicar, intentar]);
+  }, [modelo, publicar]);
 
-  const cancelar = useCallback(() => {
-    if (!creando) publicar("creacion_lead_cancelada");
-  }, [creando, publicar]);
+  const cancelar_ = useCallback(() => {
+    publicar("creacion_lead_cancelada");
+  }, [publicar]);
+
+  const [crear, cancelar] = useForm(crear_, cancelar_);
 
   return (
     <QModal

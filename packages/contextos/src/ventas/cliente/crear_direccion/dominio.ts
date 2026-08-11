@@ -11,5 +11,12 @@ export const metaNuevaDireccion: MetaModelo<NuevaDireccion> = {
 export const nuevaDireccionVacia: NuevaDireccion = {
     nombre_via: '',
     tipo_via: '',
+    numero: '',
+    otros: '',
+    cod_postal: '',
     ciudad: '',
+    provincia: '',
+    pais_id: '',
+    apartado: '',
+    telefono: '',
 }

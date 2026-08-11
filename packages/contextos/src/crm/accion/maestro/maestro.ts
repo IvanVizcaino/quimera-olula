@@ -5,7 +5,7 @@ import {
     accionesListaActivaEntidades,
 } from "@olula/lib/ListaActivaEntidades.js";
 import { Accion } from "../diseño.ts";
-import { getAcciones } from "../infraestructura.ts";
+import { finalizarAccion, getAcciones } from "../infraestructura.ts";
 import { ContextoMaestroAcciones, EstadoMaestroAcciones } from "./diseño.ts";
 
 export const metaTablaAccion: MetaTabla<Accion> = [
@@ -29,4 +29,18 @@ export const recargarAcciones: ProcesarAcciones = async (contexto, payload) => {
     const resultado = await getAcciones(criteria.filtro, criteria.orden, criteria.paginacion);
 
     return Acciones.recargar(contexto, resultado);
+}
+
+export const ampliarAcciones: ProcesarAcciones = async (contexto, payload) => {
+    const criteria = payload as Criteria;
+    const resultado = await getAcciones(criteria.filtro, criteria.orden, criteria.paginacion);
+
+    return Acciones.ampliar(contexto, resultado);
+}
+
+export const finalizarAccionRapida: ProcesarAcciones = async (contexto, payload) => {
+    const accionId = payload as string;
+    await finalizarAccion(accionId);
+
+    return Acciones.quitar(contexto, accionId);
 }

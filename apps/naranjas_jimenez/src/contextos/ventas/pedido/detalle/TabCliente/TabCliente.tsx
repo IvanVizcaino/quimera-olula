@@ -6,7 +6,7 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 
 import { EstadoPedido } from "#/ventas/pedido/detalle/diseño.ts";
-import { editable } from "#/ventas/pedido/detalle/dominio.ts";
+import { editable } from "#/ventas/pedido/detalle/detalle.ts";
 import { QCheckbox } from "@olula/componentes/index.js";
 import { Transportista } from "../../../comun/componentes/Transportista.tsx";
 import { PedidoNrj } from "../../diseño.ts";

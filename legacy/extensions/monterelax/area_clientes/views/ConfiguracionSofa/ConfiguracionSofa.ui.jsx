@@ -131,7 +131,7 @@ function ConfiguracionSofa({ idModeloProp, callbackVolver, useStyles }) {
           </DialogContent>
           <DialogActions>
             {!mobile ? (
-              <Grid container justifyContent="space-between">
+              <Grid container justifyContent="space-between" style={{ minWidth: "100%" }}>
                 <Grid container size={4} alignItems="center">
                   <Button
                     id="cancelar"

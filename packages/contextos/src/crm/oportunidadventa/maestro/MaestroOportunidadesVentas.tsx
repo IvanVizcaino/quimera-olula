@@ -1,44 +1,160 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
-import { QAvatar, QTarjetaGenerica } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
-import { useEsMovil } from "@olula/componentes/maestro/useEsMovil.js";
-import { formatearFechaDate } from "@olula/lib/dominio.js";
+import { getMetaFiltroDefecto } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
+import type { ClausulaFiltro, Filtro, Orden } from "@olula/lib/diseño.ts";
+import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CrearOportunidadVenta } from "../crear/CrearOportunidadVenta.tsx";
 import { DetalleOportunidadVenta } from "../detalle/DetalleOportunidadVenta.tsx";
-import { OportunidadVenta } from "../diseño.ts";
+import { EstadoOportunidad, OportunidadVenta } from "../diseño.ts";
+import {
+  filtrarColumnasKanbanPorEstado,
+  obtenerIdsEstadosTerminales,
+} from "../dominio.ts";
+import { getEstadosOportunidadVenta } from "../infraestructura.ts";
+import {
+  crearColumnasKanbanOportunidad,
+  crearFiltroEstadoOportunidad,
+  crearOpcionesFiltroEstadoOportunidad,
+  enriquecerColumnasKanbanOportunidad,
+} from "./kanban.ts";
 import { metaTablaOportunidadVenta } from "./maestro.ts";
 import "./MaestroOportunidadesVenta.css";
 import { getMaquina } from "./maquina.ts";
-
-type Layout = "TABLA" | "TARJETA";
+import { TarjetaOportunidadVenta } from "./TarjetaOportunidadVenta.tsx";
+import { TarjetaOportunidadVentaKanban } from "./TarjetaOportunidadVentaKanban.tsx";
 
 export const MaestroOportunidades = () => {
   const { id, criteria } = getUrlParams();
+  const modoUrl = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("modo");
+  }, []);
+  const [estadosOportunidad, setEstadosOportunidad] = useState<
+    EstadoOportunidad[]
+  >([]);
+  const [modoActual, setModoActual] = useState<"tabla" | "tarjetas" | "kanban">(
+    modoUrl === "kanban" ? "kanban" : "tarjetas"
+  );
+  const idsEstadosTerminales = useMemo(
+    () => obtenerIdsEstadosTerminales(estadosOportunidad),
+    [estadosOportunidad]
+  );
+  const todosLosEstados = useMemo(
+    () => estadosOportunidad.map((estado) => String(estado.id)),
+    [estadosOportunidad]
+  );
+  const estadosNoTerminales = useMemo(
+    () => todosLosEstados.filter((id) => !idsEstadosTerminales.includes(id)),
+    [todosLosEstados, idsEstadosTerminales]
+  );
+  const ordenBaseOportunidades = useMemo(
+    () => ["probabilidad", "DESC", "fecha_cierre", "ASC"] as unknown as Orden,
+    []
+  );
+  const columnasKanban = useMemo(
+    () => crearColumnasKanbanOportunidad(estadosOportunidad),
+    [estadosOportunidad]
+  );
+  const criteriaBaseOportunidades = useMemo(
+    () => ({
+      ...criteriaDefecto,
+      orden: ordenBaseOportunidades,
+    }),
+    [ordenBaseOportunidades]
+  );
+
+  const criteriaDesdeUrl = useMemo(
+    () =>
+      criteria.orden.toString() === criteriaDefecto.orden.toString()
+        ? { ...criteria, orden: ordenBaseOportunidades }
+        : criteria,
+    [criteria, ordenBaseOportunidades]
+  );
+
+  const [criteriaInicial, setCriteriaInicial] = useState(
+    criteria.filtro.length > 0 ||
+      criteria.orden.toString() !== criteriaDefecto.orden.toString()
+      ? criteriaDesdeUrl
+      : criteriaBaseOportunidades
+  );
 
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "INICIAL",
-    oportunidades: listaActivaEntidadesInicial<OportunidadVenta>(id, criteria),
+    oportunidades: listaActivaEntidadesInicial<OportunidadVenta>(
+      id,
+      criteriaInicial
+    ),
   });
+
+  const columnasKanbanFiltradas = useMemo(() => {
+    const filtroArray = Array.isArray(ctx.oportunidades.criteria.filtro)
+      ? (ctx.oportunidades.criteria.filtro as ClausulaFiltro[])
+      : [];
+    return filtrarColumnasKanbanPorEstado(columnasKanban, filtroArray);
+  }, [ctx.oportunidades.criteria.filtro, columnasKanban]);
+
+  const columnasKanbanConTotales = useMemo(() => {
+    return enriquecerColumnasKanbanOportunidad(
+      columnasKanbanFiltradas,
+      ctx.oportunidades.lista,
+      estadosOportunidad
+    );
+  }, [columnasKanbanFiltradas, ctx.oportunidades.lista, estadosOportunidad]);
 
   useUrlParams(ctx.oportunidades.activo, ctx.oportunidades.criteria);
 
   useEffect(() => {
-    emitir("recarga_de_oportunidades_solicitada", ctx.oportunidades.criteria);
+    let activo = true;
+
+    const cargarColumnasKanban = async () => {
+      const criteriosEstados = {
+        filtro: [] as unknown as Filtro,
+        orden: ["id"] as unknown as Orden,
+      };
+
+      const estados = await getEstadosOportunidadVenta(
+        criteriosEstados.filtro,
+        criteriosEstados.orden
+      );
+
+      if (!activo) return;
+
+      setEstadosOportunidad(estados);
+
+      if (criteria.filtro.length === 0) {
+        const idsTerminales = obtenerIdsEstadosTerminales(estados);
+        const idsNoTerminales = estados
+          .map((e) => String(e.id))
+          .filter((id) => !idsTerminales.includes(id));
+        // Actualizar criteriaInicial para que el Listado sepa cuál es el filtro base
+        const filtroNoTerminales: ClausulaFiltro[] = [
+          ["estado_id", "in", idsNoTerminales as unknown as string],
+        ];
+
+        const criteriaConFiltro = {
+          ...criteriaBaseOportunidades,
+          filtro: filtroNoTerminales,
+        };
+        setCriteriaInicial(criteriaConFiltro);
+
+        emitir("criteria_cambiado", criteriaConFiltro);
+      } else {
+        emitir("recarga_de_oportunidades_solicitada", criteriaDesdeUrl);
+      }
+    };
+
+    cargarColumnasKanban();
+
+    return () => {
+      activo = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const esMovil = useEsMovil();
-  const [layout, setLayout] = useState<Layout>("TARJETA");
-
-  const cambiarLayout = useCallback(
-    () => setLayout(layout === "TARJETA" ? "TABLA" : "TARJETA"),
-    [layout, setLayout]
-  );
 
   return (
     <div className="OportunidadesVenta">
@@ -46,26 +162,51 @@ export const MaestroOportunidades = () => {
         Maestro={
           <>
             <h2>Oportunidades de Venta</h2>
-            {!esMovil && (
-              <div className="maestro-botones">
-                <QBoton
-                  texto={
-                    layout === "TARJETA"
-                      ? "Cambiar a TABLA"
-                      : "Cambiar a TARJETA"
-                  }
-                  onClick={cambiarLayout}
-                />
-              </div>
-            )}
 
             <Listado<OportunidadVenta>
               metaTabla={metaTablaOportunidadVenta}
+              metaFiltro={{
+                ...getMetaFiltroDefecto(metaTablaOportunidadVenta),
+                estado_id: {
+                  id: "estado_id",
+                  label: "Estado",
+                  tipo: "multiseleccion",
+                  opciones:
+                    crearOpcionesFiltroEstadoOportunidad(estadosOportunidad),
+                  valorDefecto: estadosNoTerminales,
+                  filtro: crearFiltroEstadoOportunidad,
+                },
+              }}
               criteria={ctx.oportunidades.criteria}
-              modo={esMovil || layout === "TARJETA" ? "tarjetas" : "tabla"}
+              criteriaInicial={criteriaInicial}
+              modosDisponibles={["tarjetas", "kanban"]}
+              modo={modoActual}
+              mostrarCambioModo
               tarjeta={TarjetaOportunidadVenta}
+              tarjetaKanban={TarjetaOportunidadVentaKanban}
               entidades={ctx.oportunidades.lista}
               totalEntidades={ctx.oportunidades.total}
+              columnasKanban={columnasKanbanConTotales}
+              campoEstadoKanban="estado_id"
+              onCambioEstadoKanban={(idOportunidad, nuevoEstado) => {
+                const estadoDestino = estadosOportunidad.find(
+                  (estado) => String(estado.id) === nuevoEstado
+                );
+
+                emitir("estado_oportunidad_cambiado", {
+                  idOportunidad,
+                  nuevoEstado,
+                  descripcionEstado: estadoDestino?.descripcion,
+                  probabilidadEstado: estadoDestino?.probabilidad,
+                });
+              }}
+              onModoChanged={(nuevoModo) => {
+                setModoActual(nuevoModo);
+
+                if (nuevoModo === "kanban") {
+                  emitir("oportunidad_deseleccionada");
+                }
+              }}
               seleccionada={ctx.oportunidades.activo}
               renderAcciones={() => (
                 <div className="maestro-botones">
@@ -82,6 +223,9 @@ export const MaestroOportunidades = () => {
               onCriteriaChanged={(payload) =>
                 emitir("criteria_cambiado", payload)
               }
+              onSiguientePagina={(payload) =>
+                emitir("siguiente_pagina", payload)
+              }
             />
           </>
         }
@@ -92,37 +236,12 @@ export const MaestroOportunidades = () => {
           />
         }
         seleccionada={ctx.oportunidades.activo}
-        modoDisposicion="maestro-50"
+        nombreModal="detalleOportunidadKanban"
+        onCerrarDetalle={() => emitir("oportunidad_deseleccionada")}
+        modoDisposicion={modoActual === "kanban" ? "modal" : "maestro-50"}
       />
 
       {ctx.estado === "CREANDO" && <CrearOportunidadVenta publicar={emitir} />}
     </div>
-  );
-};
-
-const TarjetaOportunidadVenta = (oportunidad: OportunidadVenta) => {
-  const probabilidad =
-    oportunidad.probabilidad >= 75
-      ? "muyprobable"
-      : oportunidad.probabilidad >= 50
-        ? "probable"
-        : "improbable";
-
-  return (
-    <QTarjetaGenerica
-      avatar={
-        <QAvatar className={probabilidad}>
-          {oportunidad.probabilidad + "%"}
-        </QAvatar>
-      }
-      arribaIzquierda={oportunidad.descripcion}
-      arribaDerecha={
-        oportunidad.fecha_cierre
-          ? formatearFechaDate(oportunidad.fecha_cierre)
-          : ""
-      }
-      abajoIzquierda={oportunidad.nombre_cliente}
-      abajoDerecha={oportunidad.importe + " €"}
-    />
   );
 };

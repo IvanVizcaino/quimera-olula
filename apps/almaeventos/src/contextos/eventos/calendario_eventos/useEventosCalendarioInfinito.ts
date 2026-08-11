@@ -1,4 +1,4 @@
-import { Filtro } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro } from "@olula/lib/diseño.ts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EventoCalendario } from "./diseño.ts";
 import { getEventosCalendario } from "./infraestructura.ts";
@@ -45,7 +45,7 @@ const formatearFecha = (fecha: Date): string => {
   return fecha.toISOString().split('T')[0];
 };
 
-export const useEventosCalendarioInfinito = (filtro: Filtro): EventosCalendarioState => {
+export const useEventosCalendarioInfinito = (filtro: ClausulaFiltro[]): EventosCalendarioState => {
   const [eventos, setEventos] = useState<EventoCalendario[]>([]);
   const [cargando, setCargando] = useState(false);
   const [rangoActual, setRangoActual] = useState<RangoFechas>(() => {

@@ -22,17 +22,21 @@ const t2: TransferenciaStock = {
   fecha: "2025-12-05",
 };
 
+vi.mock("../../almacen/infraestructura.ts", () => ({
+  obtenerAlmacenes: vi.fn(async () => Promise.resolve([])),
+}));
+
+vi.mock("../infraestructura.ts", () => ({
+  obtenerTransferenciasStock: vi.fn(async () =>
+    Promise.resolve({ datos: [t1, t2], total: 2 })
+  ),
+  obtenerTransferenciaStock: vi.fn(async () => Promise.resolve(t2)),
+  obtenerLineasTransferenciaStock: vi.fn(async () =>
+    Promise.resolve({ datos: [], total: 0 })
+  ),
+}));
+
 describe("Maestro de transferencias", () => {
-  // api mockeada
-  vi.mock("../infraestructura.ts", () => ({
-    obtenerTransferenciasStock: vi.fn(async () =>
-      Promise.resolve({ datos: [t1, t2], total: 2 })
-    ),
-    obtenerTransferenciaStock: vi.fn(async () => Promise.resolve(t2)),
-    obtenerLineasTransferenciaStock: vi.fn(async () =>
-      Promise.resolve({ datos: [], total: 0 })
-    ),
-  }));
 
   test("debe renderizar la cabecera", async () => {
     render(<MaestroDetalleTransferenciasStock />);

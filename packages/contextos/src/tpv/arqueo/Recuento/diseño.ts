@@ -17,11 +17,41 @@ export type RecuentoArqueoTpv = {
     m005: number
     m002: number
     m001: number
-    // recuentoEfectivo: number,
+    recuentoEfectivo: number,
     recuentoTarjeta: number,
     recuentoVales: number
 }
 const metaCampoMoneda: MetaCampo<RecuentoArqueoTpv> = { requerido: true, tipo: "numero", positivo: true };
+
+const camposDenominacion = new Set([
+    'b500', 'b200', 'b100', 'b50', 'b20', 'b10', 'b5',
+    'm2', 'm1', 'm050', 'm020', 'm010', 'm005', 'm002', 'm001'
+]);
+
+const onChange = (modelo: RecuentoArqueoTpv, campo: string): RecuentoArqueoTpv => {
+    if (camposDenominacion.has(campo)) {
+        return {
+            ...modelo,
+            recuentoEfectivo:
+                modelo.b500 * 500 +
+                modelo.b200 * 200 +
+                modelo.b100 * 100 +
+                modelo.b50 * 50 +
+                modelo.b20 * 20 +
+                modelo.b10 * 10 +
+                modelo.b5 * 5 +
+                modelo.m2 * 2 +
+                modelo.m1 +
+                modelo.m050 * 0.5 +
+                modelo.m020 * 0.2 +
+                modelo.m010 * 0.1 +
+                modelo.m005 * 0.05 +
+                modelo.m002 * 0.02 +
+                modelo.m001 * 0.01
+        };
+    }
+    return modelo;
+};
 
 export const metaRecuentoArqueoTpv: MetaModelo<RecuentoArqueoTpv> = {
 
@@ -42,9 +72,11 @@ export const metaRecuentoArqueoTpv: MetaModelo<RecuentoArqueoTpv> = {
         m005: metaCampoMoneda,
         m002: metaCampoMoneda,
         m001: metaCampoMoneda,
+        recuentoEfectivo: { requerido: true, tipo: "moneda", bloqueado: true },
         recuentoTarjeta: { requerido: true, tipo: "moneda" },
         recuentoVales: { requerido: true, tipo: "moneda" },
     },
+    onChange,
 };
 
 export const recuentoArqueoTpvInicial: RecuentoArqueoTpv = {
@@ -64,7 +96,7 @@ export const recuentoArqueoTpvInicial: RecuentoArqueoTpv = {
     m005: 0,
     m002: 0,
     m001: 0,
-    // recuentoEfectivo: 0,
+    recuentoEfectivo: 0,
     recuentoTarjeta: 0,
     recuentoVales: 0
 };

@@ -86,6 +86,9 @@ export const DevolverVentaTpv = ({
       <div className="DevolverVentaTpv">
         {!ventaADevolver && (
           <quimera-formulario>
+            <div className="pista">
+              Lee el código de la venta o tecléalo y pulsa Intro
+            </div>
             <QInput
               label="Venta"
               nombre="venta"

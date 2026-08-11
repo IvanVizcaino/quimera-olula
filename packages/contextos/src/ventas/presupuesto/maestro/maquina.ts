@@ -4,7 +4,7 @@ import {
     ampliarPresupuestos,
     Presupuestos,
     recargarPresupuestos
-} from "./dominio.ts";
+} from "./maestro.ts";
 
 
 export const getMaquina: () => Maquina<EstadoMaestroPresupuesto, ContextoMaestroPresupuesto> = () => {

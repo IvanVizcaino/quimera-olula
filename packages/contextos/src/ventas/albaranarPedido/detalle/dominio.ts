@@ -1,6 +1,6 @@
 import { ProcesarContexto } from "@olula/lib/diseño.js";
 import { cambiarItem, cargar, listaSeleccionableVacia } from "@olula/lib/entidad.ts";
-import { pedidoVacioObjeto } from "../../pedido/detalle/dominio.ts";
+import { pedidoVacioObjeto } from "../../pedido/detalle/detalle.ts";
 import { getLineas, getPedido } from "../../pedido/infraestructura.ts";
 import { LineaAlbaranarPedido, Tramo } from "../diseño.ts";
 import { patchAlbaranarPedido } from "../infraestructura.ts";
@@ -124,6 +124,28 @@ export const actualizarEstadoCerradoLinea: ProcesarAlbaranarPedido = async (cont
     };
 };
 
+export const aprobarLinea: ProcesarAlbaranarPedido = async (contexto, payload) => {
+    const lineaId = payload as string;
+    const lineasActualizadas = contexto.lineas.lista.map((l) => {
+        if (String(l.id) !== String(lineaId)) return l;
+        const servida = l.servida || 0;
+        const disponible = Math.max(0, l.cantidad - servida);
+        return {
+            ...l,
+            a_enviar: disponible,
+            tramos: [{ id: `${l.id}-aprobado`, cantidad: disponible }],
+        } as LineaAlbaranarPedido;
+    });
+
+    return {
+        ...contexto,
+        lineas: {
+            ...contexto.lineas,
+            lista: lineasActualizadas,
+        },
+    };
+};
+
 export const cancelarSeleccion: ProcesarAlbaranarPedido = async (contexto) => {
     return {
         ...contexto,
@@ -135,7 +157,7 @@ export const cancelarSeleccion: ProcesarAlbaranarPedido = async (contexto) => {
 };
 
 export const albaranarPedido: ProcesarAlbaranarPedido = async (contexto) => {
-    await patchAlbaranarPedido(contexto.pedido.id, contexto.lineas.lista);
+    const albaranCreado = await patchAlbaranarPedido(contexto.pedido.id, contexto.lineas.lista);
 
     const pedidoActualizado = await getPedido(contexto.pedido.id);
     const lineasActualizadas = await getLineas(contexto.pedido.id);
@@ -144,6 +166,7 @@ export const albaranarPedido: ProcesarAlbaranarPedido = async (contexto) => {
         ...contexto,
         pedido: pedidoActualizado,
         lineas: cargar(lineasActualizadas)(contexto.lineas),
+        albaranCreado,
     };
 };
 

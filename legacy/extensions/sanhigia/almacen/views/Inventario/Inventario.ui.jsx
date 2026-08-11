@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@quimera/comps";
 import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 // import { LineaInventario } from "@quimera-extension/base-almacen";
 
@@ -36,6 +36,17 @@ function Inventario({ callbackChanged, codInventario, initInventario, useStyles 
   const [{ lineas, inventario, vistaDetalle, todasLasLineas, order }, dispatch] = useStateValue();
   const classes = useStyles();
   const width = useWidth();
+  const ultimaLongitudPaginada = useRef(-1);
+
+  const onScrollTablaInventario = event => {
+    if (lineas?.page?.next === null) return;
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    const cercaDelFinal = scrollHeight - scrollTop - clientHeight < 100;
+    if (cercaDelFinal && ultimaLongitudPaginada.current !== lineas.idList.length) {
+      ultimaLongitudPaginada.current = lineas.idList.length;
+      dispatch({ type: "onNextLineas" });
+    }
+  };
 
   useEffect(() => {
     util.publishEvent(inventario.event, callbackChanged);
@@ -272,7 +283,8 @@ function Inventario({ callbackChanged, codInventario, initInventario, useStyles 
                     {
                       <Box
                         id="scrollableTableInventarios"
-                        style={{ overflow: "auto", height: "auto" }}
+                        style={{ overflow: "auto", height: `calc(100vh - 500px)` }}
+                        onScroll={onScrollTablaInventario}
                       >
                         <Table
                           id="tdbLineasInventario"
@@ -282,7 +294,6 @@ function Inventario({ callbackChanged, codInventario, initInventario, useStyles 
                           clickMode="line"
                           next={() => dispatch({ type: "onNextLineas" })}
                           hasMore={lineas?.page?.next !== null}
-                          scrollableTarget="scrollableTableInventarios"
                           orderColumn={order}
                           bgcolorRowFunction={linea => dameColorLinea(linea)}
                         >

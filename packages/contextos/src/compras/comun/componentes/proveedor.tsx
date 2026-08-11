@@ -8,6 +8,7 @@ interface ProveedorProps {
   nombre?: string;
   label?: string;
   deshabilitado?: boolean;
+  opcional?: boolean;
   onChange?: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 

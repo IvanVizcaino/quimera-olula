@@ -10,7 +10,7 @@ function ListItemLineaAsociar({ disabled, dispatch, lineas, hideSecondary = fals
   const classes = useStyles();
   const [{ selectedAsociar }] = useStateValue();
   // console.log("selectedItem", selectedLote);
-  console.log(lineas);
+  // console.log(lineas);
 
   return (
     <Table id="tdbClientes" data={lineas}>

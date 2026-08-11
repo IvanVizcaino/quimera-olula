@@ -132,7 +132,7 @@ function PedidoCli({ callbackChanged, idPedido, initPedido, useStyles }) {
                 }
                 disabled={!editableGenerarPediProv}
               />
-              <QBoxButton id="albaranar" title="Albaranar" icon="shop" disabled={!editable} onClick={() => (window.location.href = `/ventas/albaranar-pedido/${pedido.data.idPedido}`)} />
+              <QBoxButton id="albaranar" title="Albarán parcial" icon="shop" disabled={!editable} onClick={() => (window.location.href = `/ventas/albaranar-pedido/${pedido.data.idPedido}`)} />
               <QBoxButton id="enviarEmail" title="Enviar por email" icon="email" />
             </>
           }

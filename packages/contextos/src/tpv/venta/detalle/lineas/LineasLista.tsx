@@ -1,7 +1,8 @@
+import { divisaTpv } from "#/tpv/comun/dominio.ts";
 import { MetaTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { criteriaDefecto } from "@olula/lib/dominio.js";
+import { criteriaDefecto, formatearMoneda } from "@olula/lib/dominio.js";
 import { LineaFactura as Linea, LineaFactura } from "../../diseño.ts";
 
 export const LineasLista = ({
@@ -82,10 +83,14 @@ const getMetaTablaLineas = () => {
     { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
     {
       id: "dto_porcentual",
-      cabecera: "% Dto.",
+      cabecera: "Dto.",
       tipo: "numero",
       render: (linea: Linea) =>
-        linea.dto_porcentual ? `${linea.dto_porcentual}%` : "",
+        linea.dto_porcentual && linea.dto_lineal
+          ? `${linea.dto_porcentual}% + ${formatearMoneda(linea.dto_lineal, divisaTpv)}`
+          : linea.dto_lineal
+          ? `${formatearMoneda(linea.dto_lineal, divisaTpv)}`
+          : linea.dto_porcentual ? `${linea.dto_porcentual}%` : "",
     },
     { id: "pvp_total", cabecera: "Total", tipo: "moneda" },
   ];

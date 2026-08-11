@@ -1,0 +1,27 @@
+.CrearIncidencia {
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: 1 / span 12;
+    }
+
+    quimera-input[nombre="nombre"] {
+        grid-column: 1 / span 12;
+    }
+
+
+    quimera-date[nombre="fecha"] {
+        grid-column: span 4;
+    }
+
+    quimera-select[nombre="prioridad"] {
+        grid-column: span 4;
+    }
+
+    quimera-select[nombre="estado"] {
+        grid-column: span 4;
+    }
+
+    quimera-textarea[nombre="descripcionLarga"] {
+        grid-column: span 12;
+    }
+}

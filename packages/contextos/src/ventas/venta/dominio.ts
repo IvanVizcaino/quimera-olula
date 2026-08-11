@@ -1,3 +1,4 @@
+import { empresaActual } from "#/valores/empresaActual.ts";
 import { Direccion } from "@olula/lib/diseño.js";
 import { MetaCampo, MetaModelo } from "@olula/lib/dominio.ts";
 import { CambioClienteVenta, ClienteVenta, LineaVenta, NuevaLineaVenta, NuevaVenta, Venta } from "./diseño.ts";
@@ -48,7 +49,7 @@ export const ventaVacia: Venta = {
 export const nuevaVentaVacia: NuevaVenta = {
     cliente_id: "",
     direccion_id: "",
-    empresa_id: "1",
+    empresa_id: empresaActual(),
 }
 
 export const cambioClienteVentaVacio: CambioClienteVenta = {
@@ -78,11 +79,20 @@ const metaDtoPorcentual: MetaCampo<LineaVenta> = {
     maximo: 100
 };
 
+const metaDtoLineal: MetaCampo<LineaVenta> = {
+    tipo: "decimal",
+    requerido: false,
+    decimales: 2,
+    positivo: true,
+};
+
 export const metaLineaVenta: MetaModelo<LineaVenta> = {
     campos: {
         cantidad: { tipo: "decimal", requerido: true, decimales: 2 },
+        iva_incluido: { tipo: "checkbox", requerido: true },
         pvp_unitario: { tipo: "moneda", requerido: true },
         dto_porcentual: metaDtoPorcentual,
+        dto_lineal: metaDtoLineal,
         referencia: { requerido: true },
     }
 };

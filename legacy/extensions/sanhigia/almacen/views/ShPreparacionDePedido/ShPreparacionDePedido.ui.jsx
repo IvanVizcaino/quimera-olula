@@ -14,8 +14,8 @@ import {
   Table,
   Typography,
 } from "@quimera/comps";
-import Quimera, { getSchemas, PropValidation, useStateValue, useWidth, util } from "quimera";
-import React, { useEffect } from "react";
+import Quimera, { getSchemas, useStateValue, useWidth, util } from "quimera";
+import { useEffect, useState } from "react";
 
 import { ModalInventarioAlVuelo, ModaLotesLinea, Ubicacion } from "../../comps";
 
@@ -59,10 +59,27 @@ function ShPreparacionDePedido({
   ] = useStateValue();
   const classes = useStyles();
   const width = useWidth();
+  const mobile = ["xs", "sm", "md"].includes(width);
+  const [anchoDescripcionCalculado, setAnchoDescripcionCalculado] = useState(700);
+
+  const dataLineas = lineas.idList
+    .filter(id => lineas.dict[id].shPreparacion == "En Curso")
+    .map(id => lineas.dict[id]);
 
   useEffect(() => {
     util.publishEvent(preparacion.event, callbackChanged);
   }, [preparacion.event.serial]);
+
+  useEffect(() => {
+    if (mobile && dataLineas.length > 0) {
+      const maxChars = Math.max(...dataLineas.map(l => (l.descripcion || "").length));
+      const anchoEstimado = Math.min(Math.max(150, maxChars * 8.5 + 40), 900);
+
+      setAnchoDescripcionCalculado(anchoEstimado);
+    } else {
+      setAnchoDescripcionCalculado(700);
+    }
+  }, [dataLineas, mobile]);
 
   useEffect(() => {
     !!initPreparacion &&
@@ -145,15 +162,10 @@ function ShPreparacionDePedido({
     }
   };
 
-  const mobile = ["xs", "sm", "md"].includes(width);
   // const anchoDetalle = mobile ? 1 : 0.5;
   const anchoDetalle = 1;
   const schema = getSchemas().preparacionPedidos;
   const editable = true;
-
-  const dataLineas = lineas.idList
-    .filter(id => lineas.dict[id].shPreparacion == "En Curso")
-    .map(id => lineas.dict[id]);
 
   // if (!initPreparacion || initPreparacion?._status === "deleted") {
   //   return null;
@@ -205,12 +217,12 @@ function ShPreparacionDePedido({
                     </Box>
                     <QTitleBox titulo="Ubic. inicial" className={classes.ubicacionBox}>
                       <Box display="flex" alignItems="flex-end" height="1.2rem">
-                        <Typography variant="h8">{preparacion.buffer.ubicacionini}</Typography>
+                        <Typography ml={mobile ? 1 : null} variant="h8">{preparacion.buffer.ubicacionini}</Typography>
                       </Box>
                     </QTitleBox>
                     <QTitleBox titulo="Ubic. final" className={classes.ubicacionBox}>
                       <Box display="flex" alignItems="flex-end" height="1.2rem">
-                        <Typography variant="h8">{preparacion.buffer.ubicacionfin}</Typography>
+                        <Typography ml={mobile ? 1 : null} variant="h8">{preparacion.buffer.ubicacionfin}</Typography>
                       </Box>
                     </QTitleBox>
                   </Box>
@@ -336,7 +348,7 @@ function ShPreparacionDePedido({
                       order="descripcion"
                       pl={2}
                       value={linea => linea.descripcion}
-                      width={550}
+                      width={anchoDescripcionCalculado}
                     />
                     {/* <Column.Text
                       id="ubicacion"
@@ -347,7 +359,7 @@ function ShPreparacionDePedido({
                     /> */}
                     <Column.Action
                       id="actioncodubicacion"
-                      width={90}
+                      width={110}
                       header="Ubic."
                       order="sh_codubicacionarticulo"
                       value={(linea, idx) => (
@@ -417,7 +429,7 @@ function ShPreparacionDePedido({
                       order="refprov"
                       pl={2}
                       value={linea => linea.referenciaProv}
-                      width={150}
+                      width={180}
                     />
                     <Column.Text
                       id="codPedido"
@@ -425,7 +437,7 @@ function ShPreparacionDePedido({
                       order="codpedido"
                       pl={2}
                       value={linea => linea.codPedido}
-                      width={110}
+                      width={125}
                     />
                     <Column.Decimal
                       id="totalenalbaran"

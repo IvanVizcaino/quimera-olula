@@ -38,8 +38,8 @@ function Header({ useStyles }) {
   return (
     <Quimera.Template id="Header">
       <AppBar position="fixed" style={{ backgroundColor: "white" }}>
-        <HGrid justify="space-between" alignItems="center">
-          <Grid container justify="flex-start" direction="row">
+        <HGrid justifyContent="space-between" alignItems="center">
+          <Grid container justifyContent="flex-start" direction="row">
             <Toolbar style={{ paddingRight: 0 }}>
               <A href="/">
                 <img src="static/images/logoVbarba.png" />
@@ -56,15 +56,15 @@ function Header({ useStyles }) {
               </Hidden>
             </Toolbar>
           </Grid>
-          <Grid container justify="flex-start" direction="row"></Grid>
-          <Grid container justify="flex-end" direction="row">
+          <Grid container justifyContent="flex-start" direction="row"></Grid>
+          <Grid container justifyContent="flex-end" direction="row">
             <IconButton id="menuDerecha">
               <Icon>person</Icon>
             </IconButton>
           </Grid>
         </HGrid>
         <Hidden smUp>
-          <HGrid justify="center" alignItems="center" style={{ marginBottom: "4px" }}>
+          <HGrid justifyContent="center" alignItems="center" style={{ marginBottom: "4px" }}>
             <Grid size="grow" zeroMinWidth>
               <Typography align="center" noWrap className={classes.tituloPaginaActualMobile}>
                 {appState.nombrePaginaActual}

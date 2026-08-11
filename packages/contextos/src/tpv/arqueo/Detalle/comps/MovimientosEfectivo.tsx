@@ -49,7 +49,6 @@ const useItemActivo = <E extends Entidad, I extends Entidad>({
     (entidadAnterior: E | null) => {
       let item: I | undefined;
       if (!entidadAnterior || entidadAnterior.id !== entidad.id) {
-        console.log("cambio de entidad !!!", items);
         item = items.length > 0 ? items[0] : undefined;
       } else if (estadoSeleccion) {
         if (estadoSeleccion.tipo === "crear") {

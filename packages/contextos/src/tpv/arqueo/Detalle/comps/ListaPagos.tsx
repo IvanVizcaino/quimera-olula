@@ -1,5 +1,6 @@
 import { MetaTabla } from "@olula/componentes/index.js";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.js";
+import { getMetaFiltroDefecto } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { ContextoError } from "@olula/lib/contexto.js";
 import { Criteria, RespuestaLista2 } from "@olula/lib/diseño.js";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
@@ -43,8 +44,8 @@ export const ListaPagos = ({
         <>
             <h3>Pagos</h3>
             <ListadoSemiControlado
-                metaTabla={getMetaTablaPagos()}
-                metaFiltro={true}
+                metaTabla={metaTablaPagos}
+                metaFiltro={metaFiltroPagos}
                 cargando={false}
                 criteriaInicial={criteriaDefecto}
                 idReiniciarCriteria={arqueoId}
@@ -59,23 +60,22 @@ export const ListaPagos = ({
     );
 };
 
-const getMetaTablaPagos = () => {
-    const meta:MetaTabla<PagoArqueoTpv> =[
-        {
-            id: "fecha",
-            cabecera: "Fecha",
-            tipo: "fecha",
-        },
-        {
-            id: "codigoVenta",
-            cabecera: "Venta",
-        },
-        { id: "formaPago", cabecera: "Forma de pago", 
-            render: (pago: PagoArqueoTpv) => pago.vale
-                ? `${pago.formaPago} ${pago.vale}`
-                : `${pago.formaPago}`,
-        },
-        { id: "importe", cabecera: "Importe", tipo: "moneda" },
-    ];
-    return meta;
-};
+const metaTablaPagos: MetaTabla<PagoArqueoTpv> = [
+    {
+        id: "fecha",
+        cabecera: "Fecha",
+        tipo: "fecha",
+    },
+    {
+        id: "codigoVenta",
+        cabecera: "Venta",
+    },
+    { id: "formaPago", cabecera: "Forma de pago",
+        render: (pago: PagoArqueoTpv) => pago.vale
+            ? `${pago.formaPago} ${pago.vale}`
+            : `${pago.formaPago}`,
+    },
+    { id: "importe", cabecera: "Importe", tipo: "moneda" },
+];
+
+const metaFiltroPagos = getMetaFiltroDefecto(metaTablaPagos);

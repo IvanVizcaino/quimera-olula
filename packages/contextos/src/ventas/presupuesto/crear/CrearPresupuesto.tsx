@@ -1,11 +1,11 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
-import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useFocus } from "@olula/lib/useFocus.js";
+import { useForm } from "@olula/lib/useForm.js";
 import { HookModelo, useModelo } from "@olula/lib/useModelo.ts";
-import { useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { Cliente } from "../../comun/componentes/cliente.tsx";
 import { DirCliente } from "../../comun/componentes/dirCliente.tsx";
 import {
@@ -19,22 +19,19 @@ import {
   metaNuevoPresupuestoClienteNoRegistrado,
   nuevoPresupuestoClienteNoRegistradoVacio,
   nuevoPresupuestoVacio,
-} from "./dominio.ts";
+} from "./crear.ts";
 
 export const CrearPresupuesto = ({
   publicar = async () => {},
-  activo = false,
   onCancelar = () => {},
+  modeloVacio = nuevoPresupuestoVacio,
 }: {
   publicar?: EmitirEvento;
-  activo: boolean;
   onCancelar?: () => void;
+  modeloVacio?: NuevoPresupuesto;
 }) => {
   const [modoNoRegistrado, setModoNoRegistrado] = useState(false);
-  const presupuestoRegistrado = useModelo(
-    metaNuevoPresupuesto,
-    nuevoPresupuestoVacio
-  );
+  const presupuestoRegistrado = useModelo(metaNuevoPresupuesto, modeloVacio);
   const presupuestoNoRegistrado = useModelo(
     metaNuevoPresupuestoClienteNoRegistrado,
     nuevoPresupuestoClienteNoRegistradoVacio
@@ -44,12 +41,12 @@ export const CrearPresupuesto = ({
     const nuevoModo = !modoNoRegistrado;
     setModoNoRegistrado(nuevoModo);
 
-    presupuestoRegistrado.init(nuevoPresupuestoVacio);
+    presupuestoRegistrado.init(modeloVacio);
     presupuestoNoRegistrado.init(nuevoPresupuestoClienteNoRegistradoVacio);
   };
 
   const cancelar = () => {
-    presupuestoRegistrado.init(nuevoPresupuestoVacio);
+    presupuestoRegistrado.init(modeloVacio);
     presupuestoNoRegistrado.init(nuevoPresupuestoClienteNoRegistradoVacio);
     setModoNoRegistrado(false);
     onCancelar();
@@ -57,7 +54,7 @@ export const CrearPresupuesto = ({
 
   return (
     <QModal
-      abierto={activo}
+      abierto={true}
       nombre="crear_presupuesto"
       titulo="Nuevo Presupuesto"
       onCerrar={cancelar}
@@ -67,6 +64,7 @@ export const CrearPresupuesto = ({
         presupuestoRegistrado={presupuestoRegistrado}
         presupuestoNoRegistrado={presupuestoNoRegistrado}
         modoNoRegistrado={modoNoRegistrado}
+        modeloVacio={modeloVacio}
         onToggleModoCliente={toggleModoCliente}
       />
     </QModal>
@@ -79,17 +77,18 @@ const FormAltaPresupuesto = ({
   presupuestoNoRegistrado,
   modoNoRegistrado,
   onToggleModoCliente,
+  modeloVacio,
 }: {
   publicar?: EmitirEvento;
   presupuestoRegistrado: HookModelo<NuevoPresupuesto>;
   presupuestoNoRegistrado: HookModelo<NuevoPresupuestoClienteNoRegistrado>;
   modoNoRegistrado: boolean;
+  modeloVacio: NuevoPresupuesto;
   onToggleModoCliente: () => void;
 }) => {
-  const { intentar } = useContext(ContextoError);
   const focus = useFocus();
 
-  const crear = async () => {
+  const crear_ = useCallback(async () => {
     let modelo;
 
     if (modoNoRegistrado) {
@@ -98,19 +97,27 @@ const FormAltaPresupuesto = ({
       modelo = { ...presupuestoRegistrado.modelo };
     }
 
-    const id = await intentar(() => postPresupuesto(modelo));
+    const id = await postPresupuesto(modelo);
     const presupuestoCreada = await getPresupuesto(id);
     publicar("presupuesto_creado", presupuestoCreada);
 
-    presupuestoRegistrado.init(nuevoPresupuestoVacio);
+    presupuestoRegistrado.init(modeloVacio);
     presupuestoNoRegistrado.init(nuevoPresupuestoClienteNoRegistradoVacio);
-  };
+  }, [
+    modoNoRegistrado,
+    presupuestoNoRegistrado,
+    presupuestoRegistrado,
+    publicar,
+    modeloVacio,
+  ]);
 
-  const cancelar = () => {
+  const cancelar_ = useCallback(() => {
     publicar("creacion_presupuesto_cancelada");
-    presupuestoRegistrado.init(nuevoPresupuestoVacio);
+    presupuestoRegistrado.init(modeloVacio);
     presupuestoNoRegistrado.init(nuevoPresupuestoClienteNoRegistradoVacio);
-  };
+  }, [publicar, presupuestoRegistrado, presupuestoNoRegistrado, modeloVacio]);
+
+  const [crear, cancelar] = useForm(crear_, cancelar_);
 
   return (
     <>
@@ -144,10 +151,6 @@ const FormAltaPresupuesto = ({
               label="Ciudad"
               {...presupuestoNoRegistrado.uiProps("ciudad")}
             />
-            <QInput
-              label="Empresa"
-              {...presupuestoNoRegistrado.uiProps("empresa_id")}
-            />
           </>
         ) : (
           <>
@@ -157,12 +160,8 @@ const FormAltaPresupuesto = ({
               ref={focus}
             />
             <DirCliente
-              clienteId={presupuestoRegistrado.modelo.cliente_id}
+              clienteId={presupuestoRegistrado.modelo.cliente.cliente_id}
               {...presupuestoRegistrado.uiProps("direccion_id")}
-            />
-            <QInput
-              label="Empresa"
-              {...presupuestoRegistrado.uiProps("empresa_id")}
             />
           </>
         )}

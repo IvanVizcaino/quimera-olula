@@ -1,10 +1,11 @@
+import { TipoAccion } from "#/crm/comun/componentes/tipo_accion.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
-import { ContextoError } from "@olula/lib/contexto.js";
 import { ProcesarEvento } from "@olula/lib/useMaquina.js";
+import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback } from "react";
 import { getAccion, postAccion } from "../infraestructura.ts";
 import "./CrearAccion.css";
 import { metaNuevaAccion, nuevaAccionVacia } from "./crear.ts";
@@ -17,21 +18,19 @@ export const CrearAccion = ({
   publicar: ProcesarEvento;
   modeloVacio?: NuevaAccion;
 }) => {
-  const { intentar } = useContext(ContextoError);
-
-  const [creando, setCreando] = useState(false);
   const { modelo, uiProps, valido } = useModelo(metaNuevaAccion, modeloVacio);
 
-  const crear = useCallback(async () => {
-    setCreando(true);
-    const id = await intentar(() => postAccion(modelo));
-    const accion = await intentar(() => getAccion(id));
+  const crear_ = useCallback(async () => {
+    const id = await postAccion(modelo);
+    const accion = await getAccion(id);
     publicar("accion_creada", accion);
-  }, [modelo, publicar, intentar]);
+  }, [modelo, publicar]);
 
-  const cancelar = useCallback(() => {
-    if (!creando) publicar("creacion_accion_cancelada");
-  }, [creando, publicar]);
+  const cancelar_ = useCallback(() => {
+    publicar("creacion_accion_cancelada");
+  }, [publicar]);
+
+  const [crear, cancelar] = useForm(crear_, cancelar_);
 
   return (
     <QModal
@@ -43,6 +42,7 @@ export const CrearAccion = ({
       <div className="CrearAccion">
         <quimera-formulario>
           <QInput label="Descripción" {...uiProps("descripcion")} />
+          <TipoAccion {...uiProps("tipo")} />
           <QInput label="Fecha" {...uiProps("fecha")} />
         </quimera-formulario>
 

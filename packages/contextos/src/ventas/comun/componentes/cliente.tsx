@@ -8,6 +8,7 @@ interface ClienteProps {
   nombre?: string;
   label?: string;
   deshabilitado?: boolean;
+  opcional?: boolean;
   ref?: React.RefObject<HTMLInputElement | null>;
   onChange?: (opcion: { valor: string; descripcion: string } | null) => void;
 }

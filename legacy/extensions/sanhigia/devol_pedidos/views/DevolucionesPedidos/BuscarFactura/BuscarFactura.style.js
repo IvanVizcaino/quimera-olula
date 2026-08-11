@@ -9,6 +9,7 @@ export default parent => {
         color: "#fff",
       },
       botonPrimario: theme.botonPrimario,
+      botonSecundario: theme.botonSecundario,
       // container: {
       //   flexGrow: 1,
       //   minHeight: 500,

@@ -5,12 +5,8 @@ import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { Criteria } from "@olula/lib/diseño.js";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { listaEntidadesInicial } from "@olula/lib/ListaEntidades.js";
-import {
-  getUrlParams,
-  setCriteriaUrlParams,
-  useUrlParams,
-} from "@olula/lib/url-params.js";
-import { useCallback, useEffect } from "react";
+import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
+import { useCallback, useEffect, useState } from "react";
 import { CrearUsuario } from "../crear/CrearUsuario.tsx";
 import { DetalleUsuario } from "../detalle/DetalleUsuario.tsx";
 import { Usuario } from "../diseño.ts";
@@ -20,18 +16,22 @@ import { getMaquina } from "./maquina.ts";
 
 const criteriaBaseUsuarios = {
   ...criteriaDefecto,
-  orden: ["id", "DESC"],
+  orden: ["nombre", "ASC"],
 };
 
 export const MaestroConDetalleUsuario = () => {
   const { id, criteria } = getUrlParams();
+  const criteriaInicial = criteria?.orden?.length
+    ? { ...criteriaBaseUsuarios, ...criteria }
+    : criteriaBaseUsuarios;
+  const [criteriaActual, setCriteriaActual] = useState(criteriaInicial);
 
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "INICIAL",
     usuarios: listaEntidadesInicial<Usuario>(),
   });
 
-  useUrlParams(ctx.usuarios.activo?.id, criteria);
+  useUrlParams(ctx.usuarios.activo?.id, criteriaActual);
 
   const crear = useCallback(
     () => emitir("creacion_de_usuario_solicitada"),
@@ -46,15 +46,24 @@ export const MaestroConDetalleUsuario = () => {
   );
 
   useEffect(() => {
-    if (id) {
-      const usuario = ctx.usuarios.lista.find((item) => item.id === id);
-      if (usuario) emitir("usuario_seleccionado", usuario);
+    if (!id) return;
+
+    const seleccionActivaSigueDisponible = ctx.usuarios.activo
+      ? ctx.usuarios.lista.some((item) => item.id === ctx.usuarios.activo?.id)
+      : false;
+
+    if (seleccionActivaSigueDisponible) return;
+
+    const usuario = ctx.usuarios.lista.find((item) => item.id === id);
+    if (usuario && usuario.id !== ctx.usuarios.activo?.id) {
+      emitir("usuario_seleccionado", usuario);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, ctx.usuarios.lista]);
 
   useEffect(() => {
-    emitir("recarga_de_usuarios_solicitada", criteria ?? criteriaBaseUsuarios);
+    setCriteriaActual(criteriaBaseUsuarios);
+    emitir("recarga_de_usuarios_solicitada", criteriaBaseUsuarios);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -64,17 +73,19 @@ export const MaestroConDetalleUsuario = () => {
         Maestro={
           <>
             <h2>Usuarios</h2>
-            <div className="maestro-botones">
-              <QBoton onClick={crear}>Nuevo Usuario</QBoton>
-            </div>
             <Listado
               metaTabla={metaTablaUsuario}
               criteriaInicial={criteriaBaseUsuarios}
-              criteria={criteria}
-              modo="tabla"
+              criteria={criteriaActual}
+              modo="tarjetas"
               entidades={ctx.usuarios.lista}
               totalEntidades={ctx.usuarios.total}
               seleccionada={ctx.usuarios.activo?.id}
+              renderAcciones={() => (
+                <div className="maestro-botones">
+                  <QBoton onClick={crear}>Nuevo Usuario</QBoton>
+                </div>
+              )}
               onSeleccion={(id) => {
                 const usuario = ctx.usuarios.lista.find(
                   (item) => item.id === id
@@ -82,7 +93,7 @@ export const MaestroConDetalleUsuario = () => {
                 if (usuario) emitir("usuario_seleccionado", usuario);
               }}
               onCriteriaChanged={(nuevaCriteria) => {
-                setCriteriaUrlParams(nuevaCriteria);
+                setCriteriaActual(nuevaCriteria);
                 recargar(nuevaCriteria);
               }}
             />

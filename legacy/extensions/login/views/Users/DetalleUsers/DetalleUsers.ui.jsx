@@ -1,5 +1,5 @@
 import { Box, DeleteButton, Field, Grid, Icon, QBox, QSection, Typography } from "@quimera/comps";
-import Quimera, { getSchemas, PropValidation, useStateValue, useWidth } from "quimera";
+import Quimera, { getSchemas, useStateValue, useWidth } from "quimera";
 
 import SelectGroup from "../../../comps/SelectGroup";
 
@@ -71,7 +71,7 @@ function DetalleUsers({ useStyles }) {
 
           <SelectGroup id="usersBuffer.idgroup" value={usersBuffer?.idgroup ?? 0} />
 
-          <Grid container size={12} justify="center">
+          <Grid container size={12} justifyContent="center">
             <Grid size={4}>
               <QSection
                 actionPrefix="eliminarUsuario"

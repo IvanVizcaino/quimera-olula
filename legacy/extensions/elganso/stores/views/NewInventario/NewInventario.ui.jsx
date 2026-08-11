@@ -5,7 +5,7 @@ import TextField from "@mui/material/TextField";
 import { Button, Field, Grid } from "@quimera/comps";
 import { navigate } from "hookrouter";
 import Quimera, { PropValidation, useStateValue } from "quimera";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDbState } from "use-db-state";
 
 const getDbInstance = (dbName, storeName) => {

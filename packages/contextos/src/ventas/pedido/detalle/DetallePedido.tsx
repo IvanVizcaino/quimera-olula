@@ -12,8 +12,8 @@ import { useNavigate, useParams } from "react-router";
 import { BorrarPedido } from "../borrar/BorrarPedido.tsx";
 import { Pedido } from "../diseño.ts";
 import "./DetallePedido.css";
-import { editable, metaPedido, pedidoVacio } from "./dominio.ts";
-import { Lineas } from "./Lineas/Lineas.tsx";
+import { editable, metaPedido, pedidoVacio } from "./detalle.ts";
+import { Lineas } from "./lineas/Lineas.tsx";
 import { getMaquina } from "./maquina.ts";
 import { TabCliente } from "./TabCliente/TabCliente.tsx";
 import { TabDatosBase as TabDatos } from "./TabDatos.tsx";
@@ -54,9 +54,14 @@ export const DetallePedidoBase = ({
     publicar
   );
 
-  const pedido = useModelo(metaPedido, ctx.pedido);
-  const { valido } = pedido;
-  const modificadoFormulario = pedido.modificado;
+  const autoGuardar = useCallback(
+    async (modelo: Pedido) => {
+      emitir("edicion_de_pedido_lista", modelo);
+    },
+    [emitir]
+  );
+
+  const pedido = useModelo(metaPedido, ctx.pedido, autoGuardar);
 
   useEffect(() => {
     emitir("pedido_id_cambiado", pedidoId, true);
@@ -66,14 +71,6 @@ export const DetallePedidoBase = ({
   const { estado, lineaActiva } = ctx;
 
   const titulo = (pedido: Pedido) => pedido.codigo || "Nuevo Pedido";
-
-  const handleGuardar = useCallback(() => {
-    emitir("edicion_de_pedido_lista", pedido.modelo);
-  }, [emitir, pedido]);
-
-  const handleCancelar = useCallback(() => {
-    emitir("edicion_de_pedido_cancelada");
-  }, [emitir]);
 
   const handleAlbaranar = useCallback(() => {
     const id = ctx.pedido.id ?? params.id;
@@ -94,19 +91,6 @@ export const DetallePedidoBase = ({
       advertencia: true,
       onClick: () => emitir("borrar_solicitado"),
       deshabilitado: false,
-    },
-  ];
-
-  const accionesEdicion = [
-    {
-      texto: "Guardar Cambios",
-      onClick: handleGuardar,
-      deshabilitado: !valido,
-    },
-    {
-      texto: "Cancelar",
-      variante: "texto" as const,
-      onClick: handleCancelar,
     },
   ];
 
@@ -133,22 +117,6 @@ export const DetallePedidoBase = ({
           <TabObservaciones pedido={pedido} />
         </Tab>
       </Tabs>
-
-      {editable(ctx.pedido) && (
-        <div
-          className={
-            modificadoFormulario
-              ? "edicion-botones edicion-botones-visible"
-              : "edicion-botones"
-          }
-        >
-          <div className="botones maestro-botones">
-            {modificadoFormulario && (
-              <QuimeraAcciones acciones={accionesEdicion} />
-            )}
-          </div>
-        </div>
-      )}
 
       <TotalesVenta modeloVenta={pedido} publicar={emitir} />
 

@@ -1,0 +1,9 @@
+.LecturaUbicacionOrden {
+    quimera-autocompletar {
+        grid-column: span 6;
+    }
+
+    quimera-input {
+        grid-column: span 6;
+    }
+}

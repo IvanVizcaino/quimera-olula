@@ -284,25 +284,28 @@ function Stocks({ useStyles, idRefStockProp, referenciaArticulo }) {
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                  <Grid container justifyContent="space-around" px={2} mb={2}>
-                    <Button
-                      id="cancelarCrearStock"
-                      text="Cancelar"
-                      color="primary"
-                      variant="contained"
-                    />
-
-                    <Button
-                      id="aceptarCrearStock"
-                      text={!creandoStock ? "Aceptar" : "Creando"}
-                      color="secondary"
-                      variant="contained"
-                      disabled={creandoStock}
-                    >
-                      {creandoStock && (
-                        <CircularProgress size={24} color="white" style={{ marginLeft: 10 }} />
-                      )}
-                    </Button>
+                  <Grid container size={12} justifyContent="space-between" mb={2} spacing={2}>
+                    <Grid size={6} display="flex" justifyContent="flex-start">
+                      <Button
+                        id="cancelarCrearStock"
+                        text="Cancelar"
+                        color="primary"
+                        variant="contained"
+                      />
+                    </Grid>
+                    <Grid size={6} display="flex" justifyContent="flex-end">
+                      <Button
+                        id="aceptarCrearStock"
+                        text={!creandoStock ? "Aceptar" : "Creando"}
+                        color="secondary"
+                        variant="contained"
+                        disabled={creandoStock}
+                      >
+                        {creandoStock && (
+                          <CircularProgress size={24} color="white" style={{ marginLeft: 10 }} />
+                        )}
+                      </Button>
+                    </Grid>
                   </Grid>
                 </DialogActions>
               </Dialog>

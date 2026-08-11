@@ -56,7 +56,9 @@ export const incluirEnListaEntidades = <T extends Entidad>(prev: ListaActivaEnti
 }
 
 export const quitarDeListaEntidades = <T extends Entidad>(prev: ListaActivaEntidades<T>, payload?: unknown): ListaActivaEntidades<T> => {
-    const idBorrada = payload as string;
+    const idBorrada = (payload as string) ?? prev.activo;
+
+    if (!idBorrada) return prev;
 
     const indiceEntidadActiva = prev.lista.findIndex(l => l.id === idBorrada);
 

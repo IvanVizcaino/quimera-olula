@@ -81,7 +81,7 @@ function AgruparPedidos({ callbackVolver, useStyles }) {
         </DialogContent>
         <DialogActions>
           <Grid container justifyContent="space-between">
-            <Grid container size={6} justify="center" alignItems="center">
+            <Grid container size={6} justifyContent="center" alignItems="center">
               <Button
                 id="cancelar"
                 text="Cancelar"
@@ -92,9 +92,9 @@ function AgruparPedidos({ callbackVolver, useStyles }) {
               // onClick={() => dispatch({ type: "volverCatalogo" })}
               />
             </Grid>
-            <Grid container size={6} justify="center" alignItems="center">
+            <Grid container size={6} justifyContent="center" alignItems="center">
               {agrupandoPedidos ? (
-                <Grid container direction="column" justify="center" alignItems="center" >
+                <Grid container direction="column" justifyContent="center" alignItems="center" >
                   <CircularProgress size={30} />
                 </Grid>
               )

@@ -28,6 +28,11 @@ export const recargarUsuarios: ProcesarMaestroUsuario = async (contexto, payload
     const criteria = payload as Criteria;
     const resultado = await getUsuarios(criteria.filtro, criteria.orden, criteria.paginacion);
     const usuariosCargados = resultado.datos;
+    const { pagina = 1, limite = usuariosCargados.length } = criteria.paginacion ?? {};
+    const totalMinimoPaginaActual = ((pagina - 1) * limite) + usuariosCargados.length;
+    const total = resultado.total >= totalMinimoPaginaActual
+        ? resultado.total
+        : Math.max(contexto.usuarios.total, totalMinimoPaginaActual);
 
     const usuarioActivo = contexto.usuarios.activo
         ? usuariosCargados.find(u => u.id === contexto.usuarios.activo?.id) ?? null
@@ -37,7 +42,7 @@ export const recargarUsuarios: ProcesarMaestroUsuario = async (contexto, payload
         ...contexto,
         usuarios: {
             lista: usuariosCargados,
-            total: resultado.total,
+            total,
             activo: usuarioActivo,
         },
         estado: "LISTO",

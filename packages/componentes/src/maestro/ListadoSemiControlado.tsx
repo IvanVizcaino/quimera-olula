@@ -1,16 +1,18 @@
-import { Criteria, Entidad } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro, Criteria, Entidad } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { useCallback, useEffect, useState } from "react";
 import { QIcono } from "../atomos/qicono.tsx";
-import { MetaTabla } from "../atomos/qtabla.tsx";
+import { MetaTabla, obtenerCols } from "../atomos/qtablacontrolada.tsx";
 import { QTablaControlada } from "../atomos/qtablacontrolada.tsx";
 import { QTarjetas } from "../atomos/qtarjetas.tsx";
-import { expandirEntidad } from "../detalle/helpers.tsx";
 import { QTarjetaMetatabla } from "../moleculas/qtarjeta_metatabla.tsx";
 import { SinDatos } from "../SinDatos/SinDatos.tsx";
 import "./Listado.css";
 import { filtrarEntidad } from "./maestroFiltros/filtro.ts";
-import { MaestroFiltrosControlado } from "./maestroFiltros/MaestroFiltrosControlado.tsx";
+import {
+  MaestroFiltrosActivoControlado,
+  MetaFiltro,
+} from "./maestroFiltros/MaestroFiltrosActivoControlado.tsx";
 
 const datosCargando = <T extends Entidad>() =>
   new Array(10).fill(null).map(
@@ -23,16 +25,11 @@ const datosCargando = <T extends Entidad>() =>
       }) as T
   );
 
-const obtenerCampos = (entidad: Entidad | null): string[] => {
-  if (!entidad) return [];
-  return expandirEntidad(entidad).map(([clave]) => clave);
-};
-
 type Modo = "tabla" | "tarjetas";
 
 type MaestroProps<T extends Entidad> = {
   metaTabla?: MetaTabla<T>;
-  metaFiltro?: boolean;
+  metaFiltro?: MetaFiltro;
   cargando?: boolean;
   tarjeta?: (entidad: T) => React.ReactNode;
   renderAcciones?: () => React.ReactNode;
@@ -43,13 +40,15 @@ type MaestroProps<T extends Entidad> = {
   seleccionada: T | null;
   onSeleccion: (seleccionada: T) => void;
   modo?: Modo;
+  modoInicial?: Modo;
+  modosDisponibles?: Modo[];
   onModoChanged?: (modo: Modo) => void;
   onCriteriaChanged: (criteria: Criteria) => void;
 };
 
 export const ListadoSemiControlado = <T extends Entidad>({
   metaTabla,
-  metaFiltro = false, // TODO: Pasar una estructura que defina el filtro y no mostrar filtro si es undefined
+  metaFiltro,
   cargando = false,
   idReiniciarCriteria,
   criteriaInicial = criteriaDefecto,
@@ -60,12 +59,29 @@ export const ListadoSemiControlado = <T extends Entidad>({
   seleccionada,
   onSeleccion,
   modo,
+  modoInicial,
+  modosDisponibles,
   onModoChanged,
   onCriteriaChanged,
 }: MaestroProps<T>) => {
   const [criteria, setCriteria] = useState<Criteria>(criteriaInicial);
-  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? "tabla");
+  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? modoInicial ?? "tabla");
   const modoInterno = modo ?? modoEstado;
+
+  const puedeTabla = metaTabla !== undefined;
+  const puedeTarjetas = true;
+
+  const modosDisponiblesCalculados: Modo[] = modosDisponibles
+    ? modosDisponibles.filter((m) => {
+        if (m === "tabla") return puedeTabla;
+        if (m === "tarjetas") return puedeTarjetas;
+        return false;
+      })
+    : [...(puedeTabla ? (["tabla"] as Modo[]) : []), "tarjetas"];
+
+  const modoEfectivo = modosDisponiblesCalculados.includes(modoInterno)
+    ? modoInterno
+    : (modosDisponiblesCalculados[0] ?? "tarjetas");
 
   const cambiarCriteria = useCallback(
     (c: Criteria) => {
@@ -76,36 +92,23 @@ export const ListadoSemiControlado = <T extends Entidad>({
   );
 
   const entidadesFiltradas = entidades.filter((entidad) =>
-    filtrarEntidad(entidad, criteria.filtro)
+    filtrarEntidad(entidad, criteria.filtro as ClausulaFiltro[])
   );
 
   const tarjetaGenerica =
     metaTabla !== undefined
       ? (entidad: T) => (
-          <QTarjetaMetatabla entidad={entidad} metaTabla={metaTabla} />
+          <QTarjetaMetatabla entidad={entidad} metaTabla={obtenerCols(metaTabla)} />
         )
       : undefined;
-  const puedeTabla = metaTabla !== undefined;
-  const puedeTarjetas = tarjeta !== undefined;
-
-  const modoEfectivo =
-    modoInterno === "tabla" && puedeTabla
-      ? "tabla"
-      : modoInterno === "tarjetas" && puedeTarjetas
-        ? "tarjetas"
-        : puedeTabla
-          ? "tabla"
-          : puedeTarjetas
-            ? "tarjetas"
-            : null;
 
   const cambiarModo = (nuevoModo: Modo) => {
     if (modo === undefined) setModoEstado(nuevoModo);
     onModoChanged?.(nuevoModo);
   };
 
-  const mostrarCambioModo = puedeTabla && puedeTarjetas && modoEfectivo;
-  // const mostrarCambioModo = false;
+  const mostrarCambioModo =
+    modosDisponiblesCalculados.length > 1 && modoEfectivo;
   const acciones = renderAcciones?.();
   const mostrarCabecera = metaFiltro || mostrarCambioModo || Boolean(acciones);
 
@@ -190,10 +193,10 @@ export const ListadoSemiControlado = <T extends Entidad>({
         <div className="listado-cabecera">
           <div className="listado-cabecera-izquierda">
             {metaFiltro && (
-              <MaestroFiltrosControlado
-                campos={obtenerCampos(entidades[0])}
-                filtro={criteria.filtro}
-                filtroInicial={criteriaInicial.filtro}
+              <MaestroFiltrosActivoControlado
+                metaFiltro={metaFiltro}
+                filtro={criteria.filtro as ClausulaFiltro[]}
+                filtroInicial={criteriaInicial.filtro as ClausulaFiltro[]}
                 onFiltroChanged={(filtro) => {
                   cambiarCriteria({
                     ...criteria,

@@ -24,7 +24,6 @@ export const BorrarPagoVentaTpv = ({
 
     const cancelar = useCallback(
         () => {
-            console.log('cancelando')
             publicar("borrado_de_pago_cancelado")
         },
         [publicar]

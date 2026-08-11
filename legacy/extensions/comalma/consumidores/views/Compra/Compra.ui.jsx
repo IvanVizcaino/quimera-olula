@@ -65,59 +65,60 @@ function Compra({ callbackChanged, idCompra, initCompra, useStyles }) {
         >
           <Grid container>
             <QModelBox id="compra.buffer" disabled={!editable} schema={schema}>
-              <Grid size={{ xs: 12, sm: 12, md: 12 }} * justify="center">
-                <QSection
-                  title="Comercio"
-                  actionPrefix="compra.buffer/idCompra"
-                  alwaysInactive={true}
-                >
-                  <Box display="flex">
-                    <Typography variant="body1">
-                      {compra.buffer.nombreComercio || "Sin Nombre"}
-                    </Typography>
-                  </Box>
-                </QSection>
-              </Grid>
-
-              <Grid container size={{ xs: 12, sm: 12, md: 12 }} justifyContent="space-between">
-                <Box width={mobile ? 0.49 : 0.3}>
-                  <QSection
-                    title="Fecha Compra"
-                    actionPrefix="compra.buffer/idCompra"
-                    alwaysInactive={!editable}
-                    dynamicComp={() => (
-                      <Box md={6}>
-                        <Field.Date id="compra.buffer.fechaCompra" label="" fullWidth />
-                      </Box>
-                    )}
-                  >
-                    <Box display="flex">
-                      <Typography variant="body1">
-                        {util.formatDate(compra.buffer.fechaCompra) || "Sin fecha compra"}
-                      </Typography>
-                    </Box>
-                  </QSection>
+              <Grid size={{ xs: 12, sm: 12, md: 12 }} * justifyContent="center">
+              <QSection
+                title="Comercio"
+                actionPrefix="compra.buffer/idCompra"
+                alwaysInactive={true}
+              >
+                <Box display="flex">
+                  <Typography variant="body1">
+                    {compra.buffer.nombreComercio || "Sin Nombre"}
+                  </Typography>
                 </Box>
-                <Box width={mobile ? 0.5 : 0.3}>
-                  <QSection
-                    title="Importe"
-                    actionPrefix="compra.buffer/idCompra"
-                    alwaysInactive={!editable}
-                    estilos={estilosBoxImporte}
-                  >
-                    <Box display="flex" md={6}>
-                      <Typography variant="body1">
-                        {util.euros(compra.buffer.importe || 0)}
-                      </Typography>
-                    </Box>
-                  </QSection>
-                </Box>
-              </Grid>
-            </QModelBox>
+              </QSection>
           </Grid>
-        </QBox>
-      )}
-    </Quimera.Template>
+
+          <Grid container size={{ xs: 12, sm: 12, md: 12 }} justifyContent="space-between">
+            <Box width={mobile ? 0.49 : 0.3}>
+              <QSection
+                title="Fecha Compra"
+                actionPrefix="compra.buffer/idCompra"
+                alwaysInactive={!editable}
+                dynamicComp={() => (
+                  <Box md={6}>
+                    <Field.Date id="compra.buffer.fechaCompra" label="" fullWidth />
+                  </Box>
+                )}
+              >
+                <Box display="flex">
+                  <Typography variant="body1">
+                    {util.formatDate(compra.buffer.fechaCompra) || "Sin fecha compra"}
+                  </Typography>
+                </Box>
+              </QSection>
+            </Box>
+            <Box width={mobile ? 0.5 : 0.3}>
+              <QSection
+                title="Importe"
+                actionPrefix="compra.buffer/idCompra"
+                alwaysInactive={!editable}
+                estilos={estilosBoxImporte}
+              >
+                <Box display="flex" md={6}>
+                  <Typography variant="body1">
+                    {util.euros(compra.buffer.importe || 0)}
+                  </Typography>
+                </Box>
+              </QSection>
+            </Box>
+          </Grid>
+        </QModelBox>
+          </Grid>
+        </QBox >
+      )
+}
+    </Quimera.Template >
   );
 }
 

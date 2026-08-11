@@ -1,5 +1,11 @@
 .Listado {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+
     .listado-cabecera {
+        flex-shrink: 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -11,6 +17,24 @@
     .listado-cabecera-izquierda {
         flex: 1;
         min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+    }
+
+    .listado-descarga {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--espaciado-xs);
+
+        select {
+            font-size: var(--texto-xs);
+            padding: 2px 4px;
+            border: 1px solid var(--color-borde);
+            border-radius: var(--radio-borde-s);
+            background: var(--color-fondo);
+            cursor: pointer;
+        }
     }
 
     .listado-cabecera-derecha {

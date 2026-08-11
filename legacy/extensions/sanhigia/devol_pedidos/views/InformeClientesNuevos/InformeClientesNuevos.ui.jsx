@@ -18,7 +18,7 @@ import {
 } from "@quimera/comps";
 import { Avatar, isWidthUp, ListItem, ListItemAvatar, ListItemText } from "@quimera/thirdparty";
 import Quimera, { useStateValue, useWidth, util } from "quimera";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function InformeClientesNuevos({ useStyles }) {
   const [
@@ -39,6 +39,17 @@ function InformeClientesNuevos({ useStyles }) {
   const classes = useStyles();
   const width = useWidth();
   const desktop = isWidthUp("sm", width);
+  const ultimaLongitudPaginada = useRef(-1);
+
+  const onScrollTablaClientesNuevos = event => {
+    if (soloSeleccionados || pagina.next === null) return;
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    const cercaDelFinal = scrollHeight - scrollTop - clientHeight < 100;
+    if (cercaDelFinal && ultimaLongitudPaginada.current !== cliNuevos.length) {
+      ultimaLongitudPaginada.current = cliNuevos.length;
+      dispatch({ type: "onMostrarSiguienteClicked" });
+    }
+  };
 
   useEffect(() => {
     dispatch({ type: "init" });
@@ -153,7 +164,11 @@ function InformeClientesNuevos({ useStyles }) {
         {estadoVista === "lanzando" && <LinearProgress />}
         {desktop ? (
           estadoVista === "lanzadoConResultados" && (
-            <Box id="scrollableTablaClientesNuevos">
+            <Box
+              id="scrollableTablaClientesNuevos"
+              style={{ height: `calc(100vh - 250px)`, overflow: "auto" }}
+              onScroll={onScrollTablaClientesNuevos}
+            >
               <Table
                 id="tdbClientesNuevos"
                 idField="codCliente"
@@ -163,7 +178,6 @@ function InformeClientesNuevos({ useStyles }) {
                 next={() => !soloSeleccionados && dispatch({ type: "onMostrarSiguienteClicked" })}
                 hasMore={pagina.next !== null}
                 loader={soloSeleccionados ? " " : null}
-                scrollableTarget="scrollableTablaClientesNuevos"
               >
                 <Column.Action
                   id="marcarCliente"

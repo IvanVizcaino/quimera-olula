@@ -9,6 +9,7 @@ export const leadVacio: Lead = {
     id: "",
     tipo: "Cliente",
     estado_id: "",
+    estado: "",
     nombre: "",
     id_fiscal: "",
     cliente_id: "",
@@ -26,6 +27,7 @@ export const leadVacio: Lead = {
     web: "",
     contacto_id: "",
     fuente_id: "",
+    fuente: "",
     responsable_id: "",
 };
 
@@ -34,7 +36,7 @@ export const metaLead: MetaModelo<Lead> = {
         tipo: { requerido: true, bloqueado: true },
         estado_id: { requerido: true },
         nombre: { requerido: true },
-        id_fiscal: { requerido: true },
+        id_fiscal: { requerido: false },
         cliente_id: { requerido: false },
         proveedor_id: { requerido: false },
         direccion: { requerido: false },

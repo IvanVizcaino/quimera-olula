@@ -317,6 +317,13 @@ export const convertirCampoDesdeUI = <T extends Modelo>(meta: MetaModelo<T>) => 
 
             return new Date(Date.parse(valor));
         }
+        case 'fecha_hora': {
+            if (valor === null || valor === '') {
+                return null;
+            }
+
+            return new Date(Date.parse(valor));
+        }
         default:
             return valor;
     }
@@ -398,7 +405,12 @@ export const convertirCampoHaciaUI = <T extends Modelo>(meta: MetaModelo<T>) => 
             return [desde?.toISOString().slice(0, 10) as string, hasta?.toISOString().slice(0, 10) as string] as unknown as string;
         }
         case 'fecha': {
+            if (typeof valor === 'string') return valor.slice(0, 10);
             return (valor as Date).toISOString().slice(0, 10);
+        }
+        case 'fecha_hora': {
+            if (typeof valor === 'string') return valor.slice(0, 16);
+            return (valor as Date).toISOString().slice(0, 16);
         }
 
         default:
@@ -430,6 +442,8 @@ const getUiProps = <M extends Modelo>(
             ? campos[campo].tipo
             : "texto";
 
+        const opcional = campo in campos && campos[campo]?.requerido === false;
+
         const conversionTipo = {
             "boolean": "checkbox",
             "dolar": "moneda",
@@ -446,6 +460,9 @@ const getUiProps = <M extends Modelo>(
             valido: cambiado && valido,
             erroneo: !valido,
             advertido: false,
+            opcional,
+            modificado: cambiado,
+            soloTexto: !modeloEsEditable(meta)(modelo),
             textoValidacion: textoValidacion,
             onChange: setCampo(modelo, meta, onModeloCambiado, campo, secundario),
             evaluarCambio: evaluarCambio(modelo, modeloInicial, meta, onModeloListo),
@@ -476,7 +493,7 @@ const setCampo = <M extends Modelo>(
     segundo?: string
 ) => async (_valor: ValorControl): Promise<void> => {
 
-    let valor = _valor || null;
+    let valor = _valor === undefined ? null : _valor;
     let descripcion: string | undefined = undefined;
 
 
@@ -620,13 +637,43 @@ export const modeloModificado = <T extends Modelo>(valor_inicial: T, valor: T) =
     )
 }
 
-export const formatearMoneda = (cantidad: number, divisa: string): string => {
+// const aNumeroMoneda = (cantidad: number | string): number | null => {
+//     if (typeof cantidad === "number") {
+//         return Number.isFinite(cantidad) ? cantidad : null;
+//     }
+
+//     const limpio = cantidad
+//         .trim()
+//         .replace(/[^0-9,.-]/g, "")
+//         .replace(/\s+/g, "");
+
+//     if (!limpio) return null;
+
+//     const hayComa = limpio.includes(",");
+//     const hayPunto = limpio.includes(".");
+
+//     const normalizado = hayComa && hayPunto
+//         ? limpio.replace(/\./g, "").replace(/,/g, ".")
+//         : hayComa
+//             ? limpio.replace(/,/g, ".")
+//             : limpio;
+
+//     const numero = Number(normalizado);
+//     return Number.isFinite(numero) ? numero : null;
+// }
+
+export const formatearMoneda = (cantidad: number | string, divisa: string): string => {
+    // const numero = aNumeroMoneda(cantidad);
+    const numero = Number(cantidad);
+    if (isNaN(numero)) return "";
+
     const divisaValida = divisa && divisa.trim() ? divisa.trim().toUpperCase() : "EUR";
     const locale = divisaValida === "EUR" ? "es-ES" : "en-US";
     return new Intl.NumberFormat(locale, {
         style: "currency",
         currency: divisaValida,
-    }).format(cantidad);
+        useGrouping: "always",
+    }).format(numero);
 };
 
 function decimalesPorMoneda(divisa: string): number {
@@ -650,6 +697,8 @@ export const formatearFechaString = (fecha: string): string => {
 };
 
 export const formatearFechaDate = (date: Date): string => {
+    if (!date) return date;
+
     return date.toLocaleDateString("es-ES", {
         day: "2-digit",
         month: "2-digit",
@@ -676,6 +725,9 @@ export const formatearHoraDate = (date: Date): string => {
     return date.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
 };
 
+export const formatearDireccionUnaLinea = (direccion: Direccion): string => {
+    return `${direccion.tipo_via ? `${direccion.tipo_via} ` : ''} ${direccion.nombre_via ? `${direccion.nombre_via} ` : ''}, ${direccion.ciudad ? `${direccion.ciudad}` : ''}`;
+};
 export const calcularPaginacionSimplificada = (
     total: number | undefined,
     paginaActual: number,
@@ -709,9 +761,12 @@ export const calcularPaginacionSimplificada = (
 };
 
 export const puede = (regla: string): boolean => {
-    if (!regla) return true;
+    if (regla === "Dashboard:visit" || regla === 'Home:visit') return true;
+
+    // if (!regla) return true;
     // Busca el permiso exacto
     const permisos = JSON.parse(permisosGrupo.obtener() || "[]") as Permiso[];
+    const permisoGeneral = permisos.find(p => p.id_regla === "general");
 
     const permisoExacto = permisos.find(p => p.id_regla === regla);
     if (permisoExacto) {
@@ -720,11 +775,12 @@ export const puede = (regla: string): boolean => {
         // Si es null, sigue buscando
     }
 
-    // Quita la última parte y busca
+    // Quita la última parte y busca permiso padre
     const partes = regla.split(".");
+    let permisoPadre: Permiso | undefined;
     if (partes.length > 1) {
         const padre = partes.slice(0, -1).join(".");
-        const permisoPadre = permisos.find(p => p.id_regla === padre);
+        permisoPadre = permisos.find(p => p.id_regla === padre);
         if (permisoPadre) {
             if (permisoPadre.valor === true) return true;
             if (permisoPadre.valor === false) return false;
@@ -732,11 +788,23 @@ export const puede = (regla: string): boolean => {
         }
     }
 
-    // Busca permiso general
-    const permisoGeneral = permisos.find(p => p.id_regla === "general");
-    if (permisoGeneral) {
-        if (permisoGeneral.valor === true) return true;
-        if (permisoGeneral.valor === false) return false;
+    // Solo consulta general si hubo alguna coincidencia parcial (null),
+    // es decir, si la regla o su padre existen en la tabla pero están indecidos.
+    // Si la regla es completamente desconocida, se permite por defecto.
+    const hayCoincidenciaIndecisa =
+        (permisoExacto !== undefined && permisoExacto.valor === null) ||
+        (permisoPadre !== undefined && permisoPadre.valor === null);
+
+    if (hayCoincidenciaIndecisa) {
+        if (permisoGeneral) {
+            if (permisoGeneral.valor === true) return true;
+            if (permisoGeneral.valor === false) return false;
+        }
+    }
+
+    // Si no hay ninguna coincidencia y general está denegado, deniega.
+    if (permisoExacto === undefined && permisoPadre === undefined && permisoGeneral?.valor === false) {
+        return false;
     }
 
     return true;
@@ -763,8 +831,18 @@ export const transformarCriteria = (relacion: RelacionDeCampos): (criteria: Crit
     const transformarClausula = (clausula: ClausulaFiltro): ClausulaFiltro =>
         clausula.with(0, relacion[clausula[0]] ?? clausula[0]) as ClausulaFiltro;
 
-    const transformarFiltro = (filtro: Filtro): Filtro => filtro.map(transformarClausula);
-
+    // const transformarFiltro = (filtro: Filtro): Filtro => {
+    //     if (Array.isArray(filtro)) return filtro.map(transformarClausula);
+    //     if ('or' in filtro) return { or: filtro.or.map(transformarFiltro) };
+    //     return { and: filtro.and.map(transformarFiltro) };
+    // };
+    const transformarFiltro = (filtro: Filtro): Filtro => {
+        if (Array.isArray(filtro) && filtro.length === 0) return filtro;
+        if (Array.isArray(filtro) && Array.isArray(filtro[0])) return (filtro as ClausulaFiltro[]).map(transformarClausula);
+        if (Array.isArray(filtro)) return transformarClausula(filtro as ClausulaFiltro);
+        if ('or' in filtro) return { or: filtro.or.map(transformarFiltro) };
+        return { and: filtro.and.map(transformarFiltro) };
+    };
     const transformarOrden = (orden: Orden): Orden => orden.with(0, relacion[orden[0]] ?? orden[0]) as Orden;
 
     return (criteria) => ({

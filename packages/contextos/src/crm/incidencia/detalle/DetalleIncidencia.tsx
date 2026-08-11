@@ -1,5 +1,6 @@
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Detalle, QBoton, Tab, Tabs } from "@olula/componentes/index.js";
+import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento, Entidad } from "@olula/lib/diseño.js";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useEffect } from "react";
@@ -52,11 +53,16 @@ export const DetalleIncidencia = ({
     >
       {!!incidenciaId && (
         <div className="DetalleIncidencia">
-          <div className="maestro-botones ">
-            <QBoton onClick={() => emitir("borrado_incidencia_solicitado")}>
-              Borrar
-            </QBoton>
-          </div>
+          <QuimeraAcciones
+            vertical
+            acciones={[
+              {
+                texto: "Borrar",
+                onClick: () => emitir("borrado_incidencia_solicitado"),
+                advertencia: true,
+              },
+            ]}
+          />
 
           <Tabs>
             <Tab label="General">

@@ -2,6 +2,7 @@
   .rowButtons {
     display: grid;
     width: 100%;
+    min-width: 300px;
     grid-template-columns: 30% 30% 30%;
     align-items: start;
     justify-content: space-around;
@@ -10,10 +11,8 @@
     .buttonHome {
       border: 1px solid $primary-color;
       border-radius: 5px;
-
-      .MuiIconButton-label {
-        display: grid;
-      }
+      padding: 12px;
+      display: grid;
 
       .iconButton {
         font-size: 35px;

@@ -1,7 +1,10 @@
 import { Etiqueta, FormFieldProps, Validacion } from "./_forminput.tsx";
 import "./qtextarea.css";
 
-type TextAreaProps = FormFieldProps & {
+type TextAreaProps = Omit<
+  FormFieldProps,
+  "onChange" | "onBlur" | "onKeyDown"
+> & {
   onInput?: (
     valor: string,
     evento: React.FormEvent<HTMLTextAreaElement>
@@ -14,6 +17,7 @@ type TextAreaProps = FormFieldProps & {
     valor: string,
     evento: React.FocusEvent<HTMLTextAreaElement>
   ) => void;
+  onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
   rows?: number;
   evaluarCambio?: () => void;
 };

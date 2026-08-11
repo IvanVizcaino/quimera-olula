@@ -7,16 +7,16 @@ on:
 
 jobs:
   Docker:
-    if: ${{ github.ref_name == '[nombre_rama]' }} && ${{vars.ORGANIZATION_VAR == 'yeboyebo'}}
+    if: ${{ github.ref_name == '[nombre_rama]' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: "yeboyebo/quimera-olula"
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18.12
+          node-version: 22
 
       - name: Make envfile
         run: echo "VITE_API_URL=https://[url_api]" > .env && echo "VITE_API_URL=https://[url_api]" > ./apps/[nombre_app]/.env
@@ -55,7 +55,7 @@ jobs:
 
   deploy-to-cluster:
     name: deploy to cluster
-    if: ${{ github.ref_name == '[nombre_rama]' }} && ${{vars.ORGANIZATION_VAR == 'yeboyebo'}}
+    if: ${{ github.ref_name == '[nombre_rama]' }}
     runs-on: ubuntu-latest
     needs: Docker
     steps:

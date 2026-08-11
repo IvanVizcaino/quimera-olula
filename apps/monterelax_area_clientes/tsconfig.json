@@ -1,10 +1,9 @@
 {
     "extends": "../../tsconfig.app.json",
     "compilerOptions": {
-        "baseUrl": "./src",
         "paths": {
             "#/*": [
-                "../node_modules/@olula/ctx/src/*"
+                "./node_modules/@olula/ctx/src/*"
             ]
         }
     },

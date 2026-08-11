@@ -1,6 +1,5 @@
 import { makeStyles } from "@quimera/styles";
 import { useStateValue, util } from "quimera";
-import React from "react";
 
 import { Box, Icon } from "../";
 import TableCell from "./TableCell";
@@ -30,13 +29,13 @@ function TableColumn({ align = "left", clickMode, columnType, data = {}, dataDri
     if (!hrefProp && columnType !== "ActionColumn") {
       clickMode === "line"
         ? dispatch({
-            type: `on${util.camelId(tableName)}RowClicked`,
-            payload: data,
-          })
+          type: `on${util.camelId(tableName)}RowClicked`,
+          payload: data,
+        })
         : dispatch({
-            type: `on${util.camelId(tableName)}${util.camelId(id)}Clicked`,
-            payload: data,
-          });
+          type: `on${util.camelId(tableName)}${util.camelId(id)}Clicked`,
+          payload: data,
+        });
     }
   }
 
@@ -60,9 +59,8 @@ function TableColumn({ align = "left", clickMode, columnType, data = {}, dataDri
         component="div"
         height="2em"
         display="flex"
-        justifyContent={flexAlign}
         alignItems="center"
-        justify={align}
+        justifyContent={align}
         width="100%"
       >
         <strong

@@ -1,0 +1,22 @@
+.QGestorDocumentos {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.QGestorDocumentos-subiendo {
+    padding: 20px;
+    text-align: center;
+    background-color: var(--color-superficie-sunken);
+    border-radius: 8px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.QGestorDocumentos-subiendo p {
+    margin: 0;
+    color: var(--color-texto-primario);
+    font-size: 16px;
+}

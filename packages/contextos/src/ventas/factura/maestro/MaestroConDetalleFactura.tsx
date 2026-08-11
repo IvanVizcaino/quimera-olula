@@ -38,9 +38,7 @@ export const MaestroConDetalleFactura = () => {
             <h2>Facturas</h2>
             <Listado<Factura>
               metaTabla={metaTablaFactura}
-              criteria={ctx.facturas.criteria}
-              modo={"tabla"}
-              entidades={ctx.facturas.lista}
+              criteria={ctx.facturas.criteria}              entidades={ctx.facturas.lista}
               totalEntidades={ctx.facturas.total}
               seleccionada={ctx.facturas.activo}
               renderAcciones={() => (

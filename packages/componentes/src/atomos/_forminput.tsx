@@ -1,3 +1,7 @@
+import { useLayoutEffect, useRef } from "react";
+import { flushSync } from "react-dom";
+import { useEsMovil } from "../maestro/useEsMovil.ts";
+
 export type FormFieldProps = {
   id?: string;
   label: string;
@@ -5,6 +9,7 @@ export type FormFieldProps = {
   deshabilitado?: boolean;
   placeholder?: string;
   valor?: string;
+  maxLength?: number;
   textoValidacion?: string;
   erroneo?: boolean;
   advertido?: boolean;
@@ -20,6 +25,7 @@ export type FormFieldProps = {
     valor: string,
     evento: React.ChangeEvent<HTMLInputElement>
   ) => void;
+  onKeyDown?: (evento: React.KeyboardEvent<HTMLInputElement>) => void;
   onBlur?: (valor: string, evento: React.FocusEvent<HTMLElement>) => void;
   onEnterKeyUp?: (
     valor: string,
@@ -52,6 +58,10 @@ const tiposFormInput = {
   multiseleccion: "checkbox",
 } as const;
 
+const TIPOS_NUMERICOS = new Set<string>([
+  "numero", "entero", "decimal", "moneda", "rango", "intervalo_numeros",
+]);
+
 export type FormInputProps = FormFieldProps & {
   lista?: string;
   autocompletar?: "off" | "on";
@@ -78,6 +88,7 @@ export const FormInput = ({
   autocompletar,
   autoSeleccion,
   autoFocus,
+  maxLength,
   ref,
   onChange,
   onBlur,
@@ -85,6 +96,11 @@ export const FormInput = ({
   onEnterKeyUp,
   evaluarCambio,
 }: InputProps) => {
+  const evaluarCambioRef = useRef(evaluarCambio);
+  useLayoutEffect(() => {
+    evaluarCambioRef.current = evaluarCambio;
+  });
+  const esMovil = useEsMovil();
   const obtenerValorPorDefecto = () => {
     if (valor !== undefined && valor !== "" && valor != null) return valor;
 
@@ -101,13 +117,14 @@ export const FormInput = ({
   const valorFinal = onChange ? obtenerValorPorDefecto() : undefined;
 
   const manejarFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (autoSeleccion) {
+    if (autoSeleccion || (esMovil && TIPOS_NUMERICOS.has(tipo))) {
       e.target.select();
     }
   };
 
   const manejarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange?.(e.target.value, e);
+    const target = e.target;
+    onChange?.(target.type === 'checkbox' ? target.checked.toString() : target.value, e);
   };
 
   const manejarBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -128,30 +145,76 @@ export const FormInput = ({
     }
   };
 
+  const manejarLimpiar = () => {
+    if (onChange) {
+      flushSync(() => {
+        onChange("", { target: { value: "", type: "time" } } as React.ChangeEvent<HTMLInputElement>);
+      });
+    }
+    evaluarCambioRef.current?.();
+  };
+
+  const inputProps = {
+    id: id,
+    type: tiposFormInput[tipo] ?? "text",
+    name: nombre,
+    placeholder: placeholder,
+    disabled: deshabilitado,
+    required: !opcional,
+    maxLength: maxLength,
+    list: lista,
+    autoComplete: autocompletar,
+    onChange: manejarChange,
+    onBlur: manejarBlur,
+    onFocus: manejarFocus,
+    onInput: manejarInput,
+    onKeyUp: manejarKeyUp,
+    autoFocus: autoFocus,
+    ref: ref as React.RefObject<HTMLInputElement>,
+  }
+  if (tipo === "checkbox") {
+    const checkedValue = checked ?? valor === "true";
+    return (
+      <input
+        {...inputProps}
+        checked={onChange ? checkedValue : undefined}
+        defaultChecked={onChange ? undefined : checkedValue}
+      />
+    );
+  }
+
+  if (tipo === "hora") {
+    return (
+      <div className="hora-wrapper">
+        <input
+          {...inputProps}
+          value={valorFinal as string}
+          defaultValue={onChange ? undefined : valor as string}
+        />
+        {opcional && valor && !deshabilitado && (
+          <button
+            type="button"
+            className="hora-limpiar"
+            onClick={manejarLimpiar}
+            aria-label="Limpiar hora"
+            tabIndex={-1}
+          >
+            ×
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <input
-      id={id}
-      type={tiposFormInput[tipo] ?? "text"}
-      name={nombre}
-      placeholder={placeholder}
-      value={valorFinal}
-      defaultValue={onChange ? undefined : valor}
-      checked={onChange ? checked : undefined}
-      defaultChecked={onChange ? undefined : checked}
-      disabled={deshabilitado}
-      required={!opcional}
-      list={lista}
-      autoComplete={autocompletar}
-      onChange={manejarChange}
-      onBlur={manejarBlur}
-      onFocus={manejarFocus}
-      onInput={manejarInput}
-      onKeyUp={manejarKeyUp}
-      autoFocus={autoFocus}
-      ref={ref as React.RefObject<HTMLInputElement>}
+      {...inputProps}
+      value={valorFinal as string}
+      defaultValue={onChange ? undefined : valor as string}
     />
   );
 };
+
 
 export const Etiqueta = ({ label }: { label: string }) => {
   return (

@@ -3,7 +3,7 @@ import "./ResumenPda.style.scss";
 import { Icon } from "@quimera/comps";
 import PropTypes from "prop-types";
 import { useStateValue, util } from "quimera";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const getDbInstance = (dbName, storeName) => {
   return new Promise((resolve, reject) => {

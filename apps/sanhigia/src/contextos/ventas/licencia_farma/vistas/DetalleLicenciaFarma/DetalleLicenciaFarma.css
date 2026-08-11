@@ -1,0 +1,50 @@
+.DetalleLicenciaFarma {
+    quimera-input[nombre="tipoLicencia"] {
+        grid-column: 1 / span 12;
+    }
+
+    quimera-select[nombre="estado"] {
+        grid-column: 1 / span 6;
+    }
+
+    quimera-date[nombre="fechaCaducidad"] {
+        grid-column: 1 / span 4;
+    }
+
+    quimera-date[nombre="fechaInicio"] {
+        grid-column: span 4;
+    }
+
+    quimera-date[nombre="fechaFin"] {
+        grid-column: span 4;
+    }
+
+    quimera-date[nombre="fechaRevisionDatos"] {
+        grid-column: span 4;
+    }
+
+    quimera-date[nombre="fechaRecepcionAcuerdos"] {
+        grid-column: span 4;
+    }
+
+    quimera-date[nombre="fechaEnvioDocumentacion"] {
+        grid-column: span 4;
+    }
+
+
+    quimera-input[nombre="nombreCliente"] {
+        grid-column: 1 / span 8;
+    }
+
+    quimera-input[nombre="clienteId"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="tratoId"] {
+        grid-column: 1 / span 6;
+    }
+
+    quimera-input[nombre="agenteId"] {
+        grid-column: span 6;
+    }
+}

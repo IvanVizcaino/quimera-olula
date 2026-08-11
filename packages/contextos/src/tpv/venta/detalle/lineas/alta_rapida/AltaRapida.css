@@ -1,0 +1,10 @@
+.alta-rapida {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.alta-rapida quimera-input[nombre="cantidad"] {
+    max-width: 5rem;
+}

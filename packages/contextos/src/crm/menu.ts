@@ -6,5 +6,5 @@ export const menuCrm = {
     "CRM/Acciones": { url: "/crm/accion", regla: "crm.accion.leer" },
     "CRM/Leads": { url: "/crm/lead", regla: "crm.lead.leer" },
     "CRM/Incidencias": { url: "/crm/incidencia", regla: "crm.incidencia.leer" },
-    "CRM/Otros": { url: "/crm/otros", regla: "crm.otros.leer" },
+    "CRM/Otros": { url: "/crm/otros", regla: "crm.lead.leer" },
 };

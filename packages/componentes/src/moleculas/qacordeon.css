@@ -1,0 +1,99 @@
+quimera-acordeon {
+    display: grid;
+    gap: var(--espaciado-s);
+
+    .qacordeon-item {
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-s);
+        overflow: hidden;
+        background: var(--color-superficie);
+    }
+
+    .qacordeon-titulo {
+        margin: 0;
+    }
+
+    .qacordeon-cabecera {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+        background: var(--color-superficie-elevada);
+        padding: var(--espaciado-s) var(--espaciado-l);
+    }
+
+    .qacordeon-cabecera-principal {
+        text-align: left;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .qacordeon-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
+        height: 2rem;
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        border-radius: 999px;
+        background: var(--color-superficie);
+        color: var(--color-texto-secundario);
+        cursor: pointer;
+        padding: 0;
+        font-size: var(--tamaño-letra-m);
+    }
+
+    .qacordeon-toggle:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .qacordeon-toggle:focus-visible {
+        outline: var(--tamaño-borde-s) solid var(--color-primario);
+        outline-offset: 2px;
+    }
+
+    .qacordeon-cabecera-texto {
+        display: grid;
+        gap: var(--espaciado-xxs);
+    }
+
+    .qacordeon-texto-principal {
+        font-size: var(--tamaño-letra-m);
+        line-height: var(--tamaño-letra-l);
+        font-weight: 600;
+        color: var(--color-texto-primario);
+    }
+
+    .qacordeon-subtitulo {
+        color: var(--color-texto-secundario);
+        font-size: var(--tamaño-letra-m);
+        font-weight: 500;
+    }
+
+    .qacordeon-cabecera-derecha {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+        color: var(--color-texto-secundario);
+    }
+
+    .qacordeon-contador {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 999px;
+        padding: 0 var(--espaciado-xs);
+        font-size: var(--tamaño-letra-m);
+        background: var(--color-superficie);
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    }
+
+    .qacordeon-contenido {
+        padding: var(--espaciado-s) var(--espaciado-l) var(--espaciado-l);
+        border-top: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    }
+}

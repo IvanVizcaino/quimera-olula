@@ -1,10 +1,11 @@
-import { formatearMoneda } from "@olula/lib/dominio.js";
+import { formatearMoneda, redondeaMoneda } from "@olula/lib/dominio.js";
 import { MovimientoEfectivo } from "./crear_movimiento_efectivo/diseño.ts";
 import { ArqueoTpv } from "./diseño.ts";
 
 const idDivisa = 'EUR';
 
 export const moneda = (v: number) => formatearMoneda(v, idDivisa);
+export const redondear = (v: number) => redondeaMoneda(v, idDivisa);
 
 export const totalMovimientos = (
     movimientos: MovimientoEfectivo[]

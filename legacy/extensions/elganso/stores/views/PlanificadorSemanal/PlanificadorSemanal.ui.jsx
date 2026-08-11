@@ -2,7 +2,7 @@ import "./PlanificadorSemanal.style.scss";
 
 import { Field, Icon, IconButton } from "@quimera/comps";
 import Quimera, { PropValidation, useStateValue } from "quimera";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { SemanaPlanificador } from "../../comps";
 

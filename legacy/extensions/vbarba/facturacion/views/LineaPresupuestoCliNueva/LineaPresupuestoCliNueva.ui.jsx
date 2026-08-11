@@ -2,12 +2,12 @@ import { Box, Collapse, Field, Grid, Icon, IconButton, QSection, Typography } fr
 import Quimera, { getSchemas, useStateValue, util } from "quimera";
 import { useEffect } from "react";
 
+import { QProveedor } from "@quimera-extension/base-almacen";
 // import { QArticulo } from "@quimera-extension/base-almacen";
 import {
   FieldConNavegacionEnter,
-  ProveedorArticulo,
   QArticuloVbarbaMarcado,
-  useArticuloFocus,
+  useArticuloFocus
 } from "../../comps";
 
 function LineaPresupuestoCliNueva({ callbackGuardada, idPresupuesto, useStyles }) {
@@ -101,12 +101,11 @@ function LineaPresupuestoCliNueva({ callbackGuardada, idPresupuesto, useStyles }
                 <Quimera.Block id="afterDescripcion" />
               </Grid>
               <Grid size={12}>
-                <ProveedorArticulo
+                <QProveedor
                   id="linea.buffer/codProveedor"
                   label={`Proveedor`}
-                  referencia={linea.buffer.referencia}
+                  disableClearable
                   fullWidth
-                  async
                 />
               </Grid>
               <Grid size={6}>

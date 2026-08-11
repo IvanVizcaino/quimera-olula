@@ -1,0 +1,33 @@
+.tarjeta-jornada {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.tarjeta-jornada-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tarjeta-jornada-fecha {
+    font-weight: 500;
+}
+
+.tarjeta-jornada-estado {
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+}
+
+.tarjeta-jornada-horas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+}
+
+.tarjeta-jornada-duracion {
+    font-weight: 500;
+    color: var(--color-texto-primario);
+}

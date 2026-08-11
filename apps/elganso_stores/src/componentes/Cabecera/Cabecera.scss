@@ -1,0 +1,21 @@
+header {
+    height: 60px;
+    min-height: 60px;
+
+    a {
+        height: 22px;
+        margin-left: 20px;
+
+        &.login {
+            margin-left: 0;
+        }
+
+        .logo-app {
+            filter: brightness(0) invert(1);
+        }
+    }
+
+    #etiqueta-menu-usuario-abierto {
+        cursor: pointer;
+    }
+}

@@ -181,3 +181,92 @@ interface ClienteVenta { cliente_id: string | null; nombre_cliente: string; ... 
 - `QInput` — input de texto/número (`label`, `nombre`, `valor`, `onChange`, `deshabilitado`)
 - `QCheckbox` — checkbox
 - `quimera-formulario` — web component contenedor de formulario
+
+## Modal bifásico con estado React interno (consulta/verificación)
+
+Úsalo cuando el flujo es **consulta sin efectos en el contexto de la máquina**: el modal pide parámetros, llama a la API internamente, muestra resultados y al cerrarse dispara un evento de transición string pura.
+
+**Cuándo elegirlo frente al modal normal:**
+- El resultado de la API no necesita persistir en el contexto de la máquina.
+- La operación es de solo lectura (consulta, verificación, exportación…).
+- El usuario necesita ver los resultados antes de cerrar el modal.
+
+**Patrón en maquina.ts** — transición string pura (sin procesador):
+
+```typescript
+INICIAL: {
+    consulta_solicitada: "CONSULTANDO",
+},
+CONSULTANDO: {
+    consulta_completada: "INICIAL",     // string puro, el modal ya cerró tras ver resultados
+    consulta_cancelada:  "INICIAL",
+},
+```
+
+**Patrón del componente modal** — estado interno React de dos fases:
+
+```typescript
+export const ModalConsulta = ({ publicar }: { publicar: EmitirEvento }) => {
+    const [parametro, setParametro] = useState('');
+    const [cargando, setCargando]   = useState(false);
+    const [resultado, setResultado] = useState<ResultadoConsulta | null>(null);
+
+    const ejecutar = useCallback(async () => {
+        setCargando(true);
+        try {
+            const res = await getConsulta(parametro || null);
+            setResultado(res);
+        } finally {
+            setCargando(false);
+        }
+    }, [parametro]);
+
+    const cerrar   = useCallback(() => publicar("consulta_completada"), [publicar]);
+    const cancelar = useCallback(() => publicar("consulta_cancelada"),  [publicar]);
+
+    return (
+        <QModal nombre="modalConsulta" titulo="Consultar X" abierto={true} onCerrar={cancelar}>
+            {!resultado ? (
+                <div>
+                    {/* Fase formulario */}
+                    <quimera-formulario>
+                        <QFechaHora label="Desde" nombre="desde" valor={parametro}
+                            onChange={v => setParametro(v)} deshabilitado={cargando} opcional={true} />
+                    </quimera-formulario>
+                    <div className="botones maestro-botones">
+                        <QBoton onClick={ejecutar} deshabilitado={cargando}>
+                            {cargando ? 'Consultando...' : 'Consultar'}
+                        </QBoton>
+                        <QBoton onClick={cancelar} variante="texto" deshabilitado={cargando}>
+                            Cancelar
+                        </QBoton>
+                    </div>
+                </div>
+            ) : (
+                <div>
+                    {/* Fase resultado */}
+                    <p>{resultado.resumen}</p>
+                    <div className="botones maestro-botones">
+                        <QBoton onClick={cerrar}>Cerrar</QBoton>
+                    </div>
+                </div>
+            )}
+        </QModal>
+    );
+};
+```
+
+**Patrón en infraestructura.ts** — URL propia si difiere de la base del módulo:
+
+```typescript
+// Si el endpoint de consulta tiene una URL distinta a baseUrl:
+const consultaUrl = new ModuloUrls().CONSULTA;   // añadir en comun/urls.ts
+
+export const getConsulta: GetConsulta = async (desde) => {
+    const query = desde ? `?desde=${encodeURIComponent(desde)}` : '';
+    const respuesta = await RestAPI.get<{ datos: ConsultaApi }>(consultaUrl + query);
+    return mapearConsultaDesdeApi(respuesta.datos);
+};
+```
+
+**Referencia real:** `rrhh/registro_jornada/maestro/RevisarFirmaJornadas.tsx`

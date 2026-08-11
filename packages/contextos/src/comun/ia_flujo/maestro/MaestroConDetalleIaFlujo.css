@@ -1,0 +1,21 @@
+.IaFlujo {
+    .tarjeta-ia-flujo {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .tarjeta-ia-flujo-descripcion {
+        font-size: 0.9em;
+        color: var(--color-texto-secundario, #666);
+    }
+
+    .tarjeta-ia-flujo-estado {
+        font-size: 0.85em;
+        color: var(--color-texto-secundario, #666);
+    }
+
+    .tarjeta-ia-flujo-estado.estado-inactivo {
+        opacity: 0.6;
+    }
+}

@@ -14,4 +14,9 @@
     div[id="pendiente"] {
         grid-column: span 6;
     }
+
+    .denominaciones {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
 }

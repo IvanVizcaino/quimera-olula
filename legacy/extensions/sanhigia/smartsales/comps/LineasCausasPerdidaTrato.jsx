@@ -26,7 +26,6 @@ export default function LineasCausasPerdidaTrato({ lineas, ...props }) {
           <Box
             display="flex"
             // flexGrow={1}
-            justify="flex-end"
             alignItems="center"
             justifyContent="flex-end"
             mr={1}

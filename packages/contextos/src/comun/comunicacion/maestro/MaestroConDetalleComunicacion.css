@@ -1,0 +1,39 @@
+.MaestroComunicacion {
+    height: 100%;
+
+    quimera-tarjeta {
+        padding: var(--espaciado-l) var(--espaciado-m);
+    }
+}
+
+.comunicacion-tarjeta-asunto {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.comunicacion-tarjeta-texto--no-leida,
+.comunicacion-tarjeta-fecha--no-leida {
+    font-weight: 700;
+}
+
+.comunicacion-tarjeta-texto--leida,
+.comunicacion-tarjeta-fecha--leida {
+    font-weight: 400;
+}
+
+.comunicacion-punto {
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.comunicacion-punto--no-leida {
+    background-color: var(--color-error);
+}
+
+.comunicacion-punto--leida {
+    background-color: var(--color-exito);
+}

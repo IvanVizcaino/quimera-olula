@@ -17,12 +17,19 @@ export const Variedad = ({
   onChange,
   ...props
 }: VariedadProps) => {
-  const [opcionesVariedad, setOpcionesVariedad] = useState<OpcionVariedad[]>([]);
+  const [opcionesVariedad, setOpcionesVariedad] = useState<OpcionVariedad[]>(
+    []
+  );
 
   useEffect(() => {
     const cargarOpcionesVariedad = async () => {
-      const items = await getItemsListaSeleccionVariedad();
-      setOpcionesVariedad(items.map((item) => ({ valor: item.id, descripcion: item.descripcion })));
+      const items = await getItemsListaSeleccionVariedad([], ["descripcion"], {
+        pagina: 1,
+        limite: 1000,
+      });
+      setOpcionesVariedad(
+        items.map((item) => ({ valor: item.id, descripcion: item.descripcion }))
+      );
     };
     cargarOpcionesVariedad();
   }, []);

@@ -1,0 +1,12 @@
+quimera-modal[nombre="anularJornada"] quimera-formulario {
+    p {
+        grid-column: 1 / span 12;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        margin: 0;
+    }
+
+    quimera-input[nombre="motivo"] {
+        grid-column: 1 / span 12;
+    }
+}

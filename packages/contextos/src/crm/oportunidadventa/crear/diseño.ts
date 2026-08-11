@@ -5,4 +5,5 @@ export type NuevaOportunidadVenta = {
     contacto_id: string;
     nombre_cliente?: string;
     tarjeta_id: string;
+    nombre_tarjeta?: string;
 };

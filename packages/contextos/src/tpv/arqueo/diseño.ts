@@ -1,5 +1,10 @@
 import { Criteria, Entidad, Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.js";
 
+type RecuentoTipoTarjeta = {
+    idTipoTarjeta: string;
+    calculado: number;
+    contado: number;
+}
 export interface CabeceraArqueoTpv extends Entidad {
     id: string;
     fechahoraApertura: Date;
@@ -33,6 +38,7 @@ type MovimientoArqueoTpvACrear = {
 }
 
 export interface ArqueoTpv extends CabeceraArqueoTpv {
+    recuentoTipoTarjeta: RecuentoTipoTarjeta[];
     movimientos: MovimientoArqueoTpv[];
 }
 

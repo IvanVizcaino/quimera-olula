@@ -1,0 +1,12 @@
+.ComunicacionesResumen {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.ComunicacionesResumen__enlace {
+    color: var(--color-primary, #0b57d0);
+    font-weight: 600;
+    text-decoration: underline;
+}

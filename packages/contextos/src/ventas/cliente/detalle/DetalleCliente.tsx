@@ -1,4 +1,3 @@
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -11,10 +10,10 @@ import { useParams } from "react-router";
 import { BorrarCliente } from "../borrar/BorrarCliente.tsx";
 import { BajaCliente } from "../dar_de_baja/BajaCliente.tsx";
 import { Cliente } from "../diseño.ts";
-import { TabCrmContactos } from "./CRMContactos/TabCrmContactos.tsx";
-import { TabCuentasBanco } from "./CuentasBanco/TabCuentasBanco.tsx";
+import { TabCrmContactos } from "./crm_contactos/TabCrmContactos.tsx";
+import { TabCuentasBanco } from "./cuentas_banco/TabCuentasBanco.tsx";
 import "./DetalleCliente.css";
-import { TabDirecciones } from "./Direcciones/TabDirecciones.tsx";
+import { TabDirecciones } from "./direcciones/TabDirecciones.tsx";
 import { clienteVacio, metaCliente } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
 import { TabComercial } from "./TabComercial.tsx";
@@ -40,7 +39,14 @@ export const DetalleCliente = ({
     publicar
   );
 
-  const cliente = useModelo(metaCliente, ctx.cliente);
+  const autoGuardar = useCallback(
+    async (modelo: Cliente) => {
+      emitir("edicion_de_cliente_lista", modelo);
+    },
+    [emitir]
+  );
+
+  const cliente = useModelo(metaCliente, ctx.cliente, autoGuardar);
 
   useEffect(() => {
     emitir("cliente_id_cambiado", clienteId, true);
@@ -48,17 +54,8 @@ export const DetalleCliente = ({
   }, [clienteId]);
 
   const { estado } = ctx;
-  const { modificado, valido } = cliente;
 
   const titulo = (cliente: Cliente) => cliente.nombre as string;
-
-  const handleGuardar = useCallback(() => {
-    emitir("edicion_de_cliente_lista", cliente.modelo);
-  }, [emitir, cliente]);
-
-  const handleCancelar = useCallback(() => {
-    emitir("edicion_de_cliente_cancelada");
-  }, [emitir]);
 
   if (!ctx.cliente.id) return;
 
@@ -149,22 +146,6 @@ export const DetalleCliente = ({
                 />,
               ]}
             />
-            {modificado && (
-              <div className="maestro-botones">
-                <QBoton onClick={handleGuardar} deshabilitado={!valido}>
-                  Guardar
-                </QBoton>
-                <QBoton
-                  tipo="reset"
-                  variante="texto"
-                  onClick={handleCancelar}
-                  deshabilitado={!modificado}
-                >
-                  Cancelar
-                </QBoton>
-              </div>
-            )}
-
             {estado === "BORRANDO_CLIENTE" && (
               <BorrarCliente
                 clienteId={ctx.cliente.id}

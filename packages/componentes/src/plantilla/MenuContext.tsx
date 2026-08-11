@@ -1,19 +1,6 @@
-import { createContext, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation } from "react-router";
-
-export type MenuType = "lateral" | "usuario";
-
-export interface MenuContextType {
-  menuAbierto: Record<MenuType, boolean>;
-  abrirMenu: (menu: MenuType) => void;
-  cerrarMenu: (menu: MenuType) => void;
-  toggleMenu: (menu: MenuType) => void;
-  cerrarTodos: () => void;
-}
-
-export const MenuContext = createContext<MenuContextType | undefined>(
-  undefined
-);
+import { MenuContext, MenuContextType, MenuType } from "./menu_context";
 
 export const MenuProvider = ({ children }: { children: React.ReactNode }) => {
   const [menuAbierto, setMenuAbierto] = useState<Record<MenuType, boolean>>({

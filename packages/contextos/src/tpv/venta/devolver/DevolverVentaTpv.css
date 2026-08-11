@@ -30,4 +30,8 @@
     quimera-input[nombre="dto_porcentual"] {
         grid-column: span 6;
     }
+
+    .pista {
+        max-width: 100%;
+    }
 }

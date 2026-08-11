@@ -8,7 +8,10 @@ export type Dependency = {
 type Routes = Record<Ruta, unknown>;
 type Ruta = string;
 
-export const crearRouterLegacy = (project: Dependency, comp: JSX.Element): RouteObject[] => getRutasLegacy(project).map(r => ({ path: r.slice(1), Component: () => comp }));
+export const crearRouterLegacy = (project: Dependency, comp: JSX.Element): RouteObject[] => {
+    const LegacyApp = () => comp;
+    return getRutasLegacy(project).map(r => ({ path: r.slice(1), Component: LegacyApp }));
+};
 
 const getRutasLegacy = (project: Dependency): Ruta[] => filtrarUnicos(getDependenciasRecursivas(project)).flatMap(getRutas);
 

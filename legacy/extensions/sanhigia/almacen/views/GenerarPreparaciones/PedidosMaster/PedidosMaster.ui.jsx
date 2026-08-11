@@ -55,7 +55,7 @@ function PedidosMaster({ idPedido }) {
           )} */}
           <Quimera.SubView id="GenerarPreparaciones/PedidosFiltro" />
           {pedidosGenerarPreparaciones.loading ? (
-            <Grid container direction="column" justify="center" alignItems="center">
+            <Grid container direction="column" justifyContent="center" alignItems="center">
               <CircularProgress size={50} style={{ marginTop: 16 }} />
             </Grid>
           ) : (

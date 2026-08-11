@@ -1,0 +1,22 @@
+.DetalleComunicacion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detalle-comunicacion-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.detalle-comunicacion-fecha {
+    margin: 0;
+    font-size: var(--tamaño-letra-s);
+    color: color-mix(in srgb, currentColor 55%, transparent);
+}
+
+.detalle-comunicacion-cuerpo {
+    white-space: pre-wrap;
+}

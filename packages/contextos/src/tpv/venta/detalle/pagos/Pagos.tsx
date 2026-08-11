@@ -1,24 +1,21 @@
 import { PagoVentaTpv } from "#/tpv/venta/diseño.ts";
 import { QBoton } from "@olula/componentes/index.ts";
 import { EmitirEvento } from "@olula/lib/diseño.js";
-import { EstadoVentaTpv } from "../detalle.ts";
 import { PagosLista } from "./PagosLista.tsx";
 export const Pagos = ({
   pagos,
   pagoActivo,
-  estado,
   publicar= async () => { },
 }: {
   pagos: PagoVentaTpv[];
   pagoActivo: PagoVentaTpv | null;
-  estado: EstadoVentaTpv;
   publicar?: EmitirEvento;
 
 }) => {
 
   return (
     <>
-      {estado !== "EMITIDA" && (
+      {pagoActivo?.arqueoAbierto && (
         <div className="botones maestro-botones ">
           <QBoton texto='Borrar'
             deshabilitado={!pagoActivo}

@@ -3,7 +3,6 @@ import "./Home.style.scss";
 import { Icon, IconButton } from "@quimera/comps";
 import { navigate } from "hookrouter";
 import Quimera, { PropValidation, useStateValue } from "quimera";
-import React from "react";
 
 import { ResumenPda } from "../../comps";
 

@@ -1,10 +1,6 @@
 .Cliente .TabComercial {
     quimera-autocompletar[nombre="cliente/agente_id"] {
-        grid-column: span 9;
-    }
-
-    div[id="span3"] {
-        grid-column: span 3;
+        grid-column: 1 / span 4;
     }
 
     quimera-select[nombre="cliente/divisa_id"] {
@@ -16,7 +12,7 @@
     }
 
     quimera-input[nombre="cliente/serie_id"] {
-        grid-column: span 3;
+        grid-column: 1 / span 3;
     }
 
     quimera-select[nombre="cliente/forma_pago_id"] {
@@ -25,28 +21,5 @@
 
     quimera-select[nombre="cliente/grupo_iva_negocio_id"] {
         grid-column: span 3;
-    }
-}
-
-@media (max-width: 768px) {
-    .Cliente .TabComercial quimera-formulario {
-        gap: var(--espaciado-s);
-        padding: var(--espaciado-s) 0;
-    }
-
-    .Cliente .TabComercial quimera-autocompletar[nombre="cliente/agente_id"] {
-        grid-column: 1 / -1 !important;
-    }
-
-    .Cliente .TabComercial quimera-select[nombre="cliente/divisa_id"],
-    .Cliente .TabComercial quimera-input[nombre="cliente/serie_id"] {
-        grid-column: span 1 !important;
-    }
-
-    .Cliente .TabComercial quimera-select[nombre="cliente/forma_pago_id"],
-    .Cliente .TabComercial quimera-autocompletar[nombre="cliente/forma_pago_id"],
-    .Cliente .TabComercial quimera-select[nombre="cliente/grupo_iva_negocio_id"],
-    .Cliente .TabComercial quimera-autocompletar[nombre="cliente/grupo_iva_negocio_id"] {
-        grid-column: span 1 !important;
     }
 }

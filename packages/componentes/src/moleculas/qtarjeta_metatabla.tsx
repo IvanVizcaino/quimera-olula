@@ -45,8 +45,11 @@ const formatearValor = (
     | "booleano",
   divisa?: string
 ): string => {
-  if (tipo === "moneda" && typeof valor === "number") {
-    return formatearMoneda(valor, divisa ?? "EUR");
+  if (tipo === "moneda") {
+    if (typeof valor === "number" || typeof valor === "string") {
+      return formatearMoneda(valor, divisa ?? "EUR");
+    }
+    return "";
   }
 
   if (tipo === "fecha" && typeof valor === "string") {
@@ -66,7 +69,7 @@ const formatearValor = (
   }
 
   if (tipo === "numero" && typeof valor === "number") {
-    return valor.toLocaleString();
+    return valor.toLocaleString("es-ES");
   }
 
   if (tipo === "booleano" && typeof valor === "boolean") {

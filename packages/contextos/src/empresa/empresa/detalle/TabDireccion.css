@@ -1,0 +1,46 @@
+.TabDireccion {
+
+    quimera-input[nombre="tipoVia"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="nombreVia"] {
+        grid-column: span 7;
+    }
+
+    quimera-input[nombre="numero"] {
+        grid-column: span 2;
+    }
+
+    quimera-input[nombre="otros"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="codPostal"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="ciudad"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="provinciaId"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="provincia"] {
+        grid-column: span 5;
+    }
+
+    quimera-input[nombre="paisId"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="apartado"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="telefonoDireccion"] {
+        grid-column: span 6;
+    }
+}

@@ -34,7 +34,6 @@ export const MoleculaContacto = ({
     [ctx, setCtx, intentar]
   );
 
-  console.log({ contactoId, id: ctx.contacto.id });
   if (contactoId && contactoId !== ctx.contacto.id) {
     emitir("contacto_id_cambiado", contactoId);
   }

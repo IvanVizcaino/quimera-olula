@@ -34,7 +34,6 @@ const pipeContactoCrm = ejecutarListaProcesos<EstadoContactoCrm, ContextoContact
 
 export const refrescarContactoCrm: ProcesarContactoCrm = async (contexto, payload) => {
     const datos = payload as Contacto;
-    console.log("-> refrescarContactoCrm", datos.id ?? contexto.contacto.id)
     const contacto = await getContacto(datos.id ?? contexto.contacto.id);
 
     return {
@@ -48,7 +47,6 @@ export const refrescarContactoCrm: ProcesarContactoCrm = async (contexto, payloa
 
 const cargarContactoCrm: (_: string) => ProcesarContactoCrm = (contactoId) =>
     async (contexto) => {
-        console.log("-> cargarContactoCrm", contactoId)
         const contacto = await getContacto(contactoId);
         return {
             ...contexto,

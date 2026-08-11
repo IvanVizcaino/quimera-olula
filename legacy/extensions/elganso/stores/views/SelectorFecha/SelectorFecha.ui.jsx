@@ -8,7 +8,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Select from "@mui/material/Select";
 import { useTheme } from "@mui/material/styles";
 import Quimera, { PropValidation, useStateValue } from "quimera";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDbState } from "use-db-state";
 
 import { LoadingGif } from "../../comps";

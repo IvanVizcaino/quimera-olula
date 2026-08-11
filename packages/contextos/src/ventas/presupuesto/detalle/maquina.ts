@@ -19,7 +19,7 @@ import {
     getContextoVacio,
     refrescarLineas,
     refrescarPresupuesto
-} from "./dominio.ts";
+} from "./detalle.ts";
 
 
 export const getMaquina: () => Maquina<EstadoPresupuesto, ContextoPresupuesto> = () => {

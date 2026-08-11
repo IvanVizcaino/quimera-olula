@@ -1,0 +1,131 @@
+.QKanban {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: var(--espaciado-s);
+    overflow: hidden;
+
+    .qkanban-contenedor {
+        display: flex;
+        gap: var(--espaciado-s);
+        flex: 1;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-inline: var(--padding-horizontal);
+        padding-bottom: var(--espaciado-s);
+    }
+
+    .qkanban-columna {
+        display: flex;
+        flex-direction: column;
+        min-width: 300px;
+        max-width: 400px;
+        flex: 1;
+        min-height: 0;
+        border: 1px solid var(--color-borde);
+        border-radius: var(--radio-borde-m);
+        background: var(--color-fondo);
+        box-shadow: var(--sombra-s);
+        overflow: hidden;
+    }
+
+    .qkanban-columna.encima {
+        border-color: var(--color-primario);
+        box-shadow: 0 0 0 1px var(--color-primario) inset;
+    }
+
+    .qkanban-columna-cabecera {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-xs);
+        padding: var(--espaciado-s);
+        border-bottom: 1px solid var(--color-borde);
+        background: color-mix(in srgb, var(--color-fondo) 92%, var(--qkanban-color, var(--color-primario)) 8%);
+    }
+
+    .qkanban-columna-titulo {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-xs);
+        min-width: 0;
+        font-weight: 600;
+    }
+
+    .qkanban-columna-cabecera-textos {
+        min-width: 0;
+        display: grid;
+        gap: 2px;
+    }
+
+    .qkanban-columna-resumen {
+        font-size: var(--tamaño-letra-m);
+        color: var(--color-texto-secundario);
+        line-height: 1.4;
+    }
+
+    .qkanban-resumen-oportunidad {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .qkanban-resumen-total {
+        font-weight: var(--grosor-letra-6);
+        color: var(--color-texto-primario);
+    }
+
+    .qkanban-resumen-ponderado {
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+    }
+
+    .qkanban-columna-badge {
+        flex-shrink: 0;
+        padding: 0 var(--espaciado-xs);
+        border-radius: var(--radio-borde-s);
+        background: var(--color-fondo-secundario);
+        color: var(--color-texto-secundario);
+        font-size: var(--texto-xs);
+        line-height: 1.6;
+    }
+
+    .qkanban-columna-cuerpo {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+        flex: 1;
+        min-height: 0;
+        padding: var(--espaciado-s);
+        overflow-y: auto;
+    }
+
+    .qkanban-vacio,
+    .qkanban-cargando {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 120px;
+        padding: var(--espaciado-m);
+        color: var(--color-texto-secundario);
+        border: 1px dashed var(--color-borde);
+        border-radius: var(--radio-borde-s);
+        background: var(--color-fondo-secundario);
+    }
+
+    .qkanban-tarjeta-arrastrable {
+        display: block;
+        cursor: grab;
+    }
+
+    .qkanban-tarjeta-arrastrable:active {
+        cursor: grabbing;
+    }
+
+    .qkanban-tarjeta-arrastrable .seleccionada {
+        outline: 2px solid var(--color-primario);
+        outline-offset: 0;
+    }
+}

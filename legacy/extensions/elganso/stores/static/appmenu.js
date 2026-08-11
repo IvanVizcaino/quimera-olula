@@ -67,7 +67,7 @@ export default parent => ({
         icons: ["date_range", "mode_edit"],
         color: "primary",
         variant: "main",
-        url: "/resumen_semanal",
+        url: "/resumen_agente",
       },
       control_horario: {
         title: "Control Horario",

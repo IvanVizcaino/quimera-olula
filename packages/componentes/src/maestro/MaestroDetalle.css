@@ -14,7 +14,7 @@ maestro-detalle {
     display: flex;
     gap: 0.1rem;
     overflow: auto;
-    height: -webkit-fill-available;
+    height: 100%;
     padding-top: var(--padding-vertical);
     transition: all 0.3s ease;
 
@@ -27,6 +27,13 @@ maestro-detalle {
 .Maestro> :has(quimera-tarjetas)> :not(quimera-tabla):not(quimera-tarjetas):not(.Listado),
 .Detalle> :has(quimera-tarjetas)> :not(quimera-tabla):not(quimera-tarjetas):not(.Listado) {
     padding-inline: var(--padding-horizontal);
+}
+
+/* Maestro y Detalle como columnas flex para que el contenido interno pueda hacer scroll */
+.Maestro {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 /* maestro-detalle>div h2,

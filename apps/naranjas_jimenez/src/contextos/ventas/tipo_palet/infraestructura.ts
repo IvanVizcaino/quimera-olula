@@ -19,9 +19,9 @@ const itemListTipoPaletDesdeApi = (item: ItemListTipoPaletApi): ItemListaTipoPal
     cantidadEnvase: item.cantidad_envases,
 })
 
-export const getItemsListaTipoPalet: GetItemsListaTipoPalet = async (filtro, orden) => {
+export const getItemsListaTipoPalet: GetItemsListaTipoPalet = async (criteria) => {
 
     return RestAPI.get<{ datos: ItemListTipoPaletApi[] }>(
-        `${baseUrl}/items_lista` + criteriaQuery(filtro, orden)
+        `${baseUrl}/items_lista` + criteriaQuery(criteria.filtro, criteria.orden, criteria.paginacion)
     ).then((respuesta) => respuesta.datos.map(itemListTipoPaletDesdeApi));
 }

@@ -1,0 +1,31 @@
+.enlaceMagico {
+    text-align: center;
+}
+
+.link {
+    background: none;
+    border: none;
+    color: var(--color-texto-secundario);
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.descripcion {
+    color: var(--color-texto-secundario);
+    font-size: 0.875rem;
+    margin-bottom: var(--espaciado-s);
+    text-align: center;
+}
+
+.exito {
+    color: var(--color-exito);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.error {
+    color: var(--color-error);
+    font-size: 0.875rem;
+    margin-top: var(--espaciado-s);
+}

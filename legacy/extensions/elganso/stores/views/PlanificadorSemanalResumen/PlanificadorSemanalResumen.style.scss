@@ -1,13 +1,13 @@
 .planificador-semana {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   width: 100%;
 
   .planificador-dia {
     color: white;
     padding: 5px;
     border-radius: 3px;
-    min-width: 60px;
+    width: 100%;
     min-height: 18px;
     text-align: center;
     font-size: 12px;
@@ -16,18 +16,23 @@
   .planificador-dia.fondo-verde {
     background-color: #03bb2f;
   }
+
   .planificador-dia.fondo-amarillo {
     background-color: #fbbd06;
   }
+
   .planificador-dia.fondo-naranja {
     background-color: #fb7c06;
   }
+
   .planificador-dia.fondo-light-grey {
     background-color: #c5c5c5;
   }
+
   .planificador-dia.fondo-grey {
     background-color: #757575;
   }
+
   .planificador-dia.fondo-coral {
     background-color: #cd5c5c;
   }
@@ -42,18 +47,23 @@
 
       .head-semana-wrapper {
         height: 56px;
+
         .head-semana-title {
           height: 50%;
           line-height: 28px;
           font-weight: bold;
         }
+
         .head-semana-content {
           height: 50%;
           line-height: 28px;
           display: flex;
           justify-content: space-between;
+
           .head-semana-content-day {
             font-size: 10px;
+            width: 100%;
+            text-align: center;
           }
         }
       }
@@ -65,11 +75,14 @@
   display: flex;
   justify-content: space-between;
   min-height: 48px;
+
   .headSelector {
     align-content: center;
+
     .selector {
       display: flex;
       justify-content: space-between;
+
       .selector-item {
         padding: 7px 10px;
         cursor: pointer;
@@ -83,12 +96,11 @@
           color: white;
           background-color: #0a3064;
           border: 1px solid #072146;
-          // cursor: unset;
-          // pointer-events: none;
         }
       }
     }
   }
+
   .selectorSemanalPlanificadorResumen {
     display: inline-flex;
     width: 100%;

@@ -1,6 +1,6 @@
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { useEffect, useState } from "react";
-import { getFuentesLead } from "../../lead/infraestructura.ts";
+import { getFuentesLead } from "../../fuenteLead/infraestructura.ts";
 
 interface FuenteLeadsProps {
   valor: string;

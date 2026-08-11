@@ -1,10 +1,10 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Calendario } from "@olula/componentes/calendario/calendario.tsx";
 import { EstadoSeleccion } from "@olula/componentes/calendario/tipos.ts";
-import { MaestroFiltros } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltros.tsx";
+import { MaestroFiltrosActivoControlado, MetaFiltro, filtroTextos } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.tsx";
 import { useEsMovil } from "@olula/componentes/maestro/useEsMovil.ts";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
-import { Filtro } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro } from "@olula/lib/diseño.ts";
 import { Maquina, useMaquina } from "@olula/lib/useMaquina.ts";
 import { useCallback, useMemo, useState } from "react";
 import { TextoConTooltip } from "../../../comun/componentes/TextoConTooltip/TextoConTooltip.tsx";
@@ -17,15 +17,19 @@ import { FichaEventoAbierto } from "./FichaEventoAbierto.tsx";
 // Define Estado type for use in MaestroEvento
 type Estado = "calendario" | "alta" | "evento_abierto" | "ejemplo_seleccion";
 
+const metaFiltroCalendario: MetaFiltro = {
+  descripcionref: { id: "descripcionref", label: "Descripción", tipo: "texto", filtro: (v) => filtroTextos("descripcionref", v) },
+  referencia:     { id: "referencia",     label: "Referencia",  tipo: "texto", filtro: (v) => filtroTextos("referencia", v) },
+};
+
 export const CalendarioEventos = () => {
   const [eventoAbierto, setEventoAbierto] = useState<EventoCalendario | null>(
     null
   );
-  const [filtro, setFiltro] = useState<Filtro>([]);
+  const [filtro, setFiltro] = useState<ClausulaFiltro[]>([]);
   const [estado, setEstado] = useState<Estado>("calendario");
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date>(new Date());
   const esMovil = useEsMovil(640);
-  const camposFiltro = ["descripcionref", "referencia"];
 
   // Usar el nuevo hook de carga infinita
   const {
@@ -69,16 +73,6 @@ export const CalendarioEventos = () => {
 
   const emitir = useMaquina(maquina, estado, setEstado);
 
-  const cambiarFiltro = (clave: string, valor: string, operador = "~") => {
-    setFiltro((prev) => [
-      ...prev.filter(([k]) => k !== clave),
-      [clave, operador, valor],
-    ]);
-  };
-  const borrarFiltro = (clave: string) => {
-    setFiltro((prev) => prev.filter(([k]) => k !== clave));
-  };
-  const resetearFiltro = () => setFiltro([]);
 
   // Manejar selección del calendario
   const manejarSeleccionCalendario = useCallback(
@@ -118,13 +112,12 @@ export const CalendarioEventos = () => {
       cabecera: {
         botonesDerModo: !esMovil
           ? [
-              <MaestroFiltros
+              <MaestroFiltrosActivoControlado
                 key="filtros"
-                campos={camposFiltro}
+                metaFiltro={metaFiltroCalendario}
                 filtro={filtro}
-                cambiarFiltro={cambiarFiltro}
-                borrarFiltro={borrarFiltro}
-                resetearFiltro={resetearFiltro}
+                filtroInicial={[]}
+                onFiltroChanged={setFiltro}
               />,
             ]
           : [],
@@ -151,12 +144,9 @@ export const CalendarioEventos = () => {
       emitir,
       esMovil,
       filtro,
+      setFiltro,
       expandirRangoAnterior,
       expandirRangoPosterior,
-      camposFiltro,
-      cambiarFiltro,
-      borrarFiltro,
-      resetearFiltro,
     ]
   );
 

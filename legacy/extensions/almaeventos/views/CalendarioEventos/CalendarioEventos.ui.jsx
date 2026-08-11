@@ -78,7 +78,7 @@ function CalendarioEventos({ useStyles }) {
         ]}
       >
         <Grid container alignItems="center" style={{ marginBottom: "10px" }}>
-          <Grid container size={2} justify="flex-start">
+          <Grid container size={2} justifyContent="flex-start">
             <Button
               id="cambiarModo"
               text={`Modo ${modo === "mes" ? "año" : "mes"}`}
@@ -86,7 +86,7 @@ function CalendarioEventos({ useStyles }) {
               color="primary"
             />
           </Grid>
-          <Grid container size={8} alignItems="center" justify="center">
+          <Grid container size={8} alignItems="center" justifyContent="center">
             <IconButton
               id="cambiarIntervaloSiguiente"
               onClick={() =>
@@ -115,7 +115,7 @@ function CalendarioEventos({ useStyles }) {
               <Icon fontSize="large">navigate_next</Icon>
             </IconButton>
           </Grid>
-          <Grid container size={2} justify="flex-end">
+          <Grid container size={2} justifyContent="flex-end">
             <Button id="hoy" text={"Hoy"} variant="outlined" color="primary" />
           </Grid>
         </Grid>
@@ -136,7 +136,7 @@ function CalendarioEventos({ useStyles }) {
                   <Box width="100%" style={{ borderRight: "1px solid lightgrey" }}>
                     <Grid container>
                       {diasSemana.map((nombreDia, index) => (
-                        <Grid style={{ width: "14.2857%" }} key={`${nombreDia}-${index}`} justify="center">
+                        <Grid style={{ width: "14.2857%" }} key={`${nombreDia}-${index}`} justifyContent="center">
                           {
                             <Box
                               width={1}
@@ -156,8 +156,8 @@ function CalendarioEventos({ useStyles }) {
                         {semana.map((dia, indexDia) =>
                           dia.ocultar ? null : (
                             <Grid className={
-                                dia?.objetosDia?.length > 0 ? "cajaDiaConDatos" : "cajaDia"
-                              } key={`${indexDia}-${dia.fecha}diasDeSemana`}>
+                              dia?.objetosDia?.length > 0 ? "cajaDiaConDatos" : "cajaDia"
+                            } key={`${indexDia}-${dia.fecha}diasDeSemana`}>
                               <Box
                                 minWidth={1}
                                 display="flex"
@@ -203,7 +203,7 @@ function CalendarioEventos({ useStyles }) {
                                     style={{ minHeight: `calc((80vh - 255px)/5)` }}
                                   >
                                     {dia.estaCargando ? (
-                                      <Grid container justify="center" alignItems="center">
+                                      <Grid container justifyContent="center" alignItems="center">
                                         <CircularProgress />
                                       </Grid>
                                     ) : (
@@ -223,7 +223,7 @@ function CalendarioEventos({ useStyles }) {
                                                       variant="subtitle1"
                                                       wrap
                                                       align="center"
-                                                      justify="center"
+                                                      justifyContent="center"
                                                       style={{
                                                         overflow: "hidden",
                                                         textOverflow: "ellipsis",
@@ -245,7 +245,7 @@ function CalendarioEventos({ useStyles }) {
                                                     variant="subtitle1"
                                                     wrap
                                                     align="center"
-                                                    justify="center"
+                                                    justifyContent="center"
                                                     style={{
                                                       overflow: "hidden",
                                                       textOverflow: "ellipsis",
@@ -278,7 +278,7 @@ function CalendarioEventos({ useStyles }) {
           </Box>
         )}
         {dibujandoCalendario && (
-          <Grid container justify="center" alignItems="center">
+          <Grid container justifyContent="center" alignItems="center">
             <CircularProgress size={30} />
           </Grid>
         )}
@@ -308,7 +308,7 @@ function CalendarioEventos({ useStyles }) {
                     variant="subtitle1"
                     wrap
                     align="center"
-                    justify="center"
+                    justifyContent="center"
                     style={{
                       overflow: "hidden",
                       textOverflow: "ellipsis",

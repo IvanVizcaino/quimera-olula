@@ -1,0 +1,24 @@
+.BotoneraJornadaBorrador {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--espaciado-s);
+    width: 100%;
+    margin-bottom: var(--espaciado-l);
+
+
+    quimera-boton {
+        display: flex;
+        width: 100%;
+
+        button {
+            flex: 1;
+        }
+    }
+
+    @media (min-width: 769px) {
+        quimera-boton {
+            max-width: 320px;
+        }
+    }
+}

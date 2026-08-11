@@ -7,17 +7,19 @@ import { ContextoDetalleEstadoOportunidad, EstadoDetalleEstadoOportunidad } from
 
 export const estadoOportunidadVacio: EstadoOportunidad = {
     id: '',
+    estadobase: 'Pendiente',
     descripcion: '',
     probabilidad: 0,
-    valor_defecto: false,
+    valorDefecto: false,
 };
 
 export const metaEstadoOportunidad: MetaModelo<EstadoOportunidad> = {
     campos: {
         id: { requerido: true },
+        estadobase: { requerido: true, tipo: "selector" },
         descripcion: { requerido: true, validacion: (estado: EstadoOportunidad) => stringNoVacio(estado.descripcion), },
         probabilidad: { requerido: true, tipo: "numero" },
-        valor_defecto: { requerido: true, tipo: "checkbox" },
+        valorDefecto: { requerido: true, tipo: "checkbox" },
     },
 };
 

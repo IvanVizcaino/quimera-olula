@@ -45,10 +45,14 @@ export default function SkewedAdornment({ adornment, adornmentClass, finished, .
   finished && (adornmentClasses += ` ${classes.finished}`);
 
   return (
-    <Box className={adornmentClasses} {...props}>
-      <Icon className={classes.icon} fontSize="small">
-        {adornment}
-      </Icon>
+    <Box className={adornmentClasses} display="flex" alignItems="center" justifyContent="center" {...props}>
+      {adornment === "whatsapp" ? (
+        <img src="/img/whatsapp-icon.svg" width="16px" height="16px" alt="Whatsapp" style={{ transform: "skew(20deg)" }} />
+      ) : (
+        <Icon className={classes.icon} fontSize="small">
+          {adornment}
+        </Icon>
+      )}
     </Box>
   );
 }

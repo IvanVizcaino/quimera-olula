@@ -14,14 +14,18 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: "yeboyebo/quimera-olula"
-      - uses: actions/setup-node@v3
+          
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: 18.12
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+    
       - name: Make envfile
         run: echo "VITE_API_URL=https://cremacafeolula.yeboyebo.es" > .env && echo "VITE_API_URL=https://cremacafeolula.yeboyebo.es" > ./apps/crema_cafe/.env
-
-      - name: Install pnpm
-        run: npm install -g pnpm
 
       - name: Install Dependecies
         run: pnpm install

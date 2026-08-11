@@ -7,8 +7,9 @@ import {
 } from "./_forminput.tsx";
 import "./qcheckbox.css";
 
-export type QCheckboxProps = Omit<FormInputProps, "valor"> & {
+export type QCheckboxProps = Omit<FormInputProps, "valor" | "onChange"> & {
   valor: boolean | string;
+  onChange?: (valor: string, evento: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const QCheckbox = ({

@@ -1,7 +1,7 @@
 import { BorrarPedido } from "#/ventas/pedido/borrar/BorrarPedido.tsx";
-import { editable, getMetaPedido } from "#/ventas/pedido/detalle/dominio.ts";
+import { editable, getMetaPedido } from "#/ventas/pedido/detalle/detalle.ts";
 
-import { Lineas } from "#/ventas/pedido/detalle/Lineas/Lineas.tsx";
+import { Lineas } from "#/ventas/pedido/detalle/lineas/Lineas.tsx";
 import { getMaquina } from "#/ventas/pedido/detalle/maquina.ts";
 import { TabObservaciones } from "#/ventas/pedido/detalle/TabObservaciones.tsx";
 import { Pedido } from "#/ventas/pedido/diseño.ts";

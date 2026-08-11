@@ -1,7 +1,11 @@
-import { Criteria, Entidad } from "@olula/lib/diseño.ts";
+import { RestAPI } from "@olula/lib/api/rest_api.ts";
+import { ClausulaFiltro, Criteria, Entidad } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
+import { criteriaQueryUrl } from "@olula/lib/infraestructura.ts";
 import { useState } from "react";
+import { QBoton } from "../atomos/qboton.tsx";
 import { QIcono } from "../atomos/qicono.tsx";
+import { QKanban, type QKanbanColumna } from "../atomos/qkanban.tsx";
 import { MetaTabla } from "../atomos/qtabla.tsx";
 import { QTablaControlada } from "../atomos/qtablacontrolada.tsx";
 import { QTarjetas } from "../atomos/qtarjetas.tsx";
@@ -25,13 +29,19 @@ const datosCargando = <T extends Entidad>() =>
       }) as T
   );
 
-type Modo = "tabla" | "tarjetas";
+type Modo = "tabla" | "tarjetas" | "kanban";
+
+export type FormatoDescarga = { valor: string; etiqueta: string };
 
 type ListadoProps<T extends Entidad> = {
   metaTabla?: MetaTabla<T>;
   metaFiltro?: MetaFiltro;
   cargando?: boolean;
   tarjeta?: (entidad: T) => React.ReactNode;
+  tarjetaKanban?: (entidad: T) => React.ReactNode;
+  columnasKanban?: QKanbanColumna[];
+  campoEstadoKanban?: keyof T;
+  onCambioEstadoKanban?: (id: string, nuevoEstado: string) => void;
   renderAcciones?: () => React.ReactNode;
   criteriaInicial?: Criteria;
   criteria?: Criteria;
@@ -40,9 +50,18 @@ type ListadoProps<T extends Entidad> = {
   seleccionada?: string;
   onSeleccion: (seleccionada: string) => void;
   modo?: Modo;
+  modoInicial?: Modo;
+  modosDisponibles?: Modo[];
+  mostrarCambioModo?: boolean;
   onModoChanged?: (modo: Modo) => void;
   onCriteriaChanged: (criteria: Criteria) => void;
   onSiguientePagina?: (criteria: Criteria) => void;
+  modoMultiseleccion?: boolean;
+  onModoMultiseleccionChanged?: (modo: boolean) => void;
+  seleccionadas?: string[];
+  onMultiSeleccion?: (seleccionadas: string[]) => void;
+  urlDescarga?: string;
+  formatosDescarga?: FormatoDescarga[];
 };
 
 export const Listado = <T extends Entidad>({
@@ -52,113 +71,243 @@ export const Listado = <T extends Entidad>({
   criteriaInicial = criteriaDefecto,
   criteria = criteriaDefecto,
   tarjeta,
+  tarjetaKanban,
+  columnasKanban,
+  campoEstadoKanban,
+  onCambioEstadoKanban,
   renderAcciones,
   entidades,
   totalEntidades,
   seleccionada,
   onSeleccion,
   modo,
+  modoInicial,
+  modosDisponibles,
+  mostrarCambioModo,
   onModoChanged,
   onCriteriaChanged,
   onSiguientePagina,
+  modoMultiseleccion,
+  onModoMultiseleccionChanged,
+  seleccionadas,
+  onMultiSeleccion,
+  urlDescarga,
+  formatosDescarga,
 }: ListadoProps<T>) => {
-  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? "tabla");
+  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? modoInicial ?? "tabla");
   const modoInterno = modo ?? modoEstado;
 
-  const puedeTabla = metaTabla !== undefined;
-  const puedeTarjetas = tarjeta !== undefined;
+  const [multiseleccionEstado, setMultiseleccionEstado] = useState(false);
+  const multiseleccionInterna = modoMultiseleccion ?? multiseleccionEstado;
 
-  const modoEfectivo =
-    modoInterno === "tabla" && puedeTabla
-      ? "tabla"
-      : modoInterno === "tarjetas" && puedeTarjetas
-        ? "tarjetas"
-        : puedeTabla
-          ? "tabla"
-          : puedeTarjetas
-            ? "tarjetas"
-            : null;
+  const [seleccionadasEstado, setSeleccionadasEstado] = useState<string[]>([]);
+  const seleccionadasInternas = seleccionadas ?? seleccionadasEstado;
+
+  const [formatoSeleccionado, setFormatoSeleccionado] = useState(
+    formatosDescarga?.[0]?.valor ?? ""
+  );
+  const [descargando, setDescargando] = useState(false);
+
+  const handleDescarga = async () => {
+    if (!urlDescarga || !formatoSeleccionado) return;
+    setDescargando(true);
+    try {
+      const qs = criteriaQueryUrl(criteria.filtro, criteria.orden);
+      const url = qs
+        ? `${urlDescarga}${qs}&formato=${formatoSeleccionado}`
+        : `${urlDescarga}?formato=${formatoSeleccionado}`;
+      const blob = await RestAPI.blob(url);
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = `exportacion.${formatoSeleccionado}`;
+      link.click();
+      URL.revokeObjectURL(downloadUrl);
+    } finally {
+      setDescargando(false);
+    }
+  };
+
+  const toggleSeleccion = (id: string) => {
+    const nuevas = seleccionadasInternas.includes(id)
+      ? seleccionadasInternas.filter((s) => s !== id)
+      : [...seleccionadasInternas, id];
+    if (seleccionadas === undefined) setSeleccionadasEstado(nuevas);
+    onMultiSeleccion?.(nuevas);
+  };
+
+  const toggleModoMultiseleccion = () => {
+    const nuevoModo = !multiseleccionInterna;
+    if (modoMultiseleccion === undefined) setMultiseleccionEstado(nuevoModo);
+    onModoMultiseleccionChanged?.(nuevoModo);
+    if (!nuevoModo) {
+      if (seleccionadas === undefined) setSeleccionadasEstado([]);
+      onMultiSeleccion?.([]);
+    }
+  };
+
+  const puedeTabla = metaTabla !== undefined;
+  const puedeTarjetas = true;
+  const puedeKanban =
+    columnasKanban !== undefined &&
+    campoEstadoKanban !== undefined &&
+    onCambioEstadoKanban !== undefined;
+
+  const modosDisponiblesCalculados: Modo[] = modosDisponibles
+    ? modosDisponibles.filter((modo) => {
+        if (modo === "tabla") return puedeTabla;
+        if (modo === "tarjetas") return puedeTarjetas;
+        if (modo === "kanban") return puedeKanban;
+        return false;
+      })
+    : [
+        ...(puedeKanban ? (["kanban"] as Modo[]) : []),
+        ...(puedeTarjetas ? (["tarjetas"] as Modo[]) : []),
+        ...(puedeTabla ? (["tabla"] as Modo[]) : []),
+      ];
+
+  const modoEfectivo = modosDisponiblesCalculados.includes(modoInterno)
+    ? modoInterno
+    : (modosDisponiblesCalculados[0] ?? null);
 
   const cambiarModo = (nuevoModo: Modo) => {
     if (modo === undefined) setModoEstado(nuevoModo);
     onModoChanged?.(nuevoModo);
   };
 
-  const mostrarCambioModo = puedeTabla && puedeTarjetas && modoEfectivo;
-  // const mostrarCambioModo = false;
+  const siguienteModo = (): Modo | null => {
+    if (!modoEfectivo || modosDisponiblesCalculados.length === 0) return null;
+
+    const indice = modosDisponiblesCalculados.indexOf(modoEfectivo);
+    return modosDisponiblesCalculados[
+      (indice + 1) % modosDisponiblesCalculados.length
+    ];
+  };
+
+  const mostrarCambioModoPorDefecto =
+    modosDisponiblesCalculados.length > 1 && Boolean(modoEfectivo) && !modo;
+  const mostrarCambioModoFinal =
+    (mostrarCambioModo ?? mostrarCambioModoPorDefecto) &&
+    modosDisponiblesCalculados.length > 1 &&
+    Boolean(modoEfectivo);
   const acciones = renderAcciones?.();
+
+  const renderTabla = (datos: T[]) => {
+    if (!metaTabla) return null;
+
+    return (
+      <QTablaControlada
+        metaTabla={metaTabla}
+        datos={datos}
+        cargando={cargando}
+        seleccionadaId={seleccionada}
+        onSeleccion={(e: T) => onSeleccion(e.id)}
+        orden={criteria.orden}
+        onOrdenChanged={(orden) => {
+          onCriteriaChanged({
+            ...criteria,
+            orden,
+            paginacion: { ...criteria.paginacion, pagina: 1 },
+          });
+        }}
+        paginacion={criteria.paginacion}
+        onPaginacionChanged={(paginacion) => {
+          onCriteriaChanged({
+            ...criteria,
+            paginacion,
+          });
+        }}
+        totalEntidades={totalEntidades}
+        seleccionadasIds={
+          multiseleccionInterna ? seleccionadasInternas : undefined
+        }
+        onMultiSeleccionToggle={
+          multiseleccionInterna ? toggleSeleccion : undefined
+        }
+        onSetSeleccionadas={
+          multiseleccionInterna
+            ? (nuevas) => {
+                if (seleccionadas === undefined) setSeleccionadasEstado(nuevas);
+                onMultiSeleccion?.(nuevas);
+              }
+            : undefined
+        }
+      />
+    );
+  };
+
+  const renderTarjetas = (
+    datos: T[],
+    tarjetaRender: (entidad: T) => React.ReactNode
+  ) => {
+    return (
+      <QTarjetas
+        tarjeta={tarjetaRender}
+        datos={datos}
+        cargando={cargando}
+        seleccionadaId={seleccionada}
+        onSeleccion={(e: T) => onSeleccion(e.id)}
+        onPaginacion={(pagina, limite) => {
+          onCriteriaChanged({ ...criteria, paginacion: { pagina, limite } });
+        }}
+        totalEntidades={totalEntidades}
+        criteria={criteria}
+        onSiguientePagina={onSiguientePagina}
+        seleccionadasIds={
+          multiseleccionInterna ? seleccionadasInternas : undefined
+        }
+        onMultiSeleccionToggle={
+          multiseleccionInterna ? toggleSeleccion : undefined
+        }
+      />
+    );
+  };
+
+  const renderKanban = (
+    datos: T[],
+    tarjetaRender: (entidad: T) => React.ReactNode
+  ) => {
+    if (!columnasKanban || !campoEstadoKanban || !onCambioEstadoKanban)
+      return null;
+
+    return (
+      <QKanban
+        entidades={datos}
+        cargando={cargando}
+        columnas={columnasKanban}
+        campoEstado={campoEstadoKanban}
+        tarjeta={tarjetaRender}
+        metaTabla={metaTabla}
+        seleccionadaId={seleccionada}
+        onSeleccion={(e: T) => onSeleccion(e.id)}
+        onCambioEstado={onCambioEstadoKanban}
+      />
+    );
+  };
 
   const renderEntidades = () => {
     if (!entidades.length && !cargando) return <SinDatos />;
 
     const datos = entidades.length ? entidades : datosCargando<T>();
+    const tarjetaGenerica = metaTabla
+      ? (entidad: T) => (
+          <QTarjetaMetatabla entidad={entidad} metaTabla={metaTabla} />
+        )
+      : undefined;
 
     if (modoEfectivo === "tarjetas") {
-      if (!tarjeta) return null;
-
-      return (
-        <QTarjetas
-          tarjeta={tarjeta}
-          datos={datos}
-          cargando={cargando}
-          seleccionadaId={seleccionada}
-          onSeleccion={(e: T) => onSeleccion(e.id)}
-          onPaginacion={(pagina, limite) => {
-            onCriteriaChanged({ ...criteria, paginacion: { pagina, limite } });
-          }}
-          totalEntidades={totalEntidades}
-          criteria={criteria}
-          onSiguientePagina={onSiguientePagina}
-        />
-      );
+      if (tarjeta) return renderTarjetas(datos, tarjeta);
+      if (tarjetaGenerica) return renderTarjetas(datos, tarjetaGenerica);
     }
 
-    if (modo == "tarjetas" && metaTabla) {
-      return (
-        <QTarjetas
-          tarjeta={(entidad: T) => (
-            <QTarjetaMetatabla entidad={entidad} metaTabla={metaTabla} />
-          )}
-          datos={datos}
-          cargando={cargando}
-          seleccionadaId={seleccionada}
-          onSeleccion={(e: T) => onSeleccion(e.id)}
-          onPaginacion={(pagina, limite) => {
-            onCriteriaChanged({ ...criteria, paginacion: { pagina, limite } });
-          }}
-          totalEntidades={totalEntidades}
-          criteria={criteria}
-          onSiguientePagina={onSiguientePagina}
-        />
-      );
+    if (modoEfectivo === "tabla" && metaTabla) {
+      return renderTabla(datos);
     }
 
-    if (modo == "tabla" && metaTabla) {
-      return (
-        <QTablaControlada
-          metaTabla={metaTabla}
-          datos={datos}
-          cargando={cargando}
-          seleccionadaId={seleccionada}
-          onSeleccion={(e: T) => onSeleccion(e.id)}
-          orden={criteria.orden}
-          onOrdenChanged={(orden) => {
-            onCriteriaChanged({
-              ...criteria,
-              orden,
-              paginacion: { ...criteria.paginacion, pagina: 1 },
-            });
-          }}
-          paginacion={criteria.paginacion}
-          onPaginacionChanged={(paginacion) => {
-            onCriteriaChanged({
-              ...criteria,
-              paginacion,
-            });
-          }}
-          totalEntidades={totalEntidades}
-        />
-      );
+    if (modoEfectivo === "kanban") {
+      if (tarjetaKanban) return renderKanban(entidades, tarjetaKanban);
+      if (tarjeta) return renderKanban(entidades, tarjeta);
+      if (tarjetaGenerica) return renderKanban(entidades, tarjetaGenerica);
     }
 
     return null;
@@ -172,8 +321,8 @@ export const Listado = <T extends Entidad>({
             metaFiltro={
               metaFiltro ?? getMetaFiltroDefecto(metaTabla as MetaTabla<T>)
             }
-            filtro={criteria.filtro}
-            filtroInicial={criteriaInicial.filtro}
+            filtro={criteria.filtro as ClausulaFiltro[]}
+            filtroInicial={criteriaInicial.filtro as ClausulaFiltro[]}
             onFiltroChanged={(filtro) => {
               onCriteriaChanged({
                 ...criteria,
@@ -182,20 +331,60 @@ export const Listado = <T extends Entidad>({
               });
             }}
           />
+          {urlDescarga && formatosDescarga && formatosDescarga.length > 0 && (
+            <div className="listado-descarga">
+              {formatosDescarga.length > 1 && (
+                <select
+                  value={formatoSeleccionado}
+                  onChange={(e) => setFormatoSeleccionado(e.target.value)}
+                >
+                  {formatosDescarga.map((f) => (
+                    <option key={f.valor} value={f.valor}>
+                      {f.etiqueta}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <QBoton
+                tamaño="pequeño"
+                deshabilitado={descargando}
+                onClick={handleDescarga}
+              >
+                {descargando ? "Exportando…" : "Exportar"}
+              </QBoton>
+            </div>
+          )}
         </div>
 
         <div className="listado-cabecera-derecha">
           {acciones}
-          {mostrarCambioModo && (
+          {onMultiSeleccion && (
+            <div className="cambio-modo">
+              <span
+                className={`cambio-modo-icono${multiseleccionInterna ? " activo" : ""}`}
+                onClick={toggleModoMultiseleccion}
+              >
+                <QIcono nombre="check" tamaño="md" />
+              </span>
+            </div>
+          )}
+          {mostrarCambioModoFinal && (
             <div className="cambio-modo">
               <span
                 className="cambio-modo-icono"
-                onClick={() =>
-                  cambiarModo(modoEfectivo === "tabla" ? "tarjetas" : "tabla")
-                }
+                onClick={() => {
+                  const nuevoModo = siguienteModo();
+                  if (nuevoModo) cambiarModo(nuevoModo);
+                }}
               >
                 <QIcono
-                  nombre={modoEfectivo === "tabla" ? "lista" : "tabla"}
+                  nombre={
+                    siguienteModo() === "kanban"
+                      ? "kanban"
+                      : siguienteModo() === "tarjetas"
+                        ? "lista"
+                        : "tabla"
+                  }
                   tamaño="md"
                 />
               </span>

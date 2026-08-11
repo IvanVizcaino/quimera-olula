@@ -1,0 +1,66 @@
+.oportunidad-resumen-banda {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--espaciado-s);
+    margin: var(--espaciado-m) 0;
+    background-color: var(--color-superficie-elevada);
+    border-radius: var(--redondeo-borde-xs);
+    border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+    margin-bottom: var(--espaciado-s);
+    font-size: var(--tamaño-letra-s);
+}
+
+.oportunidad-resumen-probabilidad {
+    font-size: var(--tamaño-letra-m);
+    font-weight: var(--grosor-letra-5);
+    color: var(--color-primario);
+    min-width: 3rem;
+    text-align: center;
+}
+
+.oportunidad-resumen-estado {
+    padding: 2px var(--espaciado-xs);
+    background-color: var(--color-primario-claro);
+    border-radius: var(--redondeo-borde-xs);
+    font-weight: var(--grosor-letra-5);
+    color: var(--color-primario-oscuro);
+}
+
+.oportunidad-resumen-importe {
+    font-weight: var(--grosor-letra-5);
+    margin-left: auto;
+}
+
+.oportunidad-resumen-importe.importe-grande {
+    background-color: var(--color-exito-claro);
+}
+
+.oportunidad-resumen-importe.importe-medio {
+    background-color: var(--color-advertencia-claro);
+}
+
+.oportunidad-resumen-importe.importe-pequeño {
+    background-color: var(--color-deshabilitado-claro);
+}
+
+.oportunidad-resumen-acciones-pendientes {
+    padding-left: var(--espaciado-s);
+}
+
+.oportunidad-resumen-fecha {
+    color: var(--color-texto-secundario, #666);
+    padding-left: var(--espaciado-s);
+}
+
+.oportunidad-resumen-cliente {
+    color: var(--color-texto-secundario, #666);
+    padding-left: var(--espaciado-s);
+    font-style: italic;
+}
+
+@media (max-width: 480px) {
+    .oportunidad-resumen-importe {
+        margin-left: 0;
+    }
+}

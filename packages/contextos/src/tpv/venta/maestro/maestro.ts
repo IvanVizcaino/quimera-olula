@@ -2,8 +2,10 @@ import { MetaTabla } from "@olula/componentes/index.js";
 
 import { Criteria, ProcesarContexto } from "@olula/lib/diseño.js";
 import { ProcesarListaActivaEntidades, accionesListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
+import { createElement } from "react";
 import { ContextoMaestroVentasTpv, EstadoMaestroVentasTpv, VentaTpv } from "../diseño.ts";
-import { getVenta, getVentas, postVenta } from "../infraestructura.ts";
+import { getVenta, getVentas } from "../infraestructura.ts";
+import { TotalPendienteVentaTpv } from "./TotalPendienteVentaTpv.tsx";
 
 
 export const metaTablaFactura: MetaTabla<VentaTpv> = [
@@ -25,6 +27,7 @@ export const metaTablaFactura: MetaTabla<VentaTpv> = [
         id: "total",
         cabecera: "Total",
         tipo: "moneda",
+        render: (venta) => createElement(TotalPendienteVentaTpv, { venta }),
     },
 ];
 
@@ -51,17 +54,18 @@ export const ampliarVentas: ProcesarVentasTpv = async (contexto, payload) => {
     return Ventas.ampliar(contexto, resultado);
 }
 
-export const crearVenta: ProcesarVentasTpv = async (contexto) => {
+export const incluirVentaCreadaPorId: ProcesarVentasTpv = async (contexto, payload) => {
 
-    const idVenta = await postVenta();
-    const venta = await getVenta(idVenta);
+    const id = payload as string;
+    const venta = await getVenta(id);
     return {
         ...contexto,
+        estado: "INICIAL",
         ventas: {
+            ...contexto.ventas,
             lista: [venta, ...contexto.ventas.lista],
             activo: venta.id,
             total: contexto.ventas.total + 1,
-            criteria: contexto.ventas.criteria,
         }
     }
 }

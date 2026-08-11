@@ -44,7 +44,7 @@ export default parent => {
         color: "red",
         backgroundColor: "#e1e1e1",
         aspectRatio: "1",
-        width: "24px",
+        // width: "24px",
         borderRadius: "50%",
         textAlign: "center",
         padding: "3px",

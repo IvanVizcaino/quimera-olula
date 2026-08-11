@@ -60,9 +60,6 @@ export const ClienteFactura = ({
 
   const valido = esRegistrado ? registrado.valido : noRegistrado.valido;
 
-  console.log("Registrado", registrado.modelo);
-  console.log("No registrado", noRegistrado.modelo);
-
   return (
     <QModal
       abierto={true}

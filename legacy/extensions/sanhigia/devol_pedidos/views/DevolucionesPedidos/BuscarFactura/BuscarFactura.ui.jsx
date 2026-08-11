@@ -55,7 +55,7 @@ function BuscarFactura({ useStyles, callbackCerrado }) {
                   <Typography variant="h5">Buscar Factura</Typography>
                 </Box>
               ) : (
-                <Grid container direction="column" justify="center">
+                <Grid container direction="column" justifyContent="center">
                   <Grid size={12}>
                     <Box my={1} align="center">
                       <Typography variant="h4">{`Devolución Factura  (${cabeceraFactura.codigo})`}</Typography>
@@ -86,7 +86,7 @@ function BuscarFactura({ useStyles, callbackCerrado }) {
                 <Button
                   id="buscarFacturaObtenida"
                   text="Buscar"
-                  className={classes.botonPrimario}
+                  // className={classes.botonSecundario}
                   size="large"
                   disabled={!idFactura}
                 />
@@ -97,13 +97,13 @@ function BuscarFactura({ useStyles, callbackCerrado }) {
             <>
               <Divider />
               <Box px={3} mt={1}>
-                <Grid container direction="column">
-                  <Grid size={12} sm={6} md={6}>
+                <Grid container direction="row" flex={1} >
+                  <Grid size={{ xs: 12, sm: 6, md: 6 }} >
                     <Box align="left">
                       <Typography variant="h5">{cabeceraFactura.nombre}</Typography>
                     </Box>
                   </Grid>
-                  <Grid size={6} sm={3} md={3}>
+                  <Grid size={{ xs: 6, sm: 3, md: 3 }}>
                     <Box align="center">
                       <Typography variant="h5">{`${cabeceraFactura.fecha}`}</Typography>
                     </Box>

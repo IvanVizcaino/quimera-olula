@@ -6,13 +6,19 @@ interface EstadoProps {
   getProps?: (campo: string) => Record<string, unknown>;
 }
 
-const opcionesEstado = [
+export const opcionesEstadoIncidencia = [
   { valor: "nueva", descripcion: "Nueva" },
   { valor: "en_espera", descripcion: "En espera" },
   { valor: "asignada", descripcion: "Asignada" },
   { valor: "rechazada", descripcion: "Rechazada" },
   { valor: "cerrada", descripcion: "Cerrada" },
 ];
+
+const opcionesEstado = opcionesEstadoIncidencia;
+
+export const descripcionEstadoIncidencia = (estado: string): string =>
+  opcionesEstadoIncidencia.find((o) => o.valor === estado)?.descripcion ??
+  estado;
 
 export const EstadoIncidencia = ({
   valor,

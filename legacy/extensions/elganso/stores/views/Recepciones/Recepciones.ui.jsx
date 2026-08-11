@@ -1,6 +1,20 @@
+import { styled } from '@mui/material/styles';
 import "./Recepciones.style.scss";
 
-import { DataGrid, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
+import CancelIcon from '@mui/icons-material/Cancel';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
+import {
+  DataGrid,
+  QuickFilter,
+  QuickFilterClear,
+  QuickFilterControl,
+  QuickFilterTrigger,
+  Toolbar,
+  ToolbarButton,
+} from "@mui/x-data-grid";
 import {
   Button,
   Container,
@@ -13,10 +27,34 @@ import {
 } from "@quimera/comps";
 import { navigate } from "hookrouter";
 import Quimera, { PropValidation, useStateValue, util } from "quimera";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDbState } from "use-db-state";
 
 import { YearInCurso } from "../../comps";
+
+const StyledQuickFilter = styled(QuickFilter)({
+  display: 'grid',
+  alignItems: 'center',
+  marginLeft: 'auto',
+});
+
+const StyledToolbarButton = styled(ToolbarButton)(({ theme, ownerState }) => ({
+  gridArea: '1 / 1',
+  width: 'min-content',
+  height: 'min-content',
+  zIndex: 1,
+  opacity: ownerState.expanded ? 0 : 1,
+  pointerEvents: ownerState.expanded ? 'none' : 'auto',
+  transition: theme.transitions.create(['opacity']),
+}));
+
+const StyledTextField = styled(TextField)(({ theme, ownerState }) => ({
+  gridArea: '1 / 1',
+  overflowX: 'clip',
+  width: ownerState.expanded ? 260 : 'var(--trigger-width)',
+  opacity: ownerState.expanded ? 1 : 0,
+  transition: theme.transitions.create(['width', 'opacity']),
+}));
 
 const getDbInstance = (dbName, storeName) => {
   return new Promise((resolve, reject) => {
@@ -147,8 +185,23 @@ function Recepciones() {
     const renderViajeName = params => {
       return (
         <div className="viajeName tableGrid">
-          <span>{params.row.nombredestino}</span>
-          <span>{params.row.idviajemultitrans}</span>
+          <span>{params.row.nombredestino} - {params.row.idviajemultitrans}</span>
+        </div>
+      );
+    };
+
+    const renderViajeFecha = params => {
+      if (!params.row.fechaalta || !params.row.horaalta) {
+        return (
+          <div className="viajeFecha tableGrid">
+            <span>{params.row.fecha}</span>
+          </div>
+        );
+      }
+
+      return (
+        <div className="viajeFecha tableGrid">
+          <span>{params.row.fecha} {params.row.horaalta}</span>
         </div>
       );
     };
@@ -193,7 +246,7 @@ function Recepciones() {
 
     function CustomToolbar() {
       return (
-        <GridToolbarContainer className="toolbarContainer">
+        <Toolbar className="toolbarContainer">
           <YearInCurso className="toolbarContainer-quickFilter" />
           <Field.CheckBox
             id="mostrarSoloMisRecepciones"
@@ -201,7 +254,57 @@ function Recepciones() {
             checked={mostrarSoloMisRecepciones}
           />
           <div className="toolbarContainer-subcontainer">
-            <GridToolbarQuickFilter className="toolbarContainer-quickFilter" />
+            <StyledQuickFilter>
+              <QuickFilterTrigger
+                render={(triggerProps, state) => (
+                  <Tooltip title="Buscar" enterDelay={0}>
+                    <StyledToolbarButton
+                      {...triggerProps}
+                      ownerState={{ expanded: state.expanded }}
+                      color="default"
+                      aria-disabled={state.expanded}
+                    >
+                      <SearchIcon fontSize="small" />
+                    </StyledToolbarButton>
+                  </Tooltip>
+                )}
+              />
+              <QuickFilterControl
+                render={({ ref, ...controlProps }, state) => (
+                  <StyledTextField
+                    {...controlProps}
+                    ownerState={{ expanded: state.expanded }}
+                    inputRef={ref}
+                    aria-label="Buscar"
+                    placeholder="Buscar..."
+                    size="small"
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon fontSize="small" />
+                          </InputAdornment>
+                        ),
+                        endAdornment: state.value ? (
+                          <InputAdornment position="end">
+                            <QuickFilterClear
+                              edge="end"
+                              size="small"
+                              aria-label="Limpiar"
+                              material={{ sx: { marginRight: -0.75 } }}
+                            >
+                              <CancelIcon fontSize="small" />
+                            </QuickFilterClear>
+                          </InputAdornment>
+                        ) : null,
+                        ...controlProps.slotProps?.input,
+                      },
+                      ...controlProps.slotProps,
+                    }}
+                  />
+                )}
+              />
+            </StyledQuickFilter>
             <IconButton
               id="button-download"
               className="buttonDescargar buttonDescargar-green "
@@ -217,7 +320,7 @@ function Recepciones() {
               <Icon>sync</Icon>
             </IconButton>
           </div>
-        </GridToolbarContainer>
+        </Toolbar>
       );
     }
 
@@ -234,8 +337,14 @@ function Recepciones() {
         renderCell: params => renderViajeName(params),
         flex: 2,
       },
-      { field: "cantidad", headerName: "UD", flex: 1 },
-      { field: "usuariorecepcion", headerName: "USER", flex: 1 },
+      {
+        field: "fecha",
+        headerName: "FECHA",
+        renderCell: params => renderViajeFecha(params),
+        flex: 1,
+      },
+      { field: "cantidad", headerName: "UD", flex: 0.5 },
+      { field: "usuariorecepcion", headerName: "USER", flex: 0.5 },
       {
         field: "acciones",
         headerName: "",
@@ -341,7 +450,15 @@ function Recepciones() {
           columns={columns}
           slots={{ toolbar: CustomToolbar }}
           localeText={{
+            noRowsLabel: "No hay recepciones",
             toolbarQuickFilterPlaceholder: "Buscar...",
+            paginationRowsPerPage: "Líneas por página",
+            paginationDisplayedRows: ({ from, to, count }) =>
+              `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`,
+            footerRowSelected: (count) =>
+              count !== 1
+                ? `${count} filas seleccionadas`
+                : `${count} fila seleccionada`,
           }}
           getRowId={row => row.idviajemultitrans}
           slotProps={{
@@ -349,12 +466,9 @@ function Recepciones() {
               showQuickFilter: true,
               printOptions: { disableToolbarButton: true },
               csvOptions: { disableToolbarButton: true },
-            },
-            pagination: {
-              labelRowsPerPage: "Líneas por página",
-              labelDisplayedRows: ({ from, to, count }) => `${from}-${to} de ${count}`,
-            },
+            }
           }}
+          showToolbar
         />
 
         <Container>
@@ -411,10 +525,11 @@ function Recepciones() {
             <DialogTitle id="form-dialog-sincro-title">{dialogTitle}</DialogTitle>
             <DialogActions>
               <div>
-                <Button id="cancelarObtenerRecepciones" text="Cancelar" />
+                <Button id="cancelarObtenerRecepciones" text="Cancelar" color="secondary" />
                 <Button
                   id="obtenerRecepciones"
                   text="Aceptar"
+                  color="primary"
                   onClick={() => {
                     let filtroYears = [];
                     getDbValue("ElGansoApp", "Years", "yearsSelected").then(years => {

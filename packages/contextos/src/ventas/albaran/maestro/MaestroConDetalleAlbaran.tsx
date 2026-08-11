@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { CrearAlbaran } from "../crear/CrearAlbaran.tsx";
 import { DetalleAlbaran } from "../detalle/DetalleAlbaran.tsx";
 import { Albaran } from "../diseño.ts";
+import { TarjetaDocumentoVenta } from "#/ventas/comun/componentes/TarjetaDocumentoVenta.tsx";
 import { metaTablaAlbaran as metaTablaBase } from "../dominio.ts";
 import "./MaestroConDetalleAlbaran.css";
 import { getMaquina } from "./maquina.ts";
@@ -67,6 +68,15 @@ export const MaestroConDetalleAlbaran = () => {
             <h2>Albaranes</h2>
             <Listado<Albaran>
               metaTabla={metaTablaAlbaran}
+              tarjeta={(albaran) => (
+                <TarjetaDocumentoVenta
+                  codigo={albaran.codigo}
+                  nombreCliente={albaran.cliente.nombre_cliente}
+                  fecha={albaran.fecha}
+                  total={albaran.total}
+                  estado={albaran.idfactura ? "cerrado" : "pendiente"}
+                />
+              )}
               criteria={ctx.albaranes.criteria}
               renderAcciones={() => (
                 <div className="maestro-botones">
@@ -74,9 +84,7 @@ export const MaestroConDetalleAlbaran = () => {
                     Nuevo Albarán
                   </QBoton>
                 </div>
-              )}
-              modo={"tabla"}
-              entidades={ctx.albaranes.lista}
+              )}              entidades={ctx.albaranes.lista}
               totalEntidades={ctx.albaranes.total}
               seleccionada={ctx.albaranes.activo}
               onSeleccion={(payload) => emitir("albaran_seleccionado", payload)}

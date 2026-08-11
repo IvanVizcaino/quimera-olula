@@ -1,3 +1,4 @@
+import { puede } from "@olula/lib/dominio.ts";
 import { getRules } from "../hooks/useManager";
 import util from "../util";
 
@@ -81,6 +82,14 @@ const getRuleValue = (rule, group) => {
   return isFunction(rule) ? rule(checkTokens => check(group, checkTokens)) : rule;
 };
 
+// Función de check combinada: prueba primero el sistema nuevo (puede / localStorage)
+// y si falla, cae al sistema legacy (acl de util.getUser).
+// Así es compatible tanto con Sanhigia como con Cabrera, Monterelax, etc.
+const makeCheckFn = group => token => {
+  if (puede(token)) return true;
+  return check(group, token);
+};
+
 const dynamicCan = action => {
   const superuser = util.getGlobalSetting("user_data")?.user?.superuser;
   if (superuser) {
@@ -89,32 +98,23 @@ const dynamicCan = action => {
 
   const rules = getRules();
   const group = util.getGlobalSetting("user_data")?.user?.group;
+  const rule = rules?.[action];
 
-  const actionGroup = getRuleValue(rules?.[action], group);
-  if (actionGroup) {
-    return true;
+  if (rule !== undefined) {
+    // Existe alias en el mapa de reglas: resolverlo con check combinado (nuevo + legacy)
+    const result = isFunction(rule) ? rule(makeCheckFn(group)) : rule;
+    if (result) return true;
+    if (!(result ?? true)) return false;
   }
-  if (!(actionGroup ?? true)) {
-    return false;
-  }
 
-  // const globalGroup = getRuleValue(rules?.[group]?.access, group)
-  // if (globalGroup) return true
-  // if (!(globalGroup ?? true)) return false
+  // Sin alias: probar sistema legacy y luego puede
+  const legacyResult = check(group, action);
+  if (legacyResult) return true;
 
-  // const global = getRuleValue(rules?.access, 'general')
-  // if (global) return true
-  // if (!(global ?? true)) return false
-
-  return true;
+  return puede(action);
 };
 
 export default {
-  // can: (action) => {
-  //   const rules = getRules()
-  //   const group = util.getUser()?.grupo
-  //   return (rules?.access || ((rules?.[group]?.access && (rules?.[group]?.[action] ?? true)) || rules?.[group]?.[action])) ?? false
-  // }
   can: dynamicCan,
 };
 

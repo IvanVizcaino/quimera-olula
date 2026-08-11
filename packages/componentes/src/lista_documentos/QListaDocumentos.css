@@ -1,0 +1,10 @@
+.QListaDocumentos {
+    width: 100%;
+}
+
+.QListaDocumentos-sin-datos {
+    padding: 20px;
+    text-align: center;
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+}

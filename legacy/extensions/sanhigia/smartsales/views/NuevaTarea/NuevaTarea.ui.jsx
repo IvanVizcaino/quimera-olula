@@ -1,5 +1,5 @@
 import { Box, Container, Field } from "@quimera/comps";
-import Quimera, { getSchemas, PropValidation, useStateValue } from "quimera";
+import Quimera, { getSchemas, useStateValue } from "quimera";
 import { useEffect } from "react";
 
 import { ConfirmButton, MainBox, TipoTarea } from "../../comps";

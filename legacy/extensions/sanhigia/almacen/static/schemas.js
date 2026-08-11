@@ -204,6 +204,7 @@ export default parent => {
         ),
         shEstadopreparacion: Field.Text("sh_estadopreparacion", "Estado preparación"),
         codserie: Field.Text("codserie", "Serie"),
+        codAlmacen: Field.Text("codalmacen", "Almacen"),
       })
       .filter(() => ["1", "eq", "1"])
       .order(() => ({ field: "fecha", direction: "DESC" }))

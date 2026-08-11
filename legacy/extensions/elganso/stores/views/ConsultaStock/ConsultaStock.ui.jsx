@@ -93,13 +93,18 @@ function ConsultaStock({ useStyles }) {
     return (
       <Accordion
         className="Accordion-Tienda"
-        expanded={filaSeleccionada === params.id ? true : false}
+        expanded={filaSeleccionada === params.id}
+        onChange={(e, isExpanded) => {
+          e.stopPropagation();
+          setFilaSeleccionada(isExpanded ? params.id : null);
+        }}
       >
         <AccordionSummary
           expandIcon={<Icon>arrow_drop_down</Icon>}
           aria-controls="panel1-content"
           id="panel1-header"
           className="cabeceraAccordion"
+          onClick={e => e.stopPropagation()}
         >
           <span>
             <b>{params.row.tienda.titulo}</b>
@@ -123,13 +128,13 @@ function ConsultaStock({ useStyles }) {
       for (const key in element) {
         rows.push(
           <div>
-            {key}: {element[key]}
+            <strong>{key}</strong>: {element[key]}
           </div>,
         );
       }
     });
 
-    return <div>{rows}</div>;
+    return <div className="disponibilidadStockContainer">{rows}</div>;
   };
 
   const columns = [
@@ -197,9 +202,6 @@ function ConsultaStock({ useStyles }) {
         disableColumnSelector
         disableDensitySelector
         disableColumnMenu
-        onRowSelectionModelChange={e => {
-          filaSeleccionada === e[0] ? setFilaSeleccionada(null) : setFilaSeleccionada(e[0]);
-        }}
         columns={columns}
         getRowId={row => row.index}
         getRowClassName={() => "rowTienda"}
@@ -207,16 +209,16 @@ function ConsultaStock({ useStyles }) {
         sx={{
           ".MuiDataGrid-virtualScroller::-webkit-scrollbar": { display: "none" },
         }}
-        slotProps={{
-          toolbar: {
-            showQuickFilter: true,
-            printOptions: { disableToolbarButton: true },
-            csvOptions: { disableToolbarButton: true },
-          },
-          pagination: {
-            labelRowsPerPage: "Líneas por página",
-            labelDisplayedRows: ({ from, to, count }) => `${from}-${to} de ${count}`,
-          },
+        localeText={{
+          noRowsLabel: "No hay stock disponible para la talla seleccionada.",
+          toolbarQuickFilterPlaceholder: "Buscar...",
+          paginationRowsPerPage: "Líneas por página",
+          paginationDisplayedRows: ({ from, to, count }) =>
+            `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`,
+          footerRowSelected: (count) =>
+            count !== 1
+              ? `${count} filas seleccionadas`
+              : `${count} fila seleccionada`,
         }}
       />
     );
@@ -293,31 +295,35 @@ function ConsultaStock({ useStyles }) {
       <div id="consultaStock">
         <div className="main-edit">
           <div className="main-edit-container">
-            {showReaderBarcode ? renderBarcode() : null}
-            <Box width={1}>
-              <div className="rowVerTodos">
-                <input
-                  type="text"
-                  id="inputBarcode"
-                  className="inputBarcodeScanner"
-                  value={scannerValue}
-                  onKeyUp={event => barCodeKeyUp(event)}
-                  name="inputBarcode"
-                  placeholder="Introduce referencia o escanea"
-                ></input>
-                <IconButton
-                  id="button-reader-barcode"
-                  className="buttonReaderBarcode"
-                  onClick={() => {
-                    setShowReaderBarcode(!showReaderBarcode);
-                    inputRef.current.focus();
-                  }}
-                >
-                  <Icon>qr_code_scanner_icon</Icon>
-                </IconButton>
+            <Box width={1} className="box-consulta-stock">
+              <div className={"header-consulta-stock" + (showReaderBarcode ? " opened" : "")}>
+                <div className="block-search">
+                  <div className="rowVerTodos">
+                    <input
+                      type="text"
+                      id="inputBarcode"
+                      className="inputBarcodeScanner"
+                      value={scannerValue}
+                      onKeyUp={event => barCodeKeyUp(event)}
+                      name="inputBarcode"
+                      placeholder="Introduce referencia o escanea"
+                    ></input>
+                    <IconButton
+                      id="button-reader-barcode"
+                      className="buttonReaderBarcode"
+                      onClick={() => {
+                        setShowReaderBarcode(!showReaderBarcode);
+                        inputRef.current.focus();
+                      }}
+                    >
+                      <Icon>qr_code_scanner_icon</Icon>
+                    </IconButton>
+                  </div>
+                  {msgSuccess !== "" ? renderMsgSuccess(msgSuccess, msgError, successBeep) : null}
+                  {msgError !== "" ? renderMsgError(msgError, errorBeep) : null}
+                </div>
+                {showReaderBarcode ? renderBarcode() : null}
               </div>
-              {msgSuccess !== "" ? renderMsgSuccess(msgSuccess, msgError, successBeep) : null}
-              {msgError !== "" ? renderMsgError(msgError, errorBeep) : null}
               {tiendasStock.length > 0 ? renderListaTiendas() : renderLoading()}
             </Box>
           </div>

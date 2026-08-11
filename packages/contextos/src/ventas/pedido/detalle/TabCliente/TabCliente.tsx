@@ -7,7 +7,7 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { Pedido } from "../../diseño.ts";
 import { EstadoPedido } from "../diseño.ts";
-import { editable } from "../dominio.ts";
+import { editable } from "../detalle.ts";
 import "./TabCliente.css";
 
 interface TabClienteProps {

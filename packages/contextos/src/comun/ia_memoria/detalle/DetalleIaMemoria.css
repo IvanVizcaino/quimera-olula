@@ -1,0 +1,19 @@
+/*
+ * DetalleIaMemoria.css — posicionado de campos del detalle principal.
+ * No hay campos fuera de los tabs; el posicionado vive en TabGeneral.css.
+ */
+
+.DetalleIaMemoria {
+}
+
+.TabInformacion dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 12px;
+    row-gap: 4px;
+}
+
+.TabInformacion dt {
+    font-weight: 600;
+    color: var(--color-texto-secundario, #666);
+}

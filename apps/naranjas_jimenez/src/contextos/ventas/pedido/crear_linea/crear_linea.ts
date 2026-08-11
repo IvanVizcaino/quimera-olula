@@ -80,16 +80,24 @@ const onChange = (modelo: FormCrearLinea, campo: string, _: unknown, otro?: Reco
     return modelo;
 }
 
+const validarCantidadEnvases = (modelo: FormCrearLinea) => {
+    console.log("modewlo", modelo);
+    if (modelo.cantidadEnvases <= 0) {
+        return "La cantidad de envases debe ser mayor que cero";
+    }
+    return true;
+}
+
 export const metaCrearLinea: MetaModelo<FormCrearLinea> = {
     campos: {
         idVariedad: { tipo: "texto", requerido: true },
-        idTipoPalet: { tipo: "texto", requerido: true },
+        idTipoPalet: { tipo: "texto", requerido: false },
         idMarca: { tipo: "texto", requerido: true },
         idCalibre: { tipo: "texto", requerido: true },
         categoria: { tipo: "texto", requerido: false },
         observaciones: { tipo: "texto", requerido: false },
         cantidadPalets: { tipo: "entero", requerido: false },
-        cantidadEnvases: { tipo: "entero", requerido: true, positivo: true },
+        cantidadEnvases: { tipo: "entero", requerido: true, validacion: validarCantidadEnvases },
     },
     onChange
 };
@@ -109,7 +117,7 @@ export const postLineaNrj: PostLineaNrj = async (id, linea) => {
                 calibre_id: linea.idCalibre,
                 categoria: linea.categoria ? linea.categoria[0] : undefined,
                 cantidad: linea.cantidadEnvases,
-                tipo_palet_id: linea.idTipoPalet,
+                tipo_palet_id: linea.idTipoPalet === "" ? null : linea.idTipoPalet,
                 cantidad_palets: linea.cantidadPalets,
                 observaciones: linea.observaciones,
             }]

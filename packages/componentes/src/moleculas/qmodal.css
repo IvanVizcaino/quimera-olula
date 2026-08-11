@@ -135,6 +135,13 @@ quimera-modal {
     }
 }
 
+/* Escritorio: ancho estable, no depende del contenido de la pestaña activa */
+@media (min-width: 1025px) {
+    quimera-modal[data-ancho-estable] dialog {
+        width: clamp(800px, 60vw, 960px);
+    }
+}
+
 /* Responsive: Tablet */
 @media (max-width: 1024px) {
     quimera-modal dialog {

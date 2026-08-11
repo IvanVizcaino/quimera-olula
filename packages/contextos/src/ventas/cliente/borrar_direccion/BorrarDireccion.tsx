@@ -1,7 +1,7 @@
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
-import { ContextoError } from "@olula/lib/contexto.ts";
 import { ProcesarEvento } from "@olula/lib/useMaquina.js";
-import { useContext } from "react";
+import { useForm } from "@olula/lib/useForm.js";
+import { useCallback } from "react";
 import { DirCliente } from "../diseño.ts";
 import { deleteDireccion } from "../infraestructura.ts";
 
@@ -18,13 +18,15 @@ export const BorrarDireccion = ({
   publicar = async () => {},
   onCancelar = () => {},
 }: BorrarDireccionProps) => {
-  const { intentar } = useContext(ContextoError);
-
-  const borrar = async () => {
-    await intentar(() => deleteDireccion(clienteId, direccion.id));
+  const borrar_ = useCallback(async () => {
+    await deleteDireccion(clienteId, direccion.id);
     publicar("borrado_confirmado", { direccion });
     onCancelar();
-  };
+  }, [clienteId, direccion, publicar, onCancelar]);
+
+  const cancelar_ = useCallback(() => onCancelar(), [onCancelar]);
+
+  const [borrar, cancelar] = useForm(borrar_, cancelar_);
 
   return (
     <QModalConfirmacion
@@ -32,7 +34,7 @@ export const BorrarDireccion = ({
       abierto={true}
       titulo="Confirmar borrar"
       mensaje={`¿Está seguro de que desea borrar la dirección "${direccion.nombre_via}"?`}
-      onCerrar={onCancelar}
+      onCerrar={cancelar}
       onAceptar={borrar}
     />
   );

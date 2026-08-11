@@ -81,13 +81,15 @@ export const QuimeraAcciones = ({
     );
 
     return (
-      <quimera-acciones className={vertical === true ? "vertical" : ""}>
-        {accionesGenerales.length === 1 &&
-          renderItemAccion(accionesGenerales[0])}
+      <quimera-acciones
+        className={`${vertical === true ? "vertical" : ""} ${activo ? "abierto" : ""}`.trim()}
+      >
         {accionesGenerales.length > 0 &&
-          accionesGenerales.length > 1 &&
           vertical === true &&
           renderAcciones(accionesGenerales)}
+        {accionesGenerales.length === 1 &&
+          vertical !== true &&
+          renderItemAccion(accionesGenerales[0])}
         {accionesGenerales.length > 0 &&
           accionesGenerales.length > 1 &&
           vertical !== true &&

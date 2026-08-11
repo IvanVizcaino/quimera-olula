@@ -29,3 +29,10 @@ export const recargarContactos: ProcesarContactos = async (contexto, payload) =>
 
     return Contactos.recargar(contexto, resultado);
 }
+
+export const ampliarContactos: ProcesarContactos = async (contexto, payload) => {
+    const criteria = payload as Criteria;
+    const resultado = await getContactos(criteria.filtro, criteria.orden, criteria.paginacion);
+
+    return Contactos.ampliar(contexto, resultado);
+}

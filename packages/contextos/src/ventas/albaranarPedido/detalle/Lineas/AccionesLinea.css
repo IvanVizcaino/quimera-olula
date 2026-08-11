@@ -1,0 +1,25 @@
+.acciones-linea {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.acciones-linea .accion-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.3rem;
+  cursor: pointer;
+}
+
+.acciones-linea .accion-icono:hover:not(:disabled) {
+  background: var(--color-superficie, #f0f0f0);
+}
+
+.acciones-linea .accion-icono:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

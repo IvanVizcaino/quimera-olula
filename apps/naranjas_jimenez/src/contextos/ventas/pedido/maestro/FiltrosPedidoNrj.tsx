@@ -1,14 +1,14 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QDateInterval } from "@olula/componentes/atomos/qdateinterval.tsx";
-import { ClausulaFiltro, Filtro } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro } from "@olula/lib/diseño.ts";
 import { useEffect, useState } from "react";
 import { Cliente } from "../../comun/componentes/Cliente.tsx";
 
 type FiltrosPedidoNrjProps = {
-  filtro: Filtro;
+  filtro: ClausulaFiltro[];
   mostrarTerminados: boolean;
-  onFiltroChanged: (filtro: Filtro, mostrarTerminados: boolean) => void;
+  onFiltroChanged: (filtro: ClausulaFiltro[], mostrarTerminados: boolean) => void;
 };
 
 export const FiltrosPedidoNrj = ({ filtro, mostrarTerminados: mostrarTerminadosProp, onFiltroChanged }: FiltrosPedidoNrjProps) => {

@@ -76,7 +76,7 @@ function EstadoTratoComp({ field, value, trato, procesando, onChanged, ...props 
   const exigirGenerarPedido = !!trato?.exigirGenerarPedido || false;
   const tipotrato = trato?.idTipotrato || 0;
   const esTratoFarma = tipotrato === util.getUser().tratolicenciafarma;
-  const tengoPermisosFarma = ACL.can("TratosFarma:visit");
+  const tengoPermisosFarma = ACL.can("crm.trato.farma");
   const disabledFarma = esTratoFarma && !tengoPermisosFarma;
   const tienePedido = trato?.idPedido ? true : false;
   const tieneLicencia = trato?.idLicencia ? true : false;

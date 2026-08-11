@@ -7,6 +7,8 @@ type QBotonProps = {
   tamaño?: "pequeño" | "mediano" | "grande" | "xl";
   destructivo?: boolean;
   advertencia?: boolean;
+  exito?: boolean;
+  ancho?: boolean;
   deshabilitado?: boolean;
   texto?: string;
   onClick?: MouseEventHandler;
@@ -22,6 +24,8 @@ export const QBoton = ({
   tamaño = "mediano",
   destructivo,
   advertencia,
+  exito,
+  ancho,
   deshabilitado,
   texto,
   props,
@@ -29,7 +33,7 @@ export const QBoton = ({
   onMouseEnter,
   onMouseLeave,
 }: PropsWithChildren<QBotonProps>) => {
-  const attrs = { tamaño, variante, destructivo, advertencia, deshabilitado };
+  const attrs = { tamaño, variante, destructivo, advertencia, exito, ancho, deshabilitado };
 
   return (
     <quimera-boton {...attrs}>

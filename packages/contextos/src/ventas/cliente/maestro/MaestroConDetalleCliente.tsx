@@ -9,6 +9,7 @@ import { CrearCliente } from "../crear/CrearCliente.tsx";
 import { DetalleCliente } from "../detalle/DetalleCliente.tsx";
 import { Cliente } from "../diseño.ts";
 import { metaTablaCliente } from "./diseño.ts";
+import { TarjetaCliente } from "./TarjetaCliente.tsx";
 import "./MaestroConDetalleCliente.css";
 import { getMaquina } from "./maquina.ts";
 
@@ -35,12 +36,8 @@ export const MaestroConDetalleCliente = () => {
             <h2>Clientes</h2>
             <Listado<Cliente>
               metaTabla={metaTablaCliente}
-              // tarjeta={(cliente) => (
-              //   <QTarjetaGenerica
-              //     entidad={cliente}
-              //     metaTabla={metaTablaCliente}
-              //   />
-              // )}
+              tarjeta={TarjetaCliente}
+              modoInicial="tarjetas"
               criteria={ctx.clientes.criteria}
               entidades={ctx.clientes.lista}
               totalEntidades={ctx.clientes.total}
@@ -67,11 +64,12 @@ export const MaestroConDetalleCliente = () => {
         modoDisposicion="maestro-50"
       />
 
-      <CrearCliente
-        publicar={emitir}
-        onCancelar={() => emitir("creacion_cancelada")}
-        activo={ctx.estado === "CREANDO_CLIENTE"}
-      />
+      {ctx.estado === "CREANDO_CLIENTE" && (
+        <CrearCliente
+          publicar={emitir}
+          onCancelar={() => emitir("creacion_cancelada")}
+        />
+      )}
     </div>
   );
 };

@@ -10,8 +10,8 @@ import {
   Typography,
 } from "@quimera/comps";
 import { Avatar, Hidden, List, ListItem, ListItemAvatar, ListItemText } from "@quimera/thirdparty";
-import Quimera, { PropValidation, useStateValue, useWidth, util } from "quimera";
-import React, { useEffect } from "react";
+import Quimera, { useStateValue, useWidth, util } from "quimera";
+import { useEffect } from "react";
 
 function DevolucionesPedidos({ useStyles }) {
   const [

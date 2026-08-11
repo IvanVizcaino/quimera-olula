@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroVentasTpv, EstadoMaestroVentasTpv } from "../diseño.ts";
-import { Ventas, ampliarVentas, crearVenta, recargarVentas } from "./maestro.ts";
+import { Ventas, ampliarVentas, incluirVentaCreadaPorId, recargarVentas } from "./maestro.ts";
 
 
 export const getMaquina: () => Maquina<EstadoMaestroVentasTpv, ContextoMaestroVentasTpv> = () => {
@@ -19,12 +19,18 @@ export const getMaquina: () => Maquina<EstadoMaestroVentasTpv, ContextoMaestroVe
 
             recarga_de_ventas_solicitada: recargarVentas,
 
-            creacion_de_venta_solicitada: crearVenta,
+            crear_venta_solicitada: "CREANDO",
 
             criteria_cambiado: [Ventas.filtrar, recargarVentas],
 
             siguiente_pagina: [Ventas.filtrar, ampliarVentas],
         },
+
+        CREANDO: {
+
+            venta_creada: incluirVentaCreadaPorId,
+
+            alta_de_venta_cancelada: "INICIAL",
+        },
     }
 }
-

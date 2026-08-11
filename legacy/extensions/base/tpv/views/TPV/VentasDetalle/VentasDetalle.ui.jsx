@@ -47,9 +47,9 @@ function VentasDetalle({ useStyles }) {
             <Box width={1} border={0} borderColor="gray" height={"calc(100%)"}>
               <Grid container spacing={0} direction="column">
                 <Grid size={12}>
-                  <Grid container size={12} justify={venta.cerrada ? "flex-end" : "flex-start"} alignItems="center" style={{
-                      height: "60px",
-                    }}>
+                  <Grid container size={12} justifyContent={venta.cerrada ? "flex-end" : "flex-start"} alignItems="center" style={{
+                    height: "60px",
+                  }}>
                     {!venta.cerrada && (
                       <Button
                         id="pagarVenta"

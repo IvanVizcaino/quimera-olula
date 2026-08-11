@@ -1,16 +1,17 @@
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Detalle, QBoton, Tab, Tabs } from "@olula/componentes/index.js";
+import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento, Entidad } from "@olula/lib/diseño.js";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 import { BorrarContacto } from "../borrar/BorrarContacto.tsx";
-import { TabClientes } from "../vistas/DetalleContacto/Clientes/TabClientes.tsx";
 import { Acciones } from "./acciones/Acciones.tsx";
 import { contactoVacio, metaContacto } from "./detalle.ts";
 import "./DetalleContacto.css";
 import { getMaquina } from "./maquina.ts";
 import { Oportunidades } from "./oportunidades/Oportunidades.tsx";
+import { TabClientes } from "./tabs/TabClientes.tsx";
 import { TabGeneral } from "./tabs/TabGeneral.tsx";
 
 export const DetalleContacto = ({
@@ -54,11 +55,16 @@ export const DetalleContacto = ({
     >
       {!!contactoId && (
         <div className="DetalleContacto">
-          <div className="maestro-botones ">
-            <QBoton onClick={() => emitir("borrado_contacto_solicitado")}>
-              Borrar
-            </QBoton>
-          </div>
+          <QuimeraAcciones
+            vertical
+            acciones={[
+              {
+                texto: "Borrar",
+                onClick: () => emitir("borrado_contacto_solicitado"),
+                advertencia: true,
+              },
+            ]}
+          />
 
           <Tabs>
             <Tab label="General">

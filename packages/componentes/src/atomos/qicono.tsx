@@ -1,100 +1,216 @@
+import {
+  IconAlignCenter,
+  IconAlignLeft,
+  IconAlignRight,
+  IconArrowBack,
+  IconArrowBackUp,
+  IconArrowBarRight,
+  IconArrowForwardUp,
+  IconBackground,
+  IconBasketDown,
+  IconBrandWhatsapp,
+  IconBuildingStore,
+  IconCalendar,
+  IconCalendarEvent,
+  IconCalendarMonth,
+  IconCalendarWeek,
+  IconChartBar,
+  IconCheck,
+  IconCheckbox,
+  IconChecks,
+  IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronUp,
+  IconCircle,
+  IconCircleFilled,
+  IconCirclePlus,
+  IconCircleX,
+  IconClockHour3,
+  IconCopy,
+  IconCreditCard,
+  IconDeviceFloppy,
+  IconDownload,
+  IconEdit,
+  IconEye,
+  IconFile,
+  IconFilePlus,
+  IconFolder,
+  IconFolderOpen,
+  IconFolderPlus,
+  IconHome,
+  IconHourglass,
+  IconLayoutKanban,
+  IconLink,
+  IconList,
+  IconListDetails,
+  IconLock,
+  IconLockOpen,
+  IconLogout,
+  IconMail,
+  IconMenu2,
+  IconMessageChatbot,
+  IconMinus,
+  IconPackage,
+  IconPackageExport,
+  IconPackageImport,
+  IconPencil,
+  IconPhone,
+  IconPlayerPause,
+  IconPlayerPauseFilled,
+  IconPlus,
+  IconQuestionMark,
+  IconSearch,
+  IconSettings,
+  IconShoppingBag,
+  IconShoppingCart,
+  IconStackBack,
+  IconStackBackward,
+  IconStar,
+  IconTable,
+  IconTag,
+  IconTool,
+  IconTrash,
+  IconUpload,
+  IconUser,
+  IconUserCircle,
+  IconUsers,
+  IconUserSearch,
+  IconUsersGroup,
+  IconX,
+  type Icon,
+} from "@tabler/icons-react";
 import "./qicono.css";
 
 type QIconoProps = {
   nombre: string;
   tamaño?: "xs" | "sm" | "md" | "lg" | "xl";
   color?: string;
+  relleno?: boolean | string;
   style?: React.CSSProperties;
-  props?: React.HTMLAttributes<HTMLDivElement>;
 };
 
-type Icono = {
-  nombre: string;
-  tipo?: "solid" | "regular" | "logo";
+const tamaños: Record<string, number> = {
+  xs: 12,
+  sm: 16,
+  md: 20,
+  lg: 28,
+  xl: 40,
 };
 
-// https://v2.boxicons.com/
-const iconos: Record<string, string | Icono> = {
-  añadir: "plus-circle",
-  buscar: "search-alt-2",
-  cerrar: "x",
-  inicio: "home",
-  fichero: "file",
-  grafico_barras: "bar-chart-alt-2",
-  candado: "lock-alt",
-  candado_abierto: "lock-open-alt",
-  editar: "edit",
-  editar_2: "edit-alt",
-  eliminar: "trash",
-  guardar: "save",
-  copiar: "copy",
-  usuario: "user",
-  perfil: "user",
-  cerrar_sesion: "arrow-out-up-square-half",
-  verdadero: "check",
-  falso: "x",
-  atras: "chevron-left",
-  adelante: "chevron-right",
-  menu: "menu",
-  calendario_vacio: "calendar-alt",
-  check: "check",
-  checkdoble: "check-double",
-  x_circle: "x-circle",
-  minus: "minus",
-  lista: "list-ul",
-  carrito: "cart",
-  tarjeta: "credit-card",
-  etiqueta_compra: "purchase-tag-alt",
-  llave_inglesa: "wrench",
-  ver: "show",
-  crear: "plus",
-  tabla: "table",
-  arriba: "chevron-up",
-  abajo: "chevron-down",
-  izquierda: "chevron-left",
-  derecha: "chevron-right",
-  circulo: { nombre: "circle", tipo: "regular" },
-  circulo_relleno: { nombre: "circle", tipo: "solid" },
-  telefono: "phone",
-  correo: "envelope",
-  casa: "home",
-  tarea: "task",
-  llaveinglesa: "wrench",
-  estrella: "star",
-  relojarena: "hourglass",
+// https://tabler.io/icons
+const iconos: Record<string, Icon> = {
+  añadir: IconCirclePlus,
+  buscar: IconSearch,
+  "pendiente-nrj": IconBackground,
+  "parcial-nrj": IconStackBackward,
+  "preparado-nrj": IconStackBack,
+  "para-enviar-nrj": IconPackage,
+  "enviado-nrj": IconPackage,
+  cerrar: IconX,
+  inicio: IconHome,
+  fichero: IconFile,
+  documento_nuevo: IconFilePlus,
+  carpeta: IconFolder,
+  carpeta_abierta: IconFolderOpen,
+  carpeta_nueva: IconFolderPlus,
+  subir: IconUpload,
+  descargar: IconDownload,
+  grafico_barras: IconChartBar,
+  candado: IconLock,
+  candado_abierto: IconLockOpen,
+  editar: IconEdit,
+  editar_2: IconPencil,
+  eliminar: IconTrash,
+  guardar: IconDeviceFloppy,
+  copiar: IconCopy,
+  usuario: IconUser,
+  perfil: IconUser,
+  asistente: IconMessageChatbot,
+  grupo: IconUsersGroup,
+  cerrar_sesion: IconLogout,
+  verdadero: IconCheck,
+  falso: IconX,
+  atras: IconArrowBack,
+  adelante: IconArrowBarRight,
+  deshacer: IconArrowBackUp,
+  rehacer: IconArrowForwardUp,
+  enlace: IconLink,
+  alinear_izquierda: IconAlignLeft,
+  alinear_centro: IconAlignCenter,
+  alinear_derecha: IconAlignRight,
+  menu: IconMenu2,
+  calendario_vacio: IconCalendar,
+  check: IconCheck,
+  checkdoble: IconChecks,
+  x_circle: IconCircleX,
+  minus: IconMinus,
+  lista: IconList,
+  kanban: IconLayoutKanban,
+  carrito: IconShoppingCart,
+  tarjeta: IconCreditCard,
+  etiqueta_compra: IconTag,
+  llave_inglesa: IconTool,
+  llaveinglesa: IconTool,
+  ver: IconEye,
+  crear: IconPlus,
+  tabla: IconTable,
+  arriba: IconChevronUp,
+  abajo: IconChevronDown,
+  izquierda: IconChevronLeft,
+  derecha: IconChevronRight,
+  circulo: IconCircle,
+  circulo_relleno: IconCircleFilled,
+  telefono: IconPhone,
+  correo: IconMail,
+  whatsapp: IconBrandWhatsapp,
+  casa: IconHome,
+  tarea: IconCheckbox,
+  estrella: IconStar,
+  relojarena: IconHourglass,
+  ajustes: IconSettings,
+  bolsa: IconShoppingBag,
+  calendario_evento: IconCalendarEvent,
+  calendario_mes: IconCalendarMonth,
+  calendario_semana: IconCalendarWeek,
+  paquete: IconPackage,
+  paquete_import: IconPackageImport,
+  paquete_export: IconPackageExport,
+  usuario_circle: IconUserCircle,
+  usuario_search: IconUserSearch,
+  lista_detalle: IconListDetails,
+  clock_3: IconClockHour3,
+  tienda: IconBuildingStore,
+  usuarios: IconUsers,
+  pausa: IconPlayerPause,
+  pausa_relleno: IconPlayerPauseFilled,
+  devolucion: IconBasketDown,
 };
 
 export const QIcono = ({
   nombre,
   tamaño = "md",
   color,
+  relleno,
   style,
-  ...props
 }: QIconoProps) => {
-  let nombreIcono, tipo;
-  if (typeof iconos[nombre] === "undefined") {
-    nombreIcono = nombre;
-    tipo = undefined;
-  } else {
-    if (typeof iconos[nombre] === "object") {
-      nombreIcono = iconos[nombre].nombre;
-      tipo = iconos[nombre].tipo;
-    } else {
-      nombreIcono = iconos[nombre];
-      tipo = undefined;
-    }
-  }
+  const Icono = iconos[nombre] ?? IconQuestionMark;
+  const size = tamaños[tamaño] ?? 20;
+  const fill =
+    typeof relleno === "string"
+      ? relleno
+      : relleno
+        ? "var(--color-primario-claro)"
+        : undefined;
 
   return (
     <quimera-icono>
-      <box-icon
-        name={nombreIcono}
-        size={tamaño}
+      <Icono
+        size={size}
         color={color}
         style={style}
-        type={tipo}
-        {...props}
-      ></box-icon>
+        {...(fill ? { fill } : {})}
+      />
     </quimera-icono>
   );
 };

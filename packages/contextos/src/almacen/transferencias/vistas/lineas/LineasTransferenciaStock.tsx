@@ -1,6 +1,7 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { MetaTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
+import { getMetaFiltroDefecto } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { Criteria, RespuestaLista2 } from "@olula/lib/diseño.ts";
@@ -20,6 +21,8 @@ const metaTablaLineasTransferenciaStock: MetaTabla<LineaTransferenciaStock> = [
   { id: "descripcion_producto", cabecera: "Artículo" },
   { id: "cantidad", cabecera: "Cantidad" },
 ];
+
+const metaFiltroLineas = getMetaFiltroDefecto(metaTablaLineasTransferenciaStock);
 
 export const LineasTransferenciaStock = ({
   transferencia,
@@ -109,7 +112,7 @@ export const LineasTransferenciaStock = ({
       {!!transferencia.modelo.id && (
         <ListadoSemiControlado
           metaTabla={metaTablaLineasTransferenciaStock}
-          metaFiltro={true}
+          metaFiltro={metaFiltroLineas}
           cargando={false}
           criteriaInicial={criteriaDefecto}
           idReiniciarCriteria={transferencia.modelo.id}

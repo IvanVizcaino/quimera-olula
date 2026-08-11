@@ -22,7 +22,7 @@ function AvisoStock({ useStyles }) {
               color="secondary"
             >{`Este artículo no tiene stock suficiente (${stock.disponible} < ${linea.buffer.cantidad})`}</Typography>
           </Box>
-          {stock.recepciones.length > 0 ? (
+          {stock?.recepciones?.length > 0 ? (
             <Box display="flex" flexDirection="column" gap={1}>
               <Typography variant="body1" color="secondary">
                 Recepciones pendientes:

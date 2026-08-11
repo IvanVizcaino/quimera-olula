@@ -13,7 +13,7 @@ function CondicionesVenta({ useStyles, ...props }) {
     <Quimera.Template id="CondicionesVenta">
       <Dialog open={true} minWidth="sm" fullWidth>
         <DialogTitle>
-          <Grid container alignItems="center" justify="space-between">
+          <Grid container alignItems="center" justifyContent="space-between">
             {t("condicionesVenta.titulo")}
             <IconButton
               id="cerrar"

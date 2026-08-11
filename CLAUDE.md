@@ -90,3 +90,41 @@ import { RestAPI } from "@olula/lib/api/rest_api.ts";
 
 ### Component URL
 A component review page is available at `/docs/componentes` when running the dev server.
+
+### Plantillas de módulo
+
+**Antes de implementar cualquier funcionalidad nueva, comprueba si coincide con alguna plantilla canónica y úsala como base literal.**
+
+Las plantillas se encuentran en `packages/contextos/src/_plantilla/modulo/`:
+
+- **`_plantilla/modulo/`** — módulo simple (maestro-detalle sin sub-recursos). Úsalo como base para cualquier módulo nuevo.
+- **`_plantilla/modulo/_con_lineas/`** — delta para módulos con sub-recursos (líneas). Contiene los ficheros que **reemplazan** la base y los que se **añaden** sin equivalente en ella. Ver `_con_lineas/README.md` para instrucciones de uso.
+
+Proceso:
+1. ¿Nuevo módulo? → lee `_plantilla/modulo/` completo antes de empezar. Si tiene líneas, lee también `_con_lineas/README.md`.
+2. ¿Nueva funcionalidad en módulo existente (modal, estado, sub-recurso)? → localiza el fichero equivalente en la plantilla y compáralo con el módulo real antes de modificar.
+3. Copia y adapta (sustituye `Modulo`/`ModLin` por el nombre del dominio). Solo te apartes si el requisito lo hace imposible, e indícalo explícitamente.
+4. ¿Auditar un módulo existente? → usa `/audit-modulo ruta/al/modulo` para comparar estructura y patrones contra la plantilla.
+
+### Organización de vistas de sub-recursos (líneas, pagos, etc.)
+
+Los componentes de operación sobre un sub-recurso (crear, cambiar, borrar) NO deben vivir en una subcarpeta genérica `lineas/` dentro de `vistas/`. Deben organizarse así:
+
+```
+vistas/
+├── crear_linea/          # Modal de alta: CrearLineaXxx.tsx
+├── cambiar_linea/        # Modal de edición: CambiarLineaXxx.tsx
+├── borrar_linea/         # Modal de borrado: BorrarLineaXxx.tsx
+└── detalle/
+    └── lineas/           # Lista del sub-recurso + orquestación de modales: LineasXxx.tsx
+```
+
+Referencia canónica: `packages/contextos/src/tpv/venta/` y `packages/contextos/src/almacen/orden/`.
+
+Reglas:
+
+1. **Una carpeta por operación** — `crear_linea/`, `cambiar_linea/`, `borrar_linea/` en el nivel `vistas/`.
+2. **El orquestador** (lista con botones + renderizado condicional de modales) vive en `detalle/lineas/NombreXxx.tsx`.
+3. **Modales sin prop `activo`** — el padre controla la visibilidad con `{estado === "X" && <Modal />}`.
+4. **`BorrarXxxLinea` usa `useForm`** — no llama directamente a la API ni usa `ContextoError` directamente.
+5. **Los modales reciben la entidad ya resuelta** (`linea: LineaXxxConId`), nunca un nullable ni solo un ID.

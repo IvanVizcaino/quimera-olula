@@ -10,8 +10,8 @@ import {
   Table,
   Typography,
 } from "@quimera/comps";
-import Quimera, { PropValidation, useStateValue, useWidth } from "quimera";
-import React, { useEffect } from "react";
+import Quimera, { useStateValue, useWidth } from "quimera";
+import { useEffect } from "react";
 
 import { ModaLotesLinea } from "../../comps";
 
@@ -128,7 +128,7 @@ function MoviLotesProv({ idLineaPP, idPedido, useStyles }) {
               header="Caducidad"
               order="caducidad"
               value={movilote => movilote.caducidad}
-              width={88}
+              width={100}
             />
             <Column.Decimal
               id="dispLotesAlmacen"

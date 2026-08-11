@@ -26,8 +26,8 @@ import {
   ListItemSecondaryAction,
   ListItemText,
 } from "@quimera/thirdparty";
-import Quimera, { PropValidation, useStateValue, util } from "quimera";
-import React, { useEffect } from "react";
+import Quimera, { useStateValue, util } from "quimera";
+import { useEffect } from "react";
 
 function DashboardEsqueletos({ useStyles }) {
   const [
@@ -127,7 +127,7 @@ function DashboardEsqueletos({ useStyles }) {
               {esqueletos.map((s, key) => (
                 <ListItem key={s.referencia} divider={true} className={classes.element}>
                   <ListItemAvatar>
-                    <Grid container justify="center" spacing={1}>
+                    <Grid container justifyContent="center" spacing={1}>
                       <Grid size="grow">
                         <Avatar variant="rounded" className={classes.green}>
                           {recepcionados ? s.canrecepcionada : s.contador}
@@ -208,7 +208,7 @@ function DashboardEsqueletos({ useStyles }) {
                   className={classes.element}
                 >
                   <ListItemAvatar>
-                    <Grid container justify="center" spacing={1}>
+                    <Grid container justifyContent="center" spacing={1}>
                       <Grid size="grow">
                         <Avatar variant="rounded" className={classes.green}>
                           {s.contador}

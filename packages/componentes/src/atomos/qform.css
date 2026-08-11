@@ -10,7 +10,8 @@ quimera-formulario {
 
     quimera-input,
     quimera-autocompletar,
-    quimera-select {
+    quimera-select,
+    quimera-radio {
         grid-column: 1 / span 12;
         width: 100%;
         min-width: 0;

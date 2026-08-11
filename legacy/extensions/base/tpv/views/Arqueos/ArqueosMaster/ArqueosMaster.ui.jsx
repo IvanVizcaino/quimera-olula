@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@quimera/comps";
 import { List } from "@quimera/thirdparty";
-import Quimera, { PropValidation, useStateValue, useWidth } from "quimera";
+import Quimera, { useStateValue, useWidth } from "quimera";
 
 import { ListItemArqueo } from "../../../comps";
 
@@ -37,7 +37,7 @@ function ArqueosMaster() {
       <Box width={anchoDetalle}>
         <Dialog open={abrirDialogoImporteInicial} maxWidth="sm" fullWidth>
           <DialogTitle>
-            <Grid container alignItems="center" justify="space-between">
+            <Grid container alignItems="center" justifyContent="space-between">
               IMPORTE INICIAL
               <IconButton
                 id="cerrar"

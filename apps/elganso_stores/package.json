@@ -17,14 +17,18 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@mui/material": "^7.0.0",
         "@olula/componentes": "workspace:*",
         "@olula/ctx": "workspace:*",
         "@olula/lib": "workspace:*",
         "@olula/olula": "workspace:*",
+        "date-fns": "4",
         "quimera": "workspace:@quimera/core@*",
+        "react": "^19.0.0",
         "use-db-state": "2.0.2"
     },
     "devDependencies": {
+        "@aldabil/react-scheduler": "3.0.4",
         "baseline-browser-mapping": "^2.9.19"
     }
 }

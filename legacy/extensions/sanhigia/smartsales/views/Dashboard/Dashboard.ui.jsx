@@ -26,6 +26,7 @@ import {
 } from "../../comps";
 
 import { Agente } from "@quimera-extension/base-ventas";
+import { ComunicacionesResumen } from "../../../../../../apps/sanhigia/src/contextos/smartsales/ComunicacionesResumen.tsx";
 
 function Dashboard({ useStyles }) {
   const [
@@ -48,10 +49,11 @@ function Dashboard({ useStyles }) {
     dispatch,
   ] = useStateValue();
   const classes = useStyles();
+  const usuario = util.getUser?.();
+  const esUsuarioMarketing =
+    usuario?.group === "MKT" || usuario?.group === "Responsable de marketing";
   const sinFiltroAgente =
-    util.getUser()?.superuser ||
-    util.getUser().group === "MKT" ||
-    util.getUser().group === "Responsable de marketing";
+    usuario?.superuser || esUsuarioMarketing;
   const agente = util.getGlobalSetting("user_data")?.user?.agente?.toString();
   const tratosList = tratos.list
     .filter(trato => trato.codAgente === agente)
@@ -68,7 +70,9 @@ function Dashboard({ useStyles }) {
   }, [dispatch]);
 
   console.log('mimensaje_agentes: previsiones.codAgente: ', previsiones.codAgente, ", agente: ", agente, "condicion: ", previsiones.codAgente === 'TODOS' || previsiones.codAgente === agente);
-  const verSoloProgress = previsiones.codAgente === 'TODOS' || (previsiones.codAgente === agente && !util.getUser()?.superuser)
+  const verSoloProgress =
+    previsiones.codAgente === 'TODOS' ||
+    (previsiones.codAgente === agente && !usuario?.superuser)
 
   return (
     <Quimera.Template id="Dashboard">
@@ -93,6 +97,10 @@ function Dashboard({ useStyles }) {
               >
                 Nuevo Trato
               </Button>
+            </MainBox>
+            <MainBox title="Comunicaciones">
+              <br />
+              <ComunicacionesResumen />
             </MainBox>
             <MainBox className={classes.agendaBox} title="Agenda" url="/ss/agenda">
               <SearchContacto navigation={true} />
@@ -156,15 +164,14 @@ function Dashboard({ useStyles }) {
               )}
 
               {(totalTratosMkt > 0 ||
-                util.getUser()?.superuser ||
-                util.getUser().group === "MKT" ||
-                util.getUser().group === "Responsable de marketing") && (
+                usuario?.superuser ||
+                esUsuarioMarketing) && (
                   <Box className={classes.botonAlertaHeader} onClick={() => navigate("/ss/tratosmkt")}>
                     <Typography variant="h3" className={classes.mainBoxSubtitle}>
                       Tratos de venta de formación
                     </Typography>
-                    {util.getUser().group !== "MKT" ||
-                      (util.getUser().group !== "Responsable de marketing" && (
+                    {usuario?.group !== "MKT" ||
+                      (usuario?.group !== "Responsable de marketing" && (
                         <span className={classes.listItemTarea}>
                           <span className={classes.listItemTareaAux}>{totalTratosMkt}</span>
                         </span>

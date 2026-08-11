@@ -1,44 +1,64 @@
+import { opcionesEstadoIncidencia } from "#/crm/comun/componentes/EstadoIncidencia.tsx";
+import { PrioridadIncidencia } from "#/crm/comun/componentes/PrioridadIncidencia.tsx";
+import { TipoIncidencia } from "#/crm/comun/componentes/TipoIncidencia.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
-import { QAvatar, QIcono, QTarjetaGenerica } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
-import { useEsMovil } from "@olula/componentes/maestro/useEsMovil.js";
-import { formatearFechaDate } from "@olula/lib/dominio.js";
+import {
+  filtroTextos,
+  getMetaFiltroDefecto,
+} from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
+import type { ClausulaFiltro, Orden } from "@olula/lib/diseño.js";
+import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CrearIncidencia } from "../crear/CrearIncidencia.tsx";
 import { DetalleIncidencia } from "../detalle/DetalleIncidencia.tsx";
 import { Incidencia } from "../diseño.ts";
-import { metaTablaIncidencia } from "./maestro.ts";
-import "./MaestroIncidencias.css";
+import { TarjetaIncidencia } from "../vistas/TarjetaIncidencia.tsx";
+import {
+  crearFiltroEstadoIncidencia,
+  estadosIncidenciaOcultosPorDefecto,
+  metaTablaIncidencia,
+} from "./maestro.ts";
 import { getMaquina } from "./maquina.ts";
 
-type Layout = "TABLA" | "TARJETA";
+const ordenPorPrioridad = ["prioridad", "ASC"] as unknown as Orden;
+
+const estadosVisiblesPorDefecto = opcionesEstadoIncidencia
+  .map((opcion) => opcion.valor)
+  .filter((valor) => !estadosIncidenciaOcultosPorDefecto.includes(valor));
+
+const criteriaBaseIncidencias = {
+  ...criteriaDefecto,
+  orden: ordenPorPrioridad,
+  filtro: [
+    ["estado", "in", estadosVisiblesPorDefecto as unknown as string],
+  ] as ClausulaFiltro[],
+};
 
 export const MaestroIncidencias = () => {
   const { id, criteria } = getUrlParams();
 
+  const criteriaInicial =
+    criteria.filtro.length > 0 ||
+    criteria.orden.toString() !== criteriaDefecto.orden.toString()
+      ? criteria
+      : criteriaBaseIncidencias;
+
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "INICIAL",
-    incidencias: listaActivaEntidadesInicial<Incidencia>(id, criteria),
+    incidencias: listaActivaEntidadesInicial<Incidencia>(id, criteriaInicial),
   });
 
   useUrlParams(ctx.incidencias.activo, ctx.incidencias.criteria);
 
   useEffect(() => {
-    emitir("recarga_de_incidencias_solicitada", ctx.incidencias.criteria);
+    emitir("recarga_de_incidencias_solicitada", criteriaInicial);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const esMovil = useEsMovil();
-  const [layout, setLayout] = useState<Layout>("TARJETA");
-
-  const cambiarLayout = useCallback(
-    () => setLayout(layout === "TARJETA" ? "TABLA" : "TARJETA"),
-    [layout, setLayout]
-  );
 
   return (
     <div className="MaestroIncidencias">
@@ -46,24 +66,44 @@ export const MaestroIncidencias = () => {
         Maestro={
           <>
             <h2>Incidencias</h2>
-            {!esMovil && (
-              <div className="maestro-botones">
-                <QBoton
-                  texto={
-                    layout === "TARJETA"
-                      ? "Cambiar a TABLA"
-                      : "Cambiar a TARJETA"
-                  }
-                  onClick={cambiarLayout}
-                />
-              </div>
-            )}
 
             <Listado<Incidencia>
               metaTabla={metaTablaIncidencia}
+              metaFiltro={{
+                ...getMetaFiltroDefecto(metaTablaIncidencia),
+                estado: {
+                  id: "estado",
+                  label: "Estado",
+                  tipo: "multiseleccion",
+                  opciones: opcionesEstadoIncidencia,
+                  filtro: crearFiltroEstadoIncidencia,
+                },
+                prioridad: {
+                  id: "prioridad",
+                  label: "Prioridad",
+                  filtro: (v) => filtroTextos("prioridad", v),
+                  render: (valor, onChange) => (
+                    <PrioridadIncidencia
+                      valor={(valor as string) ?? ""}
+                      onChange={(opcion) => onChange(opcion?.valor ?? "")}
+                    />
+                  ),
+                },
+                tipo_incidencia: {
+                  id: "tipo_incidencia",
+                  label: "Tipo",
+                  filtro: (v) => filtroTextos("tipo_incidencia", v),
+                  render: (valor, onChange) => (
+                    <TipoIncidencia
+                      valor={(valor as string) ?? ""}
+                      onChange={(opcion) => onChange(opcion?.valor ?? "")}
+                    />
+                  ),
+                },
+              }}
               criteria={ctx.incidencias.criteria}
-              modo={esMovil || layout === "TARJETA" ? "tarjetas" : "tabla"}
-              tarjeta={TarjetaCrmIncidencia}
+              modosDisponibles={["tarjetas"]}
+              tarjeta={TarjetaIncidencia}
               entidades={ctx.incidencias.lista}
               totalEntidades={ctx.incidencias.total}
               seleccionada={ctx.incidencias.activo}
@@ -82,6 +122,9 @@ export const MaestroIncidencias = () => {
               onCriteriaChanged={(payload) =>
                 emitir("criteria_cambiado", payload)
               }
+              onSiguientePagina={(payload) =>
+                emitir("siguiente_pagina", payload)
+              }
             />
           </>
         }
@@ -94,36 +137,5 @@ export const MaestroIncidencias = () => {
 
       {ctx.estado === "CREANDO" && <CrearIncidencia publicar={emitir} />}
     </div>
-  );
-};
-
-const iconoEstadoAccion = (estado: string) => {
-  const icono = {
-    nueva: "estrella",
-    en_espera: "relojarena",
-    asignada: "usuario",
-    rechazada: "cerrar",
-    cerrada: "checkdoble",
-  };
-
-  return icono[estado as keyof typeof icono];
-};
-
-const TarjetaCrmIncidencia = (incidencia: Incidencia) => {
-  return (
-    <QTarjetaGenerica
-      avatar={
-        <QAvatar className={incidencia.prioridad}>
-          <QIcono nombre={iconoEstadoAccion(incidencia.estado)} tamaño="sm" />
-        </QAvatar>
-      }
-      arribaIzquierda={incidencia.nombre}
-      arribaDerecha={formatearFechaDate(incidencia.fecha)}
-      abajoIzquierda={
-        incidencia.estado.at(0)?.toUpperCase() +
-        incidencia.estado.slice(1).replace("_", " ")
-      }
-      abajoDerecha={incidencia.descripcion}
-    />
   );
 };

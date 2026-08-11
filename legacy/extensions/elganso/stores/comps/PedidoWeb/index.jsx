@@ -33,6 +33,11 @@ function PedidoWeb({ _estilos, ...props }) {
   const [msgBarcodeClass, setMsgBarcodeClass] = React.useState();
   const [msgBarcode, setMsgBarcode] = React.useState("Haga click para escanear");
   const [scannerValue, setScannerValue] = React.useState();
+  const [localExpanded, setLocalExpanded] = React.useState(props.expanded);
+
+  React.useEffect(() => {
+    setLocalExpanded(props.expanded);
+  }, [props.expanded]);
 
   const renderCabecera = params => {
     const { row } = params;
@@ -249,6 +254,8 @@ function PedidoWeb({ _estilos, ...props }) {
                 }
               }
             }}
+            aria-label="Avisar Transportista"
+            title="Avisar Transportista"
           >
             <Icon>local_shipping</Icon>
           </IconButton>
@@ -268,6 +275,8 @@ function PedidoWeb({ _estilos, ...props }) {
                 window.open(`${etiquetaUrl}`, "_blank");
               }
             }}
+            aria-label="Imprimir Etiqueta"
+            title="Imprimir Etiqueta"
           >
             <Icon>print</Icon>
           </IconButton>
@@ -287,6 +296,8 @@ function PedidoWeb({ _estilos, ...props }) {
                 });
               }
             }}
+            aria-label="Marcar como enviado"
+            title="Marcar como enviado"
           >
             <Icon>check</Icon>
           </IconButton>
@@ -301,7 +312,7 @@ function PedidoWeb({ _estilos, ...props }) {
                 let posibleFaltante = true;
 
                 rowFaltanteSelectionModel.forEach(idLinea => {
-                  const lineaFaltante = lineas.find(linea => linea.id === idLinea);
+                  const lineaFaltante = lineas.find(linea => linea.id === Number(idLinea));
                   if (lineaFaltante.pedidopreparado) {
                     posibleFaltante = false;
                   }
@@ -318,6 +329,8 @@ function PedidoWeb({ _estilos, ...props }) {
                 }
               }
             }}
+            aria-label="Marcar como faltante"
+            title="Marcar como faltante"
           >
             <Icon>send</Icon>
           </IconButton>
@@ -345,10 +358,22 @@ function PedidoWeb({ _estilos, ...props }) {
             disableRowSelectionOnClick
             checkboxSelection={true}
             hideFooter={true}
-            onRowSelectionModelChange={newRowFaltanteSelectionModel => {
-              setFaltanteSelectionModel(newRowFaltanteSelectionModel);
+            onRowSelectionModelChange={(newRowFaltanteSelectionModel, details) => {
+              if (newRowFaltanteSelectionModel && typeof newRowFaltanteSelectionModel === 'object' && 'ids' in newRowFaltanteSelectionModel) {
+                if (newRowFaltanteSelectionModel.type == 'include') {
+                  const selectedProjectIds = Array.from(newRowFaltanteSelectionModel.ids || []).map(id => String(id));
+                  setFaltanteSelectionModel(selectedProjectIds);
+                }
+
+                // Si hacemos click en 'Select All' y es de tipo exclude marcamos todos las lineas de la tabla
+                if (newRowFaltanteSelectionModel.type == 'exclude') {
+                  const idsLineas = Array.from(lineasMostrar || []).map(linea => String(linea.id));
+                  setFaltanteSelectionModel(idsLineas);
+                }
+              } else {
+                setFaltanteSelectionModel([]);
+              }
             }}
-            rowSelectionModel={rowFaltanteSelectionModel}
             columns={columns}
             slots={{ toolbar: null }}
             getRowId={row => row.id}
@@ -383,11 +408,18 @@ function PedidoWeb({ _estilos, ...props }) {
                 showQuickFilter: true,
                 printOptions: { disableToolbarButton: true },
                 csvOptions: { disableToolbarButton: true },
-              },
-              pagination: {
-                labelRowsPerPage: "Líneas por página",
-                labelDisplayedRows: ({ from, to, count }) => `${from}-${to} de ${count}`,
-              },
+              }
+            }}
+            localeText={{
+              noRowsLabel: "No hay artículos",
+              toolbarQuickFilterPlaceholder: "Buscar...",
+              paginationRowsPerPage: "Líneas por página",
+              paginationDisplayedRows: ({ from, to, count }) =>
+                `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`,
+              footerRowSelected: (count) =>
+                count !== 1
+                  ? `${count} filas seleccionadas`
+                  : `${count} fila seleccionada`,
             }}
           />
         ) : (
@@ -450,7 +482,12 @@ function PedidoWeb({ _estilos, ...props }) {
 
   return (
     <div className="pedidoWebWrapper">
-      <Accordion expanded={expanded}>
+      <Accordion
+        expanded={localExpanded}
+        onChange={(e, isExpanded) => {
+          setLocalExpanded(isExpanded);
+        }}
+      >
         <AccordionSummary
           expandIcon={<Icon>arrow_drop_down</Icon>}
           aria-controls="panel1-content"

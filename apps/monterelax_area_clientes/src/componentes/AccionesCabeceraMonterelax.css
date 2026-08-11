@@ -8,3 +8,24 @@
         fill: var(--blanco);
     }
 }
+
+.accion-cabecera-carrito {
+    position: relative;
+}
+
+.accion-cabecera-carrito-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background-color: var(--color-error, #d32f2f);
+    color: #ccc;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    pointer-events: none;
+}

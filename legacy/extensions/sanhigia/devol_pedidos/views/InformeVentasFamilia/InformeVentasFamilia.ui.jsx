@@ -36,7 +36,7 @@ function InformeVentasFamilia({ useStyles }) {
             <Agente
               id="filtro.codAgente"
               label="Agente"
-              todoslosagentes={ACL.can("ss_informes:todoslosagentes")}
+              todoslosagentes={ACL.can("crm.informe.todos_los_agentes")}
               fullWidth
             />
           </Grid>
@@ -44,7 +44,7 @@ function InformeVentasFamilia({ useStyles }) {
             <Cliente
               id="filtro.codCliente"
               label="Cliente"
-              todoslosagentes={ACL.can("ss_informes:todoslosagentes")}
+              todoslosagentes={ACL.can("crm.informe.todos_los_agentes")}
               fullWidth
             />
           </Grid>

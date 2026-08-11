@@ -1,0 +1,11 @@
+.euro-billete {
+    width: 80px;
+    height: 45px;
+    display: block;
+}
+
+.euro-moneda {
+    width: 48px;
+    height: 48px;
+    display: block;
+}

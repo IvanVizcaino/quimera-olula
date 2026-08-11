@@ -7,6 +7,7 @@ interface AgenteProps {
   valor: string;
   nombre?: string;
   label?: string;
+  deshabilitado?: boolean;
   onChange: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 

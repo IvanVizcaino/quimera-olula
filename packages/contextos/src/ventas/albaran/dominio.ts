@@ -1,3 +1,4 @@
+import { empresaActual } from "#/valores/empresaActual.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { MetaModelo, modeloEsEditable, modeloEsValido } from "@olula/lib/dominio.ts";
 import {
@@ -78,7 +79,7 @@ export const albaranVacioContexto = (): Albaran => ({ ...albaranVacioObjeto });
 export const nuevoClienteRegistradoVacio: NuevoAlbaran = {
     cliente_id: "",
     direccion_id: "",
-    empresa_id: "1",
+    empresa_id: empresaActual(),
 } as NuevoAlbaran;
 
 export const cambioClienteVacio = (): CambioClienteAlbaran => ({

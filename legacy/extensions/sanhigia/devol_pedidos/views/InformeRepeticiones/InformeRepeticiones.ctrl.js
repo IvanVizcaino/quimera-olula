@@ -99,7 +99,7 @@ export const bunch = parent => ({
             codagente: codAgente,
             grupo,
           })
-          .download("onFicheroRecibido", "filename.xlsx", dispatch);
+          .download("onFicheroRecibido", "informe_repeticiones.xlsx", dispatch);
         // .go('onFicheroRecibido', dispatch)
       },
     },

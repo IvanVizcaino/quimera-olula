@@ -35,7 +35,6 @@ import * as MasterContactosMD from "./views/ContactosMD/MasterContactosMD";
 import * as Container from "./views/Container";
 import * as Curso from "./views/Curso";
 import * as Cursos from "./views/Cursos";
-import * as NuevoCurso from "./views/NuevoCurso";
 import * as FilterCursos from "./views/Cursos/FilterCursos";
 import * as MasterCursos from "./views/Cursos/MasterCursos";
 import * as Dashboard from "./views/Dashboard";
@@ -55,6 +54,7 @@ import * as InformeTareasAgente from "./views/InformeTareasAgente";
 import * as NuevaTarea from "./views/NuevaTarea";
 import * as NuevoContacto from "./views/NuevoContacto";
 import * as NuevoContactoMD from "./views/NuevoContactoMD";
+import * as NuevoCurso from "./views/NuevoCurso";
 import * as NuevoTrato from "./views/NuevoTrato";
 import * as PedidosCliNuevo from "./views/PedidosCliNuevo";
 import * as PedidosCliOtrosAgentes from "./views/PedidosCliOtrosAgentes";
@@ -270,22 +270,23 @@ export default {
     app: AppMenu,
   },
   rules: {
-    "Dashboard:visit": (check: (rule: string) => boolean) => check("ss_tratos"),
+    "Dashboard:visit": (check: (rule: string) => boolean) => check("crm.trato"),
     "OnlyAdmin:visit": false,
-    "ss_campanias:visit": (check: (rule: string) => boolean) => check("ss_campanias.get"),
-    "ss_informes:visit": (check: (rule: string) => boolean) => check("sh_informes"),
-    "Trato:boton-borrar": (check: (rule: string) => boolean) => check("ss_tratos/borrar_trato"),
-    "TratosFarma:visit": (check: (rule: string) => boolean) => check("farma/acceso_tratos"),
-    "ss_informes:marketing": (check: (rule: string) => boolean) => check("sh_informes/marketing"),
+    "ss_campanias:visit": (check: (rule: string) => boolean) => check("ss_campanias.leer"),
+    "ss_informes:visit": (check: (rule: string) => boolean) => check("crm.informe"),
+    "Trato:boton-borrar": (check: (rule: string) => boolean) => check("crm.trato.borrar"),
+    "TratosFarma:visit": (check: (rule: string) => boolean) => check("crm.trato.farma"),
+    "ss_informes:marketing": (check: (rule: string) => boolean) => check("crm.informe.marketing"),
     "ss_informes:todoslosagentes": (check: (rule: string) => boolean) =>
-      check("sh_informes/todos_los_agentes"),
-    "clientes:acceso": (check: (rule: string) => boolean) => check("clientes/acceso_clientes"),
+      check("crm.informe.todos_los_agentes"),
+    "clientes:acceso": (check: (rule: string) => boolean) => check("ventas.cliente.leer"),
     "lead_pacientes:visit": (check: (rule: string) => boolean) =>
-      check("ss_campanias/lead_pacientes"),
+      check("crm.campana.lead_pacientes"),
     "articulos:acceso_caducidad": (check: (rule: string) => boolean) =>
-      check("articulos/acceso_caducidad"),
+      check("almacen.articulo.leer_caducidad"),
     "contactos:revisar_contacto": (check: (rule: string) => boolean) =>
-      check("contactos/revisar_contacto"),
+      check("crm.contacto.revisar_contacto"),
+    "LicenciasFarma:visit": (check: (rule: string) => boolean) => check("ventas.licencia_farma"),
   },
   schemas,
 };

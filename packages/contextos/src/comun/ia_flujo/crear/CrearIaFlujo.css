@@ -1,0 +1,9 @@
+.CrearIaFlujo {
+    quimera-input[nombre="descripcionCorta"] {
+        grid-column: span 12;
+    }
+
+    quimera-textarea[nombre="contenido"] {
+        grid-column: span 12;
+    }
+}

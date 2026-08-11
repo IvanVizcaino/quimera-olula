@@ -1,0 +1,52 @@
+.asistente-confirmacion {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 0.875rem 1rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.asistente-confirmacion__titulo {
+    margin: 0 0 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.asistente-confirmacion__detalles {
+    margin: 0 0 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.asistente-confirmacion__fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.8125rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.asistente-confirmacion__fila:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.asistente-confirmacion__fila dt {
+    color: #6b7280;
+}
+
+.asistente-confirmacion__fila dd {
+    margin: 0;
+    color: #111827;
+    font-weight: 500;
+    text-align: right;
+}
+
+.asistente-confirmacion__acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}

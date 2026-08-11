@@ -14,6 +14,7 @@ type WhoAmI = {
     usuario_id: string;
 };
 
+
 const parseWhoAmIStorage = (): WhoAmI | null => {
     const raw = localStorage.getItem("whoami");
     if (!raw) return null;
