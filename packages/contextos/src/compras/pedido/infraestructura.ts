@@ -62,6 +62,7 @@ export interface PedidoApi {
     recargo_financiero: number;
     recibido: string | null;
     observaciones: string | null;
+    impreso?: boolean;
 }
 
 export interface LineaPedidoApi {
@@ -184,6 +185,7 @@ export const pedidoDesdeApi = (api: PedidoApi): Pedido => ({
     recargoFinanciero: api.recargo_financiero,
     recibido: api.recibido as Recibido | null,
     observaciones: api.observaciones,
+    impreso: api.impreso,
 });
 
 export const lineaPedidoDesdeApi = (api: LineaPedidoApi): LineaPedido => ({

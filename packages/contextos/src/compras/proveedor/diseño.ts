@@ -27,6 +27,10 @@ export interface Proveedor extends Entidad {
     formaPago: string | null;
     divisa: string | null;
     serie: string | null;
+    // Solo con el plugin `persona_fisica` activo.
+    personaFisica?: boolean;
+    nombrePila?: string | null;
+    apellidos?: string | null;
 }
 
 export interface NuevoProveedor extends Modelo {

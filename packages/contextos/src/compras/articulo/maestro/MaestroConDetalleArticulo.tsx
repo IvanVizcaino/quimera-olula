@@ -1,3 +1,4 @@
+import { metaTablaConDisponible } from "#/almacen/articulo/maestro/disponible.ts";
 import { filtroFamilia } from "#/almacen/comun/filtros.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
@@ -6,6 +7,8 @@ import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { ClausulaFiltro, Criteria } from "@olula/lib/diseño.ts";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.ts";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.ts";
@@ -16,7 +19,7 @@ import { Articulo } from "../diseño.ts";
 import { getMaquina } from "./maquina.ts";
 import { TarjetaArticulo } from "./TarjetaArticulo.tsx";
 
-const metaTablaArticulo: MetaTabla<Articulo> = [
+export const metaTablaArticuloBase: MetaTabla<Articulo> = [
   { id: "id", cabecera: "Referencia" },
   { id: "descripcion", cabecera: "Descripción" },
   {
@@ -74,6 +77,10 @@ const metaFiltroArticulo: MetaFiltro = {
 };
 
 export const MaestroConDetalleArticulo = () => {
+  const metaTablaFactoria =
+    (FactoryObj.app.Compras?.articulo_metaTabla as
+      | MetaTabla<Articulo>
+      | undefined) ?? metaTablaArticuloBase;
   const criteriaBase = useMemo(criteriaArticulosCompra, []);
 
   const { id, criteria } = getUrlParams();
@@ -85,6 +92,13 @@ export const MaestroConDetalleArticulo = () => {
   });
 
   const { articulos } = ctx;
+
+  // Columna «Disponible» (plugin `disponible_art`): solo si la API compras envía el dato.
+  const metaTablaArticulo = metaTablaConDisponible(
+    metaTablaFactoria,
+    pluginActivo("disponible_art") &&
+      articulos.lista.some((a) => a.totalDisponible != null)
+  );
 
   useUrlParams(articulos.activo, articulos.criteria);
 

@@ -30,6 +30,13 @@ export interface Albaran extends Entidad {
     facturaId: string | null;
     pendienteFactura: boolean;
     observaciones: string | null;
+    impreso?: boolean;
+}
+
+export interface MovimientoLote {
+    id: string;
+    loteId: string;
+    cantidad: number;
 }
 
 export interface LineaAlbaran extends Entidad {
@@ -50,6 +57,8 @@ export interface LineaAlbaran extends Entidad {
     tipoIva: number;
     tipoRecargo: number;
     tipoIrpf: number;
+    porLotes: boolean;
+    movimientos: MovimientoLote[];
 }
 
 export interface NuevoAlbaran extends Modelo {

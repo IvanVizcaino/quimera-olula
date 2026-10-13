@@ -10,6 +10,10 @@ import {
 import { Factura, LineaFactura } from "../diseño.ts";
 import { facturaEditable } from "../dominio.ts";
 import {
+    postBorrarMovimientoLoteCompra,
+    postCrearMovimientoLoteCompra,
+} from "#/almacen/albaran_compra/infraestructura.ts";
+import {
     getFactura,
     getLineasFactura,
     patchFactura,
@@ -106,6 +110,7 @@ export const facturaVacia = (): Factura => ({
     noGenerarAsiento: false,
     asientoId: null,
     observaciones: null,
+    importacion: null,
 });
 
 export const contextoDetalleFacturaInicial: ContextoDetalleFactura = {
@@ -222,6 +227,26 @@ export const onLineaCreada: ProcesarDetalle = async (contexto, payload) => {
 export const onLineaCambiada: ProcesarDetalle = async (contexto, payload) => {
     const id = payload as string;
     return pipeFactura(contexto, [refrescarFactura, refrescarLineas, activarLineaPorId(id)]);
+};
+
+const reactivarLineaActiva: ProcesarDetalle = async (contexto) => {
+    const id = contexto.lineas.activo?.id;
+    if (!id) return contexto;
+    return activarLineaPorId(id)(contexto);
+};
+
+export const crearMovimientoLote: ProcesarDetalle = async (contexto, payload) => {
+    const { lote_id, cantidad } = payload as { lote_id: string; cantidad: number };
+    const lineaId = contexto.lineas.activo!.id;
+    await postCrearMovimientoLoteCompra(contexto.factura.id, lineaId, { lote_id, cantidad });
+    return pipeFactura(contexto, [refrescarFactura, refrescarLineas, reactivarLineaActiva]);
+};
+
+export const borrarMovimientoLote: ProcesarDetalle = async (contexto, payload) => {
+    const { movimiento_id } = payload as { movimiento_id: string };
+    const lineaId = contexto.lineas.activo!.id;
+    await postBorrarMovimientoLoteCompra(contexto.factura.id, lineaId, { movimiento_id });
+    return pipeFactura(contexto, [refrescarFactura, refrescarLineas, reactivarLineaActiva]);
 };
 
 export const onLineaBorrada: ProcesarDetalle = async (contexto, payload) => {

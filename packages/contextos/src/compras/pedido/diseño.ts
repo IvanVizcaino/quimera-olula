@@ -31,6 +31,7 @@ export interface Pedido extends Entidad {
     recargoFinanciero: number;
     recibido: Recibido | null;
     observaciones: string | null;
+    impreso?: boolean;
 }
 
 export interface LineaPedido extends Entidad {

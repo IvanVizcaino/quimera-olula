@@ -1,9 +1,11 @@
 import { Maquina } from "@olula/lib/diseño.ts";
 import { publicar } from "@olula/lib/dominio.ts";
 import {
+    borrarMovimientoLote,
     cambiarDivisa,
     cambiarProveedor,
     cargarContexto,
+    crearMovimientoLote,
     facturarAlbaranProceso,
     limpiarContexto,
     Lineas,
@@ -89,6 +91,8 @@ export const getMaquina: () => Maquina<EstadoDetalleAlbaran, ContextoDetalleAlba
         CAMBIANDO_LINEA: {
             linea_cambiada: [onLineaCambiada, "ABIERTO"],
             cambio_de_linea_cancelado: "ABIERTO",
+            crear_movimiento_lote_solicitado: [crearMovimientoLote, "CAMBIANDO_LINEA"],
+            borrar_movimiento_lote_solicitado: [borrarMovimientoLote, "CAMBIANDO_LINEA"],
         },
 
         BORRANDO_LINEA: {

@@ -15,7 +15,17 @@ export const metaLote: MetaModelo<LoteAlbaranar> = {
 
 export const metaLinea: MetaModelo<LineaAlbaranar> = {
     campos: {
-        recibiendo: { tipo: "numero", positivo: true },
+        recibiendo: {
+            tipo: "numero",
+            positivo: true,
+            validacion: (linea) => {
+                const max = cantidadPendienteLinea(linea);
+                if (linea.recibiendo > max) {
+                    return `No puede superar lo pendiente (${max})`;
+                }
+                return true;
+            },
+        },
         lotes: { itemMeta: metaLote },
     },
     editable: (linea: LineaAlbaranar, campo?: string) => {
@@ -45,24 +55,36 @@ export const calcularRecibiendo = (linea: LineaAlbaranar): number => {
     return linea.recibiendo;
 };
 
-export const lineaDesdeLineaPedido = (l: LineaPedido): LineaAlbaranar => ({
-    idLinea: l.id,
-    sku: l.referencia ?? "",
-    descripcion: l.descripcion,
-    cantidad: l.cantidad,
-    recibida: l.cantidadRecibida,
-    pendiente: l.cantidad,
-    recibiendo: 0,
-    cerrada: false,
-    porLotes: l.porLotes,
-    lotes: [],
-});
+/** Cantidad del pedido aún no albaranada (gene_albaranesp: cantidad − recibida). */
+export const cantidadPendienteLinea = (
+    linea: Pick<LineaAlbaranar, "cantidad" | "recibida">
+): number => Math.max(0, linea.cantidad - linea.recibida);
+
+export const lineaDesdeLineaPedido = (l: LineaPedido): LineaAlbaranar => {
+    const pendiente = cantidadPendienteLinea({
+        cantidad: l.cantidad,
+        recibida: l.cantidadRecibida,
+    });
+    return {
+        idLinea: l.id,
+        sku: l.referencia ?? "",
+        descripcion: l.descripcion,
+        cantidad: l.cantidad,
+        recibida: l.cantidadRecibida,
+        pendiente,
+        recibiendo: l.porLotes ? 0 : pendiente,
+        cerrada: false,
+        porLotes: l.porLotes,
+        lotes: [],
+    };
+};
 
 export const marcarTodasPendientes = (modelo: AlbaranarPedido): AlbaranarPedido => ({
     ...modelo,
     lineas: modelo.lineas.map((l) => {
         if (l.porLotes || l.cerrada) return l;
-        return { ...l, recibiendo: Math.max(0, l.cantidad - l.recibida) };
+        const pendiente = cantidadPendienteLinea(l);
+        return { ...l, pendiente, recibiendo: pendiente };
     }),
 });
 

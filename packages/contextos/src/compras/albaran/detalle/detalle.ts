@@ -10,6 +10,10 @@ import {
 } from "@olula/lib/ListaEntidades.ts";
 import { Albaran, LineaAlbaran } from "../diseño.ts";
 import { albaranFacturado } from "../dominio.ts";
+import {
+    postBorrarMovimientoLoteCompra,
+    postCrearMovimientoLoteCompra,
+} from "#/almacen/albaran_compra/infraestructura.ts";
 import { getAlbaran, getLineasAlbaran, patchAlbaran } from "../infraestructura.ts";
 import { ContextoDetalleAlbaran, EstadoDetalleAlbaran } from "./diseño.ts";
 
@@ -191,6 +195,26 @@ export const onLineaCreada: ProcesarDetalle = async (contexto, payload) => {
 export const onLineaCambiada: ProcesarDetalle = async (contexto, payload) => {
     const id = payload as string;
     return pipeAlbaran(contexto, [refrescarAlbaran, refrescarLineas, activarLineaPorId(id)]);
+};
+
+const reactivarLineaActiva: ProcesarDetalle = async (contexto) => {
+    const id = contexto.lineas.activo?.id;
+    if (!id) return contexto;
+    return activarLineaPorId(id)(contexto);
+};
+
+export const crearMovimientoLote: ProcesarDetalle = async (contexto, payload) => {
+    const { lote_id, cantidad } = payload as { lote_id: string; cantidad: number };
+    const lineaId = contexto.lineas.activo!.id;
+    await postCrearMovimientoLoteCompra(contexto.albaran.id, lineaId, { lote_id, cantidad });
+    return pipeAlbaran(contexto, [refrescarAlbaran, refrescarLineas, reactivarLineaActiva]);
+};
+
+export const borrarMovimientoLote: ProcesarDetalle = async (contexto, payload) => {
+    const { movimiento_id } = payload as { movimiento_id: string };
+    const lineaId = contexto.lineas.activo!.id;
+    await postBorrarMovimientoLoteCompra(contexto.albaran.id, lineaId, { movimiento_id });
+    return pipeAlbaran(contexto, [refrescarAlbaran, refrescarLineas, reactivarLineaActiva]);
 };
 
 export const onLineaBorrada: ProcesarDetalle = async (contexto, payload) => {

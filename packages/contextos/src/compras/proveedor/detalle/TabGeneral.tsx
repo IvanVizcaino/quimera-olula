@@ -1,8 +1,10 @@
 import { opcionesTipoIdFiscalCompras } from "#/compras/comun/valores.ts";
 import { TipoIdFiscal } from "#/comun/componentes/tipoIdFiscal.tsx";
+import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QDate } from "@olula/componentes/atomos/qdate.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { Proveedor } from "../diseño.ts";
 import "./TabGeneral.css";
@@ -15,11 +17,23 @@ export const TabGeneral = ({
     proveedor: Proveedor;
 }) => {
     const { uiProps } = form;
+    const conPersonaFisica = pluginActivo("persona_fisica");
 
     return (
         <div className="TabGeneral">
             <quimera-formulario>
-                <QInput label="Nombre" {...uiProps("nombre")} />
+                {conPersonaFisica && (
+                    <QCheckbox label="Persona física" {...uiProps("personaFisica")} />
+                )}
+                {(!conPersonaFisica || !proveedor.personaFisica) && (
+                    <QInput label="Nombre" {...uiProps("nombre")} />
+                )}
+                {conPersonaFisica && proveedor.personaFisica && (
+                    <>
+                        <QInput label="Nombre de pila" {...uiProps("nombrePila")} />
+                        <QInput label="Apellidos" {...uiProps("apellidos")} />
+                    </>
+                )}
                 <QInput label="Nombre Comercial" {...uiProps("nombreComercial")} />
                 <TipoIdFiscal
                     {...uiProps("tipoIdFiscal")}

@@ -1,6 +1,20 @@
 import { Criteria, Entidad, Modelo, RespuestaLista } from "@olula/lib/diseño.ts";
 import { TipoArticuloLinea } from "../comun/diseño.ts";
 
+export type TratamientoIvaImportacion = "Total" | "Reversión";
+
+/** Plugin `facturas_impor` (Eneboo `facturasprov.idfacturaimport`, `dua`...). */
+export interface ImportacionFactura extends Modelo {
+    facturaImportacionId: string | null;
+    facturaDuaId: string | null;
+    dua: string | null;
+    fechaDua: Date | null;
+    base: number;
+    tipoIva: number;
+    cuota: number;
+    tratamiento: TratamientoIvaImportacion;
+}
+
 export interface Factura extends Entidad {
     id: string;
     codigo: string;
@@ -36,6 +50,14 @@ export interface Factura extends Entidad {
     noGenerarAsiento: boolean;
     asientoId: string | null;
     observaciones: string | null;
+    importacion: ImportacionFactura | null;
+    impreso?: boolean;
+}
+
+export interface MovimientoLote {
+    id: string;
+    loteId: string;
+    cantidad: number;
 }
 
 export interface LineaFactura extends Entidad {
@@ -56,6 +78,8 @@ export interface LineaFactura extends Entidad {
     tipoIva: number;
     tipoRecargo: number;
     tipoIrpf: number;
+    porLotes: boolean;
+    movimientos: MovimientoLote[];
 }
 
 export interface NuevaFactura extends Modelo {
@@ -98,6 +122,11 @@ export type FacturaCreada = {
 
 export type CambiosFactura = Partial<Factura>;
 
+export type PatchImportacionFactura = (
+    id: string,
+    cambios: Partial<ImportacionFactura>
+) => Promise<void>;
+
 export type CambiosLineaFactura = Partial<ModeloLineaFactura>;
 
 export type GetFactura = (id: string) => Promise<Factura>;
@@ -117,6 +146,8 @@ export type PostLineasFactura = (
     id: string,
     lineas: NuevaLineaFactura[]
 ) => Promise<string[]>;
+/** Plugin `facturas_impor`: Eneboo `frasImport_crearLinea`. */
+export type PostLineaIvaImportacion = (id: string) => Promise<string>;
 export type PatchLineaFactura = (
     id: string,
     lineaId: string,

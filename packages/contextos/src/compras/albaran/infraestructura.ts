@@ -28,6 +28,7 @@ import {
     PostAlbaran,
     PostLineasAlbaran,
 } from "./diseño.ts";
+import { camposLoteLineaDesdeApi, MovimientoLoteApi } from "#/almacen/comun/movimiento_lote.ts";
 import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 const baseUrl = new ApiUrls().ALBARAN;
@@ -61,6 +62,7 @@ export interface AlbaranApi {
     factura_id: string | null;
     pendiente_factura: boolean;
     observaciones: string | null;
+    impreso?: boolean;
 }
 
 export interface LineaAlbaranApi {
@@ -81,6 +83,8 @@ export interface LineaAlbaranApi {
     tipo_iva: number;
     tipo_recargo: number;
     tipo_irpf: number;
+    por_lotes?: boolean;
+    movimientos?: MovimientoLoteApi[];
 }
 
 interface NuevaLineaAlbaranApi {
@@ -156,6 +160,7 @@ export const albaranDesdeApi = (api: AlbaranApi): Albaran => ({
     facturaId: api.factura_id,
     pendienteFactura: api.pendiente_factura,
     observaciones: api.observaciones,
+    impreso: api.impreso,
 });
 
 export const lineaAlbaranDesdeApi = (api: LineaAlbaranApi): LineaAlbaran => ({
@@ -176,6 +181,7 @@ export const lineaAlbaranDesdeApi = (api: LineaAlbaranApi): LineaAlbaran => ({
     tipoIva: api.tipo_iva,
     tipoRecargo: api.tipo_recargo,
     tipoIrpf: api.tipo_irpf,
+    ...camposLoteLineaDesdeApi(api),
 });
 
 const esProveedorNoRegistrado = (

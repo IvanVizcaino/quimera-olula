@@ -9,6 +9,11 @@ export interface Articulo extends Entidad {
     grupoIvaProductoId: string;
     noStock: boolean;
     seCompra: boolean;
+    /** Listado: columna «Uso» (CC-02 Crema); la API compras puede no enviarlo aún. */
+    seVende: boolean;
+    descripcionSubfamilia?: string | null;
+    /** Plugin `disponible_art`: `articulos.totaldisponible` (si la API compras lo envía). */
+    totalDisponible?: number | null;
 }
 
 /**

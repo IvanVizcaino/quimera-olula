@@ -10,6 +10,7 @@ export const articuloVacio = (): Articulo => ({
     grupoIvaProductoId: "",
     noStock: false,
     seCompra: false,
+    seVende: false,
 });
 
 export const CAMPO_INCLUIR_NO_COMPRABLES = "incluir_no_comprables";

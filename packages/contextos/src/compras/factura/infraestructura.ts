@@ -28,12 +28,32 @@ import {
     PatchLineaFactura,
     PatchRectificativa,
     PostFactura,
+    PostLineaIvaImportacion,
     PostLineasFactura,
+    ImportacionFactura,
+    PatchImportacionFactura,
     ReciboFactura,
+    TratamientoIvaImportacion,
 } from "./diseño.ts";
+import { camposLoteLineaDesdeApi, MovimientoLoteApi } from "#/almacen/comun/movimiento_lote.ts";
 import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 const baseUrl = new ApiUrls().FACTURA;
+
+export interface ImportacionFacturaApi {
+    factura_importacion_id: string | null;
+    factura_dua_id: string | null;
+    dua: string | null;
+    fecha_dua: string | null;
+    base: number;
+    tipo_iva: number;
+    cuota: number;
+    tratamiento: string;
+}
+
+type CambiosImportacionApi = Partial<
+    Omit<ImportacionFacturaApi, "factura_dua_id" | "tratamiento">
+> & { tratamiento?: TratamientoIvaImportacion };
 
 export interface FacturaApi {
     id: string;
@@ -70,6 +90,8 @@ export interface FacturaApi {
     no_generar_asiento: boolean;
     asiento_id: string | null;
     observaciones: string | null;
+    importacion?: ImportacionFacturaApi | null;
+    impreso?: boolean;
 }
 
 export interface LineaFacturaApi {
@@ -90,6 +112,8 @@ export interface LineaFacturaApi {
     tipo_iva: number;
     tipo_recargo: number;
     tipo_irpf: number;
+    por_lotes?: boolean;
+    movimientos?: MovimientoLoteApi[];
 }
 
 interface NuevaLineaFacturaApi {
@@ -122,6 +146,7 @@ interface CambiosFacturaApi {
     servicios?: boolean;
     no_generar_asiento?: boolean;
     editable?: boolean;
+    importacion?: CambiosImportacionApi;
 }
 
 interface CambiosLineaFacturaApi {
@@ -140,6 +165,41 @@ const horaDesdeApi = (hora: string | null): string => (hora ?? "").slice(0, 8);
 
 const horaAApi = (hora: string): string =>
     hora.length === 5 ? `${hora}:00` : hora.slice(0, 8);
+
+export const importacionDesdeApi = (
+    api: ImportacionFacturaApi | null | undefined
+): ImportacionFactura | null =>
+    api
+        ? {
+              facturaImportacionId: api.factura_importacion_id,
+              facturaDuaId: api.factura_dua_id,
+              dua: api.dua,
+              fechaDua: api.fecha_dua ? new Date(Date.parse(api.fecha_dua)) : null,
+              base: api.base,
+              tipoIva: api.tipo_iva,
+              cuota: api.cuota,
+              tratamiento: api.tratamiento === "Reversión" ? "Reversión" : "Total",
+          }
+        : null;
+
+/** `null` borra factura de importación, DUA y fecha DUA (contrato backend). */
+export const cambiosImportacionAApi = (
+    i: Partial<ImportacionFactura>
+): CambiosImportacionApi => {
+    const cambios: CambiosImportacionApi = {};
+    if (i.facturaImportacionId !== undefined) {
+        cambios.factura_importacion_id = i.facturaImportacionId;
+    }
+    if (i.dua !== undefined) cambios.dua = i.dua;
+    if (i.fechaDua !== undefined) {
+        cambios.fecha_dua = i.fechaDua ? fechaAApi(i.fechaDua) : null;
+    }
+    if (i.base !== undefined) cambios.base = i.base;
+    if (i.tipoIva !== undefined) cambios.tipo_iva = i.tipoIva;
+    if (i.cuota !== undefined) cambios.cuota = i.cuota;
+    if (i.tratamiento !== undefined) cambios.tratamiento = i.tratamiento;
+    return cambios;
+};
 
 export const facturaDesdeApi = (api: FacturaApi): Factura => ({
     id: api.id,
@@ -176,6 +236,8 @@ export const facturaDesdeApi = (api: FacturaApi): Factura => ({
     noGenerarAsiento: api.no_generar_asiento,
     asientoId: api.asiento_id,
     observaciones: api.observaciones,
+    importacion: importacionDesdeApi(api.importacion),
+    impreso: api.impreso,
 });
 
 export const lineaFacturaDesdeApi = (api: LineaFacturaApi): LineaFactura => ({
@@ -196,6 +258,7 @@ export const lineaFacturaDesdeApi = (api: LineaFacturaApi): LineaFactura => ({
     tipoIva: api.tipo_iva,
     tipoRecargo: api.tipo_recargo,
     tipoIrpf: api.tipo_irpf,
+    ...camposLoteLineaDesdeApi(api),
 });
 
 const esProveedorNoRegistrado = (
@@ -319,6 +382,14 @@ export const patchFactura: PatchFactura = async (id, cambios) => {
     );
 };
 
+export const patchImportacionFactura: PatchImportacionFactura = async (id, cambios) => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}`,
+        { cambios: { importacion: cambiosImportacionAApi(cambios) } },
+        "Error al guardar la importación de la factura"
+    );
+};
+
 export const patchRectificativa: PatchRectificativa = async (id, rectificativaId) => {
     await RestAPI.patch(
         `${baseUrl}/${id}/rectificativa`,
@@ -347,6 +418,16 @@ export const getLineaFactura: GetLineaFactura = async (id, lineaId) =>
         lineaFacturaDesdeApi,
         "Error al obtener la línea"
     );
+
+export const postLineaIvaImportacion: PostLineaIvaImportacion = async (id) => {
+    const respuesta = await RestAPI.post(
+        `${baseUrl}/${id}/linea_iva_importacion`,
+        {},
+        "Error al crear la línea de IVA de importación"
+    );
+    const { linea_id } = respuesta as unknown as { linea_id: string };
+    return linea_id;
+};
 
 export const postLineasFactura: PostLineasFactura = async (id, lineas) => {
     const respuesta = await RestAPI.post<{ lineas: NuevaLineaFacturaApi[] }>(

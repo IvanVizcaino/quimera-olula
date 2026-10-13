@@ -1,9 +1,10 @@
 import { ColumnaEstadoTabla } from "#/comun/componentes/ColumnaEstadoTabla.tsx";
+import { conColumnaImpreso } from "#/comun/marca_impresion.ts";
 import { MetaTabla, QIcono } from "@olula/componentes/index.js";
 import { Albaran } from "../diseño.ts";
 import { albaranFacturado } from "../dominio.ts";
 
-export const metaTablaAlbaran: MetaTabla<Albaran> = [
+export const metaTablaAlbaran: MetaTabla<Albaran> = conColumnaImpreso([
   {
     id: "facturaId",
     cabecera: "",
@@ -47,4 +48,4 @@ export const metaTablaAlbaran: MetaTabla<Albaran> = [
     render: (albaran) => albaran.nombreAlmacen || albaran.almacenId || "",
   },
   { id: "idFiscal", cabecera: "Id Fiscal", prioridad: "baja" },
-];
+]);

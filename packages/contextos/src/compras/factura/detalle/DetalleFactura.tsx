@@ -8,12 +8,18 @@ import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { imprimir_blob } from "@olula/lib/impresion.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { useCallback, useEffect } from "react";
 import { BorrarFactura } from "../borrar/BorrarFactura.tsx";
 import { CambiarRectificativa } from "../cambiar_rectificativa/CambiarRectificativa.tsx";
 import { Factura } from "../diseño.ts";
 import { facturaEditable } from "../dominio.ts";
-import { getReportFactura, getTrazaFactura } from "../infraestructura.ts";
+import {
+    getReportFactura,
+    getTrazaFactura,
+    patchImportacionFactura,
+    postLineaIvaImportacion,
+} from "../infraestructura.ts";
 import {
     contextoDetalleFacturaInicial,
     guardarFactura,
@@ -25,6 +31,7 @@ import { getMaquina } from "./maquina.ts";
 import { TabDatos } from "./TabDatos.tsx";
 import { TabObservaciones } from "./TabObservaciones.tsx";
 import { TabProveedor } from "./TabProveedor.tsx";
+import { TabImportacion } from "./TabImportacion.tsx";
 import { TabRecibos } from "./TabRecibos.tsx";
 import { TotalesDocumento } from "#/compras/comun/componentes/TotalesDocumento.tsx";
 
@@ -115,6 +122,28 @@ export const DetalleFactura = ({
                             label="Observaciones"
                             children={<TabObservaciones form={formModelo} />}
                         />,
+                        ...(pluginActivo("facturas_impor")
+                            ? [
+                                  <Tab
+                                      key="tab-importacion"
+                                      label="Importación"
+                                      children={
+                                          <TabImportacion
+                                              key={JSON.stringify(factura.importacion)}
+                                              factura={factura}
+                                              onGuardar={async (cambios) => {
+                                                  await patchImportacionFactura(factura.id, cambios);
+                                                  await emitir("factura_guardada");
+                                              }}
+                                              onCrearLineaIva={async () => {
+                                                  await postLineaIvaImportacion(factura.id);
+                                                  await emitir("factura_guardada");
+                                              }}
+                                          />
+                                      }
+                                  />,
+                              ]
+                            : []),
                         <Tab
                             key="tab-recibos"
                             label="Recibos"

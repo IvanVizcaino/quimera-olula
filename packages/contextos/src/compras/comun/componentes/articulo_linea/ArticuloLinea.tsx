@@ -1,6 +1,8 @@
 import { Articulo } from "#/compras/comun/componentes/articulo.tsx";
 import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { useEffect, useRef } from "react";
 import { ArticuloDeLineaConTipo } from "../../diseño.ts";
 import "./ArticuloLinea.css";
@@ -26,6 +28,9 @@ export const ArticuloLinea = ({
     bloqueado = false,
     autoFocus = false,
 }: ArticuloLineaProps) => {
+    const descripcionMultilinea = pluginActivo("lineas_largas");
+    const CampoDescripcion = descripcionMultilinea ? QTextArea : QInput;
+
     const refArticulo = useRef<HTMLInputElement | null>(null);
     const refDescripcionGenerica = useRef<HTMLInputElement | null>(null);
     const refDescripcionLibre = useRef<HTMLInputElement | null>(null);
@@ -64,12 +69,13 @@ export const ArticuloLinea = ({
     if (tipoArticulo === "libre") {
         return (
             <div className="ArticuloLinea-campo">
-                <QInput
+                <CampoDescripcion
                     nombre="descripcion"
                     label="Descripción"
                     valor={descripcion}
                     onChange={(valor) => onChange({ descripcion: valor })}
                     ref={refDescripcionLibre}
+                    {...(descripcionMultilinea ? { rows: 3 } : {})}
                 />
                 {!bloqueado && (
                     <button
@@ -127,12 +133,13 @@ export const ArticuloLinea = ({
                 )}
             </div>
             {tipoArticulo === "generico" && (
-                <QInput
+                <CampoDescripcion
                     nombre="descripcion"
                     label="Descripción personalizada"
                     valor={descripcion}
                     onChange={(valor) => onChange({ descripcion: valor })}
                     ref={refDescripcionGenerica}
+                    {...(descripcionMultilinea ? { rows: 3 } : {})}
                 />
             )}
         </>

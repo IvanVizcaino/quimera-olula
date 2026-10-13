@@ -1,5 +1,6 @@
 import { MetaTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { LineaAlbaran } from "../../diseño.ts";
+import { decimalesPrecioCompra } from "../../../comun/dominio.ts";
 import { etiquetaLinea } from "../../dominio.ts";
 
 const porcentaje = (valor: number | null | undefined) => (valor ? `${valor}%` : "");
@@ -17,6 +18,7 @@ export const metaTablaLineaAlbaran = (divisa?: string): MetaTabla<LineaAlbaran> 
         cabecera: "Coste",
         tipo: "moneda",
         divisa,
+        decimales: decimalesPrecioCompra(),
         prioridad: "alta",
     },
     {
@@ -44,6 +46,7 @@ export const metaTablaLineaAlbaran = (divisa?: string): MetaTabla<LineaAlbaran> 
         cabecera: "Total",
         tipo: "moneda",
         divisa,
+        decimales: decimalesPrecioCompra(),
         prioridad: "alta",
     },
 ];

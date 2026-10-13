@@ -59,6 +59,10 @@ export interface ProveedorApi {
     forma_pago: string | null;
     divisa: string | null;
     serie: string | null;
+    // Solo con el plugin `persona_fisica` activo.
+    persona_fisica?: boolean;
+    nombre_pila?: string | null;
+    apellidos?: string | null;
 }
 
 interface NuevoProveedorApi {
@@ -154,6 +158,9 @@ export const proveedorDesdeApi = (api: ProveedorApi): Proveedor => ({
     formaPago: api.forma_pago,
     divisa: api.divisa,
     serie: api.serie,
+    personaFisica: api.persona_fisica,
+    nombrePila: api.nombre_pila,
+    apellidos: api.apellidos,
 });
 
 const nuevoProveedorAApi = (p: NuevoProveedor): NuevoProveedorApi => ({
@@ -184,6 +191,10 @@ const cambiosProveedorAApi = (p: CambiosProveedor): CambiosProveedorApi => {
     if (p.subcuentaCodigo !== undefined) cambios.subcuenta_codigo = p.subcuentaCodigo;
     if (p.subcuentaId !== undefined) cambios.subcuenta_id = p.subcuentaId;
     if (p.deBaja !== undefined) cambios.de_baja = p.deBaja;
+    // Campos persona_fisica (solo se envían si están definidos; el backend los ignora si el plugin está inactivo)
+    if (p.personaFisica !== undefined) (cambios as Record<string, unknown>).persona_fisica = p.personaFisica;
+    if (p.nombrePila !== undefined) (cambios as Record<string, unknown>).nombre_pila = p.nombrePila;
+    if (p.apellidos !== undefined) (cambios as Record<string, unknown>).apellidos = p.apellidos;
     return cambios;
 };
 

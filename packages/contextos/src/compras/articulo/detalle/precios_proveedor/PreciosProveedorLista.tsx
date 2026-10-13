@@ -6,8 +6,9 @@ import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { ArticuloProveedor } from "../../../articulo_proveedor/diseño.ts";
+import { decimalesPrecioCompra } from "../../../comun/dominio.ts";
 
-const metaTablaPrecios: MetaTabla<ArticuloProveedor> = [
+const metaTablaPrecios = (): MetaTabla<ArticuloProveedor> => [
   {
     id: "por_defecto",
     cabecera: "",
@@ -30,6 +31,7 @@ const metaTablaPrecios: MetaTabla<ArticuloProveedor> = [
     cabecera: "Coste",
     tipo: "moneda",
     divisa: (p) => p.divisaId,
+    decimales: decimalesPrecioCompra(),
   },
   { id: "dto", cabecera: "% Dto.", tipo: "numero" },
   {
@@ -65,7 +67,7 @@ export const PreciosProveedorLista = ({
 
   return (
     <ListadoSemiControlado
-      metaTabla={metaTablaPrecios}
+      metaTabla={metaTablaPrecios()}
       entidades={precios}
       totalEntidades={precios.length}
       cargando={false}

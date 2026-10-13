@@ -1,4 +1,5 @@
 import { ColumnaEstadoTabla } from "#/comun/componentes/ColumnaEstadoTabla.tsx";
+import { conColumnaImpreso } from "#/comun/marca_impresion.ts";
 import { MetaTabla, QIcono } from "@olula/componentes/index.js";
 import { Pedido, Recibido } from "../diseño.ts";
 
@@ -11,7 +12,7 @@ const estadosRecepcion: Record<Recibido, string> = {
 const estadoRecepcion = (pedido: Pedido): string =>
   estadosRecepcion[pedido.recibido ?? "No"];
 
-export const metaTablaPedido: MetaTabla<Pedido> = [
+export const metaTablaPedido: MetaTabla<Pedido> = conColumnaImpreso([
   {
     id: "recibido",
     cabecera: "",
@@ -68,4 +69,4 @@ export const metaTablaPedido: MetaTabla<Pedido> = [
     render: (pedido) => pedido.nombreAlmacen || pedido.almacenId || "",
   },
   { id: "idFiscal", cabecera: "Id Fiscal", prioridad: "baja" },
-];
+]);

@@ -1,8 +1,9 @@
 import { ColumnaEstadoTabla } from "#/comun/componentes/ColumnaEstadoTabla.tsx";
+import { conColumnaImpreso } from "#/comun/marca_impresion.ts";
 import { MetaTabla, QIcono } from "@olula/componentes/index.js";
 import { Factura } from "../diseño.ts";
 
-export const metaTablaFactura: MetaTabla<Factura> = [
+export const metaTablaFactura: MetaTabla<Factura> = conColumnaImpreso([
   {
     id: "editable",
     cabecera: "",
@@ -52,4 +53,4 @@ export const metaTablaFactura: MetaTabla<Factura> = [
     render: (factura) => factura.codigoRectificativa ?? "",
   },
   { id: "idFiscal", cabecera: "Id Fiscal", prioridad: "baja" },
-];
+]);

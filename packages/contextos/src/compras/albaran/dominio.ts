@@ -1,5 +1,5 @@
 import { MetaModelo } from "@olula/lib/dominio.ts";
-import { articuloDeLineaValido, getTipoArticulo } from "../comun/dominio.ts";
+import { articuloDeLineaValido, decimalesPrecioCompra, getTipoArticulo } from "../comun/dominio.ts";
 import {
     Albaran,
     LineaAlbaran,
@@ -26,12 +26,16 @@ export const metaLineaAlbaran: MetaModelo<ModeloLineaAlbaran> = {
     campos: {
         descripcion: { requerido: true },
         cantidad: { requerido: true, tipo: "decimal", decimales: 2 },
-        pvpUnitario: { requerido: true, tipo: "moneda", decimales: 2 },
+        pvpUnitario: { requerido: true, tipo: "moneda", get decimales() { return decimalesPrecioCompra(); } },
         dtoPorcentual: { tipo: "decimal", decimales: 2 },
         dtoLineal: { tipo: "moneda", decimales: 2 },
         tipoIrpf: { tipo: "decimal", decimales: 2 },
         pvpSinDto: { tipo: "moneda", bloqueado: true },
-        pvpTotal: { tipo: "moneda", bloqueado: true },
+        pvpTotal: {
+            tipo: "moneda",
+            bloqueado: true,
+            get decimales() { return decimalesPrecioCompra(); },
+        },
         tipoIva: { tipo: "decimal", bloqueado: true },
         tipoRecargo: { tipo: "decimal", bloqueado: true },
     },
@@ -46,7 +50,7 @@ export const metaNuevaLineaAlbaran: MetaModelo<NuevaLineaAlbaran> = {
         pvpUnitario: {
             requerido: (linea) => linea.tipoArticulo === "libre",
             tipo: "moneda",
-            decimales: 2,
+            get decimales() { return decimalesPrecioCompra(); },
         },
     },
     validacion: articuloDeLineaValido,

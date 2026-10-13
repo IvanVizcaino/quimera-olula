@@ -1,5 +1,5 @@
 import { MetaModelo } from "@olula/lib/dominio.ts";
-import { articuloDeLineaValido, getTipoArticulo } from "../comun/dominio.ts";
+import { articuloDeLineaValido, decimalesPrecioCompra, getTipoArticulo } from "../comun/dominio.ts";
 import {
     LineaPedido,
     ModeloLineaPedido,
@@ -30,12 +30,16 @@ export const metaLineaPedido: MetaModelo<ModeloLineaPedido> = {
     campos: {
         descripcion: { requerido: true },
         cantidad: { requerido: true, tipo: "decimal", decimales: 2 },
-        pvpUnitario: { requerido: true, tipo: "moneda", decimales: 2 },
+        pvpUnitario: { requerido: true, tipo: "moneda", get decimales() { return decimalesPrecioCompra(); } },
         dtoPorcentual: { tipo: "decimal", decimales: 2 },
         dtoLineal: { tipo: "moneda", decimales: 2 },
         tipoIrpf: { tipo: "decimal", decimales: 2 },
         pvpSinDto: { tipo: "moneda", bloqueado: true },
-        pvpTotal: { tipo: "moneda", bloqueado: true },
+        pvpTotal: {
+            tipo: "moneda",
+            bloqueado: true,
+            get decimales() { return decimalesPrecioCompra(); },
+        },
         tipoIva: { tipo: "decimal", bloqueado: true },
         tipoRecargo: { tipo: "decimal", bloqueado: true },
         cantidadRecibida: { tipo: "decimal", bloqueado: true },
@@ -48,11 +52,15 @@ export const metaNuevaLineaPedido: MetaModelo<NuevaLineaPedido> = {
         referencia: { tipo: "texto" },
         descripcion: { tipo: "texto" },
         cantidad: { requerido: true, tipo: "decimal", decimales: 2 },
-        pvpUnitario: { tipo: "moneda", decimales: 2 },
+        pvpUnitario: { tipo: "moneda", get decimales() { return decimalesPrecioCompra(); } },
         dtoPorcentual: { tipo: "decimal", decimales: 2, positivo: true, maximo: 100 },
         dtoLineal: { tipo: "moneda", decimales: 2, positivo: true },
         tipoIrpf: { tipo: "decimal", decimales: 2, positivo: true, maximo: 100 },
-        pvpTotal: { tipo: "moneda", bloqueado: true },
+        pvpTotal: {
+            tipo: "moneda",
+            bloqueado: true,
+            get decimales() { return decimalesPrecioCompra(); },
+        },
         tipoIva: { tipo: "decimal", decimales: 2, bloqueado: true },
         tipoRecargo: { tipo: "decimal", decimales: 2, bloqueado: true },
     },

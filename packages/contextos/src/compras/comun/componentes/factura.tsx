@@ -1,6 +1,6 @@
 import { getFacturas } from "#/compras/factura/infraestructura.ts";
 import { QAutocompletar } from "@olula/componentes/moleculas/qautocompletar.tsx";
-import { Criteria } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro, Criteria } from "@olula/lib/diseño.ts";
 
 interface FacturaCompraProps {
   descripcion?: string;
@@ -8,6 +8,8 @@ interface FacturaCompraProps {
   nombre?: string;
   label?: string;
   deshabilitado?: boolean;
+  /** Cláusulas adicionales, combinadas (AND) con la búsqueda por código. */
+  filtroExtra?: ClausulaFiltro[];
   onChange?: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 
@@ -17,6 +19,7 @@ export const FacturaCompra = ({
   nombre = "factura_id",
   label = "Factura",
   deshabilitado = false,
+  filtroExtra = [],
   onChange,
   ...props
 }: FacturaCompraProps) => {
@@ -24,7 +27,9 @@ export const FacturaCompra = ({
     if (!id && texto.length < 2) return [];
 
     const criteria: Criteria = {
-      filtro: id ? [["id", "=", id]] : [["codigo", "~", texto]],
+      filtro: id
+        ? [["id", "=", id]]
+        : ([["codigo", "~", texto], ...filtroExtra] as ClausulaFiltro[]),
       orden: ["fecha", "DESC"],
       paginacion: { pagina: 1, limite: 10 },
     };

@@ -5,8 +5,10 @@ import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFil
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { ListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.ts";
 import { ArticuloProveedor } from "../../../articulo_proveedor/diseño.ts";
+import { decimalesPrecioCompra } from "../../../comun/dominio.ts";
 
-const metaTablaArticulos: MetaTabla<ArticuloProveedor> = [
+const metaTablaArticulos = (): MetaTabla<ArticuloProveedor> => [
+
   {
     id: "por_defecto",
     cabecera: "",
@@ -35,6 +37,7 @@ const metaTablaArticulos: MetaTabla<ArticuloProveedor> = [
     cabecera: "Coste",
     tipo: "moneda",
     divisa: (p) => p.divisaId,
+    decimales: decimalesPrecioCompra(),
   },
   { id: "dto", cabecera: "% Dto.", tipo: "numero" },
 ];
@@ -60,7 +63,7 @@ export const ArticulosProveedor = ({
   publicar: EmitirEvento;
 }) => (
   <Listado<ArticuloProveedor>
-    metaTabla={metaTablaArticulos}
+    metaTabla={metaTablaArticulos()}
     metaFiltro={metaFiltroArticulos}
     criteria={articulos.criteria}
     modo="tabla"

@@ -1,4 +1,5 @@
 import { MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
+import { decimalesPrecioCompra } from "../comun/dominio.ts";
 import { ArticuloProveedor, NuevoArticuloProveedor } from "./diseño.ts";
 
 export const articuloProveedorVacio = (): ArticuloProveedor => ({
@@ -33,7 +34,13 @@ export const nuevoArticuloProveedorVacio = (
 });
 
 const camposComunes = {
-    coste: { requerido: true, tipo: "moneda" as const, decimales: 2 },
+    coste: {
+        requerido: true,
+        tipo: "moneda" as const,
+        get decimales() {
+            return decimalesPrecioCompra();
+        },
+    },
     divisaId: { requerido: false },
     dto: { requerido: false, tipo: "decimal" as const, decimales: 2 },
     refProveedor: { requerido: false },

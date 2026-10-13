@@ -22,6 +22,9 @@ interface ArticuloApi {
     grupo_iva_producto_id: string | null;
     sin_stock: boolean;
     se_compra: boolean;
+    se_vende?: boolean;
+    descripcion_subfamilia?: string | null;
+    total_disponible?: number | null;
 }
 
 interface TagArticuloApi {
@@ -47,6 +50,9 @@ export const articuloDesdeApi = (api: ArticuloApi): Articulo => ({
     grupoIvaProductoId: api.grupo_iva_producto_id ?? "",
     noStock: api.sin_stock,
     seCompra: api.se_compra,
+    seVende: api.se_vende ?? false,
+    descripcionSubfamilia: api.descripcion_subfamilia,
+    totalDisponible: api.total_disponible,
 });
 
 const oNulo = (valor: string): string | null => valor === "" ? null : valor;
