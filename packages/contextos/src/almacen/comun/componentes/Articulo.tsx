@@ -17,6 +17,8 @@ interface ArticuloProps {
   opcional?: boolean;
   ref?: React.RefObject<HTMLInputElement | null>;
   soloLectura?: boolean;
+  /** Texto de cada opción del desplegable. Por defecto "referencia - descripción". */
+  formatoOpcion?: (articulo: TagArticulo) => string;
   onChange: (opcion: { valor: string; descripcion: string; datos: TagArticulo } | null) => void;
 }
 
@@ -26,6 +28,7 @@ export const Articulo = ({
   nombre = "referencia",
   label = "Artículo",
   onChange,
+  formatoOpcion = (a) => `${a.id} - ${a.descripcion}`,
   ...props
 }: ArticuloProps) => {
   const [descripcionResuelta, setDescripcionResuelta] = useState(descripcion);
@@ -63,7 +66,7 @@ export const Articulo = ({
     return articulos.map((articulo) => ({
       valor: articulo.id,
       descripcion: articulo.descripcion,
-      descripcionOpcion: `${articulo.id} - ${articulo.descripcion}`,
+      descripcionOpcion: formatoOpcion(articulo),
       datos: articulo,
     }));
   };

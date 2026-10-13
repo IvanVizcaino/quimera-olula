@@ -55,9 +55,20 @@ interface ArticuloItemApi {
     tipo_barcode: string | null;
     familia_id: string | null;
     descripcion_familia: string | null;
+    grupo_iva_producto_id?: string | null;
     sin_stock: boolean;
     se_compra: boolean;
     se_vende: boolean;
+    // Solo con el plugin `subfamilias` activo.
+    subfamilia_id?: string | null;
+    descripcion_subfamilia?: string | null;
+    // Solo con el plugin `pesos_medidas` activo.
+    unidad_id?: string | null;
+    descripcion_unidad?: string | null;
+    magnitud_unidad?: string | null;
+    factor_conv_unidad?: number | null;
+    // Solo con el plugin `disponible_art` activo.
+    total_disponible?: number | null;
 }
 
 interface ArticuloApi extends ArticuloItemApi {
@@ -72,9 +83,17 @@ const articuloItemDesdeApi = (api: ArticuloItemApi): ArticuloItem => ({
     tipoCodBarras: tipoCodBarrasDesdeApi(api.tipo_barcode),
     familiaId: api.familia_id ?? "",
     descripcionFamilia: api.descripcion_familia ?? "",
+    grupoIvaProductoId: api.grupo_iva_producto_id ?? "",
     noStock: api.sin_stock,
     seCompra: api.se_compra,
     seVende: api.se_vende,
+    subfamiliaId: api.subfamilia_id,
+    descripcionSubfamilia: api.descripcion_subfamilia,
+    unidadId: api.unidad_id,
+    descripcionUnidad: api.descripcion_unidad,
+    magnitudUnidad: api.magnitud_unidad,
+    factorConvUnidad: api.factor_conv_unidad,
+    totalDisponible: api.total_disponible,
 });
 
 const articuloDesdeApi = (api: ArticuloApi): Articulo => ({
@@ -106,6 +125,8 @@ const cambiosArticuloAApi = (cambios: CambiosArticulo): Record<string, unknown> 
     if (cambios.noStock !== undefined) api.sin_stock = cambios.noStock;
     if (cambios.seCompra !== undefined) api.se_compra = cambios.seCompra;
     if (cambios.seVende !== undefined) api.se_vende = cambios.seVende;
+    if (cambios.subfamiliaId !== undefined) api.subfamilia_id = cambios.subfamiliaId ?? null;
+    if (cambios.unidadId !== undefined) api.unidad_id = cambios.unidadId ?? null;
 
     return api;
 };

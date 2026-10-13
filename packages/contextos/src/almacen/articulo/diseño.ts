@@ -14,9 +14,21 @@ export interface ArticuloItem extends Entidad {
     tipoCodBarras: TipoCodBarras | "";
     familiaId: string;
     descripcionFamilia: string;
+    /** Eneboo `articulos.codimpuesto` (columna Impuesto CC-02). */
+    grupoIvaProductoId: string;
     noStock: boolean;
     seCompra: boolean;
     seVende: boolean;
+    // Solo con el plugin `subfamilias` activo.
+    subfamiliaId?: string | null;
+    descripcionSubfamilia?: string | null;
+    // Solo con el plugin `pesos_medidas` activo.
+    unidadId?: string | null;
+    descripcionUnidad?: string | null;
+    magnitudUnidad?: string | null;
+    factorConvUnidad?: number | null;
+    // Solo con el plugin `disponible_art` activo (`articulos.totaldisponible`).
+    totalDisponible?: number | null;
 };
 
 export interface CajaProveedorArticulo extends Entidad {
@@ -62,6 +74,8 @@ export type CambiosArticulo = Partial<
         | "noStock"
         | "seCompra"
         | "seVende"
+        | "subfamiliaId"
+        | "unidadId"
     >
 >;
 

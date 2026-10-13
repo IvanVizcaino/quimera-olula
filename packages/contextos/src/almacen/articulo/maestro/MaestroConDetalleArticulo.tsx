@@ -6,18 +6,21 @@ import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { ClausulaFiltro, Criteria } from "@olula/lib/diseño.ts";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { useEffect, useMemo } from "react";
 import { CrearArticulo } from "../crear/CrearArticulo.tsx";
 import { DetalleArticulo } from "../detalle/DetalleArticulo.tsx";
 import { Articulo } from "../diseño.ts";
 import { UsoArticulo } from "../UsoArticulo.tsx";
 import { ContextoMaestroArticulo } from "./diseño.ts";
+import { metaTablaConDisponible } from "./disponible.ts";
 import { getMaquina } from "./maquina.ts";
 
-const metaTablaArticulo: MetaTabla<Articulo> = [
+export const metaTablaArticuloBase: MetaTabla<Articulo> = [
   { id: "id", cabecera: "Referencia" },
   { id: "descripcion", cabecera: "Descripción" },
   {
@@ -79,6 +82,13 @@ const criteriaConStock = (): Criteria => ({
 });
 
 export const MaestroConDetalleArticulo = () => {
+  // Slot de factoría: una app puede cambiar columnas y su orden (p. ej. crema_cafe, CC-02).
+  const metaTablaArticulo = metaTablaConDisponible(
+    (FactoryObj.app.Almacen?.articulo_metaTabla as
+      | MetaTabla<Articulo>
+      | undefined) ?? metaTablaArticuloBase,
+    pluginActivo("disponible_art")
+  );
   const criteriaBase = useMemo(criteriaConStock, []);
 
   const { id, criteria } = getUrlParams();

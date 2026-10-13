@@ -6,6 +6,7 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { puede } from "@olula/lib/dominio.ts";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router";
@@ -21,6 +22,7 @@ import {
   metaArticulo,
 } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
+import { TabComponentes } from "./componentes/TabComponentes.tsx";
 import { TabGeneral } from "./TabGeneral.tsx";
 
 const titulo = (articulo: Articulo) => articulo.descripcion;
@@ -59,6 +61,8 @@ export const DetalleArticulo = ({
   const { estado, articulo, cajaProveedorActiva } = ctx;
 
   if (!articulo.id) return null;
+
+  const conArticulosCompuestos = pluginActivo("articulos_compuestos");
 
   const acciones = [
     {
@@ -108,6 +112,13 @@ export const DetalleArticulo = ({
                 key="tab-compras"
                 label="Compras"
                 children={<PanelComprasArticulo articuloId={articulo.id} />}
+              />
+            ),
+            conArticulosCompuestos && (
+              <Tab
+                key="tab-componentes"
+                label="Componentes"
+                children={<TabComponentes articuloId={articulo.id} />}
               />
             ),
           ]}

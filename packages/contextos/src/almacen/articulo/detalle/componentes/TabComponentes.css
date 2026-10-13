@@ -1,0 +1,45 @@
+.TabComponentes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-md, 1rem);
+    padding: var(--espaciado-sm, 0.5rem) 0;
+}
+
+.TabComponentes__ayuda {
+    margin: 0;
+    color: var(--color-texto-secundario, #666);
+    font-size: 0.9rem;
+}
+
+.TabComponentes__cabecera {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-sm, 0.5rem);
+}
+
+.TabComponentes__tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.TabComponentes__tabla th,
+.TabComponentes__tabla td {
+    padding: 0.5rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-borde, #ddd);
+}
+
+.TabComponentes__contrato {
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+}
+
+.TabComponentes__estado {
+    padding: 1rem 0;
+}
+
+.TabComponentes__ok {
+    margin: 0;
+    color: var(--color-exito, #2e7d32);
+}

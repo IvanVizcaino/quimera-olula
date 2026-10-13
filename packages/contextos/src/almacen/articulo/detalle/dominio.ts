@@ -17,6 +17,7 @@ export const articuloVacio = (): Articulo => ({
     tipoCodBarras: "",
     familiaId: "",
     descripcionFamilia: "",
+    grupoIvaProductoId: "",
     noStock: false,
     seCompra: false,
     seVende: false,
@@ -30,6 +31,8 @@ const camposEditables = [
     "tipoCodBarras",
     "familiaId",
     "noStock",
+    "subfamiliaId",
+    "unidadId",
 ] as const;
 
 export const cambiosArticulo = (anterior: Articulo, nuevo: Articulo): CambiosArticulo =>
