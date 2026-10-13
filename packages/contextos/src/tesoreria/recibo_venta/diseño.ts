@@ -1,4 +1,5 @@
 import { Criteria, Entidad, RespuestaLista } from "@olula/lib/diseño.ts";
+import { TotalesReciboListado } from "../comun/totales_recibo.ts";
 
 export interface MovimientoRecibo extends Entidad {
     id: string;
@@ -28,6 +29,8 @@ export interface ReciboVenta extends Entidad {
 export type GetReciboVenta = (id: string) => Promise<ReciboVenta>;
 
 export type GetRecibosVenta = (criteria: Criteria) => RespuestaLista<ReciboVenta>;
+
+export type GetTotalesRecibosVenta = (criteria: Criteria) => Promise<TotalesReciboListado>;
 
 export type PagoReciboVenta = {
     cuentaPagoId: string;

@@ -8,15 +8,19 @@ import { useModelo } from "@olula/lib/useModelo.js";
 import { useEffect } from "react";
 import { bancaActiva } from "../../comun/banca.js";
 import { ReciboCompra } from "../diseño.js";
-import { reciboCompraPagable } from "../dominio.js";
+import { reciboCompraAnulable, reciboCompraDevolvible, reciboCompraPagable } from "../dominio.js";
 import { getTrazaReciboCompra } from "../infraestructura.ts";
 import {
   contextoDetalleReciboCompraInicial,
   metaReciboCompra,
 } from "./detalle.js";
 import "./DetalleReciboCompra.css";
-import { OrdenarPagoReciboCompra } from "./ordenar_pago/OrdenarPagoReciboCompra.tsx";
+import { AnularPagoReciboCompra } from "./anular_pago/AnularPagoReciboCompra.tsx";
+import { DevolverReciboCompra } from "./devolver/DevolverReciboCompra.tsx";
 import { getMaquina } from "./maquina.js";
+import { OrdenarPagoReciboCompra } from "./ordenar_pago/OrdenarPagoReciboCompra.tsx";
+import { PagarReciboCompra } from "./pagar/PagarReciboCompra.tsx";
+import { PagosReciboCompra } from "./pagos/PagosReciboCompra.tsx";
 
 export const DetalleReciboCompra = ({
   id,
@@ -43,16 +47,29 @@ export const DetalleReciboCompra = ({
   const titulo = (r: ReciboCompra) => r.codigo || `Recibo ${r.id}`;
   const bancaHabilitada = bancaActiva();
 
+  const accionPrincipal = reciboCompraDevolvible(ctx.recibo)
+    ? {
+        texto: "Devolver",
+        onClick: () => emitir("devolucion_solicitada"),
+      }
+    : {
+        texto: "Registrar pago",
+        onClick: () => emitir("pagar_solicitado"),
+        deshabilitado: !reciboCompraPagable(ctx.recibo),
+      };
+
   const acciones = [
-    // "Documentos relacionados" no existe en el ERP; posibilidad de habilitarla si se pide:
-    // {
-    //   texto: "Documentos relacionados",
-    //   onClick: () => emitir("traza_solicitada"),
-    // },
+    accionPrincipal,
     bancaHabilitada && {
-      texto: "Pagar al proveedor",
+      texto: "Pagar al proveedor (banco)",
       onClick: () => emitir("ordenar_pago_solicitado"),
       deshabilitado: !reciboCompraPagable(ctx.recibo),
+    },
+    {
+      texto: "Anular pago",
+      onClick: () => emitir("anular_pago_solicitado"),
+      deshabilitado: !reciboCompraAnulable(ctx.recibo),
+      advertencia: true,
     },
   ];
 
@@ -65,7 +82,7 @@ export const DetalleReciboCompra = ({
       cerrarDetalle={() => emitir("recibo_deseleccionado", null, true)}
     >
       <div className="DetalleReciboCompra">
-        {bancaHabilitada && <QuimeraAcciones acciones={acciones} vertical />}
+        <QuimeraAcciones acciones={acciones} vertical />
 
         <quimera-formulario>
           <QInput label="Código" {...uiProps("codigo")} />
@@ -77,6 +94,18 @@ export const DetalleReciboCompra = ({
           <QInput label="ID Fiscal" {...uiProps("idFiscal")} />
           <QInput label="Factura" {...uiProps("facturaId")} />
         </quimera-formulario>
+
+        <PagosReciboCompra pagos={ctx.recibo.pagos} />
+
+        {ctx.estado === "PAGANDO" && <PagarReciboCompra publicar={emitir} />}
+
+        {ctx.estado === "DEVOLVIENDO" && (
+          <DevolverReciboCompra recibo={ctx.recibo} publicar={emitir} />
+        )}
+
+        {ctx.estado === "ANULANDO_PAGO" && (
+          <AnularPagoReciboCompra recibo={ctx.recibo} publicar={emitir} />
+        )}
 
         {ctx.estado === "ORDENANDO_PAGO" && (
           <OrdenarPagoReciboCompra recibo={ctx.recibo} publicar={emitir} />

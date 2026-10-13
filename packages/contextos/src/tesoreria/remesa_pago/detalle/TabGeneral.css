@@ -1,0 +1,28 @@
+.TabGeneral {
+
+    /* Fila 1: Fecha (4) + Fecha de cargo (4) + Estado (4) = 12 */
+    quimera-input[nombre="fecha"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="fechaCargo"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="estado"] {
+        grid-column: span 4;
+    }
+
+    /* Fila 2: Cuenta (6) + Total (3) + Divisa (3) = 12 */
+    quimera-input[nombre="cuentaId"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="total"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="divisaId"] {
+        grid-column: span 3;
+    }
+}

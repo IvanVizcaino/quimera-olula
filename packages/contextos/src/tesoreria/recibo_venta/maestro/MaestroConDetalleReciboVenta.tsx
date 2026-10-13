@@ -27,6 +27,7 @@ import { recibosSeleccionados } from "./maestro.js";
 import "./MaestroConDetalleReciboVenta.css";
 import { getMaquina } from "./maquina.js";
 import { metaTablaReciboVenta } from "./metatabla_recibo_venta.js";
+import { TotalesListadoRecibos } from "../../comun/componentes/TotalesListadoRecibos.tsx";
 import { RemesarRecibos } from "./RemesarRecibos.js";
 
 const metaFiltroReciboVenta: MetaFiltro = {
@@ -80,11 +81,12 @@ export const MaestroConDetalleReciboVenta = () => {
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "INICIAL",
     recibos: listaActivaEntidadesInicial<ReciboVenta>(id, criteriaInicial),
+    totales: null,
     seleccionados: [],
     remesaCreada: null,
   });
 
-  const { estado, recibos, seleccionados, remesaCreada } = ctx;
+  const { estado, recibos, totales, seleccionados, remesaCreada } = ctx;
 
   const [multiseleccion, setMultiseleccion] = useState(false);
 
@@ -154,6 +156,7 @@ export const MaestroConDetalleReciboVenta = () => {
                 emitir("siguiente_pagina", payload)
               }
             />
+            <TotalesListadoRecibos totales={totales} />
           </>
         }
         Detalle={<DetalleReciboVenta id={recibos.activo} publicar={emitir} />}

@@ -1,0 +1,27 @@
+.totales-listado-recibos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    justify-content: flex-end;
+    padding: 0.75rem 0.25rem 0;
+    margin-top: 0.25rem;
+    border-top: 1px solid var(--color-borde-suave, #e5e7eb);
+}
+
+.totales-listado-recibos-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+    min-width: 7rem;
+}
+
+.totales-listado-recibos-etiqueta {
+    font-size: 0.8125rem;
+    color: var(--color-texto-secundario, #6b7280);
+}
+
+.totales-listado-recibos-valor {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}

@@ -8,11 +8,21 @@ export const getMaquina: () => Maquina<EstadoMaestroReciboCompra, ContextoMaestr
             recibo_seleccionado: [maestro.Recibos.activar],
             recibo_deseleccionado: [maestro.Recibos.desactivar],
 
+            recibo_cambiado: [maestro.Recibos.cambiar],
+
             recarga_de_recibos_solicitada: maestro.recargarRecibos,
 
             criteria_cambiado: [maestro.Recibos.filtrar, maestro.recargarRecibos],
 
             siguiente_pagina: [maestro.Recibos.filtrar, maestro.ampliarRecibos],
+
+            seleccionados_cambiados: maestro.seleccionadosCambiados,
+            remesado_solicitado: "REMESANDO",
+        },
+
+        REMESANDO: {
+            remesado_confirmado: maestro.remesarSeleccionados,
+            remesado_cancelado: "INICIAL",
         },
     };
 };

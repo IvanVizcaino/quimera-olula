@@ -1,3 +1,4 @@
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
@@ -5,11 +6,15 @@ import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { criteriaDefecto, formatearMoneda } from "@olula/lib/dominio.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import { DetalleReciboCompra } from "../detalle/DetalleReciboCompra.js";
 import { ReciboCompra } from "../diseño.js";
 import "./MaestroConDetalleReciboCompra.css";
+import { TotalesListadoRecibos } from "../../comun/componentes/TotalesListadoRecibos.tsx";
 import { getMaquina } from "./maquina.js";
+import { recibosSeleccionados } from "./maestro.js";
+import { RemesarRecibosCompra } from "./RemesarRecibosCompra.js";
 
 const metaTablaReciboCompra: MetaTabla<ReciboCompra> = [
     { id: 'codigo', cabecera: 'Código' },
@@ -28,12 +33,26 @@ export const MaestroConDetalleReciboCompra = () => {
     const { id, criteria } = getUrlParams();
     const criteriaInicial = criteria.filtro.length > 0 ? criteria : criteriaBase;
 
+    const navigate = useNavigate();
+
     const { ctx, emitir } = useMaquina(getMaquina, {
         estado: "INICIAL",
         recibos: listaActivaEntidadesInicial<ReciboCompra>(id, criteriaInicial),
+        totales: null,
+        seleccionados: [],
+        remesaCreada: null,
     });
 
-    const { recibos } = ctx;
+    const { estado, recibos, totales, seleccionados, remesaCreada } = ctx;
+
+    const [multiseleccion, setMultiseleccion] = useState(false);
+
+    const elegidos = recibosSeleccionados(seleccionados, recibos.lista);
+
+    useEffect(() => {
+        if (remesaCreada) navigate(`/tesoreria/remesa_pago?id=${remesaCreada}`);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [remesaCreada]);
 
     useUrlParams(recibos.activo, recibos.criteria);
 
@@ -56,16 +75,37 @@ export const MaestroConDetalleReciboCompra = () => {
                             entidades={recibos.lista}
                             totalEntidades={recibos.total}
                             seleccionada={recibos.activo}
+                            seleccionadas={seleccionados}
+                            onMultiSeleccion={(ids) => emitir("seleccionados_cambiados", ids)}
+                            modoMultiseleccion={multiseleccion}
+                            onModoMultiseleccionChanged={setMultiseleccion}
+                            renderAcciones={() =>
+                                multiseleccion && (
+                                    <div className="maestro-botones">
+                                        <QBoton
+                                            onClick={() => emitir("remesado_solicitado")}
+                                            deshabilitado={elegidos.length === 0}
+                                        >
+                                            {`Remesar (${elegidos.length})`}
+                                        </QBoton>
+                                    </div>
+                                )
+                            }
                             onSeleccion={(payload) => emitir("recibo_seleccionado", payload)}
                             onCriteriaChanged={(payload) => emitir("criteria_cambiado", payload)}
                             onSiguientePagina={(payload) => emitir("siguiente_pagina", payload)}
                         />
+                        <TotalesListadoRecibos totales={totales} />
                     </>
                 }
                 Detalle={<DetalleReciboCompra id={recibos.activo} publicar={emitir} />}
                 seleccionada={recibos.activo}
                 modoDisposicion="maestro-50"
             />
+
+            {estado === "REMESANDO" && (
+                <RemesarRecibosCompra recibos={elegidos} publicar={emitir} />
+            )}
         </div>
     );
 };
