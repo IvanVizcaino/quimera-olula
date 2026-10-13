@@ -15,8 +15,8 @@ import {
     parseModelo340Id,
 } from "../dominio.ts";
 import { DiffTotalModelo340, Registro340, ResultadoGeneracionModelo340 } from "../diseño.ts";
-import {
 import "#/comun/estilos/pagina_proceso.css";
+import {
     getDatosModelo340,
     getExportAeatModelo340,
     getGeneracionModelo340,

@@ -14,8 +14,8 @@ import {
     validarFormCierre,
 } from "../dominio.ts";
 import { FormCierreEjercicio, ResultadoCierreEjercicio } from "../diseño.ts";
-import {
 import "#/comun/estilos/pagina_proceso.css";
+import {
     patchBorrarAsientoAperturaEjercicio,
     patchCerrarEjercicio,
     patchCrearAsientoAperturaEjercicio,
