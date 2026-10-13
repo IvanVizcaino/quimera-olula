@@ -2,6 +2,7 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { formatearDireccionUnaLinea } from "@olula/lib/dominio.ts";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { useState } from "react";
 import { CambiarDireccionEmpresa } from "../cambiar_direccion/CambiarDireccionEmpresa.js";
@@ -35,6 +36,8 @@ export const TabGeneral = ({ form, publicar }: TabGeneralProps) => {
     const direccionSinDefinir =
         direccionResumen.replace(/[,\s]/g, "").length === 0;
 
+    const conRegistroSanitario = pluginActivo("registro_sanitario");
+
     return (
         <div className="TabGeneral">
             <quimera-formulario>
@@ -45,6 +48,9 @@ export const TabGeneral = ({ form, publicar }: TabGeneralProps) => {
                 <QInput label="Email" {...uiProps("email")} />
                 <QInput label="Web" {...uiProps("web")} />
                 <QInput label="Ejercicio" {...uiProps("ejercicioId")} />
+                {conRegistroSanitario && (
+                    <QInput label="Registro Sanitario" {...uiProps("registroSanitario")} />
+                )}
 
                 <section className="TabGeneral-direccion-resumen">
                     <div className="TabGeneral-direccion-resumen-label">

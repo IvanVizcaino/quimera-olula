@@ -34,6 +34,8 @@ export interface Empresa extends Entidad {
     paisId: string;
     apartado: string;
     telefonoDireccion: string;
+    // Solo con el plugin `registro_sanitario` activo.
+    registroSanitario?: string | null;
 }
 
 /**

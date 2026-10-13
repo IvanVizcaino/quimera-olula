@@ -26,6 +26,8 @@ export interface EmpresaApi {
     forma_pago_id: string | null;
     divisa_id: string | null;
     almacen_id: string | null;
+    // Solo con el plugin `registro_sanitario` activo.
+    registro_sanitario?: string | null;
 }
 
 export interface NuevaEmpresaApi {
@@ -106,6 +108,7 @@ export const empresaDesdeApi = (api: EmpresaApi): Empresa => ({
     paisId: api.direccion?.pais_id ?? "",
     apartado: api.direccion?.apartado ?? "",
     telefonoDireccion: api.direccion?.telefono ?? "",
+    registroSanitario: api.registro_sanitario,
 });
 
 /**
@@ -139,6 +142,7 @@ const cambiosEmpresaAApi = (e: CambiosEmpresa): CambiosEmpresaApi => {
     if (e.formaPagoId !== undefined) cambios["forma_pago_id"] = e.formaPagoId;
     if (e.divisaId !== undefined) cambios["divisa_id"] = e.divisaId;
     if (e.almacenId !== undefined) cambios["almacen_id"] = e.almacenId;
+    if (e.registroSanitario !== undefined) (cambios as Record<string, unknown>)["registro_sanitario"] = e.registroSanitario;
 
     // Si viene algún campo de dirección, se reconstruye el objeto completo.
     // El auto-guardado envía el modelo entero, por lo que todos estarán presentes.

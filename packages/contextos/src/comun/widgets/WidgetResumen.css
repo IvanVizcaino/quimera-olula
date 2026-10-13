@@ -1,0 +1,59 @@
+.widget-resumen {
+    display: grid;
+    gap: var(--espaciado-s);
+}
+
+.widget-resumen__titulo {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.widget-resumen__valor {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.widget-resumen__detalle {
+    font-size: 0.875rem;
+    color: var(--color-texto-secundario);
+}
+
+.widget-resumen__lista {
+    display: grid;
+    gap: var(--espaciado-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.widget-resumen__fila {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--espaciado-s);
+    font-size: 0.875rem;
+}
+
+.widget-resumen__fila strong {
+    font-weight: 600;
+}
+
+.widget-resumen__acciones {
+    margin-top: var(--espaciado-xs);
+}
+
+.widget-resumen__enlace {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.widget-resumen__vacio {
+    font-size: 0.875rem;
+    color: var(--color-texto-secundario);
+}
+
+.widget-resumen__alerta {
+    color: var(--color-advertencia-oscuro, #b45309);
+    font-weight: 500;
+}
