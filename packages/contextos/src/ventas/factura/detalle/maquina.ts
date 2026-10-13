@@ -6,6 +6,7 @@ import {
     activarLinea,
     borrarFactura,
     borrarLinea,
+    borrarMovimientoLote,
     cambiarAgente,
     cambiarCantidadLinea,
     cambiarCliente,
@@ -16,6 +17,7 @@ import {
     cancelarCambioFactura,
     cargarContexto,
     crearLinea,
+    crearMovimientoLote,
     emitirFactura,
     getContextoVacio,
     refrescarFactura,
@@ -133,6 +135,10 @@ export const getMaquina: () => Maquina<EstadoFactura, ContextoFactura> = () => {
             linea_actualizada: cambiarLinea,
 
             editar_linea_cancelado: "ABIERTO",
+
+            crear_movimiento_lote_solicitado: crearMovimientoLote,
+
+            borrar_movimiento_lote_solicitado: borrarMovimientoLote,
         },
 
         BORRANDO_LINEA: {

@@ -30,6 +30,10 @@ export interface Cliente extends Entidad {
   divisa: string;
   serie: string;
   grupo: string;
+  // Solo con el plugin `persona_fisica` activo.
+  personaFisica?: boolean;
+  nombrePila?: string | null;
+  apellidos?: string | null;
 };
 
 export interface IdFiscal {

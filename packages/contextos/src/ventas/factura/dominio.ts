@@ -1,5 +1,7 @@
 import { MetaTabla } from "@olula/componentes/index.js";
-import { plugin } from "@olula/lib/dominio.ts";
+import { conColumnaImpreso } from "#/comun/marca_impresion.ts";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import {
     cambioClienteVentaVacio,
     clienteVentaVacio,
@@ -43,19 +45,51 @@ export const descripcionEstadoExpedicion: Record<EstadoExpedicion, string> = {
     PRE_VERIFACTU: "Pre Verifactu",
 };
 
-/** Con el plugin de expedición activo la firma es la que cierra la factura, no la emisión. */
+/**
+ * Con el plugin de expedición activo la firma es la que cierra la factura, no
+ * la emisión.
+ *
+ * En el paquete común solo vale la variante "activo", que el backend no manda
+ * hoy (manda "basico", "firma", "inactivo" o "NoConfigurado"): para todas las
+ * apps el efecto es el de siempre, solo el borrador es editable. La regla
+ * "editable hasta firmada" para la variante "firma" es cosa de cada app y se
+ * inyecta con `factura_reglaEditable` en la factoría de Ventas (ver
+ * `reglaEditableHastaFirmada` y apps/crema_cafe).
+ */
 export const conPluginExpedicion = (): boolean =>
-    plugin("estado_expedicion_factura") === "activo";
+    pluginActivo("estado_expedicion_factura", "activo");
+
+export type ReglaFacturaEditable = (factura: Factura) => boolean;
 
 /**
  * Sin plugin solo se edita el borrador. Con plugin una factura emitida (o con
  * error de firma) sigue siendo editable y solo la firmada queda bloqueada.
  */
-export const facturaEditable = (factura: Factura): boolean => {
+export const reglaEditableBase: ReglaFacturaEditable = (factura) => {
     if (!factura.estadoExpedicion) return false;
     if (factura.estadoExpedicion === "BORRADOR") return true;
 
     return conPluginExpedicion() && factura.estadoExpedicion !== "FIRMADA";
+};
+
+/**
+ * Regla para apps cuyo plugin de expedición es la variante "firma": una
+ * emitida (o con error de firma) se edita hasta que se firma. Si el backend no
+ * manda el plugin o manda otra variante se cae a la regla base (fallback).
+ */
+export const reglaEditableHastaFirmada: ReglaFacturaEditable = (factura) => {
+    if (pluginActivo("estado_expedicion_factura", ["firma", "activo"])) {
+        if (!factura.estadoExpedicion) return false;
+        return factura.estadoExpedicion !== "FIRMADA";
+    }
+    return reglaEditableBase(factura);
+};
+
+export const facturaEditable = (factura: Factura): boolean => {
+    const regla = FactoryObj.app.Ventas?.factura_reglaEditable as
+        | ReglaFacturaEditable
+        | undefined;
+    return (regla ?? reglaEditableBase)(factura);
 };
 
 /**
@@ -71,7 +105,7 @@ export const emisionEsReintento = (factura: Factura): boolean =>
     factura.estadoExpedicion === "ERROR_FIRMA";
 
 // La columna de estado la añade el maestro, que es quien pinta el círculo.
-export const metaTablaFactura: MetaTabla<Factura> = [
+export const metaTablaFactura: MetaTabla<Factura> = conColumnaImpreso([
     {
         id: "codigo",
         cabecera: "Código",
@@ -107,7 +141,7 @@ export const metaTablaFactura: MetaTabla<Factura> = [
         prioridad: "baja",
         render: (f) => f.nombre_almacen || f.almacen_id,
     },
-];
+]);
 
 export const facturaVacia = (): Factura => ({
     ...ventaVacia,

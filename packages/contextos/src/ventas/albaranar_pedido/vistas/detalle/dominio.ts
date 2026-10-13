@@ -3,7 +3,6 @@ import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { AlbaranarPedido, LineaAlbaranar, LoteAlbaranar } from "../../diseño.ts";
 import {
     addLoteLinea,
-    calcularEnviada,
     lineaDesdeLineaPedido,
     marcarTodasPendientes,
     removeLoteLinea,
@@ -115,12 +114,7 @@ export const cancelarModal: ProcesarAlbaranar2 = async (ctx) => ({
 export const albaranar: ProcesarAlbaranar2 = async (ctx) => {
     const albaranCreado = await patchAlbaranarPedido(ctx.albaranado);
     const lineasPedido = await getLineas(ctx.albaranado.id);
-    const lineas = lineasPedido.map((l) => {
-        const lineaAnterior = ctx.albaranado.lineas.find((la) => la.idLinea === l.id);
-        return lineaAnterior
-            ? { ...lineaAnterior, pendiente: l.cantidad, enviada: calcularEnviada(lineaAnterior) }
-            : lineaDesdeLineaPedido(l);
-    });
+    const lineas = lineasPedido.map((l) => lineaDesdeLineaPedido(l));
     return {
         ...ctx,
         albaranado: { ...ctx.albaranado, lineas },

@@ -13,10 +13,13 @@ export interface Pedido extends Venta {
     almacen_id: string;
     nombre_almacen: string;
     lineas: LineaPedido[];
+    /** Plugin `marca_impresion`. */
+    impreso?: boolean;
 }
 export interface LineaPedido extends LineaVenta {
     porLotes: boolean;
     servida: number;
+    cerrada?: boolean;
 }
 
 export interface CambiosLineaPedido {
@@ -83,6 +86,7 @@ export type PatchCambiarAgente = (id: string, cambio: CambioAgente) => Promise<v
 export type EstadoPedido = (
     'INICIAL' | 'ABIERTO' | 'VIENDO_TRAZA' | 'SERVIDO'
     | 'BORRANDO_PEDIDO'
+    | 'CERRANDO_PEDIDO'
     | 'CAMBIANDO_CLIENTE'
     | 'CAMBIANDO_DESCUENTO'
     | 'CAMBIANDO_DIVISA'
@@ -92,6 +96,7 @@ export type EstadoPedido = (
 
 export type EstadoMaestroPedido = (
     'INICIAL' | 'CREANDO_PEDIDO' | 'ALBARANANDO_PEDIDOS' | 'ALBARANES_CREADOS'
+    | 'CERRANDO_HASTA_FECHA'
 );
 
 export type ContextoPedido<T extends Pedido = Pedido> = {

@@ -162,8 +162,8 @@ export const LineasAlbaranar = ({
             <thead>
                 <tr>
                     <th>Artículo</th>
-                    <th className="num">Enviada</th>
-                    <th className="num">A Enviar</th>
+                    <th className="num">Servida / Pedida</th>
+                    <th className="num">A enviar</th>
                     {conLotes && <th>Por lotes</th>}
                     <th></th>
                 </tr>

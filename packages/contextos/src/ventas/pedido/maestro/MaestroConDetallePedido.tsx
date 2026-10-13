@@ -6,6 +6,7 @@ import {
   filtroFechas,
   MetaFiltro,
 } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
+import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { ClausulaFiltro } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
@@ -23,6 +24,7 @@ import { CrearPedido } from "../crear/CrearPedido.tsx";
 import { DetallePedido } from "../detalle/DetallePedido.tsx";
 import { Pedido } from "../diseño.ts";
 import { AlbaranarPedidos } from "./AlbaranarPedidos.tsx";
+import { CerrarPedidosHastaFecha } from "./CerrarPedidosHastaFecha.tsx";
 import "./MaestroConDetallePedido.css";
 import { TarjetaDocumentoVenta } from "#/ventas/comun/componentes/TarjetaDocumentoVenta.tsx";
 import { agruparPorCliente, estadoServidoPedido, todosPuedenAlbaranarse } from "./maestro.ts";
@@ -123,9 +125,19 @@ export const MaestroConDetallePedido = () => {
               onMultiSeleccion={(ids) => emitir("seleccionados_cambiados", ids)}
               renderAcciones={() => (
                 <div className="maestro-botones">
-                  <QBoton onClick={() => emitir("crear_pedido_solicitado")}>
-                    Nuevo Pedido
-                  </QBoton>
+                  <QuimeraAcciones
+                    vertical
+                    acciones={[
+                      {
+                        texto: "Nuevo Pedido",
+                        onClick: () => emitir("crear_pedido_solicitado"),
+                      },
+                      {
+                        texto: "Cerrar pedidos hasta fecha",
+                        onClick: () => emitir("cierre_hasta_fecha_solicitado"),
+                      },
+                    ]}
+                  />
                   {todosPuedenAlbaranarse(ctx.seleccionados, ctx.pedidos.lista) && (
                     <QBoton onClick={() => emitir("albaranado_multiple_solicitado")}>
                       Albaranar ({ctx.seleccionados.length})
@@ -162,6 +174,10 @@ export const MaestroConDetallePedido = () => {
           pedidos={ctx.seleccionados.length}
           grupos={agruparPorCliente(ctx.seleccionados, ctx.pedidos.lista)}
         />
+      )}
+
+      {ctx.estado === "CERRANDO_HASTA_FECHA" && (
+        <CerrarPedidosHastaFecha publicar={emitir} />
       )}
 
       {ctx.estado === "ALBARANES_CREADOS" && (

@@ -13,6 +13,8 @@ export interface Presupuesto extends Venta {
   por_comision: number;
   almacen_id: string;
   lineas: LineaPresupuesto[];
+  /** Plugin `marca_impresion`. */
+  impreso?: boolean;
 }
 
 export type NuevoPresupuesto = {

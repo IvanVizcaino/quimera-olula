@@ -6,12 +6,15 @@ import ApiUrls from "../comun/urls.ts";
 import { direccionVacia, payloadCambioCliente } from "../venta/dominio.ts";
 import { articuloDeLinea, NuevaLineaVentaApiReq, NuevaLineaVentaApiRes, peticionNuevaLineaApi, respuestaNuevaLineaApi } from "../venta/infraestructura.ts";
 import { DeleteLinea, EstadoExpedicion, Factura, GetFactura, GetFacturas, GetLineasFactura, GetRecibosFactura, GetReportFactura, LineaFactura, PatchArticuloLinea, PatchCambiarAgente, PatchCambiarDivisa, PatchCantidadLinea, PatchClienteFactura, PatchEmitirFactura, PatchLinea, PostFactura, PostLinea, QueryNuevaLinea, ReciboFactura } from "./diseño.ts";
+import { camposLoteLineaDesdeApi, MovimientoLoteApi } from "#/almacen/comun/movimiento_lote.ts";
 import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
 const baseUrl = new ApiUrls().FACTURA;
 
-interface LineaFacturaApi extends Omit<LineaFactura, 'descripcionArticulo'> {
+interface LineaFacturaApi extends Omit<LineaFactura, 'descripcionArticulo' | 'porLotes' | 'movimientos'> {
     descripcion_articulo: string | null;
+    por_lotes?: boolean;
+    movimientos?: MovimientoLoteApi[];
 }
 
 interface FacturaAPI {
@@ -49,6 +52,8 @@ interface FacturaAPI {
     observaciones: string;
     editable?: boolean;
     estado_expedicion: EstadoExpedicion;
+    punto_venta_id?: string | null;
+    impreso?: boolean;
 }
 export const facturaDesdeAPI = (p: FacturaAPI): Factura => ({
     ...p,
@@ -57,6 +62,8 @@ export const facturaDesdeAPI = (p: FacturaAPI): Factura => ({
     netoSinDto: p.neto_sin_dto,
     por_comision: p.por_comision ?? p.por_comision_agente ?? 0,
     estadoExpedicion: p.estado_expedicion,
+    punto_venta_id: p.punto_venta_id ?? null,
+    impreso: p.impreso,
     cliente: {
         cliente_id: p.cliente_id ?? null,
         nombre_cliente: p.nombre_cliente ?? "",
@@ -69,6 +76,7 @@ export const facturaDesdeAPI = (p: FacturaAPI): Factura => ({
 export const lineaFacturaDesdeApi = (l: LineaFacturaApi): LineaFactura => ({
     ...l,
     descripcionArticulo: l.descripcion_articulo,
+    ...camposLoteLineaDesdeApi(l),
 } as unknown as LineaFactura);
 
 export const getFactura: GetFactura = async (id) => {

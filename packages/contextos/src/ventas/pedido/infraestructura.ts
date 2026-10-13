@@ -28,6 +28,7 @@ export interface LineaPedidoApi {
     importe_comision: number;
     por_lotes: boolean;
     servida: number;
+    cerrada?: boolean;
 };
 
 interface PedidoApi {
@@ -307,3 +308,43 @@ export const postAlbaranarPedidos = async (pedidoIds: string[]): Promise<{ id: s
 };
 
 export const getTrazaPedido = (id: string): Promise<unknown> => getTraza(`${baseUrl}/${id}`);
+
+export type ResultadoCierrePedidos = {
+    pedidoIds: string[];
+    total: number;
+    cerrados: boolean;
+};
+
+/** `PATCH /ventas/pedido/<id>/cerrar`: cierra (o reabre) todas las líneas y recalcula `servido`. */
+export const patchCerrarPedido = async (id: string, cerrar: boolean): Promise<void> => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}/cerrar`,
+        { cerrar },
+        cerrar ? "Error al cerrar el pedido" : "Error al abrir el pedido"
+    );
+};
+
+const fechaIso = (fecha: Date): string => fecha.toISOString().slice(0, 10);
+
+/**
+ * `POST /ventas/pedido/cerrar-hasta-fecha` (Eneboo `cerrarPedidosCli`).
+ * Con `simular` solo devuelve los pedidos afectados.
+ */
+export const postCerrarPedidosHastaFecha = async (
+    fechaHasta: Date,
+    simular: boolean
+): Promise<ResultadoCierrePedidos> => {
+    const respuesta = (await RestAPI.post(
+        `${baseUrl}/cerrar-hasta-fecha`,
+        { fecha_hasta: fechaIso(fechaHasta), simular },
+        "Error al cerrar los pedidos"
+    )) as unknown as
+        | { datos: { pedido_ids: string[]; total: number; cerrados: boolean } }
+        | { pedido_ids: string[]; total: number; cerrados: boolean };
+    const datos = "datos" in respuesta ? respuesta.datos : respuesta;
+    return {
+        pedidoIds: datos.pedido_ids.map(String),
+        total: datos.total,
+        cerrados: datos.cerrados,
+    };
+};

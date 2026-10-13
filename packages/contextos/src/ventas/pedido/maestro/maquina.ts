@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { ContextoMaestroPedido, EstadoMaestroPedido } from "./diseño.ts";
-import { Pedidos, albaranarPedidos, ampliarPedidos, recargarPedidos } from "./maestro.ts";
+import { Pedidos, albaranarPedidos, ampliarPedidos, recargarPedidos, recargarPedidosActuales } from "./maestro.ts";
 
 
 export const getMaquina: () => Maquina<EstadoMaestroPedido, ContextoMaestroPedido> = () => {
@@ -30,6 +30,15 @@ export const getMaquina: () => Maquina<EstadoMaestroPedido, ContextoMaestroPedid
             seleccionados_cambiados: async (ctx, payload) => ({ ...ctx, seleccionados: payload as string[] }),
 
             albaranado_multiple_solicitado: "ALBARANANDO_PEDIDOS",
+
+            cierre_hasta_fecha_solicitado: "CERRANDO_HASTA_FECHA",
+        },
+
+        CERRANDO_HASTA_FECHA: {
+
+            pedidos_cerrados_hasta_fecha: [recargarPedidosActuales, "INICIAL"],
+
+            cierre_hasta_fecha_cancelado: "INICIAL",
         },
 
         CREANDO_PEDIDO: {

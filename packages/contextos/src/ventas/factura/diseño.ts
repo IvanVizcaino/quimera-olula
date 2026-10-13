@@ -20,6 +20,8 @@ export type EstadoExpedicion =
 export interface Factura extends Venta {
     cliente: ClienteVenta;
     estadoExpedicion: EstadoExpedicion;
+    /** Presente si el plugin `marca_impresion` está activo. */
+    impreso?: boolean;
     editable?: boolean;
     por_comision: number;
     lineas?: LineaFactura[];
@@ -29,9 +31,20 @@ export interface Factura extends Venta {
     // automatica?: boolean;
     servicios?: boolean;
     rectificativa_id?: string | null;
+    /** Punto de venta TPV origen; null en facturas no generadas desde TPV. */
+    punto_venta_id?: string | null;
 }
+export interface MovimientoLote {
+    id: string;
+    loteId: string;
+    cantidad: number;
+}
+
 export interface LineaFactura extends LineaVenta {
     otro_campo?: string;
+    /** Presente en GET líneas de factura con plugin trazabilidad; TPV usa otro tipo homónimo. */
+    porLotes?: boolean;
+    movimientos?: MovimientoLote[];
 }
 
 export type NuevaFactura = {

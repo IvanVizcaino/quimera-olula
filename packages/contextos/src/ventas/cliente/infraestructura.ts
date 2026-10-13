@@ -10,12 +10,20 @@ import { Cliente, CrmContacto, CuentaBanco, DirCliente, GetCliente, NuevaCuentaB
 const UrlsVentas = new UrlsVentasClass();
 const UrlsCrm = new UrlsCrmClass();
 
-type ClienteApi = Cliente & {
+type ClienteApi = Omit<Cliente, 'fecha_baja'> & {
   fecha_baja: string | null;
+  // Campos de persona_fisica (NotRequired en la API)
+  persona_fisica?: boolean;
+  nombre_pila?: string | null;
+  apellidos?: string | null;
 };
 const clienteFromAPI = (c: ClienteApi): Cliente => ({
-  ...c,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ...(c as any as Cliente),
   fecha_baja: c.fecha_baja ? new Date(Date.parse(c.fecha_baja)) : null,
+  personaFisica: c.persona_fisica,
+  nombrePila: c.nombre_pila,
+  apellidos: c.apellidos,
 });
 
 export type DireccionAPI = {
@@ -106,6 +114,10 @@ export const patchCliente: PatchCliente = async (id, cliente) =>
       observaciones: cliente.observaciones,
       copiasfactura: cliente.copiasfactura,
       grupo_id: cliente.grupo_id,
+      // Campos persona_fisica (solo se envían si el plugin está activo; el backend los ignora si no)
+      ...(cliente.personaFisica !== undefined ? { persona_fisica: cliente.personaFisica } : {}),
+      ...(cliente.nombrePila !== undefined ? { nombre_pila: cliente.nombrePila } : {}),
+      ...(cliente.apellidos !== undefined ? { apellidos: cliente.apellidos } : {}),
     },
   }, "Error al guardar el cliente");
 

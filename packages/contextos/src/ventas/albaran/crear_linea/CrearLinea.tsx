@@ -70,7 +70,6 @@ export const CrearLinea = ({
     const libre = linea.tipoArticulo === "libre";
     const ivaIncluidoActivo = plugin("iva_incluido") === "activo";
     const porLotes = !!linea.porLotes;
-    console.log("LINEA", linea, porLotes);
 
     return (
         <QModal

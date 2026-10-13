@@ -5,6 +5,10 @@ import { ejecutarListaProcesos, publicar } from "@olula/lib/dominio.ts";
 import { CambioClienteFactura, Factura, LineaFactura } from "../diseño.ts";
 import { facturaVacia } from "../dominio.ts";
 import {
+    postBorrarMovimientoLote,
+    postCrearMovimientoLote,
+} from "#/almacen/albaran_venta/infraestructura.ts";
+import {
     deleteLinea,
     getFactura,
     getLineas,
@@ -206,6 +210,41 @@ export const crearLinea: ProcesarFactura = async (contexto, payload) => {
     ]);
 };
 
+export const reactivarLineaActiva: ProcesarFactura = async (contexto) => {
+    if (!contexto.lineaActiva) return contexto;
+    const lineas = contexto.factura.lineas as LineaFactura[];
+    const lineaActiva =
+        lineas.find((l) => l.id === contexto.lineaActiva?.id) ?? contexto.lineaActiva;
+    return { ...contexto, lineaActiva };
+};
+
+export const crearMovimientoLote: ProcesarFactura = async (contexto, payload) => {
+    const { lote_id, cantidad } = payload as { lote_id: string; cantidad: number };
+    await postCrearMovimientoLote(contexto.factura.id, contexto.lineaActiva!.id, {
+        lote_id,
+        cantidad,
+    });
+    return pipeFactura(contexto, [
+        refrescarFactura,
+        refrescarLineas,
+        reactivarLineaActiva,
+        "CAMBIANDO_LINEA",
+    ]);
+};
+
+export const borrarMovimientoLote: ProcesarFactura = async (contexto, payload) => {
+    const { movimiento_id } = payload as { movimiento_id: string };
+    await postBorrarMovimientoLote(contexto.factura.id, contexto.lineaActiva!.id, {
+        movimiento_id,
+    });
+    return pipeFactura(contexto, [
+        refrescarFactura,
+        refrescarLineas,
+        reactivarLineaActiva,
+        "CAMBIANDO_LINEA",
+    ]);
+};
+
 export const cambiarLinea: ProcesarFactura = async (contexto, payload) => {
     const linea = payload as LineaFactura;
 
@@ -214,6 +253,7 @@ export const cambiarLinea: ProcesarFactura = async (contexto, payload) => {
     return pipeFactura(contexto, [
         refrescarFactura,
         refrescarLineas,
+        reactivarLineaActiva,
         "ABIERTO",
     ]);
 };

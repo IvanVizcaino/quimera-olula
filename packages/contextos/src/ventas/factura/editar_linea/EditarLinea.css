@@ -74,6 +74,71 @@
         grid-column: span 6;
     }
 
+    .lotes-seccion {
+        grid-column: 1 / -1;
+        margin-top: var(--espaciado-m);
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+    }
+
+    .lotes-cabecera {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+    }
+
+    .lotes-titulo {
+        font-size: var(--tamaño-letra-s);
+        font-weight: 600;
+        color: var(--color-texto-secundario, #666);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .lotes-formulario {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--espaciado-s);
+        flex-wrap: wrap;
+        padding: var(--espaciado-s);
+        background: var(--color-fondo-secundario, #f5f5f5);
+        border-radius: var(--radio-borde, 4px);
+    }
+
+    .lotes-formulario-botones {
+        display: flex;
+        gap: var(--espaciado-xs);
+    }
+
+    .lotes-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--tamaño-letra-s);
+
+        th, td {
+            padding: var(--espaciado-xs) var(--espaciado-s);
+            text-align: left;
+            border-bottom: 1px solid var(--color-borde-suave, #eee);
+        }
+
+        .lotes-num {
+            text-align: right;
+        }
+
+        td:last-child {
+            text-align: right;
+        }
+    }
+
+    .lotes-vacio {
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario, #888);
+        margin: 0;
+        font-style: italic;
+    }
+
     @media (max-width: 768px) {
         quimera-formulario {
             grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -1,3 +1,4 @@
+import { getLoteSugerido } from "#/almacen/albaran_venta/infraestructura.ts";
 import { Lote } from "#/almacen/comun/componentes/Lote.tsx";
 import { ArticuloLinea } from "#/ventas/comun/componentes/articulo_linea/ArticuloLinea.tsx";
 import { GrupoIvaProducto } from "#/ventas/comun/componentes/grupo_iva_producto.tsx";
@@ -6,9 +7,10 @@ import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { useForm } from "@olula/lib/useForm.js";
+import { plugin } from "@olula/lib/dominio.js";
 import { ProcesarEvento } from "@olula/lib/useMaquina.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LineaAlbaran, MovimientoLote } from "../diseño.ts";
 import { patchLinea } from "../infraestructura.ts";
 import "./CambiarLinea.css";
@@ -72,6 +74,21 @@ export const CambiarLinea = ({
   const libre = modelo.tipoArticulo === "libre";
   const porLotes = linea.porLotes;
   const movimientos = linea.movimientos ?? [];
+  const trazabilidadActiva = plugin("trazabilidad") === "activa";
+
+  // CC-04: pre-rellenar con el último lote comprado al abrir la línea sin movimientos
+  useEffect(() => {
+    if (!trazabilidadActiva || !porLotes || movimientos.length > 0) return;
+    const referencia = modelo.referencia;
+    if (!referencia) return;
+    getLoteSugerido(referencia).then((codlote) => {
+      if (codlote) {
+        setNuevoLoteId(codlote);
+        setMostrandoFormularioLote(true);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // solo al montar
 
   const crearLote = useCallback(() => {
     const cantidad = parseFloat(nuevaCantidad);
@@ -108,7 +125,7 @@ export const CambiarLinea = ({
           <QInput label="Precio" {...uiProps("pvp_unitario")} />
           <QInput label="Total" {...uiProps("pvp_total")} />
 
-          {porLotes && (
+          {trazabilidadActiva && porLotes && (
             <div className="lotes-seccion">
               <div className="lotes-cabecera">
                 <span className="lotes-titulo">Lotes</span>
@@ -127,6 +144,7 @@ export const CambiarLinea = ({
                   <Lote
                     label="Lote"
                     nombre="nuevo_lote_id"
+                    sku={modelo.referencia ?? undefined}
                     valor={nuevoLoteId}
                     onChange={(opcion) => setNuevoLoteId(opcion?.valor ?? "")}
                   />

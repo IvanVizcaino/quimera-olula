@@ -1,4 +1,4 @@
-import { facturaDesdeAPI } from "#/ventas/factura/infraestructura.ts";
+import { facturaDesdeAPI, lineaFacturaDesdeApi } from "#/ventas/factura/infraestructura.ts";
 import { direccionVacia } from "#/ventas/venta/dominio.ts";
 import { describe, expect, test } from "vitest";
 
@@ -65,5 +65,41 @@ describe("facturaDesdeAPI mapea la cabecera", () => {
         });
         expect(conDescuento.dtoPorcentual).toBe(10);
         expect(conDescuento.netoSinDto).toBe(197.2);
+    });
+
+    test("punto_venta_id llega mapeado (null cuando el campo viene ausente)", () => {
+        expect(facturaDesdeAPI(facturaApi).punto_venta_id).toBeNull();
+    });
+
+    test("punto_venta_id llega mapeado cuando el campo tiene valor", () => {
+        const conPunto = facturaDesdeAPI({ ...facturaApi, punto_venta_id: "PV01" });
+        expect(conPunto.punto_venta_id).toBe("PV01");
+    });
+});
+
+describe("lineaFacturaDesdeApi trazabilidad", () => {
+    test("mapea por_lotes y movimientos", () => {
+        const linea = lineaFacturaDesdeApi({
+            id: "l1",
+            referencia: "R1",
+            descripcion: "d",
+            descripcion_articulo: null,
+            cantidad: 1,
+            pvp_unitario: 10,
+            dto_porcentual: 0,
+            dto_lineal: 0,
+            pvp_total: 10,
+            iva_incluido: false,
+            grupo_iva_producto_id: "G",
+            tipo_irpf: 0,
+            tipo_recargo: 0,
+            tipo_iva: 21,
+            por_comision: 0,
+            importe_comision: 0,
+            por_lotes: true,
+            movimientos: [{ id: "mv", lote_id: "LOT1", cantidad: 4 }],
+        });
+        expect(linea.porLotes).toBe(true);
+        expect(linea.movimientos).toEqual([{ id: "mv", loteId: "LOT1", cantidad: 4 }]);
     });
 });

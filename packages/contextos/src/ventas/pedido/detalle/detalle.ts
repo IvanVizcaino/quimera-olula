@@ -16,8 +16,10 @@ import {
     patchCambiarDescuento,
     patchCambiarDivisa,
     patchCantidadLinea,
+    patchCerrarPedido,
     patchPedido
 } from "../infraestructura.ts";
+import { pedidoServidoTotal } from "../dominio.ts";
 import { ContextoPedido, EstadoPedido } from "./diseño.ts";
 
 
@@ -110,8 +112,7 @@ export const cancelarCambioPedido: ProcesarPedido = async (contexto) => {
 }
 
 export const abiertoOServido: ProcesarPedido = async (contexto) => {
-    const servido = contexto.pedido.servido?.toUpperCase();
-    const esServido = servido === 'SI' || servido === 'SERVIDO';
+    const esServido = pedidoServidoTotal(contexto.pedido);
     return {
         ...contexto,
         estado: esServido ? "SERVIDO" : "ABIERTO"
@@ -200,6 +201,17 @@ export const cambiarPedido: ProcesarPedido = async (contexto, payload) => {
         refrescarPedido,
         refrescarLineas,
         'ABIERTO',
+    ]);
+}
+
+/** Payload: `true` cierra todas las líneas, `false` las reabre. */
+export const cerrarPedido: ProcesarPedido = async (contexto, payload) => {
+    await patchCerrarPedido(contexto.pedido.id, payload as boolean);
+
+    return pipePedido(contexto, [
+        refrescarPedido,
+        refrescarLineas,
+        abiertoOServido,
     ]);
 }
 

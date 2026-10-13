@@ -15,7 +15,17 @@ export const metaLote: MetaModelo<LoteAlbaranar> = {
 
 export const metaLinea: MetaModelo<LineaAlbaranar> = {
     campos: {
-        enviada: { tipo: "numero", positivo: true },
+        enviada: {
+            tipo: "numero",
+            positivo: true,
+            validacion: (linea) => {
+                const max = cantidadPendienteLinea(linea);
+                if (linea.enviada > max) {
+                    return `No puede superar lo pendiente (${max})`;
+                }
+                return true;
+            },
+        },
         lotes: { itemMeta: metaLote },
     },
     editable: (linea: LineaAlbaranar, campo?: string) => {
@@ -45,24 +55,33 @@ export const calcularEnviada = (linea: LineaAlbaranar): number => {
     return linea.enviada;
 };
 
-export const lineaDesdeLineaPedido = (l: LineaPedido): LineaAlbaranar => ({
-    idLinea: l.id,
-    sku: l.referencia ?? "",
-    descripcion: l.descripcion,
-    cantidad: l.cantidad,
-    servida: l.servida,
-    pendiente: l.cantidad,
-    enviada: 0,
-    cerrada: false,
-    porLotes: l.porLotes,
-    lotes: [],
-});
+/** Cantidad del pedido aún no albaranada (gene_albaranesc: cantidad − servida). */
+export const cantidadPendienteLinea = (
+    linea: Pick<LineaAlbaranar, "cantidad" | "servida">
+): number => Math.max(0, linea.cantidad - linea.servida);
+
+export const lineaDesdeLineaPedido = (l: LineaPedido): LineaAlbaranar => {
+    const pendiente = cantidadPendienteLinea({ cantidad: l.cantidad, servida: l.servida });
+    return {
+        idLinea: l.id,
+        sku: l.referencia ?? "",
+        descripcion: l.descripcion,
+        cantidad: l.cantidad,
+        servida: l.servida,
+        pendiente,
+        enviada: l.porLotes ? 0 : pendiente,
+        cerrada: false,
+        porLotes: l.porLotes,
+        lotes: [],
+    };
+};
 
 export const marcarTodasPendientes = (modelo: AlbaranarPedido): AlbaranarPedido => ({
     ...modelo,
     lineas: modelo.lineas.map((l) => {
         if (l.porLotes || l.cerrada) return l;
-        return { ...l, enviada: Math.max(0, l.cantidad - l.servida) };
+        const pendiente = cantidadPendienteLinea(l);
+        return { ...l, pendiente, enviada: pendiente };
     }),
 });
 

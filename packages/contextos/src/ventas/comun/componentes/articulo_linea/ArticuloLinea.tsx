@@ -1,6 +1,9 @@
 import { Articulo } from "#/almacen/comun/componentes/Articulo.tsx";
+import type { TagArticulo } from "#/ventas/articulo/diseño.ts";
 import { TipoArticuloLinea } from "#/ventas/venta/diseño.ts";
 import { QIcono, QInput } from "@olula/componentes/index.js";
+import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { useEffect, useRef } from "react";
 import "./ArticuloLinea.css";
 
@@ -17,6 +20,8 @@ interface ArticuloLineaProps extends CamposArticuloLinea {
     onChange: (cambios: Partial<CamposArticuloLinea>) => void;
     ref?: React.RefObject<HTMLInputElement | null>;
     bloqueado?: boolean;
+    /** Texto de cada opción del buscador de artículos (por defecto, el de la base). */
+    formatoOpcion?: (articulo: TagArticulo) => string;
 }
 
 export const ArticuloLinea = ({
@@ -27,7 +32,11 @@ export const ArticuloLinea = ({
     nombre = "idArticulo",
     onChange,
     bloqueado = false,
+    formatoOpcion,
 }: ArticuloLineaProps) => {
+    const descripcionMultilinea = pluginActivo("lineas_largas");
+    const CampoDescripcion = descripcionMultilinea ? QTextArea : QInput;
+
     const refArticulo = useRef<HTMLInputElement | null>(null);
     const refDescripcionRegistrado = useRef<HTMLInputElement | null>(null);
     const refDescripcionLibre = useRef<HTMLInputElement | null>(null);
@@ -82,6 +91,7 @@ export const ArticuloLinea = ({
                         }
                         ref={refArticulo}
                         soloLectura={bloqueado}
+                        formatoOpcion={formatoOpcion}
                     />
                     {idArticulo && !bloqueado && (
                         <button
@@ -107,13 +117,14 @@ export const ArticuloLinea = ({
                     }
                 </div>
                 {tipoArticulo === "generico" && (
-                    <QInput
+                    <CampoDescripcion
                         nombre="descripcion"
                         label="Descripción personalizada"
                         valor={descripcion ?? ""}
                         onChange={(val) => onChange({ descripcion: val })}
                         valido={!!descripcion}
                         ref={refDescripcionRegistrado}
+                        {...(descripcionMultilinea ? { rows: 3 } : {})}
                     />
                 )}
             </>
@@ -122,13 +133,14 @@ export const ArticuloLinea = ({
 
     return (
         <div className="ArticuloLinea-campo">
-            <QInput
+            <CampoDescripcion
                 nombre="descripcion"
                 label="Descripción"
                 valor={descripcion ?? ""}
                 erroneo={!descripcion}
                 onChange={(val) => onChange({ descripcion: val })}
                 ref={refDescripcionLibre}
+                {...(descripcionMultilinea ? { rows: 3 } : {})}
             />
             {!bloqueado &&
                 <button

@@ -20,6 +20,14 @@ export const recargarPedidos: ProcesarPedidos = async (contexto, payload) => {
     return Pedidos.recargar(contexto, resultado);
 }
 
+/** Recarga con el criteria vigente (tras un cierre masivo). */
+export const recargarPedidosActuales: ProcesarPedidos = async (contexto) => {
+    const { filtro, orden, paginacion } = contexto.pedidos.criteria;
+    const resultado = await getPedidos(filtro, orden, paginacion);
+
+    return Pedidos.recargar(contexto, resultado);
+}
+
 export const ampliarPedidos: ProcesarPedidos = async (contexto, payload) => {
     const criteria = payload as Criteria;
     const resultado = await getPedidos(criteria.filtro, criteria.orden, criteria.paginacion);
@@ -106,3 +114,10 @@ export const albaranarPedidos: ProcesarPedidos = async (contexto) => {
 
 const mensajeDeError = (error: unknown): string =>
     error instanceof Error ? error.message : String(error);
+
+const fechaAMostrar = (iso: string): string => iso.split("-").reverse().join("/");
+
+export const mensajeCierreHastaFecha = (total: number, fechaIso: string): string =>
+    total === 0
+        ? `No hay pedidos pendientes anteriores a la fecha ${fechaAMostrar(fechaIso)}.`
+        : `Se van a cerrar ${total} pedidos anteriores a la fecha ${fechaAMostrar(fechaIso)}.`;

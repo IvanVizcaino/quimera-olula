@@ -1,3 +1,4 @@
+import { conColumnaImpreso } from "#/comun/marca_impresion.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { MetaModelo, modeloEsEditable } from "@olula/lib/dominio.ts";
 import {
@@ -18,7 +19,7 @@ import {
 } from "./diseño.ts";
 
 // La columna de estado la añade delante MaestroConDetalleAlbaran.
-export const metaTablaAlbaran: MetaTabla<Albaran> = [
+export const metaTablaAlbaran: MetaTabla<Albaran> = conColumnaImpreso([
     {
         id: "codigo",
         cabecera: "Código",
@@ -61,7 +62,8 @@ export const metaTablaAlbaran: MetaTabla<Albaran> = [
         prioridad: "baja",
         render: (a) => (a.de_abono ? "Sí" : ""),
     },
-];
+]);
+
 
 export const albaranVacio = (): Albaran => ({
     ...ventaVacia,

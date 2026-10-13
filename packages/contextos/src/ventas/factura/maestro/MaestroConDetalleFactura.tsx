@@ -13,6 +13,7 @@ import {
   filtroCliente,
   filtroCodigo,
   filtroFechaDocumento,
+  filtroPuntoVenta,
 } from "../../comun/filtros.tsx";
 import { CrearFactura } from "../crear/CrearFactura.tsx";
 import { DetalleFactura } from "../detalle/DetalleFactura.tsx";
@@ -52,6 +53,7 @@ export const MaestroConDetalleFactura = () => {
     agente_id: filtroAgente,
     fecha: filtroFechaDocumento,
     almacen_id: filtroAlmacen,
+    punto_venta_id: filtroPuntoVenta,
   };
 
   return (

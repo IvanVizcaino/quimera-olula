@@ -18,8 +18,10 @@ import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { BorrarPedido } from "../borrar/BorrarPedido.tsx";
+import { CerrarPedido } from "../cerrar/CerrarPedido.tsx";
 import { Pedido } from "../diseño.ts";
 import { getReportPedido, getTrazaPedido } from "../infraestructura.ts";
+import { modoCierrePedido } from "../dominio.ts";
 import { editable, metaPedido, pedidoVacio } from "./detalle.ts";
 import "./DetallePedido.css";
 import { Lineas } from "./lineas/Lineas.tsx";
@@ -90,6 +92,7 @@ export const DetallePedidoBase = ({
   if (!ctx.pedido.id) return;
 
   const esEditable = editable(ctx.pedido);
+  const modoCierre = modoCierrePedido(ctx.pedido);
 
   const imprimir = async () => {
     const blob = await getReportPedido(ctx.pedido.id);
@@ -101,6 +104,11 @@ export const DetallePedidoBase = ({
       texto: "Albaran parcial",
       onClick: handleAlbaranar,
       deshabilitado: !esEditable,
+    },
+    {
+      texto: modoCierre === "abrir" ? "Abrir pedido" : "Cerrar pedido",
+      onClick: () => emitir("cierre_pedido_solicitado"),
+      deshabilitado: modoCierre === null,
     },
     {
       texto: "Imprimir",
@@ -182,6 +190,10 @@ export const DetallePedidoBase = ({
 
       {estado === "BORRANDO_PEDIDO" && (
         <BorrarPedido pedido={ctx.pedido} publicar={emitir} />
+      )}
+
+      {estado === "CERRANDO_PEDIDO" && (
+        <CerrarPedido pedido={ctx.pedido} publicar={emitir} />
       )}
 
       {estado === "VIENDO_TRAZA" && (

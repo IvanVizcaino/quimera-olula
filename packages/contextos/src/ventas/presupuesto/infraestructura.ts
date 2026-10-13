@@ -38,6 +38,7 @@ type PresupuestoAPI = {
     direccion_id: string | null;
     direccion: Direccion;
     estado_aprobado: EstadoAprobado;
+    impreso?: boolean;
 };
 
 const baseUrl = new ApiUrls().PRESUPUESTO;
@@ -57,6 +58,7 @@ export const presupuestoFromAPI = (p: PresupuestoAPI): Presupuesto => ({
     fecha_salida: new Date(Date.parse(p.fecha_salida)),
     dtoPorcentual: p.por_descuento,
     netoSinDto: p.neto_sin_dto,
+    impreso: p.impreso,
     cliente: {
         cliente_id: p.cliente_id ?? null,
         nombre_cliente: p.nombre_cliente ?? "",

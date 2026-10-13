@@ -14,6 +14,7 @@ import {
     cambiarLinea,
     cambiarPedido,
     cancelarCambioPedido,
+    cerrarPedido,
     cargarContexto,
     crearLinea,
     getContextoVacio,
@@ -47,6 +48,8 @@ export const getMaquina = (): Maquina<EstadoPedido, ContextoPedido> => {
 
             borrar_solicitado: "BORRANDO_PEDIDO",
 
+            cierre_pedido_solicitado: "CERRANDO_PEDIDO",
+
             cambio_cliente_solicitado: "CAMBIANDO_CLIENTE",
 
             cambio_divisa_solicitado: "CAMBIANDO_DIVISA",
@@ -77,6 +80,8 @@ export const getMaquina = (): Maquina<EstadoPedido, ContextoPedido> => {
 
             traza_solicitada: "VIENDO_TRAZA",
 
+            cierre_pedido_solicitado: "CERRANDO_PEDIDO",
+
             pedido_cargado: [abiertoOServido],
 
             pedido_deseleccionado: [
@@ -90,6 +95,13 @@ export const getMaquina = (): Maquina<EstadoPedido, ContextoPedido> => {
             borrado_de_pedido_listo: borrarPedido,
 
             borrar_cancelado: "ABIERTO",
+        },
+
+        CERRANDO_PEDIDO: {
+
+            cierre_pedido_listo: cerrarPedido,
+
+            cierre_pedido_cancelado: [abiertoOServido],
         },
 
         CAMBIANDO_CLIENTE: {

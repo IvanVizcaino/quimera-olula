@@ -13,11 +13,13 @@ import "./TotalesVenta.css";
 interface TotalesVentaProps<T extends Venta> {
   modeloVenta: HookModelo<T>;
   publicar: EmitirEvento;
+  ocultarDescuento?: boolean;
 }
 
 export const TotalesVenta = <T extends Venta>({
   modeloVenta,
   publicar,
+  ocultarDescuento = false,
 }: TotalesVentaProps<T>) => {
   const venta = modeloVenta.modelo;
   const pluginDtoCabeceraVentaActivo =
@@ -25,7 +27,7 @@ export const TotalesVenta = <T extends Venta>({
 
   return (
     <div className="totales-venta">
-      {modeloVenta.editable && pluginDtoCabeceraVentaActivo && (
+      {!ocultarDescuento && modeloVenta.editable && pluginDtoCabeceraVentaActivo && (
         <div className="botones maestro-botones ">
           <QBoton onClick={() => publicar("descuento_solicitado", venta)}>
             Descuento

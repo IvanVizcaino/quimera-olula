@@ -24,6 +24,20 @@ const activarPlugin = () =>
 
 beforeEach(() => localStorage.clear());
 
+describe("fallback del plugin de expedición", () => {
+    const hoy = (plugins: Record<string, string>) =>
+        localStorage.setItem("whoami", JSON.stringify({ plugins }));
+
+    test("plugin ausente (backend sin T0.4): comportamiento anterior", () => {
+        hoy({});
+        expect(editable(conEstado("EMITIDA"))).toBe(false);
+    });
+    test("variante basico o inactivo: emitida cerrada", () => {
+        hoy({ estado_expedicion_factura: "basico" });
+        expect(editable(conEstado("EMITIDA"))).toBe(false);
+    });
+});
+
 describe("sin el plugin de expedición solo se edita el borrador", () => {
     test("en estado BORRADOR se edita", () => {
         expect(editable(abierta())).toBe(true);
@@ -128,5 +142,15 @@ describe("campos que no se tocan a mano ni en una factura abierta", () => {
         expect(campoEditable(cerrada, "fecha")).toBe(false);
         expect(campoEditable(cerrada, "hora")).toBe(false);
         expect(campoEditable(cerrada, "automatica")).toBe(false);
+    });
+});
+
+describe("app genérica: la variante firma NO cambia el comportamiento oficial", () => {
+    test("con firma solo se edita el borrador", () => {
+        localStorage.setItem("whoami", JSON.stringify({ plugins: { estado_expedicion_factura: "firma" } }));
+        expect(editable(abierta())).toBe(true);
+        expect(editable(conEstado("EMITIDA"))).toBe(false);
+        expect(editable(conEstado("ERROR_FIRMA"))).toBe(false);
+        expect(editable(conEstado("FIRMADA"))).toBe(false);
     });
 });

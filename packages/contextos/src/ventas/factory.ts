@@ -9,7 +9,12 @@ import { ventasPedidoInfra } from "./pedido/infraestructura.ts";
 import { payloadPatchPedido, pedidoDesdeAPI } from "./pedido/infraestructura_base.ts";
 import { getMetaTablaPedido } from "./pedido/maestro/metatabla_pedido.tsx";
 
+import { reglaEditableBase } from "./factura/dominio.ts";
+
 export class FactoryVentasOlula {
+
+    /** Regla de factura editable; una app puede sustituirla (p. ej. crema_cafe: editable hasta firmada). */
+    static factura_reglaEditable = reglaEditableBase
 
     static pedido_detalle_lineas_LineasLista = LineasListaBase
     static pedido_DetallePedido = DetallePedidoBase

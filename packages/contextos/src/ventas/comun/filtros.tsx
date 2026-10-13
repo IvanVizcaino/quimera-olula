@@ -1,4 +1,5 @@
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
+import { PuntoVentaTpv } from "#/tpv/comun/componentes/PuntoVentaTpv.tsx";
 import {
   filtroFechas,
   MetaCampoFiltro,
@@ -66,4 +67,18 @@ export const filtroFechaDocumento: MetaCampoFiltro = {
   label: "Fecha",
   tipo: "intervalo_fechas",
   filtro: (v) => filtroFechas("fecha", v),
+};
+
+export const filtroPuntoVenta: MetaCampoFiltro = {
+  id: "punto_venta_id",
+  label: "Punto de venta",
+  filtro: (v) => (v ? ["punto_venta_id", "=", v as string] : null),
+  render: (valor, onChange) => (
+    <PuntoVentaTpv
+      nombre="punto_venta_id"
+      valor={(valor as string) ?? ""}
+      opcional
+      onChange={(opcion) => onChange(opcion?.valor ?? "")}
+    />
+  ),
 };

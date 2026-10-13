@@ -14,6 +14,8 @@ export interface Albaran extends Venta {
     nombre_almacen: string;
     de_abono: boolean;
     lineas: LineaAlbaran[];
+    /** Plugin `marca_impresion`. */
+    impreso?: boolean;
 }
 
 export interface MovimientoLote {
