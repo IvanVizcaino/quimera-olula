@@ -3,6 +3,7 @@ import { useTimerRefresco } from "#/auth/useTimerRefresco.ts";
 import { Vista } from "@olula/componentes/index.ts";
 import { FactoryObj, FactoryProvider } from "@olula/lib/factory_ctx.tsx";
 import { crearMenu, MenuContextFactory } from "@olula/lib/menu.ts";
+import { crearWidgets, WidgetContextFactory } from "@olula/lib/widgets.ts";
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouteObject, RouterProvider } from "react-router";
@@ -32,6 +33,11 @@ const App = () => {
 
   useEffect(() => {
     FactoryObj.setMenu(menuFactory);
+    FactoryObj.setWidgets(
+      crearWidgets(
+        factoryCremaCafe as unknown as Record<string, WidgetContextFactory>
+      )
+    );
     FactoryObj.setApp(appFactory);
   }, []);
 

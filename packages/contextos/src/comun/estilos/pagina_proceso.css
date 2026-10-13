@@ -1,0 +1,132 @@
+/**
+ * Layout de pantallas de proceso / informe a pantalla completa
+ * (sin MaestroDetalle). Usa tokens de tema: superficie elevada, paddings.
+ */
+.InformeContable,
+.InformeAlmacen,
+.PaginaProceso {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100%;
+    padding: var(--padding-vertical) var(--padding-horizontal);
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m, 1rem);
+}
+
+.InformeContable > h2,
+.InformeAlmacen > h2,
+.PaginaProceso > h2,
+.pagina-proceso__cabecera > h2 {
+    margin: 0;
+}
+
+.InformeContable > p,
+.InformeAlmacen > p,
+.PaginaProceso > p,
+.pagina-proceso__intro {
+    margin: 0;
+    max-width: 52rem;
+    color: var(--color-texto-secundario, var(--gris-5));
+    line-height: var(--altura-linea-normal, 1.45);
+}
+
+.pagina-proceso__panel,
+.InformeContable > quimera-formulario,
+.InformeAlmacen > quimera-formulario,
+.modelo347-inmuebles {
+    background: linear-gradient(
+        180deg,
+        var(--color-superficie) 0%,
+        var(--color-superficie-elevada) 100%
+    );
+    border: var(--tamaño-borde-s, 1px) solid var(--color-borde-sutil, var(--gris-2));
+    border-radius: var(--redondeo-borde-m, 8px);
+    box-shadow: var(--sombra-xs, 0 1px 2px rgba(0, 0, 0, 0.04));
+    padding: var(--espaciado-m, 1rem);
+}
+
+.InformeContable > quimera-formulario,
+.InformeAlmacen > quimera-formulario {
+    display: block;
+}
+
+.pagina-proceso__panel quimera-formulario {
+    margin: 0;
+}
+
+.pagina-proceso__panel .maestro-botones,
+.InformeContable > .maestro-botones,
+.InformeContable > .botones,
+.InformeAlmacen > .maestro-botones,
+.PaginaProceso > .maestro-botones {
+    margin-top: var(--espaciado-s, 0.5rem);
+    margin-bottom: 0;
+    justify-content: flex-start;
+}
+
+.pagina-proceso__resultado,
+.RegenerarMovimientos__resumen,
+.resultado-recalculo-saldos {
+    background: var(--color-superficie-sunken, var(--gris-1));
+    border: var(--tamaño-borde-s, 1px) solid var(--color-borde-sutil, var(--gris-2));
+    border-radius: var(--redondeo-borde-m, 8px);
+    padding: var(--espaciado-m, 1rem);
+}
+
+.pagina-proceso__resultado h3,
+.RegenerarMovimientos__resumen h3 {
+    margin: 0 0 var(--espaciado-s, 0.5rem);
+}
+
+.RegenerarMovimientos__articulos {
+    list-style: none;
+    margin: var(--espaciado-s, 0.5rem) 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-xs, 0.35rem);
+}
+
+.RegenerarMovimientos__articulos li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espaciado-xs, 0.35rem);
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: var(--color-superficie-sunken, var(--gris-1));
+    border: 1px solid var(--color-borde-sutil, var(--gris-2));
+    font-size: 0.9rem;
+}
+
+.modelo347-inmuebles {
+    margin-top: var(--espaciado-m, 1rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s, 0.5rem);
+}
+
+.modelo347-inmuebles h3 {
+    margin: 0;
+}
+
+.modelo347-inmuebles > .aviso {
+    margin: 0;
+}
+
+.PaginaProceso .aviso-info,
+.InformeContable .aviso-info {
+    padding: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+    border-radius: var(--redondeo-borde-m, 8px);
+    background: var(--color-superficie-sunken, var(--gris-1));
+    border-left: 3px solid var(--color-primario, #2563eb);
+    color: var(--color-texto-secundario, var(--gris-5));
+}
+
+@media (max-width: 768px) {
+    .InformeContable,
+    .InformeAlmacen,
+    .PaginaProceso {
+        padding: var(--padding-vertical) var(--padding-horizontal);
+    }
+}
