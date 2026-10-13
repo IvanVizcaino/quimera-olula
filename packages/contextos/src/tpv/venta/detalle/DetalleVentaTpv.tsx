@@ -1,4 +1,5 @@
 import { CambiarDescuento } from "#/ventas/comun/componentes/moleculas/CambiarDescuento/CambiarDescuento.tsx";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { TotalesVenta } from "#/ventas/venta/vistas/TotalesVenta.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Detalle, QBoton, Tab, Tabs } from "@olula/componentes/index.js";
@@ -6,8 +7,13 @@ import { EmitirEvento, Entidad } from "@olula/lib/diseño.js";
 import { abrirCajon } from "@olula/lib/impresion.ts";
 import { listaEntidadesInicial } from "@olula/lib/ListaEntidades.js";
 import { useModelo } from "@olula/lib/useModelo.js";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { botonOculto } from "#/tpv/config/dominio.ts";
+import { useOpcionesTpv } from "#/tpv/config/useOpcionesTpv.ts";
+import { SiguienteVentaTpv } from "../siguiente_venta/SiguienteVentaTpv.tsx";
+import { PasoSiguienteVenta, primerPasoSiguienteVenta } from "../impresion.ts";
 import { BorrarVentaTpv } from "../borrar/BorrarVentaTpv.tsx";
+import { CambiarTotalVentaTpv } from "../cambiar_total/CambiarTotalVentaTpv.tsx";
 import { BorrarPagoVentaTpv } from "../borrar_pago/BorrarPagoVentaTpv.tsx";
 import { DevolverVentaTpv } from "../devolver/DevolverVentaTpv.tsx";
 import { LineaFactura, PagoVentaTpv, VentaTpv } from "../diseño.ts";
@@ -54,13 +60,35 @@ export const DetalleVentaTpv = ({
         emitir("venta_id_cambiada", id, true);
     }, [id]);
 
+    const opciones = useOpcionesTpv();
+    const [pasoSiguiente, setPasoSiguiente] = useState<PasoSiguienteVenta>(null);
+
+    const avanceForzado = useRef(false);
     const estadoAnterior = useRef(ctx.estado); // Referencia para saber cuándo imprimir el tique
     useEffect(() => {
         const estadosPago = ["PAGANDO_EN_EFECTIVO", "PAGANDO_CON_TARJETA", "PAGANDO_CON_VALE"];
-        if (ctx.estado === 'EMITIDA' && estadosPago.includes(estadoAnterior.current) && ctx.venta.pendiente === 0) {
-            imprimirTicketOFactura(ctx.venta, ctx.pagos.lista);
-        }
+        const anterior = estadoAnterior.current;
         estadoAnterior.current = ctx.estado;
+        if (ctx.estado !== 'EMITIDA') return;
+        const cobrada = estadosPago.includes(anterior) && ctx.venta.pendiente === 0;
+        // ABIERTA -> EMITIDA directo solo ocurre al emitir un vale (que ya imprime por sí mismo)
+        const valeEmitido = anterior === 'ABIERTA';
+        if (!cobrada && !valeEmitido) return;
+        (async () => {
+            if (cobrada && opciones.imprimirTiqueAlCobrar) {
+                await imprimirTicketOFactura(ctx.venta, ctx.pagos.lista);
+            }
+            // Orden de Eneboo (pbnPagar_clicked): imprimir, abrir cajón, pasar a la siguiente
+            if (cobrada && opciones.abrirCajonAlCobrar) {
+                abrirCajon();
+            }
+            const paso = primerPasoSiguienteVenta(ctx.venta, opciones);
+            // Crema: tras emitir un vale se avanza siempre (aunque se cancele la confirmación
+            // o rvpasarsiguiente esté desactivado)
+            avanceForzado.current = valeEmitido && opciones.emitirValeAvanzaSiempre;
+            if (paso) setPasoSiguiente(paso);
+            else if (avanceForzado.current) publicar("crear_venta_solicitada");
+        })();
     }, [ctx.estado, ctx.venta]);
 
     if (!ctx.venta.id) return;
@@ -142,10 +170,23 @@ export const DetalleVentaTpv = ({
             ]}
             ></Tabs>
 
-            <TotalesVenta publicar={emitir} modeloVenta={modeloVenta} />
+            <TotalesVenta publicar={emitir} modeloVenta={modeloVenta} ocultarDescuento={botonOculto(opciones, "descuento")} />
+
+            {estado === "ABIERTA" && pluginActivo("dto_cabecera_venta", "eneboo") && (
+                <div className="botones maestro-botones">
+                    <QBoton
+                        texto="Cambiar total"
+                        onClick={() => emitir("total_solicitado")}
+                    />
+                </div>
+            )}
 
             {estado === "CAMBIANDO_DESCUENTO" && (
                 <CambiarDescuento publicar={emitir} venta={venta}/>
+            )}
+
+            {estado === "CAMBIANDO_TOTAL" && (
+                <CambiarTotalVentaTpv publicar={emitir} venta={venta} />
             )}
 
             {venta.pendiente !== 0 && (
@@ -184,6 +225,22 @@ export const DetalleVentaTpv = ({
             )}
             {estado === "GENERANDO_TIQUE_REGALO" && (
                 <TiqueRegaloVentaTpv venta={venta} lineas={lineas.lista} publicar={emitir} />
+            )}
+            {pasoSiguiente && (
+                <SiguienteVentaTpv
+                    venta={venta}
+                    lineas={lineas.lista}
+                    opciones={opciones}
+                    pasoInicial={pasoSiguiente}
+                    onPasar={() => {
+                        setPasoSiguiente(null);
+                        publicar("crear_venta_solicitada");
+                    }}
+                    onCancelar={() => {
+                        setPasoSiguiente(null);
+                        if (avanceForzado.current) publicar("crear_venta_solicitada");
+                    }}
+                />
             )}
         </div>
         </Detalle>

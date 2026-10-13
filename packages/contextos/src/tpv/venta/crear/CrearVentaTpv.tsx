@@ -13,7 +13,8 @@ export const CrearVentaTpv = ({
         try {
             const id = await postVenta();
             publicar("venta_creada", id);
-        } catch {
+        } catch (error) {
+            console.error("Error al crear venta TPV:", error);
             publicar("alta_de_venta_cancelada");
         }
     }, [publicar]);

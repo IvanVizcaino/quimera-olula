@@ -1,11 +1,13 @@
 import { ArticuloLinea, CamposArticuloLinea } from "#/ventas/comun/componentes/articulo_linea/ArticuloLinea.tsx";
 import { GrupoIvaProducto } from "#/ventas/comun/componentes/grupo_iva_producto.tsx";
+import type { TagArticulo } from "#/ventas/articulo/diseño.ts";
 import type { ModeloNuevaLinea } from "#/ventas/venta/diseño.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import { plugin } from "@olula/lib/dominio.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
@@ -56,6 +58,10 @@ export const CrearLineaVentaTpv = ({
     const valido = lineaArticulo.valido;
     const [mostrarMas, setMostrarMas] = useState(false);
     const libre = linea.tipoArticulo === "libre";
+    // Slot de factoría TPV: formato del texto de cada artículo en el buscador (CC-02 en crema_cafe).
+    const formatoOpcion = FactoryObj.app.TPV?.articulo_formatoOpcion as
+        | ((articulo: TagArticulo) => string)
+        | undefined;
     const ivaIncluidoActivo = plugin("iva_incluido") === "activo";
 
     return (
@@ -74,6 +80,7 @@ export const CrearLineaVentaTpv = ({
                         descripcion={linea.descripcion ?? ""}
                         nombre="idArticulo_nueva_linea_tpv"
                         onChange={onArticuloCambiado}
+                        formatoOpcion={formatoOpcion}
                     />
                     <QInput label="Cantidad" {...lineaArticulo.uiProps("cantidad")} />
                     <QInput label="PVP unitario" {...lineaArticulo.uiProps("pvpUnitario")} />

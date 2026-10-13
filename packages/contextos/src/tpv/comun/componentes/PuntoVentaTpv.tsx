@@ -1,5 +1,5 @@
-import { AgenteTpv as TipoAgenteTpv } from "#/tpv/agente/diseño.ts";
 import { getPuntosVentaTpv } from "#/tpv/punto_de_venta/infraestructura.ts";
+import { PuntoVentaTpv as TipoPuntoVentaTpv } from "#/tpv/punto_de_venta/diseño.ts";
 import { QSelect } from "@olula/componentes/index.js";
 import { Criteria } from "@olula/lib/diseño.js";
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ interface ArticuloProps {
     valor: string;
     nombre?: string;
     label?: string;
+    opcional?: boolean;
     ref?: React.RefObject<HTMLSelectElement | null>;
     onChange: (opcion: { valor: string; descripcion: string } | null) => void;
 }
@@ -15,7 +16,7 @@ interface ArticuloProps {
 type OpcionPuntoVenta = {
     valor: string;
     descripcion: string;
-    punto: TipoAgenteTpv
+    punto: TipoPuntoVentaTpv
 }
 
 export const PuntoVentaTpv = ({

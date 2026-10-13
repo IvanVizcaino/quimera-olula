@@ -1,9 +1,9 @@
 import { AgenteTpv as CompAgenteTpv } from "#/tpv/comun/componentes/AgenteTpv.tsx";
-import { agenteActivo } from "#/tpv/comun/infraestructura.ts";
+import { agenteActivo, suscribirAgenteTpvCambiado } from "#/tpv/comun/infraestructura.ts";
 import { QBoton } from "@olula/componentes/index.js";
 import { useFocus } from "@olula/lib/useFocus.js";
 import { useModelo } from "@olula/lib/useModelo.js";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AgenteTpv } from "../diseño.ts";
 import { metaCambioAgenteActual } from "./agente_actual.ts";
 import "./AgenteTpvActual.css";
@@ -13,6 +13,8 @@ export const AgenteTpvActual = () => {
 
   const [cambiando, setCambiando] = useState(false);
   const [agente, setAgente] = useState<AgenteTpv | null>(miAgenteActivo);
+
+  useEffect(() => suscribirAgenteTpvCambiado(setAgente), []);
 
   const cambiarAgente = async (agente: AgenteTpv) => {
     agenteActivo.actualizar(agente);
@@ -30,7 +32,7 @@ export const AgenteTpvActual = () => {
         />
       ) : (
         <div className="inactivo">
-          <h2>{agente?.nombre ?? ""} </h2>
+          <h2>{agente?.nombre ?? "Seleccionar agente"}</h2>
           <QBoton
             texto="..."
             onClick={() => setCambiando(true)}

@@ -2,6 +2,19 @@ import { AgenteTpv } from "../agente/diseño.ts";
 import { PuntoVentaTpv } from "../punto_de_venta/diseño.ts";
 
 const CLAVE_PUNTO_VENTA = "punto-venta-tpv-local";
+const EVENTO_AGENTE_TPV = "tpv-agente-cambiado";
+
+export const notificarAgenteTpvCambiado = (agente: AgenteTpv) => {
+    window.dispatchEvent(new CustomEvent(EVENTO_AGENTE_TPV, { detail: agente }));
+};
+
+export const suscribirAgenteTpvCambiado = (onAgente: (agente: AgenteTpv) => void) => {
+    const handler = (evento: Event) => {
+        onAgente((evento as CustomEvent<AgenteTpv>).detail);
+    };
+    window.addEventListener(EVENTO_AGENTE_TPV, handler);
+    return () => window.removeEventListener(EVENTO_AGENTE_TPV, handler);
+};
 
 export const puntoVentaLocal = {
 

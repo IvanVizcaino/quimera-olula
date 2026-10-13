@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.js";
 import { publicar } from "@olula/lib/dominio.js";
-import { abiertaOEmitidaContexto, cambiarDescuento, cambiarVenta, cargarContexto, ContextoVentaTpv, crearLineaPorBarcode, emitirVale, EstadoVentaTpv, getContextoVacio, Lineas, onLineaBorrada, onLineaCambiada, onLineaCreada, onVentaBorrada, Pagos, refrescarCabecera, refrescarLineas, refrescarPagos } from "./detalle.ts";
+import { abiertaOEmitidaContexto, cambiarDescuento, cambiarTotal, cambiarVenta, cargarContexto, ContextoVentaTpv, crearLineaPorBarcode, emitirVale, EstadoVentaTpv, getContextoVacio, Lineas, onLineaBorrada, onLineaCambiada, onLineaCreada, onVentaBorrada, Pagos, refrescarCabecera, refrescarLineas, refrescarPagos } from "./detalle.ts";
 
 
 export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () => {
@@ -31,6 +31,8 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
             cambio_cliente_solicitado: "CAMBIANDO_CLIENTE",
 
             descuento_solicitado: "CAMBIANDO_DESCUENTO",
+
+            total_solicitado: "CAMBIANDO_TOTAL",
 
             cambio_linea_solicitado: "CAMBIANDO_LINEA",
 
@@ -79,6 +81,13 @@ export const getMaquina: () => Maquina<EstadoVentaTpv, ContextoVentaTpv> = () =>
             descuento_aplicado: [cambiarDescuento],
 
             descuento_cancelado: "ABIERTA",
+        },
+
+        CAMBIANDO_TOTAL: {
+
+            total_aplicado: [cambiarTotal],
+
+            cambio_total_cancelado: "ABIERTA",
         },
 
         EMITIDA: {

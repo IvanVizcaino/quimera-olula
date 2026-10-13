@@ -139,6 +139,8 @@ export type GetReportVale = (id: string) => Promise<Blob>;
 
 export type PatchEmitirVenta = (id: string) => Promise<void>;
 
+export type PatchCambiarTotal = (id: string, total: number) => Promise<void>;
+
 
 export type EstadoMaestroVentasTpv = 'INICIAL' | 'CREANDO';
 

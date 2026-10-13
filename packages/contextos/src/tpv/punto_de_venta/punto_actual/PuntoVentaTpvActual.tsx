@@ -1,5 +1,6 @@
+import { getAgenteTpv } from "#/tpv/agente/infraestructura.ts";
 import { PuntoVentaTpv as CompPuntoVentaTpv } from "#/tpv/comun/componentes/PuntoVentaTpv.tsx";
-import { puntoVentaLocal } from "#/tpv/comun/infraestructura.ts";
+import { agenteActivo, notificarAgenteTpvCambiado, puntoVentaLocal } from "#/tpv/comun/infraestructura.ts";
 import { QBoton } from "@olula/componentes/index.js";
 import { useFocus } from "@olula/lib/useFocus.js";
 import { useModelo } from "@olula/lib/useModelo.js";
@@ -24,6 +25,15 @@ export const PuntoVentaTpvActual = ({
     puntoVentaLocal.actualizar(punto);
     setPunto(punto);
     setCambiando(false);
+    if (punto.agenteId) {
+      try {
+        const agente = await getAgenteTpv(punto.agenteId);
+        agenteActivo.actualizar(agente);
+        notificarAgenteTpvCambiado(agente);
+      } catch (error) {
+        console.error("No se pudo cargar el agente del punto de venta:", error);
+      }
+    }
     if (onChange && (!puntoAnterior || punto.id !== puntoAnterior.id)) {
       onChange();
     }
@@ -39,7 +49,7 @@ export const PuntoVentaTpvActual = ({
         />
       ) : (
         <div className="inactivo">
-          <h2>{punto?.nombre ?? ""} </h2>
+          <h2>{punto?.nombre ?? "Seleccionar punto de venta"}</h2>
           <QBoton
             texto="..."
             onClick={() => setCambiando(true)}

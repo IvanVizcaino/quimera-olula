@@ -1,13 +1,16 @@
 import { ejecutarListaProcesos, MetaModelo, publicar } from "@olula/lib/dominio.ts";
 
+import { getTpvConfig } from "#/tpv/comun/dominio.ts";
 import { getReportFactura } from "#/ventas/factura/infraestructura.ts";
 import { cambioClienteVentaVacio, metaCambioClienteVenta, metaVenta } from "#/ventas/venta/dominio.ts";
 import { ProcesarContexto } from "@olula/lib/diseño.js";
 import { imprimir_blob } from "@olula/lib/impresion.js";
 import { accionesListaEntidades, ListaEntidades, ProcesarListaEntidades } from "@olula/lib/ListaEntidades.js";
 import { CambioClienteFactura, LineaFactura, PagoVentaTpv, VentaTpv } from "../diseño.ts";
+import { opcionesTpvPorDefecto } from "../../config/dominio.ts";
 import { ventaTpvVacia } from "../dominio.ts";
-import { getLineas, getPagos, getReportVale, getReportVenta, getVenta, patchCambiarDescuento, patchFechaVenta, patchVenta, postEmitirVale, postLineaPorBarcode } from "../infraestructura.ts";
+import { planImpresionVenta } from "../impresion.ts";
+import { getLineas, getPagos, getReportVale, getReportVenta, getVenta, patchCambiarDescuento, patchCambiarTotal, patchFechaVenta, patchVenta, postEmitirVale, postLineaPorBarcode } from "../infraestructura.ts";
 
 
 export const cambioClienteFacturaVacio: CambioClienteFactura = cambioClienteVentaVacio;
@@ -24,6 +27,7 @@ export type EstadoVentaTpv = (
     | "CREANDO_LINEA" | "BORRANDO_LINEA" | "CAMBIANDO_LINEA"
     | "DEVOLVIENDO_VENTA"
     | "GENERANDO_TIQUE_REGALO"
+    | "CAMBIANDO_TOTAL"
 );
 
 export type ContextoVentaTpv = {
@@ -300,6 +304,26 @@ export const cambiarDescuento: ProcesarVentaTpv = async (contexto, payload) => {
     ]);
 }
 
+export const cambiarTotal: ProcesarVentaTpv = async (contexto, payload) => {
+    const { total } = payload as { total: number };
+    await patchCambiarTotal(contexto.venta.id, total);
+
+    return pipeVentaTpv(contexto, [
+        refrescarCabecera,
+        refrescarLineas,
+        'ABIERTA',
+    ]);
+}
+
+// Si la config no se puede leer, el TPV sigue funcionando con los valores por defecto.
+const configSegura = async () => {
+    try {
+        return await getTpvConfig();
+    } catch {
+        return { opciones: opcionesTpvPorDefecto, formaPagoValeId: "" };
+    }
+};
+
 export const emitirVale: ProcesarVentaTpv = async (contexto, payload) => {
 
     const venta = payload as VentaTpv
@@ -310,8 +334,11 @@ export const emitirVale: ProcesarVentaTpv = async (contexto, payload) => {
         refrescarPagos,
         abiertaOEmitidaContexto,
     ]);
+    const { opciones } = await configSegura();
     await imprimirVale(ctx.venta.codigo);
-    await imprimirTicketOFactura(ctx.venta, ctx.pagos.lista);
+    if (opciones.emitirValeReimprimeTique) {
+        await imprimirTicketOFactura(ctx.venta, ctx.pagos.lista);
+    }
     return [ctx, eventos];
 }
 
@@ -383,20 +410,18 @@ export const cargarContexto: ProcesarVentaTpv = async (contexto, payload) => {
 
 
 export const imprimirTicketOFactura = async (venta: VentaTpv, pagos: PagoVentaTpv[]) => {
-    if (venta.cliente) {
+    const { opciones, formaPagoValeId } = await configSegura();
+    const plan = planImpresionVenta(venta, pagos, opciones, formaPagoValeId);
+    if (plan.documento === "factura") {
         const blob = await getReportFactura(venta.id);
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
-    } else {
+    } else if (plan.documento === "tique") {
         const blob = await getReportVenta(venta.id);
-        console.log('imprimiendo venta');
         await imprimir_blob(blob);
-        console.log('imprimiendo venta impresa');
-        const pagos_vale = pagos.filter((p) => p.vale && p.saldoVale && p.saldoVale > 0);
-        for (const p of pagos_vale) {
-            console.log("Imprimiendo vale", p.vale);
-            await imprimirVale(p.vale!);
-        }
+    }
+    for (const vale of plan.vales) {
+        await imprimirVale(vale);
     }
 }
 
