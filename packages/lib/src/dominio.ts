@@ -729,7 +729,11 @@ export const modeloModificado = <T extends Modelo>(valor_inicial: T, valor: T, m
 //     return Number.isFinite(numero) ? numero : null;
 // }
 
-export const formatearMoneda = (cantidad: number | string, divisa: string): string => {
+export const formatearMoneda = (
+    cantidad: number | string,
+    divisa: string,
+    decimales?: number
+): string => {
     // const numero = aNumeroMoneda(cantidad);
     const numero = Number(cantidad);
     if (isNaN(numero)) return "";
@@ -740,6 +744,9 @@ export const formatearMoneda = (cantidad: number | string, divisa: string): stri
         style: "currency",
         currency: divisaValida,
         useGrouping: "always",
+        ...(decimales !== undefined
+            ? { minimumFractionDigits: decimales, maximumFractionDigits: decimales }
+            : {}),
     }).format(numero);
 };
 

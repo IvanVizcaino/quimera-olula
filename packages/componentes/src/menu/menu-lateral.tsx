@@ -1,4 +1,5 @@
 import { puedeAlguna } from "@olula/lib/dominio.ts";
+import { cumplePlugin } from "@olula/lib/plugins.tsx";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { ElementoMenu, ElementoMenuPadre } from "@olula/lib/menu.ts";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
@@ -38,6 +39,9 @@ export const MenuLateral = () => {
       <QIcono nombre={elemento.icono} tamaño="sm" />
     ) : null;
     const cumpleFiltro = elemento.nombre.toLowerCase().includes(filtro);
+
+    // Si exige un plugin y no está activo, no mostrar (ni sus subelementos)
+    if (!cumplePlugin(elemento.plugin)) return null;
 
     // Si tiene regla y no tiene permiso, no mostrar
     if ("regla" in elemento && elemento.regla && !puedeAlguna(elemento.regla)) {

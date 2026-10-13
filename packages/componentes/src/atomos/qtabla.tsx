@@ -28,6 +28,8 @@ type MetaColumna<T extends Entidad> = {
     | "booleano"
     | undefined;
   divisa?: string | ((entidad: T) => string);
+  /** Decimales fijos para columnas `moneda` (p. ej. 4 en precios de compra). */
+  decimales?: number;
   ancho?: string;
   render?: (entidad: T) => string | ReactNode;
 };
@@ -63,6 +65,7 @@ const fila = <T extends Entidad>(entidad: Entidad, metaTabla: MetaTabla<T>) => {
     render,
     tipo,
     divisa,
+    decimales,
     ancho,
   }: MetaColumna<T>) => {
     let datos = render?.(entidad as T) ?? (entidad[id] as unknown);
@@ -72,7 +75,8 @@ const fila = <T extends Entidad>(entidad: Entidad, metaTabla: MetaTabla<T>) => {
       if (typeof datos === "number" || typeof datos === "string") {
         datos = formatearMoneda(
           datos,
-          resolverDivisa(divisa, entidad as T) ?? "EUR"
+          resolverDivisa(divisa, entidad as T) ?? "EUR",
+          decimales
         );
       }
     } else if (tipo === "fecha" && typeof datos === "string") {

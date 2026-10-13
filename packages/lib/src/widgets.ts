@@ -1,8 +1,11 @@
 import { ComponentType } from "react";
+import type { RequisitoPlugin } from "./plugins.tsx";
 
 export interface DefinicionWidget {
     id: string;
     regla?: string;
+    /** Si se indica, el widget solo se muestra con ese plugin activo. */
+    plugin?: RequisitoPlugin;
     Componente: ComponentType;
 }
 

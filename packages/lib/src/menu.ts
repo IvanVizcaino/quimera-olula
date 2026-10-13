@@ -1,5 +1,9 @@
+import type { RequisitoPlugin } from "./plugins.tsx";
+
 export interface ElementoMenuBase {
     nombre: string;
+    /** Si se indica, el elemento solo se muestra con ese plugin activo. Sin campo: siempre visible. */
+    plugin?: RequisitoPlugin;
     icono?: string;
     regla?: string | string[];
     color?: string;
