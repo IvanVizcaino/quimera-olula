@@ -66,8 +66,6 @@ export const pagarRecibo: ProcesarDetalle = async (contexto, payload) => {
     await patchPagarReciboCompra(contexto.recibo.id, {
         cuentaPagoId: pago.cuenta_pago_id,
         fecha: pago.fecha.toISOString().slice(0, 10),
-        iban: pago.iban || null,
-        numeroCheque: pago.numero_cheque || null,
     });
     const recibo = await getReciboCompra(contexto.recibo.id);
 
@@ -83,8 +81,6 @@ export const devolverRecibo: ProcesarDetalle = async (contexto, payload) => {
     await patchDevolverReciboCompra(contexto.recibo.id, {
         cuentaPagoId: devolucion.cuenta_pago_id,
         fecha: devolucion.fecha.toISOString().slice(0, 10),
-        iban: devolucion.iban || null,
-        numeroCheque: devolucion.numero_cheque || null,
     });
     const recibo = await getReciboCompra(contexto.recibo.id);
 

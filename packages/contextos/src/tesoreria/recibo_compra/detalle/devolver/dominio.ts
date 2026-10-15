@@ -10,8 +10,6 @@ export const devolucionReciboCompraVacia = (recibo: ReciboCompra): DevolucionRec
         cuenta_pago_id: cuenta?.id ?? "",
         nombre_cuenta_pago: cuenta?.nombre ?? "",
         fecha: new Date(),
-        iban: "",
-        numero_cheque: "",
     };
 };
 
@@ -19,7 +17,5 @@ export const metaDevolucionReciboCompra: MetaModelo<DevolucionReciboCompra> = {
     campos: {
         cuenta_pago_id: { requerido: true },
         fecha: { tipo: "fecha", requerido: true },
-        iban: {},
-        numero_cheque: {},
     },
 };

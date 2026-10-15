@@ -1,6 +1,6 @@
 import { CuentaBancariaSelect } from "#/empresa/comun/componentes/cuenta_bancaria_select.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QDate, QInput, QModal } from "@olula/componentes/index.js";
+import { QDate, QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useMemo } from "react";
@@ -47,8 +47,6 @@ export const DevolverReciboCompra = ({
             deshabilitado
           />
           <QDate label="Fecha" {...uiProps("fecha")} />
-          <QInput label="IBAN" {...uiProps("iban")} />
-          <QInput label="Nº cheque / otro medio" {...uiProps("numero_cheque")} />
         </quimera-formulario>
         <div className="botones maestro-botones">
           <QBoton onClick={devolver} deshabilitado={!valido}>

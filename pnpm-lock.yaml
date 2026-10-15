@@ -277,7 +277,7 @@ importers:
     devDependencies:
       '@aldabil/react-scheduler':
         specifier: 3.0.4
-        version: 3.0.4(enlf4ijhpnpv2txndqdtxq6bsi)
+        version: 3.0.4(bf1724196a603b0543b9fd903d1f9aa5)
       baseline-browser-mapping:
         specifier: ^2.9.19
         version: 2.11.0
@@ -1707,7 +1707,7 @@ importers:
     dependencies:
       '@aldabil/react-scheduler':
         specifier: 3.1.2
-        version: 3.1.2(enlf4ijhpnpv2txndqdtxq6bsi)
+        version: 3.1.2(bf1724196a603b0543b9fd903d1f9aa5)
       '@emotion/react':
         specifier: ^11.14.0
         version: 11.14.0(@types/react@19.2.17)(react@19.2.8)
@@ -7880,7 +7880,7 @@ snapshots:
 
   '@adobe/css-tools@4.4.4': {}
 
-  '@aldabil/react-scheduler@3.0.4(enlf4ijhpnpv2txndqdtxq6bsi)':
+  '@aldabil/react-scheduler@3.0.4(bf1724196a603b0543b9fd903d1f9aa5)':
     dependencies:
       '@mui/icons-material': 7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@types/react@19.2.17)(react@19.2.8)
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -7889,7 +7889,7 @@ snapshots:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
 
-  '@aldabil/react-scheduler@3.1.2(enlf4ijhpnpv2txndqdtxq6bsi)':
+  '@aldabil/react-scheduler@3.1.2(bf1724196a603b0543b9fd903d1f9aa5)':
     dependencies:
       '@mui/icons-material': 7.3.11(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(@types/react@19.2.17)(react@19.2.8)
       '@mui/material': 7.3.11(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react@19.2.8))(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)

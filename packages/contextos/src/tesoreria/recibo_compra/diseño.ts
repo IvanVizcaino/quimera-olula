@@ -34,10 +34,6 @@ export type GetTotalesRecibosCompra = (criteria: Criteria) => Promise<TotalesRec
 export type PagoReciboCompra = {
     cuentaPagoId: string;
     fecha: string;
-    /** mediopago340 C — proveedores RECC (criterio_caja.eneboo). */
-    iban?: string | null;
-    /** mediopago340 T/O — proveedores RECC. */
-    numeroCheque?: string | null;
 };
 
 export type PatchPagarReciboCompra = (id: string, pago: PagoReciboCompra) => Promise<void>;
@@ -45,8 +41,6 @@ export type PatchPagarReciboCompra = (id: string, pago: PagoReciboCompra) => Pro
 export type DevolucionReciboCompra = {
     cuentaPagoId: string;
     fecha: string;
-    iban?: string | null;
-    numeroCheque?: string | null;
 };
 
 export type PatchDevolverReciboCompra = (id: string, devolucion: DevolucionReciboCompra) => Promise<void>;

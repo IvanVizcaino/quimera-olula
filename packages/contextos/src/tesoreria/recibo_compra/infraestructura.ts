@@ -109,8 +109,6 @@ export const patchPagarReciboCompra: PatchPagarReciboCompra = async (id, pago: P
         {
             cuenta_pago_id: pago.cuentaPagoId,
             fecha: pago.fecha,
-            iban: pago.iban || null,
-            numero_cheque: pago.numeroCheque || null,
         },
         "Error al pagar el recibo de pago"
     );
@@ -123,8 +121,6 @@ export const patchDevolverReciboCompra: PatchDevolverReciboCompra = async (id, d
         {
             cuenta_pago_id: devolucion.cuentaPagoId,
             fecha: devolucion.fecha,
-            iban: devolucion.iban || null,
-            numero_cheque: devolucion.numeroCheque || null,
         },
         "Error al devolver el recibo de pago"
     );
