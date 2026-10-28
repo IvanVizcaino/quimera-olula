@@ -10,7 +10,7 @@ export type ContextoMaestroSubcuenta = {
     subcuentas: ListaActivaEntidades<Subcuenta>;
 };
 
-export const ordenDefectoSubcuenta = ["codigo", "asc"];
+export const ordenDefectoSubcuenta = ["codigo", "ASC"];
 
 export const metaTablaSubcuenta: MetaTabla<Subcuenta> = [
     { id: "codigo", cabecera: "Código" },

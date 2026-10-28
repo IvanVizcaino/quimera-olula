@@ -6,14 +6,14 @@ describe("subcuenta maestro dominio (D2 F-01)", () => {
     test("criteriaConEjercicio fija filtro ejercicio_id", () => {
         const c = criteriaConEjercicio("2026");
         expect(c.filtro).toEqual([["ejercicio_id", "eq", "2026"]]);
-        expect(c.orden).toEqual(["codigo", "asc"]);
+        expect(c.orden).toEqual(["codigo", "ASC"]);
     });
 
     test("ejercicioIdDesdeCriteria lee eq", () => {
         expect(
             ejercicioIdDesdeCriteria({
                 filtro: [["ejercicio_id", "eq", "2025"]],
-                orden: ["codigo", "asc"],
+                orden: ["codigo", "ASC"],
                 paginacion: { pagina: 1, limite: 20 },
             }),
         ).toBe("2025");
