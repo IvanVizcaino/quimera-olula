@@ -69,6 +69,8 @@ interface ArticuloItemApi {
     factor_conv_unidad?: number | null;
     // Solo con el plugin `disponible_art` activo.
     total_disponible?: number | null;
+    // Solo con el plugin `art_obsoletos` activo.
+    obsoleto?: boolean;
 }
 
 interface ArticuloApi extends ArticuloItemApi {
@@ -94,6 +96,7 @@ const articuloItemDesdeApi = (api: ArticuloItemApi): ArticuloItem => ({
     magnitudUnidad: api.magnitud_unidad,
     factorConvUnidad: api.factor_conv_unidad,
     totalDisponible: api.total_disponible,
+    obsoleto: api.obsoleto ?? false,
 });
 
 const articuloDesdeApi = (api: ArticuloApi): Articulo => ({
@@ -127,6 +130,7 @@ const cambiosArticuloAApi = (cambios: CambiosArticulo): Record<string, unknown> 
     if (cambios.seVende !== undefined) api.se_vende = cambios.seVende;
     if (cambios.subfamiliaId !== undefined) api.subfamilia_id = cambios.subfamiliaId ?? null;
     if (cambios.unidadId !== undefined) api.unidad_id = cambios.unidadId ?? null;
+    if (cambios.obsoleto !== undefined) api.obsoleto = cambios.obsoleto;
 
     return api;
 };

@@ -1,10 +1,12 @@
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QTabla, MetaTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { descargarDocumento } from "@olula/lib/api/documentos.ts";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { formatearMoneda } from "@olula/lib/dominio.ts";
+import { pluginActivo } from "@olula/lib/plugins.tsx";
 import { useCallback, useContext, useMemo, useState } from "react";
 import { LineaInventarioValorado, TotalesInventarioValorado } from "../diseño.ts";
 import { criteriaInventarioValorado, nombreFicheroPdfInventarioValorado } from "../dominio.ts";
@@ -26,6 +28,8 @@ export const InformeInventarioValorado = () => {
     const { intentar } = useContext(ContextoError);
     const [almacenId, setAlmacenId] = useState("");
     const [referencia, setReferencia] = useState("");
+    const [excluirObsoletos, setExcluirObsoletos] = useState(false);
+    const conObsoletos = pluginActivo("art_obsoletos");
     const [filas, setFilas] = useState<LineaInventarioValorado[]>([]);
     const [totales, setTotales] = useState<TotalesInventarioValorado | null>(null);
     const [total, setTotal] = useState(0);
@@ -37,8 +41,9 @@ export const InformeInventarioValorado = () => {
             criteriaInventarioValorado({
                 almacenId,
                 referencia,
+                excluirObsoletos,
             }),
-        [almacenId, referencia]
+        [almacenId, referencia, excluirObsoletos]
     );
 
     const consultar = useCallback(async () => {
@@ -87,6 +92,14 @@ export const InformeInventarioValorado = () => {
                         onChange={setReferencia}
                         opcional
                     />
+                    {conObsoletos && (
+                        <QCheckbox
+                            label="Excluir obsoletos"
+                            nombre="excluir_obsoletos"
+                            valor={excluirObsoletos}
+                            onChange={(v) => setExcluirObsoletos(v === "true")}
+                        />
+                    )}
                 </quimera-formulario>
                 <div className="maestro-botones">
                     <QBoton onClick={consultar} deshabilitado={cargando}>

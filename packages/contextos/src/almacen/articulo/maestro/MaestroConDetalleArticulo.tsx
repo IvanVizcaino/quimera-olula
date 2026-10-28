@@ -18,6 +18,7 @@ import { Articulo } from "../diseño.ts";
 import { UsoArticulo } from "../UsoArticulo.tsx";
 import { ContextoMaestroArticulo } from "./diseño.ts";
 import { metaTablaConDisponible } from "./disponible.ts";
+import { criteriaSinObsoletos, metaFiltroConObsoletos } from "./obsoletos.ts";
 import { getMaquina } from "./maquina.ts";
 
 export const metaTablaArticuloBase: MetaTabla<Articulo> = [
@@ -38,7 +39,7 @@ const filtroBooleano =
       ? null
       : [campo, "=", String(valor)];
 
-const metaFiltroArticulo: MetaFiltro = {
+export const metaFiltroArticuloBase: MetaFiltro = {
   id: {
     id: "id",
     label: "Referencia",
@@ -89,7 +90,17 @@ export const MaestroConDetalleArticulo = () => {
       | undefined) ?? metaTablaArticuloBase,
     pluginActivo("disponible_art")
   );
-  const criteriaBase = useMemo(criteriaConStock, []);
+  // «Ocultar obsoletos» (Eneboo `masterarticulos`): marcado de salida, el
+  // usuario lo quita desde el panel de filtros para ver los obsoletos.
+  const conObsoletos = pluginActivo("art_obsoletos");
+  const metaFiltroArticulo = useMemo(
+    () => metaFiltroConObsoletos(metaFiltroArticuloBase, conObsoletos),
+    [conObsoletos]
+  );
+  const criteriaBase = useMemo(
+    () => criteriaSinObsoletos(criteriaConStock(), conObsoletos),
+    [conObsoletos]
+  );
 
   const { id, criteria } = getUrlParams();
   const criteriaInicial = criteria.filtro.length > 0 ? criteria : criteriaBase;

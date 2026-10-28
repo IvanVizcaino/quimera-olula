@@ -27,6 +27,7 @@ export const TabGeneral = ({
   const conSubfamilias = pluginActivo("subfamilias");
   const conPesosMedidas = pluginActivo("pesos_medidas");
   const conDisponible = pluginActivo("disponible_art");
+  const conObsoletos = pluginActivo("art_obsoletos");
   
   return (
     <div className="TabGeneral">
@@ -65,6 +66,9 @@ export const TabGeneral = ({
             valor={String(articulo.totalDisponible ?? 0)}
             soloLectura
           />
+        )}
+        {conObsoletos && (
+          <QCheckbox label="Obsoleto" {...uiProps("obsoleto")} />
         )}
         <QTextArea label="Observaciones" {...uiProps("observaciones")} />
         {

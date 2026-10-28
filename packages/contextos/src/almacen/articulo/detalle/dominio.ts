@@ -21,6 +21,7 @@ export const articuloVacio = (): Articulo => ({
     noStock: false,
     seCompra: false,
     seVende: false,
+    obsoleto: false,
     proveedores: [],
 });
 
@@ -33,6 +34,7 @@ const camposEditables = [
     "noStock",
     "subfamiliaId",
     "unidadId",
+    "obsoleto",
 ] as const;
 
 export const cambiosArticulo = (anterior: Articulo, nuevo: Articulo): CambiosArticulo =>
@@ -53,6 +55,7 @@ export const metaArticulo: MetaModelo<Articulo> = {
         tipoCodBarras: { requerido: false },
         familiaId: { requerido: false },
         noStock: { tipo: "checkbox" },
+        obsoleto: { tipo: "checkbox" },
     },
     editable: () => puede("almacen.articulo"),
 };

@@ -29,6 +29,9 @@ export interface ArticuloItem extends Entidad {
     factorConvUnidad?: number | null;
     // Solo con el plugin `disponible_art` activo (`articulos.totaldisponible`).
     totalDisponible?: number | null;
+    /** Eneboo `articulos.obsoleto` (ext. `art_obsoletos`). Sin el plugin la API
+     * no lo manda y siempre llega `false`. */
+    obsoleto: boolean;
 };
 
 export interface CajaProveedorArticulo extends Entidad {
@@ -76,6 +79,7 @@ export type CambiosArticulo = Partial<
         | "seVende"
         | "subfamiliaId"
         | "unidadId"
+        | "obsoleto"
     >
 >;
 
