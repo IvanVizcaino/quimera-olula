@@ -137,6 +137,23 @@ export type CargaTerminada = {
     mensaje: string | null;
 };
 
+export type ConsultaMiembros = {
+    filtros: Record<string, CodigoMiembro[]>;
+    buscar: string;
+    todos: boolean;
+    limite: number;
+    desplazamiento: number;
+    seleccionados: CodigoMiembro[];
+};
+
+export type PaginaMiembros = {
+    miembros: Miembro[];
+    hayMas: boolean;
+    seleccionados: Miembro[];
+};
+
+export type BuscarMiembros = (cuboId: string, nivel: string, consulta: ConsultaMiembros) => Promise<PaginaMiembros>;
+
 export type GetCatalogo =() => Promise<Cubo[]>;
 
 export type GetMiembros = (cuboId: string, nivel: string, buscar?: string) => Promise<Miembros>;

@@ -10,7 +10,7 @@ import {
     nivelDeTipo,
     trimestresElegidos,
 } from "../../dominio.ts";
-import { getMiembros } from "../../infraestructura.ts";
+import { buscarMiembros } from "../../infraestructura.ts";
 
 type BotoneraTiempoProps = {
     cubo: Cubo;
@@ -19,6 +19,7 @@ type BotoneraTiempoProps = {
 };
 
 const ANOS_BOTONERA = 5;
+const MAX_ANOS_CONSULTA = 100;
 const TRIMESTRES = ["T1", "T2", "T3", "T4"];
 const MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
@@ -38,7 +39,14 @@ export const BotoneraTiempo = ({ cubo, peticion, onCambio }: BotoneraTiempoProps
 
     useEffect(() => {
         if (!refAno) return;
-        getMiembros(cubo.id, refAno).then(({ miembros }) =>
+        buscarMiembros(cubo.id, refAno, {
+            filtros: {},
+            buscar: "",
+            todos: true,
+            limite: MAX_ANOS_CONSULTA,
+            desplazamiento: 0,
+            seleccionados: [],
+        }).then(({ miembros }) =>
             setAnos(
                 miembros
                     .filter((m) => m.codigo !== null)

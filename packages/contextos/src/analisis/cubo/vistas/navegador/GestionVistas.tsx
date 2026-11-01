@@ -5,6 +5,7 @@ import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
 import { useState } from "react";
 import { ResumenVista } from "../../../vista/diseño.ts";
+import { BotonAccion } from "./BotonAccion.tsx";
 
 type GestionVistasProps = {
     vistas: ResumenVista[];
@@ -35,21 +36,30 @@ export const GestionVistas = ({ vistas, vista, emitir }: GestionVistasProps) => 
                     opcion?.valor ? emitir("vista_abierta", opcion.valor) : emitir("vista_cerrada")
                 }
             />
-            <QBoton variante="texto" deshabilitado={!vista} onClick={() => emitir("vista_guardada")}>
-                Guardar
-            </QBoton>
-            <QBoton
-                variante="texto"
+            <BotonAccion
+                icono="guardar"
+                texto="Guardar"
+                soloIcono
+                deshabilitado={!vista}
+                onClick={() => emitir("vista_guardada")}
+            />
+            <BotonAccion
+                icono="copiar"
+                texto="Guardar como"
+                soloIcono
                 onClick={() => {
                     setNombre(vista ? `${vista.nombre} (copia)` : "");
                     setPidiendoNombre(true);
                 }}
-            >
-                Guardar como
-            </QBoton>
-            <QBoton variante="texto" destructivo deshabilitado={!vista} onClick={() => setConfirmandoBorrado(true)}>
-                Borrar
-            </QBoton>
+            />
+            <BotonAccion
+                icono="eliminar"
+                texto="Borrar vista"
+                soloIcono
+                destructivo
+                deshabilitado={!vista}
+                onClick={() => setConfirmandoBorrado(true)}
+            />
 
             {pidiendoNombre && (
                 <QModal nombre="guardar-vista" titulo="Guardar vista" abierto onCerrar={() => setPidiendoNombre(false)}>

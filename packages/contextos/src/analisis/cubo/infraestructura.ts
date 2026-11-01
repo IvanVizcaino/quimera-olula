@@ -1,6 +1,8 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import AnalisisUrls from "../comun/urls.ts";
+import { paginaDesdeLista } from "./dominio.ts";
 import {
+    BuscarMiembros,
     CodigoMiembro,
     Cubo,
     Dimension,
@@ -100,13 +102,42 @@ export const getMiembros: GetMiembros = async (cuboId, nivel, buscar) => {
     return { miembros: respuesta.datos, hayMas: respuesta.hay_mas };
 };
 
+const filtrosApi = (filtros: Record<string, CodigoMiembro[]>) =>
+    Object.fromEntries(Object.entries(filtros).map(([nivel, codigos]) => [nivel, codigos.map(codigoApi)]));
+
+type PaginaMiembrosApi = {
+    datos: Miembro[];
+    hay_mas: boolean;
+    seleccionados: Miembro[];
+};
+
+export const postMiembros: BuscarMiembros = async (cuboId, nivel, consulta) => {
+    const respuesta = await RestAPI.query<object, PaginaMiembrosApi>(
+        `${baseUrl}/${cuboId}/nivel/${nivel}/miembro`,
+        {
+            filtros: filtrosApi(consulta.filtros),
+            buscar: consulta.buscar || null,
+            todos: consulta.todos,
+            limite: consulta.limite,
+            desplazamiento: consulta.desplazamiento,
+            seleccionados: consulta.seleccionados.map(codigoApi),
+        }
+    );
+    return { miembros: respuesta.datos, hayMas: respuesta.hay_mas, seleccionados: respuesta.seleccionados ?? [] };
+};
+
+const buscarMiembrosProvisional: BuscarMiembros = async (cuboId, nivel, consulta) => {
+    const { miembros, hayMas } = await getMiembros(cuboId, nivel, consulta.buscar || undefined);
+    return paginaDesdeLista(miembros, hayMas, consulta);
+};
+
+export const buscarMiembros: BuscarMiembros = buscarMiembrosProvisional;
+
 export const peticionApi = (peticion: PeticionPivot): PeticionPivotApi => ({
     filas: peticion.filas,
     columnas: peticion.columnas,
     medidas: peticion.medidas,
-    filtros: Object.fromEntries(
-        Object.entries(peticion.filtros).map(([nivel, codigos]) => [nivel, codigos.map(codigoApi)])
-    ),
+    filtros: filtrosApi(peticion.filtros),
     orden: peticion.orden,
     top: peticion.top,
     excluir_ceros: peticion.excluirCeros,

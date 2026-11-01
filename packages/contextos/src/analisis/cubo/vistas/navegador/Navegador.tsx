@@ -1,5 +1,4 @@
 import { QAviso } from "@olula/componentes/atomos/qaviso.tsx";
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { FilaMultinivel, QTablaMultinivel } from "@olula/componentes/atomos/qtablamultinivel.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
@@ -17,6 +16,7 @@ import {
 } from "../../dominio.ts";
 import { getMaquina } from "./maquina.ts";
 import { contextoNavegadorInicial } from "./navegador.ts";
+import { BotonAccion } from "./BotonAccion.tsx";
 import { BotoneraTiempo } from "./BotoneraTiempo.tsx";
 import { GestionVistas } from "./GestionVistas.tsx";
 import { Grafico } from "./Grafico.tsx";
@@ -78,8 +78,10 @@ export const Navegador = () => {
     const presentar = (cambios: Partial<Presentacion>) => emitir("presentacion_cambiada", cambios);
     const medidas = cubo.medidas.filter((m) => peticion.medidas.includes(m.id));
     const niveles = nivelesCubo(cubo);
-    const cabeceraEtiqueta =
+    const etiquetaFilas =
         peticion.filas.map((ref) => niveles.find((n) => n.ref === ref)?.descripcion ?? ref).join(" / ") || "Total";
+    const medidaUnica = medidasEnColumnas && medidas.length === 1 && peticion.columnas.length > 0;
+    const cabeceraEtiqueta = medidaUnica ? `${etiquetaFilas} · ${medidas[0].descripcion}` : etiquetaFilas;
 
     const alternar = (fila: FilaMultinivel) => {
         const codigos = JSON.parse(fila.id) as CodigoMiembro[];
@@ -98,49 +100,56 @@ export const Navegador = () => {
     return (
         <div className="analisis-navegador">
             <header className="analisis-cabecera">
-                <QSelect
-                    label="Cubo"
-                    nombre="cubo"
-                    valor={cubo.id}
-                    opciones={cubos.map((c) => ({ valor: c.id, descripcion: c.descripcion }))}
-                    onChange={(opcion) => opcion && consultar("cubo_cambiado", opcion.valor)}
-                />
+                <div className="analisis-cabecera-cubo">
+                    <QSelect
+                        label="Cubo"
+                        nombre="cubo"
+                        valor={cubo.id}
+                        opciones={cubos.map((c) => ({ valor: c.id, descripcion: c.descripcion }))}
+                        onChange={(opcion) => opcion && consultar("cubo_cambiado", opcion.valor)}
+                    />
+                    <div className="analisis-carga">
+                        <span data-estado={cubo.estadoCarga?.estado ?? ""}>{textoCarga(cubo)}</span>
+                        {recargando(cubo) && !avisoSse && (
+                            <BotonAccion
+                                icono="rehacer"
+                                texto="Actualizar estado"
+                                soloIcono
+                                onClick={() => emitir("catalogo_refrescado")}
+                            />
+                        )}
+                        {puede("analisis.carga") && !recargando(cubo) && (
+                            <BotonAccion icono="rehacer" texto="Recargar" onClick={() => setPidiendoRecarga(true)} />
+                        )}
+                    </div>
+                </div>
                 <GestionVistas
                     vistas={vistas}
                     vista={vista}
                     emitir={(evento, payload) => consultar(evento, payload)}
                 />
-                <span className="analisis-carga">{textoCarga(cubo)}</span>
-                {recargando(cubo) && !avisoSse && (
-                    <QBoton variante="texto" onClick={() => emitir("catalogo_refrescado")}>
-                        Actualizar estado
-                    </QBoton>
-                )}
-                {puede("analisis.carga") && !recargando(cubo) && (
-                    <QBoton variante="texto" onClick={() => setPidiendoRecarga(true)}>
-                        Recargar
-                    </QBoton>
-                )}
-                <QBoton
-                    variante="texto"
-                    deshabilitado={!historial || historial.posicion === 0}
-                    onClick={() => consultar("historial_atras")}
-                >
-                    Atrás
-                </QBoton>
-                <QBoton
-                    variante="texto"
-                    deshabilitado={!historial || historial.posicion === historial.peticiones.length - 1}
-                    onClick={() => consultar("historial_adelante")}
-                >
-                    Adelante
-                </QBoton>
-                <QBoton variante="texto" onClick={() => presentar({ verGrafico: !verGrafico })}>
-                    {verGrafico ? "Ver tabla" : "Ver gráfico"}
-                </QBoton>
-                <QBoton variante="texto" onClick={() => emitir("exportacion_solicitada")}>
-                    Exportar a Excel
-                </QBoton>
+                <div className="analisis-acciones">
+                    <BotonAccion
+                        icono="atras"
+                        texto="Atrás"
+                        soloIcono
+                        deshabilitado={!historial || historial.posicion === 0}
+                        onClick={() => consultar("historial_atras")}
+                    />
+                    <BotonAccion
+                        icono="adelante"
+                        texto="Adelante"
+                        soloIcono
+                        deshabilitado={!historial || historial.posicion === historial.peticiones.length - 1}
+                        onClick={() => consultar("historial_adelante")}
+                    />
+                    <BotonAccion
+                        icono={verGrafico ? "tabla" : "grafico_barras"}
+                        texto={verGrafico ? "Ver tabla" : "Ver gráfico"}
+                        onClick={() => presentar({ verGrafico: !verGrafico })}
+                    />
+                    <BotonAccion icono="descargar" texto="Exportar a Excel" onClick={() => emitir("exportacion_solicitada")} />
+                </div>
             </header>
             <aside className="analisis-panel">
                 <PanelEjes cubo={cubo} peticion={peticion} onCambio={cambiar} />

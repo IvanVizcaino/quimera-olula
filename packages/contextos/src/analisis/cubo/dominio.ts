@@ -3,6 +3,7 @@ import {
     Arbol,
     CargaTerminada,
     CodigoMiembro,
+    ConsultaMiembros,
     Cubo,
     DatosGrafico,
     FilaPivot,
@@ -13,6 +14,7 @@ import {
     Nivel,
     Nodo,
     OrdenPivot,
+    PaginaMiembros,
     PeticionPivot,
     POR_ETIQUETA,
     TipoNivel,
@@ -20,6 +22,7 @@ import {
 } from "./diseño.ts";
 
 const TOTAL = "Total";
+const SIN_VALOR = "(sin valor)";
 
 export const claveRuta = (ruta: Miembro[]) => JSON.stringify(ruta.map((m) => m.codigo));
 
@@ -130,11 +133,18 @@ export const columnasTabla = (
     columnas.flatMap((columna) => {
         const etiquetas = columna.map((m) => m.etiqueta);
         const hoja = columna.length === nivelesColumna;
-        if (!medidasEnColumnas) {
+        const porMiembro = {
+            cabecera: hoja && columna.length > 0 ? etiquetas[etiquetas.length - 1] : TOTAL,
+            grupo: hoja && columna.length > 0 ? etiquetas.slice(0, -1) : etiquetas,
+        };
+        if (!medidasEnColumnas) return [{ id: claveRuta(columna), ...porMiembro }];
+        if (medidas.length === 1) {
+            const [medida] = medidas;
             return [{
-                id: claveRuta(columna),
-                cabecera: hoja && columna.length > 0 ? etiquetas[etiquetas.length - 1] : TOTAL,
-                grupo: hoja && columna.length > 0 ? etiquetas.slice(0, -1) : etiquetas,
+                id: `${claveRuta(columna)}|${medida.id}`,
+                ...porMiembro,
+                cabecera: nivelesColumna === 0 ? medida.descripcion : porMiembro.cabecera,
+                ...tipoColumna(medida.formato),
             }];
         }
         const grupo = hoja ? etiquetas : [...etiquetas, TOTAL];
@@ -230,6 +240,11 @@ export const moverNivel = (peticion: PeticionPivot, ref: string, destino: Eje | 
         filas: destino === "filas" ? insertar(filas) : filas,
         columnas: destino === "columnas" ? insertar(columnas) : columnas,
     };
+};
+
+export const asignarEje = (peticion: PeticionPivot, eje: Eje, refs: string[]): PeticionPivot => {
+    const otro: Eje = eje === "filas" ? "columnas" : "filas";
+    return { ...peticion, [eje]: refs, [otro]: peticion[otro].filter((r) => !refs.includes(r)) };
 };
 
 export const alternarMedida = (peticion: PeticionPivot, id: string, medidas: Medida[]): PeticionPivot => {
@@ -389,5 +404,32 @@ export const cargaTerminadaDesdeEvento = (data: unknown): CargaTerminada | null 
         estado: d.estado,
         filas: numeroONulo(d.filas),
         mensaje: typeof d.mensaje === "string" ? d.mensaje : null,
+    };
+};
+
+export const claveCodigo = (codigo: CodigoMiembro) => JSON.stringify(codigo === null ? null : String(codigo));
+
+const MAX_NOMBRES_RESUMEN = 2;
+
+export const resumenFiltro = (codigos: CodigoMiembro[], etiquetas: Record<string, string>): string => {
+    const nombres = codigos.map((c) => etiquetas[claveCodigo(c)] ?? (c === null ? SIN_VALOR : String(c)));
+    if (nombres.length <= MAX_NOMBRES_RESUMEN + 1) return nombres.join(", ");
+    return `${nombres.slice(0, MAX_NOMBRES_RESUMEN).join(", ")} y ${nombres.length - MAX_NOMBRES_RESUMEN} más`;
+};
+
+export const PAGINA_MIEMBROS = 10;
+
+export const miembroConocido = (codigo: CodigoMiembro, conocidos: Miembro[]): Miembro =>
+    conocidos.find((m) => claveCodigo(m.codigo) === claveCodigo(codigo)) ??
+    { codigo, etiqueta: codigo === null ? SIN_VALOR : String(codigo) };
+
+export const paginaDesdeLista = (miembros: Miembro[], hayMasEnOrigen: boolean, consulta: ConsultaMiembros): PaginaMiembros => {
+    const elegidos = new Set(consulta.seleccionados.map(claveCodigo));
+    const resto = miembros.filter((m) => !elegidos.has(claveCodigo(m.codigo)));
+    const fin = consulta.desplazamiento + consulta.limite;
+    return {
+        miembros: resto.slice(consulta.desplazamiento, fin),
+        hayMas: fin < resto.length || hayMasEnOrigen,
+        seleccionados: consulta.desplazamiento === 0 ? miembros.filter((m) => elegidos.has(claveCodigo(m.codigo))) : [],
     };
 };

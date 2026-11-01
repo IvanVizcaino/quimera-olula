@@ -7,8 +7,10 @@ import {
   alternarTrimestre,
   apilar,
   arbolDesdePivot,
+  asignarEje,
   cargaTerminadaDesdeEvento,
   cambiarFiltro,
+  claveCodigo,
   claveRuta,
   columnasTabla,
   datosGrafico,
@@ -23,7 +25,10 @@ import {
   necesitaCargar,
   nombreExportacion,
   ordenTrasPulsar,
+  miembroConocido,
+  paginaDesdeLista,
   peticionNodo,
+  resumenFiltro,
   rutasExpandidas,
 } from "./dominio.ts";
 
@@ -158,6 +163,18 @@ describe("columnasTabla", () => {
     ]);
     expect(resultado[0]).toMatchObject({ id: `${claveRuta([])}|importe`, tipo: "moneda" });
     expect(resultado[1]).toMatchObject({ tipo: "numero", decimales: 0 });
+  });
+
+  test("con una sola medida en columnas no se repite su nombre: cabecera por miembro", () => {
+    const resultado = columnasTabla(columnas, [importe], 2, true);
+    expect(resultado.map((c) => [c.grupo, c.cabecera])).toEqual([
+      [[], "Total"],
+      [["2025"], "Total"],
+      [["2025"], "T1"],
+      [["2026"], "Total"],
+      [["2026"], "T1"],
+    ]);
+    expect(resultado[2]).toMatchObject({ id: `${claveRuta([m(2025), m("T1")])}|importe`, tipo: "moneda" });
   });
 
   test("medidas en filas: una columna por miembro", () => {
@@ -436,5 +453,59 @@ describe("rutasExpandidas", () => {
     ]);
     expect(rutasExpandidas(arbol)).toEqual([[m("F2", "Bebidas")]]);
     expect(rutasExpandidas(alternarNodo(arbol, [m("F2", "Bebidas")]))).toEqual([]);
+  });
+});
+
+describe("resumenFiltro", () => {
+  const etiquetas = { [claveCodigo("C1")]: "Acme", [claveCodigo(2025)]: "2025", [claveCodigo(null)]: "(sin valor)" };
+
+  test("hasta tres valores, todos; con más, los dos primeros y cuántos faltan", () => {
+    expect(resumenFiltro(["C1", 2025, null], etiquetas)).toBe("Acme, 2025, (sin valor)");
+    expect(resumenFiltro(["C1", "C2", "C3", "C4"], etiquetas)).toBe("Acme, C2 y 2 más");
+  });
+
+  test("el código vale como etiqueta si no se conoce; el año en número o en texto es el mismo", () => {
+    expect(resumenFiltro(["2025", null], {})).toBe("2025, (sin valor)");
+    expect(claveCodigo(2025)).toBe(claveCodigo("2025"));
+  });
+});
+
+describe("asignarEje", () => {
+  test("pone los niveles en el orden dado y los quita del otro eje", () => {
+    expect(asignarEje(peticion, "columnas", ["articulo.familia", "tiempo.ano"])).toMatchObject({
+      filas: ["articulo.articulo"],
+      columnas: ["articulo.familia", "tiempo.ano"],
+    });
+    expect(asignarEje(peticion, "filas", [])).toMatchObject({ filas: [], columnas: ["tiempo.ano"] });
+  });
+});
+
+describe("paginaDesdeLista", () => {
+  const lista = ["A", "B", "C", "D", "E"].map((c) => m(c, `Etiqueta ${c}`));
+  const consulta = { filtros: {}, buscar: "", todos: false, limite: 2, desplazamiento: 0, seleccionados: ["B", "Z"] };
+
+  test("la primera página no repite los elegidos y trae las etiquetas de los que encuentra", () => {
+    expect(paginaDesdeLista(lista, false, consulta)).toEqual({
+      miembros: [m("A", "Etiqueta A"), m("C", "Etiqueta C")],
+      hayMas: true,
+      seleccionados: [m("B", "Etiqueta B")],
+    });
+  });
+
+  test("las siguientes páginas siguen donde se quedó y no traen elegidos", () => {
+    expect(paginaDesdeLista(lista, false, { ...consulta, desplazamiento: 2 })).toEqual({
+      miembros: [m("D", "Etiqueta D"), m("E", "Etiqueta E")],
+      hayMas: false,
+      seleccionados: [],
+    });
+    expect(paginaDesdeLista(lista, true, { ...consulta, desplazamiento: 2 }).hayMas).toBe(true);
+  });
+});
+
+describe("miembroConocido", () => {
+  test("usa la etiqueta conocida o, si no, el código", () => {
+    expect(miembroConocido(2025, [m("2025", "Año 2025")])).toEqual(m("2025", "Año 2025"));
+    expect(miembroConocido("Z", [])).toEqual(m("Z", "Z"));
+    expect(miembroConocido(null, [])).toEqual(m(null, "(sin valor)"));
   });
 });
