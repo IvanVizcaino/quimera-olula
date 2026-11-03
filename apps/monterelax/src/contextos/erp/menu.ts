@@ -1,0 +1,23 @@
+
+export const menuErp = {
+    "Gerencia": { icono: "grafico_barras" },
+    "Gerencia/Dashboard Gerencia": { url: "/dashboardGerencia/gerencia", regla: "accesoglobal.gerencia" },
+    "Producción": { icono: "grafico_barras" },
+    "Producción/Producción": { url: "/dashboardGerencia/produccion", regla: "accesoglobal.produccion" },
+    "Representantes": { icono: "usuarios" },
+    "Representantes/Ventas": { url: "/dashboardRepresentantes", regla: "accesoglobal.representantes" },
+    "Representantes/Cobros": { url: "/dashboardCobros", regla: "accesoglobal.representantes" },
+    "Representantes/Seguimiento de Pedidos": { url: "/pedidosCliente", regla: "accesoglobal.representantes" },
+    "Representantes/Tarifas": { url: "/documentos", regla: "accesoglobal.representantes" },
+    "Representantes/Productos disponibles": { url: "/dashboardStocks", regla: ["accesoglobal.gerencia", "accesoglobal.produccion", "accesoglobal.representantes"] },
+    "Fábrica": { icono: "paquete" },
+    "Fábrica/Órdenes de Carga": { url: "/ordenesDeCarga", regla: ["accesoglobal.gerencia", "accesoglobal.produccion"] },
+    "Cosido": { icono: "llave_inglesa" },
+    "Cosido/Cola de Cosido": { url: "/colacosido", regla: "accesoglobal.cosido" },
+    "Cosido/Recepción de Cosido": { url: "/recepcioncosido", regla: ["accesoglobal.gerencia", "accesoglobal.produccion"] },
+    "Cosido/Dashboard Cosido": { url: "/dashboardCosido", regla: ["accesoglobal.gerencia", "accesoglobal.produccion"] },
+    "Cosido/Cola de Cosido interna": { url: "/colaCosidoInterno", regla: "accesoglobal.cosidointerno" },
+    "Montado": { icono: "llave_inglesa" },
+    "Montado/Cola de Montado": { url: "/colaMontado", regla: "accesoglobal.montado" },
+    "Montado/Cola de Montado interna": { url: "/colaMontadoInterno", regla: "accesoglobal.montadointerno" },
+};

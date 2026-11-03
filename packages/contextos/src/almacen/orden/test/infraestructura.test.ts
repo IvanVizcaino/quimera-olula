@@ -25,6 +25,8 @@ describe("[orden-infra-01] lineaOrdenDesdeApi convierte correctamente de snake_c
         caja_destino_id: null,
         caja_destino: null,
         linea_pick_id: null,
+        pasos_pick: null,
+        pasos_drop: null,
         lecturas: [],
     };
 

@@ -60,7 +60,10 @@ function Dashboard({ useStyles }) {
     ?.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
   const tareasList = Object.values(tareas.dict ?? {})
     .filter(tarea => sinFiltroAgente || tarea.codAgente === agente)
-    .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+    // .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+    .sort((a, b) =>
+      `${a.fecha} ${a.hora ?? ""}`.localeCompare(`${b.fecha} ${b.hora ?? ""}`),
+    )
     .map(tarea => tarea.idTarea);
 
   useEffect(() => {
@@ -69,7 +72,7 @@ function Dashboard({ useStyles }) {
     });
   }, [dispatch]);
 
-  console.log('mimensaje_agentes: previsiones.codAgente: ', previsiones.codAgente, ", agente: ", agente, "condicion: ", previsiones.codAgente === 'TODOS' || previsiones.codAgente === agente);
+  // console.log('mimensaje_agentes: previsiones.codAgente: ', previsiones.codAgente, ", agente: ", agente, "condicion: ", previsiones.codAgente === 'TODOS' || previsiones.codAgente === agente);
   const verSoloProgress =
     previsiones.codAgente === 'TODOS' ||
     (previsiones.codAgente === agente && !usuario?.superuser)

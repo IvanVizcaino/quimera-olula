@@ -21,6 +21,7 @@ export const metaTipoCaja: MetaModelo<TipoCaja> = {
         descripcion: { requerido: true },
         sku: { requerido: false },
         capacidad: { requerido: false, tipo: "decimal" },
+        prefijo: { requerido: false },
     },
 };
 
@@ -48,8 +49,15 @@ export const guardarTipoCaja = async (
     contexto: ContextoDetalleTipoCaja,
     tipoCaja: TipoCaja
 ): Promise<void> => {
+    const cambios: Partial<TipoCaja> = {};
     if (tipoCaja.descripcion !== contexto.tipoCaja.descripcion) {
-        await patchTipoCaja(tipoCaja.id, { descripcion: tipoCaja.descripcion });
+        cambios.descripcion = tipoCaja.descripcion;
+    }
+    if (tipoCaja.prefijo !== contexto.tipoCaja.prefijo) {
+        cambios.prefijo = tipoCaja.prefijo;
+    }
+    if (Object.keys(cambios).length > 0) {
+        await patchTipoCaja(tipoCaja.id, cambios);
     }
 };
 

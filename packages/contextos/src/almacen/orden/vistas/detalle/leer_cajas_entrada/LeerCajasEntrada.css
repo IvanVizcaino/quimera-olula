@@ -1,0 +1,10 @@
+.LeerCajasEntrada {
+    quimera-autocompletar {
+        grid-column: span 6;
+    }
+
+    .LeerCajasEntrada__resultado {
+        margin-top: 0.5rem;
+        font-size: var(--tamaño-letra-s);
+    }
+}

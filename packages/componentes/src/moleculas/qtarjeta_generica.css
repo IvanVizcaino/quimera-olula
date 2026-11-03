@@ -33,7 +33,9 @@
 
     >section {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        /* La derecha se ajusta a su contenido pero puede encoger (con puntos
+           suspensivos) para que un valor largo no aplaste la izquierda. */
+        grid-template-columns: minmax(min(9rem, 50%), 1fr) minmax(0, max-content);
         align-items: start;
         gap: var(--espaciado-s);
         min-width: 0;
@@ -51,14 +53,37 @@
 
         >div:nth-child(2n) {
             text-align: right;
-            overflow: visible;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
     }
 
+    /* Columna derecha: importes y cifras alineados */
+    >section>div:nth-child(2n) {
+        font-variant-numeric: tabular-nums;
+    }
+
     .qtarjeta-generica-grid-arriba {
-        font-size: large;
-        font-weight: var(--grosor-letra-5);
+        font-size: var(--tamaño-letra-m);
+        font-weight: var(--grosor-letra-6);
+        line-height: var(--altura-linea-compacta);
+    }
+
+    .qtarjeta-generica-grid-abajo {
+        font-size: var(--tamaño-letra-s);
+
+        /* Dato secundario (email, fecha…): una línea con puntos suspensivos */
+        >div:first-child {
+            color: var(--color-texto-secundario);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        >div:nth-child(2n) {
+            font-weight: var(--grosor-letra-6);
+        }
     }
 }
 
@@ -71,5 +96,19 @@
 @media (max-width: 768px) {
     .qtarjeta-generica-grid {
         gap: var(--espaciado-xs);
+    }
+}
+/* Móvil, tarjetas del maestro: el nombre principal (cliente, proveedor…) en una
+   línea con puntos suspensivos. Las de los detalles (líneas) sí pueden partir. */
+@media (max-width: 768px) {
+    .Maestro .qtarjeta-generica-grid .qtarjeta-generica-grid-arriba {
+        font-size: clamp(0.875rem, 3.8vw, 0.9375rem);
+    }
+
+    .Maestro .qtarjeta-generica-grid .qtarjeta-generica-grid-arriba > div:first-child {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow-wrap: normal;
     }
 }

@@ -5,6 +5,7 @@ class ComunUrls {
     readonly IA_FLUJO = `/comun/ia-flujo`;
     readonly IA_TAREA_PROGRAMADA = `/comun/ia-tarea-programada`;
     readonly CREDENCIAL_EXTERNA = `/comun/credencial-externa`;
+    readonly DASHBOARD = `/comun/dashboard`;
 }
 
 export default ComunUrls;

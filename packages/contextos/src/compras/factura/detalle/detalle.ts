@@ -14,6 +14,7 @@ import {
     getLineasFactura,
     patchFactura,
     patchRectificativa,
+    patchRegistrarFactura,
 } from "../infraestructura.ts";
 import { ContextoDetalleFactura, EstadoDetalleFactura } from "./diseño.ts";
 
@@ -36,7 +37,6 @@ const camposEditablesCerrada = [
     "deAbono",
     "servicios",
     "noGenerarAsiento",
-    "editable",
 ];
 
 export const metaFactura: MetaModelo<Factura> = {
@@ -48,7 +48,6 @@ export const metaFactura: MetaModelo<Factura> = {
         nombreProveedor: { bloqueado: true },
         idFiscal: { bloqueado: true },
         codigoRectificativa: { bloqueado: true },
-        asientoId: { bloqueado: true },
         fecha: { requerido: true, tipo: "fecha" },
         hora: { tipo: "hora" },
         numeroProveedor: {},
@@ -106,6 +105,7 @@ export const facturaVacia = (): Factura => ({
     noGenerarAsiento: false,
     asientoId: null,
     observaciones: null,
+    estadoExpedicion: '',
 });
 
 export const contextoDetalleFacturaInicial: ContextoDetalleFactura = {
@@ -155,14 +155,13 @@ export const guardarFactura = async (
     await patchFactura(factura.id, cambios);
 };
 
-export const cerrarFacturaProceso: ProcesarDetalle = async (contexto) => {
-    await patchFactura(contexto.factura.id, { editable: false });
-    return pipeFactura(contexto, [refrescarFactura]);
-};
-
-export const reabrirFacturaProceso: ProcesarDetalle = async (contexto) => {
-    await patchFactura(contexto.factura.id, { editable: true });
-    return pipeFactura(contexto, [refrescarFactura]);
+/**
+ * El servidor calcula el código definitivo, así que hay que releer la factura
+ * para verlo: la respuesta solo confirma.
+ */
+export const registrarFacturaProceso: ProcesarDetalle = async (contexto) => {
+    await patchRegistrarFactura(contexto.factura.id);
+    return pipeFactura(contexto, [refrescarFactura, "ABIERTO"]);
 };
 
 export const cambiarRectificativa: ProcesarDetalle = async (contexto, payload) => {

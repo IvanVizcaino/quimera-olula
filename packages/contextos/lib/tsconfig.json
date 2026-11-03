@@ -1,0 +1,10 @@
+{
+    "extends": "../../../tsconfig.app.json",
+    "compilerOptions": {
+    },
+    "include": [
+        ".",
+        "../../../eslint.config.js",
+        "../../../vite.config.ts"
+    ]
+}

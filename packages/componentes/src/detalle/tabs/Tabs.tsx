@@ -1,3 +1,4 @@
+import { useControlPantalla } from "@olula/lib/controles_pantalla.ts";
 import React, { useEffect, useRef, useState } from "react";
 import estilos from "./tabs.module.css";
 
@@ -26,6 +27,28 @@ const Tabs: React.FC<TabsProps> = ({ children, className, tabInicial = 0 }) => {
 
   const tabs = React.Children.toArray(children) as React.ReactElement<TabProps>[];
   const indice = Math.min(activeTab, tabs.length - 1);
+
+  // Cambiar de pestaña por voz / desde el asistente (ver controles_pantalla.ts).
+  useControlPantalla("pestanas", () => ({
+    describir: () => ({
+      tipo: "pestanas",
+      id: "",
+      pestanas: tabs.map((tab) => tab.props.label),
+      activa: indice,
+    }),
+    ejecutar: (accion, parametros) => {
+      if (accion !== "seleccionar") return { ok: false, mensaje: "No sé hacer eso con las pestañas." };
+      const etiqueta = typeof parametros.pestana === "string" ? parametros.pestana.toLowerCase() : null;
+      const destino = etiqueta !== null
+        ? tabs.findIndex((tab) => tab.props.label.toLowerCase() === etiqueta)
+        : Number(parametros.indice);
+      if (!Number.isInteger(destino) || destino < 0 || destino >= tabs.length || tabs[destino].props.deshabilitado) {
+        return { ok: false, mensaje: "No encuentro esa pestaña." };
+      }
+      setActiveTab(destino);
+      return { ok: true, mensaje: `Pestaña ${tabs[destino].props.label}.` };
+    },
+  }));
 
   // Detecta overflow
   useEffect(() => {

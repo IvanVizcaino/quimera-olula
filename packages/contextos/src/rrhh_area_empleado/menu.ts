@@ -1,4 +1,4 @@
 export const menuRrhh = {
-    "RRHH": { icono: "fichero" },
+    "RRHH": { icono: "menu_rrhh", area: "Organización" },
     "RRHH/Mis jornadas": { url: "/rrhh/mi_jornada", regla: "rrhh.mi_jornada.leer" },
 };

@@ -110,6 +110,15 @@ export const DetallePedidoNrj = ({
           )}
 
           <Tabs>
+            <Tab label="Líneas">
+              <Lineas
+                pedido={ctx.pedido}
+                lineaActiva={lineaActiva}
+                publicar={emitir}
+                estadoPedido={estado}
+              />
+            </Tab>
+
             <Tab label="Cliente">
               <TabClienteNrj
                 pedido={pedido}
@@ -142,13 +151,6 @@ export const DetallePedidoNrj = ({
             total={Number(ctx.pedido.total ?? 0)}
             divisa={String(ctx.pedido.coddivisa ?? "EUR")}
           /> */}
-
-          <Lineas
-            pedido={ctx.pedido}
-            lineaActiva={lineaActiva}
-            publicar={emitir}
-            estadoPedido={estado}
-          />
 
           {estado === "BORRANDO_PEDIDO" && (
             <BorrarPedido pedido={ctx.pedido} publicar={emitir} />

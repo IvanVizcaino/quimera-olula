@@ -26,10 +26,20 @@ function DashboardFiltro({ useStyles }) {
                 />
               </Grid>
               <Grid size={3}>
-                <Field.Date id="bufferFiltro.fechaDesde" label="Desde" boxStyle={classes.fecha} />
+                <Field.Date
+                  id="bufferFiltro.fechaDesde"
+                  label="Desde"
+                  boxStyle={classes.fecha}
+                  datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
+                />
               </Grid>
               <Grid size={3}>
-                <Field.Date id="bufferFiltro.fechaHasta" label="Hasta" boxStyle={classes.fecha} />
+                <Field.Date
+                  id="bufferFiltro.fechaHasta"
+                  label="Hasta"
+                  boxStyle={classes.fecha}
+                  datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
+                />
               </Grid>
               <Grid size={6}>
                 <CuentaBanco id="bufferFiltro.cuenta" label="Cuenta" fullWidth async />

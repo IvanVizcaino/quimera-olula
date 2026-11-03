@@ -1,4 +1,4 @@
-.TabGeneral {
+.VentasArticulo .TabGeneral {
     quimera-input[nombre="id"] {
         grid-column: span 3;
     }

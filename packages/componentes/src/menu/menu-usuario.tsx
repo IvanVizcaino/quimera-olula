@@ -1,6 +1,6 @@
 import "./menu-usuario.css";
 
-import { puede } from "@olula/lib/dominio.ts";
+import { puedeAlguna } from "@olula/lib/dominio.ts";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { ElementoMenu, ElementoMenuPadre } from "@olula/lib/menu.ts";
 import { useContext } from "react";
@@ -63,7 +63,7 @@ export const MenuUsuarioBase = (props: {
       <QIcono nombre={elemento.icono} tamaño="sm" />
     ) : null;
 
-    if ("regla" in elemento && elemento.regla && !puede(elemento.regla)) {
+    if ("regla" in elemento && elemento.regla && !puedeAlguna(elemento.regla)) {
       return null;
     }
 

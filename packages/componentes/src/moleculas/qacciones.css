@@ -35,6 +35,12 @@ quimera-acciones {
     .actions {
         position: relative;
         z-index: 20;
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: var(--espaciado-s);
+        }
     }
 
     .acciones {
@@ -94,4 +100,22 @@ quimera-acciones {
             }
         }
     }
+}
+/* Acciones destructivas (Borrar): borde neutro y texto rojo; fondo rojo suave al
+   pasar el ratón. Algo separadas del resto para no pulsarlas sin querer. */
+quimera-acciones quimera-boton[destructivo][variante="borde"] :is(button, a) {
+    background: var(--color-superficie);
+    border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+    color: var(--color-error-texto);
+
+    &:hover {
+        background: var(--color-error-suave);
+        border-color: var(--color-error-texto);
+        color: var(--color-error-texto);
+        box-shadow: none;
+    }
+}
+
+quimera-acciones .acciones-inline quimera-boton[destructivo]:not(:first-child) {
+    margin-left: var(--espaciado-m);
 }

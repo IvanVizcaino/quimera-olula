@@ -49,6 +49,7 @@ export const lineaDesdeLineaPedido = (l: LineaPedido): LineaAlbaranar => ({
     idLinea: l.id,
     sku: l.referencia ?? "",
     descripcion: l.descripcion,
+    pvpTotal: l.pvp_total,
     cantidad: l.cantidad,
     servida: l.servida,
     pendiente: l.cantidad,

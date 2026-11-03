@@ -6,33 +6,34 @@ export interface ItemPedidoCompra extends Entidad {
     id: string;
     fecha: Date;
     proveedor: string;
+    proveedorId: string;
     codigo: string;
 }
 
 export interface LineaPedidoCompra extends Entidad {
     id: string;
+    articuloId: string;
     sku: string;
     descripcion: string;
     cantidad: number;
     cantidadRecibida: number;
     cerrada: boolean;
+    porLotes: boolean;
 }
 
 export interface PedidoCompra extends ItemPedidoCompra {
     lineas: LineaPedidoCompra[];
 }
 
-export interface LoteLineaNuevaEntradaDesdePedido {
-    id: string,
-    cantidad: number,
-    caducidad?: Date,
-    lote?: string,
-}
-
 export interface LineaNuevaEntradaDesdePedido {
-    id: string;
+    linea_pedido_id: string;
     cantidad: number;
-    lotes?: LoteLineaNuevaEntradaDesdePedido[];
+    lote_id: string | null;
+    caducidad: string | null;
+    tipo_caja_id: string | null;
+    num_cajas: number | null;
+    subcaja_compra_id: string | null;
+    palet_num: number | null;
 }
 
 export interface NuevaEntradaDesdePedido extends Modelo {

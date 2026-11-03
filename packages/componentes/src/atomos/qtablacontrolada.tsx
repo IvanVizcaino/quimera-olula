@@ -28,6 +28,8 @@ export type MetaColumna<T extends Entidad> = {
   tipo?: TipoColumna;
   divisa?: string | ((entidad: T) => string);
   ancho?: string; // Ancho específico para esta columna
+  /** Énfasis visual: `destacado` en negrita (cliente, total), `secundario` en gris (código). */
+  estilo?: "destacado" | "secundario";
   render?: (entidad: T) => string | ReactNode;
 };
 
@@ -135,6 +137,7 @@ const fila = <T extends Entidad>(
     tipo,
     divisa,
     ancho,
+    estilo,
   }: MetaColumna<T>) => {
     const valorCelda =
       cargando && typeof entidad[id] == "string"
@@ -150,6 +153,7 @@ const fila = <T extends Entidad>(
       <td
         key={[entidad.id, id].join("-")}
         className={`${id} ${tipo ?? ""}`}
+        data-estilo={estilo}
         style={ancho ? { width: ancho } : undefined}
       >
         {valorCelda}
@@ -211,8 +215,15 @@ const Paginador = (
     });
   };
 
+  const desde = (pagina - 1) * limite + 1;
+  const hasta = Math.min(pagina * limite, totalEntidades);
+
   return (
     <quimera-tabla-paginacion>
+      <span className="paginacion-rango">
+        {desde.toLocaleString("es-ES")}–{hasta.toLocaleString("es-ES")} de{" "}
+        {totalEntidades.toLocaleString("es-ES")}
+      </span>
       <QBoton
         deshabilitado={pagina === 1 || totalPaginas === 0}
         tamaño="pequeño"
@@ -235,9 +246,9 @@ const Paginador = (
         <QBoton
           key={numPagina}
           tamaño="pequeño"
-          deshabilitado={numPagina === pagina}
-          variante={numPagina === pagina ? "borde" : "texto"}
-          onClick={() => handlePaginacion(numPagina)}
+          variante={numPagina === pagina ? "solido" : "texto"}
+          props={numPagina === pagina ? { "aria-current": "page" } : undefined}
+          onClick={() => numPagina !== pagina && handlePaginacion(numPagina)}
         >
           {numPagina}
         </QBoton>

@@ -36,6 +36,9 @@ const useStyles = makeStyles(theme => ({
   error: {
     backgroundColor: "#FF9191",
   },
+  info: {
+    backgroundColor: "#76ccfd",
+  },
 }));
 
 export default function SkewedAdornment({ adornment, adornmentClass, finished, ...props }) {

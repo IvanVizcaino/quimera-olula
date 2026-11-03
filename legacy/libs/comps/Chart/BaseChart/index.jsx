@@ -1,38 +1,38 @@
 import { Chart, ChartAnnotation } from "@quimera/thirdparty";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
-function BaseChart({ type = "bar", labels = [], data = [], title = "", color = "#771111", chartProps = {}, ...props }) {
+const SIN_DATOS = [];
+const SIN_PROPS = {};
+
+function BaseChart({ type = "bar", labels = SIN_DATOS, data = SIN_DATOS, title = "", color = "#771111", chartProps = SIN_PROPS, ...props }) {
   const chartRef = useRef(null);
-  const [currentChart, setCurrentChart] = useState(null);
-
-  function loadChart() {
-    if (chartRef.current) {
-      let myChart = currentChart;
-      if (myChart !== null) {
-        myChart.destroy();
-      }
-      chartProps.plugins = [ChartAnnotation];
-      myChart = new Chart(chartRef.current, {
-        type,
-        data: {
-          labels,
-          datasets: [
-            {
-              label: title,
-              data,
-              backgroundColor: color,
-            },
-          ],
-        },
-        plugins: [ChartAnnotation],
-        ...chartProps,
-      });
-      setCurrentChart(myChart);
-    }
-  }
+  const chartActual = useRef(null);
 
   useEffect(() => {
-    loadChart();
+    if (!chartRef.current) {
+      return undefined;
+    }
+
+    chartActual.current = new Chart(chartRef.current, {
+      type,
+      data: {
+        labels,
+        datasets: [
+          {
+            label: title,
+            data,
+            backgroundColor: color,
+          },
+        ],
+      },
+      ...chartProps,
+      plugins: [ChartAnnotation],
+    });
+
+    return () => {
+      chartActual.current?.destroy();
+      chartActual.current = null;
+    };
   }, [data, chartProps]);
 
   return (

@@ -1,0 +1,17 @@
+{
+    "extends": "../../tsconfig.app.json",
+    "compilerOptions": {
+        "paths": {
+            "#/*": [
+                "./node_modules/@olula/ctx/src/*"
+            ],
+        }
+    },
+    "include": [
+        ".",
+        "../../eslint.config.js",
+        "../../vite.config.ts",
+        "../../legacy/apps/arboricultura/src/project.ts",
+        "../../legacy/apps/arboricultura/src/theme.js"
+    ]
+}

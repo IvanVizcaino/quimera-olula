@@ -1,4 +1,4 @@
-.Factura .TabProveedor {
+.ComprasFactura .TabProveedor {
     quimera-autocompletar[nombre="proveedorId"] {
         grid-column: 1 / span 8;
         min-width: 0;

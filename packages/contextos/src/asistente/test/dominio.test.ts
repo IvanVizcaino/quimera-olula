@@ -84,6 +84,7 @@ describe("[asistente-dom-03] normalizarRespuestaIa normaliza la respuesta cruda 
             necesitaCapacidades: false,
             accionNavegacion: null,
             descarga: null,
+            accionesPantalla: [],
             adjuntos: [],
             encolado: false,
         });
@@ -192,7 +193,12 @@ describe("[asistente-dom-05] accionNavegacionConNombreCorto usa el nombre de la 
 describe("[asistente-dom-05] hiloDesdeApi mapea un hilo (snake_case) a camelCase", () => {
     test("mapea thread_id, titulo y actualizado_en", () => {
         expect(hiloDesdeApi({ thread_id: "t-1", titulo: "Pedido de Acme", actualizado_en: "2026-01-01T00:00:00Z" }))
-            .toEqual({ threadId: "t-1", titulo: "Pedido de Acme", actualizadoEn: "2026-01-01T00:00:00Z" });
+            .toEqual({ threadId: "t-1", titulo: "Pedido de Acme", actualizadoEn: "2026-01-01T00:00:00Z", canal: "web" });
+    });
+
+    test("mapea el canal, y uno desconocido o ausente se trata como web", () => {
+        expect(hiloDesdeApi({ thread_id: "t-1", canal: "voz" }).canal).toBe("voz");
+        expect(hiloDesdeApi({ thread_id: "t-1", canal: "fax" }).canal).toBe("web");
     });
 });
 

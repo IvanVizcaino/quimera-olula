@@ -1,8 +1,13 @@
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
-import { ConexionBancaria } from "../diseño.js";
+import { ConexionBancaria, PrestamoBancario } from "../diseño.js";
 import { conexionBancariaVacia } from "../dominio.js";
-import { getConexionBancaria } from "../infraestructura.js";
+import {
+    getConexionBancaria,
+    getPrestamoBancario,
+    getPrestamosBancarios,
+    patchTiposProductoConexionBancaria,
+} from "../infraestructura.js";
 import { ContextoDetalleConexionBancaria, EstadoDetalleConexionBancaria } from "./diseño.js";
 
 type ProcesarDetalle = ProcesarContexto<EstadoDetalleConexionBancaria, ContextoDetalleConexionBancaria>;
@@ -30,13 +35,21 @@ export const metaConexionBancaria: MetaModelo<ConexionBancaria> = {
 export const contextoDetalleConexionBancariaInicial: ContextoDetalleConexionBancaria = {
     estado: 'INICIAL',
     conexion: conexionBancariaVacia,
+    prestamos: [],
+    prestamoSeleccionado: null,
 };
+
+const cargarPrestamos = async (conexion: ConexionBancaria): Promise<PrestamoBancario[]> =>
+    conexion.cuentas.some((cuenta) => cuenta.tipo === "loans")
+        ? await getPrestamosBancarios(conexion.id)
+        : [];
 
 export const cargarConexionBancaria: (_: string) => ProcesarDetalle =
     (idConexion) => async (contexto) => {
         const conexion = await getConexionBancaria(idConexion);
+        const prestamos = await cargarPrestamos(conexion);
         return pipeConexionBancaria(contexto, [
-            async (ctx) => ({ ...ctx, conexion }),
+            async (ctx) => ({ ...ctx, conexion, prestamos, prestamoSeleccionado: null }),
             'ABIERTO',
         ]);
     };
@@ -46,7 +59,7 @@ export const cargarContexto: ProcesarDetalle = async (contexto, payload) => {
     if (idConexion) {
         return cargarConexionBancaria(idConexion)(contexto);
     }
-    return { ...contexto, estado: 'INICIAL', conexion: conexionBancariaVacia };
+    return { ...contexto, estado: 'INICIAL', conexion: conexionBancariaVacia, prestamos: [] };
 };
 
 /**
@@ -56,8 +69,26 @@ export const cargarContexto: ProcesarDetalle = async (contexto, payload) => {
  */
 export const refrescarConexionBancaria: ProcesarDetalle = async (contexto) => {
     const conexion = await getConexionBancaria(contexto.conexion.id);
+    const prestamos = await cargarPrestamos(conexion);
     return [
-        { ...contexto, estado: 'ABIERTO', conexion },
+        { ...contexto, estado: 'ABIERTO', conexion, prestamos, prestamoSeleccionado: null },
         [["conexion_bancaria_cambiada", conexion]],
     ];
 };
+
+/** Los tipos de producto (accounts, loans) que se leen de la conexión. */
+export const cambiarTiposProducto: ProcesarDetalle = async (contexto, payload) => {
+    await patchTiposProductoConexionBancaria(contexto.conexion.id, payload as ConexionBancaria["tiposProducto"]);
+    return refrescarConexionBancaria(contexto);
+};
+
+export const seleccionarPrestamo: ProcesarDetalle = async (contexto, payload) => ({
+    ...contexto,
+    prestamoSeleccionado: payload as PrestamoBancario,
+});
+
+/** Con sus cuotas, que la lista no trae. */
+export const cargarCuotasPrestamo: ProcesarDetalle = async (contexto, payload) => ({
+    ...contexto,
+    prestamoSeleccionado: await getPrestamoBancario((payload as PrestamoBancario).id),
+});

@@ -7,6 +7,10 @@ import { MovimientoRecibo, ReciboVenta } from "./diseño.ts";
  */
 const ESTADOS_PAGABLES = ["emitido", "devuelto"];
 
+/** El recibo no está en la divisa de la empresa: el cobro y la devolución piden tasa de cambio. */
+export const enDivisaExtranjera = (recibo: ReciboVenta): boolean =>
+    !!recibo.divisaEmpresaId && !!recibo.divisaId && recibo.divisaEmpresaId !== recibo.divisaId;
+
 export const reciboPagable = (recibo: ReciboVenta): boolean =>
     ESTADOS_PAGABLES.includes(recibo.estado.trim().toLowerCase());
 
@@ -88,3 +92,16 @@ export const estadosDesdeFiltro = (filtro: ClausulaFiltro[]): string[] => {
 
     return clausula ? comoLista(clausula[2]) : [];
 };
+
+export type VarianteEstado = "neutro" | "error" | "exito" | "advertencia" | "gris";
+
+const VARIANTES_ESTADO_RECIBO_VENTA: Record<string, VarianteEstado> = {
+    emitido: "neutro",
+    devuelto: "error",
+    pagado: "exito",
+    remesado: "advertencia",
+    agrupado: "gris",
+};
+
+export const varianteEstadoReciboVenta = (estado: string): VarianteEstado =>
+    VARIANTES_ESTADO_RECIBO_VENTA[estado.trim().toLowerCase()] ?? "neutro";

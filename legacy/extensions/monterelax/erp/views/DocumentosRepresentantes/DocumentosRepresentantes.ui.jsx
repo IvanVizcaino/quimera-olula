@@ -1,5 +1,5 @@
 import { Box, Container, Field, Icon, IconButton, QBox, Typography } from "@quimera/comps";
-import { InputAdornment, TreeItem, TreeView } from "@quimera/thirdparty";
+import { TreeItem, TreeView } from "@quimera/thirdparty";
 import Quimera, { PropValidation, useStateValue, util } from "quimera";
 import React, { useEffect } from "react";
 
@@ -48,9 +48,26 @@ function DocumentosRepresentantes({ useStyles }) {
   const renderTree = nodes => (
     <TreeItem
       key={nodes.id}
-      nodeId={String(nodes.id)}
+      itemId={String(nodes.id)}
       label={
-        <div style={{ display: "flex", alignItems: "center", paddingLeft: "4px" }}>
+        <div
+          style={{ display: "flex", alignItems: "center", paddingLeft: "4px" }}
+          onClick={
+            nodes.type === "doc"
+              ? () => {
+                  dispatch({
+                    type: "onDocumentoSeleccionado",
+                    payload: {
+                      nombreDocumentoSeleccionado: nodes.name,
+                      idDocumentoSeleccion: nodes.id,
+                    },
+                  });
+                }
+              : () => {
+                  dispatch({ type: "onCarpetaClicked", payload: { carpeta: nodes } });
+                }
+          }
+        >
           {nodes.type === "dir" ? (
             <Icon className={classes.iconFolder}>folder</Icon>
           ) : (
@@ -62,22 +79,6 @@ function DocumentosRepresentantes({ useStyles }) {
             </Typography>
           }
         </div>
-      }
-      onClick={
-        nodes.type === "doc"
-          ? () => {
-              // dispatch({ type: 'onDescargarDocumento', payload: { nombreDocumentoSeleccionado: nodes.name, idDocumentoSeleccion: nodes.id } })
-              dispatch({
-                type: "onDocumentoSeleccionado",
-                payload: {
-                  nombreDocumentoSeleccionado: nodes.name,
-                  idDocumentoSeleccion: nodes.id,
-                },
-              });
-            }
-          : () => {
-              dispatch({ type: "onCarpetaClicked", payload: { carpeta: nodes } });
-            }
       }
     >
       {Array.isArray(nodes.children) ? nodes.children.map(node => renderTree(node)) : null}
@@ -116,26 +117,18 @@ function DocumentosRepresentantes({ useStyles }) {
             variant="outlined"
             margin="dense"
             fullWidth
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <IconButton id="buscar" aria-label="Buscar documentos">
-                    <Icon>search</Icon>
-                  </IconButton>
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <>
-                  {textoBusqueda && (
-                    <InputAdornment>
-                      <IconButton id="borrarBusqueda" aria-label="Borrar búsqueda">
-                        <Icon>clear</Icon>
-                      </IconButton>
-                    </InputAdornment>
-                  )}
-                </>
-              ),
-            }}
+            startAdornment={
+              <IconButton id="buscar" aria-label="Buscar documentos">
+                <Icon>search</Icon>
+              </IconButton>
+            }
+            endAdornment={
+              textoBusqueda ? (
+                <IconButton id="borrarBusqueda" aria-label="Borrar búsqueda">
+                  <Icon>clear</Icon>
+                </IconButton>
+              ) : null
+            }
             onKeyPress={event =>
               event.key === "Enter" &&
               dispatch({ type: "onEnterPressed", payload: { value: event.target.value } })
@@ -143,9 +136,11 @@ function DocumentosRepresentantes({ useStyles }) {
           />
           {!buscando && tree && (
             <TreeView
-              defaultExpanded={["root"]}
-              defaultCollapseIcon={<Icon style={{ color: "#959698" }}>arrow_drop_down</Icon>}
-              defaultExpandIcon={<Icon style={{ color: "#959698" }}>arrow_right</Icon>}
+              defaultExpandedItems={["root"]}
+              slots={{
+                collapseIcon: () => <Icon style={{ color: "#959698" }}>arrow_drop_down</Icon>,
+                expandIcon: () => <Icon style={{ color: "#959698" }}>arrow_right</Icon>,
+              }}
               style={{ marginTop: "16px" }}
               // defaultCollapseIcon={<Icon>folder_open</Icon>}
               // defaultExpandIcon={<Icon>folder</Icon>}

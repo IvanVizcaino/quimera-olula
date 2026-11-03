@@ -43,10 +43,6 @@ quimera-tabla {
         border-radius: var(--redondeo-borde-xs);
     }
 
-    tbody tr:nth-child(even) {
-        background: var(--color-superficie-elevada);
-    }
-
     tbody tr {
 
         &[data-seleccionada="true"] th,
@@ -57,10 +53,14 @@ quimera-tabla {
         &[data-seleccionada="true"] {
             background-color: var(--color-primario-selected);
         }
+
+        &[data-seleccionada="true"]> :first-child {
+            box-shadow: inset 3px 0 0 var(--color-primario);
+        }
     }
 
     thead tr {
-        background: var(--color-head-tabla);
+        background: var(--color-superficie-sunken);
         font-weight: var(--grosor-letra-5);
     }
 
@@ -69,7 +69,7 @@ quimera-tabla {
     }
 
     tbody tr:hover {
-        background-color: var(--color-primario-hover);
+        background-color: color-mix(in oklab, var(--color-primario) 10%, var(--color-superficie));
         cursor: pointer;
         transition: background-color var(--transicion-rapida);
     }
@@ -91,7 +91,7 @@ quimera-tabla {
     }
 
     th {
-        border-bottom: var(--tamaño-borde-s) solid var(--gris-4);
+        border-bottom: var(--tamaño-borde-s) solid var(--color-borde-tabla);
         transition: background-color var(--transicion-basica), color var(--transicion-basica);
         padding: var(--espaciado-m);
         font-size: var(--tamaño-letra-m);
@@ -99,9 +99,9 @@ quimera-tabla {
         text-transform: capitalize;
 
         &[data-modo="columna"] {
-            padding: var(--espaciado-xs) var(--espaciado-m);
-            font-size: var(--tamaño-letra-s);
-            font-weight: var(--grosor-letra-5);
+            padding: var(--espaciado-s) var(--espaciado-m);
+            font-size: var(--tamaño-letra-xs);
+            font-weight: var(--grosor-letra-6);
             line-height: var(--tamaño-letra-l);
             vertical-align: middle;
             color: var(--color-texto-secundario);
@@ -125,11 +125,12 @@ quimera-tabla {
     }
 
     td {
-        padding: var(--espaciado-m);
-        font-size: var(--tamaño-letra-m);
+        height: var(--alto-fila-tabla);
+        padding: var(--espaciado-s) var(--espaciado-m);
+        font-size: var(--tamaño-letra-s);
         vertical-align: middle;
         overflow-wrap: break-word;
-        border-bottom: var(--tamaño-borde-s) solid var(--gris-4);
+        border-bottom: var(--tamaño-borde-s) solid var(--color-borde-tabla);
         transition: background-color var(--transicion-basica);
         white-space: nowrap;
     }
@@ -178,6 +179,18 @@ quimera-tabla {
     th.moneda,
     th.numero {
         text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Énfasis por columna (MetaColumna.estilo) */
+    td[data-estilo="destacado"] {
+        font-weight: var(--grosor-letra-6);
+        color: var(--color-texto-primario);
+    }
+
+    td[data-estilo="secundario"] {
+        color: var(--color-texto-secundario);
+        font-variant-numeric: tabular-nums;
     }
 
     /* Centrado para fechas, horas y booleanos */
@@ -198,7 +211,6 @@ quimera-tabla {
     overflow-y: auto;
     /* Scroll horizontal solo aquí */
     width: 100%;
-    border-bottom: var(--tamaño-borde-s) solid var(--gris-4);
 }
 
 .tabla-contenedor-scroll table {
@@ -211,13 +223,43 @@ quimera-tabla-paginacion {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: var(--espaciado-m);
-    border-radius: var(--redondeo-borde-m);
-    gap: var(--espaciado-xs);
-    background: var(--color-fondo);
-    padding: var(--espaciado-m) 0;
+    gap: var(--espaciado-xxs);
+    background: var(--color-superficie);
+    border-top: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+    padding: var(--espaciado-s) var(--espaciado-m);
 
     >span {
         padding: var(--espaciado-xs);
     }
+
+    .paginacion-rango {
+        margin-right: auto;
+        padding-inline: 0;
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+}
+
+/* Maestro contraído junto al detalle: sin sitio para el rango */
+.Maestro.contraido quimera-tabla-paginacion .paginacion-rango {
+    display: none;
+}
+/* Maestro: la tabla va en una tarjeta con borde (paginación incluida) */
+.Maestro .Listado>quimera-tabla {
+    margin: 0 var(--padding-horizontal) var(--espaciado-m);
+    background: var(--color-superficie);
+    border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+    border-radius: var(--redondeo-borde-m);
+    overflow: hidden;
+
+    tbody tr:last-child td {
+        border-bottom: 0;
+    }
+}
+
+/* Página actual de la paginación */
+quimera-tabla-paginacion quimera-boton[variante="solido"] button {
+    min-width: 2rem;
 }

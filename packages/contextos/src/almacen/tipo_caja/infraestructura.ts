@@ -16,18 +16,21 @@ export interface TipoCajaApi {
     descripcion: string;
     sku: string | null;
     capacidad: number | null;
+    prefijo: string | null;
 }
 
 export interface NuevoTipoCajaApi {
     descripcion?: string;
     sku?: string | null;
     capacidad?: number | null;
+    prefijo?: string | null;
 }
 
 export interface CambiosTipoCajaApi {
     descripcion?: string;
     sku?: string | null;
     capacidad?: number | null;
+    prefijo?: string | null;
 }
 
 const baseUrl = new ApiUrls().TIPO_CAJA;
@@ -41,6 +44,7 @@ export const tipoCajaDesdeApi = (api: TipoCajaApi): TipoCaja => ({
     descripcion: api.descripcion,
     sku: api.sku,
     capacidad: api.capacidad,
+    prefijo: api.prefijo,
 });
 
 /**
@@ -73,6 +77,7 @@ export const postTipoCaja: PostTipoCaja = async (nuevo: NuevoTipoCaja) => {
         descripcion: nuevo.descripcion,
         sku: nuevo.sku,
         capacidad: nuevo.capacidad,
+        prefijo: nuevo.prefijo,
     };
     const respuesta = await RestAPI.post<NuevoTipoCajaApi>(
         baseUrl,
@@ -90,6 +95,7 @@ export const patchTipoCaja: PatchTipoCaja = async (id, cambios: CambiosTipoCaja)
     if (cambios.descripcion !== undefined) payload.descripcion = cambios.descripcion;
     if (cambios.sku !== undefined) payload.sku = cambios.sku;
     if (cambios.capacidad !== undefined) payload.capacidad = cambios.capacidad;
+    if (cambios.prefijo !== undefined) payload.prefijo = cambios.prefijo;
     await RestAPI.patch<CambiosTipoCajaApi>(
         `${baseUrl}/${id}`,
         payload,

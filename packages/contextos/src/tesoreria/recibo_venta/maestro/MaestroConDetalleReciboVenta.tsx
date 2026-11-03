@@ -1,3 +1,4 @@
+import { filtroCliente } from "#/ventas/comun/filtros.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
@@ -35,9 +36,10 @@ const metaFiltroReciboVenta: MetaFiltro = {
     label: "Código",
     filtro: (v) => (v ? ["codigo", "~", v as string] : null),
   },
+  cliente_id: filtroCliente,
   nombre_cliente: {
     id: "nombre_cliente",
-    label: "Cliente",
+    label: "Nombre cliente",
     filtro: (v) => (v ? ["nombre_cliente", "~", v as string] : null),
   },
   id_fiscal: {

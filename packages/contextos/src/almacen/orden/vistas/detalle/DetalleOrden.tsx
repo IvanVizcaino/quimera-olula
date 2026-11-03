@@ -6,24 +6,32 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QInput } from "@olula/componentes/index.js";
+import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.js";
+import { plugin } from "@olula/lib/dominio.js";
+import { imprimir_blob } from "@olula/lib/impresion.ts";
 import { listaEntidadesInicial } from "@olula/lib/ListaEntidades.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
 import { desbloquearTTS, useSintesisVoz } from "@olula/lib/voz/useSintesisVoz.ts";
-import { plugin } from "@olula/lib/dominio.js";
-import { useCallback, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { useParams } from "react-router";
 import { TipoOrden } from "../../../comun/componentes/TipoOrden.tsx";
 import { LineaOrdenAlmacen, OrdenAlmacen } from "../../diseño.ts";
 import { metaOrden, ordenVacia } from "../../dominio.ts";
+import { crearCajasOrden, getReportEtiquetasOrden } from "../../infraestructura.ts";
 import { BorrarOrden } from "../borrar/BorrarOrden.tsx";
+import { ColocacionOrden } from "../colocar/ColocacionOrden.tsx";
 import { TerminarOrden } from "../terminar/TerminarOrden.tsx";
+import { calcularAccionPrincipal } from "./accion_principal.ts";
 import { guardarOrden } from "./detalle.ts";
 import "./DetalleOrden.css";
 import { LecturaOrden } from "./lectura/LecturaLineaOrden.tsx";
 import { LecturasCajaOrden } from "./lecturas_caja/LecturasCajaOrden.tsx";
 import { LecturaCajaOrden } from "./leer_caja/LecturaCajaOrden.tsx";
+import { iniciarAudioLectura } from "./leer_cajas_entrada/LeerCajasEntrada.tsx";
+import { LeerDropOrden } from "./leer_drop_orden/LeerDropOrden.tsx";
+import { LeerPickOrden } from "./leer_pick_orden/LeerPickOrden.tsx";
 import { LecturaUbicacionOrden } from "./leer_ubicacion/LecturaUbicacionOrden.tsx";
 import { LineasOrden } from "./lineas/LineasOrden.tsx";
 import { ContextoOrdenAlmacen, getMaquina } from "./maquina.ts";
@@ -47,8 +55,22 @@ export const DetalleOrden = ({
     };
 
     const { ctx, emitir } = useMaquina(getMaquina, contextoInicial, publicar);
+    const { intentar } = useContext(ContextoError);
     const [modoVoz, setModoVoz] = usePreferencia("sga.modo-voz", false);
     const tts = useSintesisVoz();
+    const imprimirEtiquetas = useCallback(async () => {
+        await intentar(async () => {
+            const blob = await getReportEtiquetasOrden(ctx.orden.id);
+            imprimir_blob(blob);
+        });
+    }, [ctx.orden.id, intentar]);
+
+    const generarCajas = useCallback(async () => {
+        await intentar(async () => {
+            await crearCajasOrden(ctx.orden.id);
+            await emitir("orden_id_cambiada", ctx.orden.id, true);
+        });
+    }, [ctx.orden.id, emitir, intentar]);
 
     const autoGuardar = useCallback(
         async (orden: OrdenAlmacen) => {
@@ -62,6 +84,7 @@ export const DetalleOrden = ({
     const { modelo } = orden;
 
     const sgaActivo = plugin("sga") === "activo";
+    const ocultarTemporalDemos = false;
     const mostrarOrigen = ["SALIDA", "TRASPASO"].includes(modelo.tipo);
     const mostrarDestino = ["ENTRADA", "TRASPASO"].includes(modelo.tipo);
 
@@ -69,7 +92,15 @@ export const DetalleOrden = ({
         if (ordenId) {
             emitir("orden_id_cambiada", ordenId, true);
         }
-    }, [ordenId]);
+    }, [ordenId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const accionPrincipal = sgaActivo && ctx.estado === "ABIERTA"
+        ? calcularAccionPrincipal(modelo, {
+              emitirPickSolicitado: () => emitir("lectura_pick_solicitada"),
+              emitirDropSolicitado: () => { iniciarAudioLectura(); emitir("lectura_drop_solicitada"); },
+              emitirColocacionSolicitada: () => emitir("colocacion_solicitada"),
+          })
+        : null;
 
     if (!ctx.orden.id) return null;
 
@@ -82,11 +113,32 @@ export const DetalleOrden = ({
             cerrarDetalle={() => publicar("cancelar_seleccion")}
         >
             <div className="maestro-botones">
-                <QBoton onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
+                <QBoton variante="borde" onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
                 {modelo.estado !== "TERMINADA" && (
-                    <QBoton onClick={() => emitir("terminado_solicitado")}>Terminar</QBoton>
+                    <QBoton variante="borde" onClick={() => emitir("terminado_solicitado")}>Terminar</QBoton>
+                )}
+                {modelo.tipo === "ENTRADA" && (
+                    <QBoton
+                        variante="borde"
+                        deshabilitado={modelo.estado !== "TERMINADA"}
+                        onClick={() => emitir("colocacion_solicitada")}
+                    >
+                        Colocar
+                    </QBoton>
+                )}
+                <QBoton variante="borde" onClick={imprimirEtiquetas}>Imprimir etiquetas</QBoton>
+                {sgaActivo && (
+                    <QBoton variante="borde" onClick={generarCajas}>Crear cajas</QBoton>
                 )}
             </div>
+            {accionPrincipal && (
+                <div className="accion-principal">
+                    <QBoton tamaño="xl" onClick={accionPrincipal.onClick}>
+                        {accionPrincipal.label}
+                    </QBoton>
+                    <p className="accion-principal__instruccion">{accionPrincipal.instruccion}</p>
+                </div>
+            )}
             <div className="DetalleOrden">
                 <quimera-formulario>
                     <QInput label="Descripción" {...orden.uiProps("descripcion")}/>
@@ -116,7 +168,7 @@ export const DetalleOrden = ({
                         />
                     )}
                     {sgaActivo && mostrarDestino && (
-                        <QBoton texto='Nueva caja' onClick={() => emitir("creacion_de_caja_solicitada")} />
+                        <QBoton variante="borde" texto='Nueva caja' onClick={() => emitir("creacion_de_caja_solicitada")} />
                     )}
                     {sgaActivo && mostrarDestino && (
                         <Ubicacion
@@ -128,15 +180,24 @@ export const DetalleOrden = ({
                 </quimera-formulario>
             </div>
             <div className="maestro-botones">
-                <QBoton onClick={() => emitir("lectura_solicitada")}>Lectura</QBoton>
-                {sgaActivo && ["TRASPASO", "SALIDA"].includes(modelo.tipo) && (
-                    <QBoton onClick={() => emitir("lectura_caja_solicitada")}>Lectura caja</QBoton>
+                {ocultarTemporalDemos && (
+                <QBoton variante="borde" onClick={() => emitir("lectura_solicitada")}>Lectura</
+                QBoton>
                 )}
-                {sgaActivo && ["TRASPASO", "SALIDA"].includes(modelo.tipo) && (
-                    <QBoton onClick={() => emitir("lectura_ubicacion_solicitada")}>Lectura bandeja</QBoton>
+                {ocultarTemporalDemos && sgaActivo && ["TRASPASO", "SALIDA"].includes(modelo.tipo) && (
+                    <QBoton variante="borde" onClick={() => emitir("lectura_caja_solicitada")}>Lectura caja</QBoton>
+                )}
+                {ocultarTemporalDemos && sgaActivo && ["TRASPASO", "SALIDA"].includes(modelo.tipo) && (
+                    <QBoton variante="borde" onClick={() => emitir("lectura_ubicacion_solicitada")}>Lectura bandeja</QBoton>
+                )}
+                {sgaActivo && modelo.pasosPick && (
+                    <QBoton variante="borde" onClick={() => emitir("lectura_pick_solicitada")}>Leer pick</QBoton>
+                )}
+                {sgaActivo && (modelo.pasosDrop || modelo.tipo === "ENTRADA") && (
+                    <QBoton variante="borde" onClick={() => { iniciarAudioLectura(); emitir("lectura_drop_solicitada"); }}>Leer drop</QBoton>
                 )}
                 {sgaActivo && (
-                    <QBoton onClick={() => {
+                    <QBoton variante="borde" onClick={() => {
                         const nuevoValor = !modoVoz;
                         if (nuevoValor) desbloquearTTS();
                         setModoVoz(nuevoValor);
@@ -181,6 +242,15 @@ export const DetalleOrden = ({
             )}
             {ctx.estado === "CREANDO_CAJA" && (
                 <CrearCaja publicar={emitir} idUbicacion={modelo.idUbicacionDestino} />
+            )}
+            {ctx.estado === "LEYENDO_PICK" && (
+                <LeerPickOrden publicar={emitir} orden={ctx.orden} />
+            )}
+            {ctx.estado === "LEYENDO_DROP" && (
+                <LeerDropOrden publicar={emitir} orden={ctx.orden} />
+            )}
+            {ctx.estado === "COLOCANDO" && (
+                <ColocacionOrden publicar={emitir} orden={ctx.orden} />
             )}
         </Detalle>
     );

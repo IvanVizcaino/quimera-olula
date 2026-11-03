@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { iconoAccionBoton } from "../atomos/icono_accion.ts";
 import { QBoton } from "../atomos/qboton.tsx";
 import { QIcono } from "../atomos/qicono.tsx";
 import "./qacciones.css";
@@ -11,8 +12,23 @@ export type Accion =
       deshabilitado?: boolean;
       variante?: "solido" | "borde" | "texto";
       advertencia?: boolean;
+      /** Acción principal del detalle: se muestra como botón fuera del menú. */
+      principal?: boolean;
     }
   | false;
+
+type AccionDefinida = Exclude<Accion, false>;
+
+/** La marcada como principal o, si no hay (o está deshabilitada), la primera
+ *  con texto que esté habilitada y no sea de advertencia. Así cambia sola
+ *  según el estado del documento. */
+const accionPrincipal = (
+  acciones: AccionDefinida[]
+): AccionDefinida | undefined =>
+  acciones.find((accion) => accion.principal && !accion.deshabilitado) ??
+  acciones.find(
+    (accion) => accion.texto && !accion.deshabilitado && !accion.advertencia
+  );
 
 export const QuimeraAcciones = ({
   acciones,
@@ -35,13 +51,22 @@ export const QuimeraAcciones = ({
         </span>
       );
     } else if (accion && typeof accion === "object") {
+      // Borrar/Eliminar: secundaria y en rojo (no el naranja de aviso); el
+      // rojo relleno queda para el botón que confirma en el modal.
+      const destructiva =
+        !!accion.advertencia &&
+        !!accion.texto &&
+        iconoAccionBoton(accion.texto) === "eliminar";
       return (
         <QBoton
           key={accion.texto || accion.icono}
           onClick={accion.onClick}
           deshabilitado={accion.deshabilitado}
-          advertencia={accion.advertencia}
-          variante={accion.deshabilitado ? accion.variante : "solido"}
+          advertencia={accion.advertencia && !destructiva}
+          destructivo={destructiva}
+          variante={
+            destructiva ? "borde" : accion.deshabilitado ? accion.variante : "solido"
+          }
         >
           {accion.texto}
         </QBoton>
@@ -62,22 +87,37 @@ export const QuimeraAcciones = ({
     );
   };
 
-  const renderAcciones = (accionesGenerales: (Accion | false)[]) => {
+  const renderAcciones = (accionesGenerales: AccionDefinida[]) => {
+    const principal = accionPrincipal(accionesGenerales);
+    const resto = accionesGenerales.filter((accion) => accion !== principal);
+
     return (
       <div className="actions">
         <div className="header">
-          <QBoton key="acciones" onClick={handleAccionesClick} variante="borde">
-            Acciones
-          </QBoton>
+          {principal && renderItemAccion(principal)}
+          {resto.length > 0 && (
+            <QBoton
+              key="acciones"
+              onClick={handleAccionesClick}
+              variante="borde"
+              props={{
+                "aria-label": "Más acciones",
+                "aria-expanded": activo,
+                title: "Más acciones",
+              }}
+            >
+              <QIcono nombre="mas_opciones" tamaño="sm" />
+            </QBoton>
+          )}
         </div>
-        {activo && renderItemsAcciones(accionesGenerales)}
+        {activo && resto.length > 0 && renderItemsAcciones(resto)}
       </div>
     );
   };
 
   const render = () => {
-    const accionesGenerales = acciones.filter((accion): accion is Accion =>
-      Boolean(accion)
+    const accionesGenerales = acciones.filter(
+      (accion): accion is AccionDefinida => Boolean(accion)
     );
 
     return (

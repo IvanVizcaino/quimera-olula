@@ -1,0 +1,26 @@
+.TabContacto {
+
+    quimera-input[nombre="telefono"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="email"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="direccion"] {
+        grid-column: span 9;
+    }
+
+    quimera-input[nombre="codpostal"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="ciudad"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="provincia"] {
+        grid-column: span 6;
+    }
+}

@@ -1,5 +1,8 @@
 import { Entidad } from "@olula/lib/diseño.ts";
+import { useContext } from "react";
+import { ContextoMaestro } from "./contexto_maestro.ts";
 import { QModal } from "../moleculas/qmodal.tsx";
+import { useControlPantalla } from "@olula/lib/controles_pantalla.ts";
 import { MaestroDetalleProps as MaestroDetalleBaseProps } from "./diseño.tsx";
 import "./MaestroDetalle.css";
 
@@ -24,6 +27,18 @@ export function MaestroDetalle<T extends Entidad>(
   } = props;
 
   const haySeleccion = !!seleccionada;
+  const { anidado } = useContext(ContextoMaestro);
+
+  // "Cierra el detalle" por voz / desde el asistente (ver controles_pantalla.ts). En
+  // disposición modal ya lo cubre el propio QModal.
+  useControlPantalla("detalle", () => ({
+    describir: () => ({ tipo: "detalle", id: "" }),
+    ejecutar: (accion) => {
+      if (accion !== "cerrar" || !onCerrarDetalle) return { ok: false, mensaje: "No puedo cerrar este detalle." };
+      onCerrarDetalle();
+      return { ok: true, mensaje: "Detalle cerrado." };
+    },
+  }), haySeleccion && !!onCerrarDetalle && modoDisposicion !== "modal");
   const tipoLayout =
     modoDisposicion ??
     (layout === "TABLA" ? "pantalla-completa" : "maestro-dinamico");
@@ -48,21 +63,31 @@ export function MaestroDetalle<T extends Entidad>(
     .filter(Boolean)
     .join(" ");
 
+  const contextoMaestro = {
+    enMaestroPrincipal: !anidado,
+    anidado: true,
+  };
+  const contextoDetalle = { enMaestroPrincipal: false, anidado: true };
+
   return (
     <maestro-detalle tipo={tipo}>
-      <div className={claseMaestro}>{Maestro}</div>
-      <div className={claseDetalle}>{esModal ? null : Detalle}</div>
-      {esModal && (
-        <QModal
-          nombre={nombreModal}
-          abierto={haySeleccion}
-          onCerrar={onCerrarDetalle}
-          mostrarCabecera={false}
-          anchoEstable
-        >
-          {Detalle}
-        </QModal>
-      )}
+      <ContextoMaestro.Provider value={contextoMaestro}>
+        <div className={claseMaestro}>{Maestro}</div>
+      </ContextoMaestro.Provider>
+      <ContextoMaestro.Provider value={contextoDetalle}>
+        <div className={claseDetalle}>{esModal ? null : Detalle}</div>
+        {esModal && (
+          <QModal
+            nombre={nombreModal}
+            abierto={haySeleccion}
+            onCerrar={onCerrarDetalle}
+            mostrarCabecera={false}
+            anchoEstable
+          >
+            {Detalle}
+          </QModal>
+        )}
+      </ContextoMaestro.Provider>
     </maestro-detalle>
   );
 }

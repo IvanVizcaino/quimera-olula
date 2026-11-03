@@ -1,0 +1,249 @@
+/* Orbe flotante del modo voz — abajo al centro, por encima de todo (también del
+   botón flotante del asistente, que está en la esquina). */
+.asistente-voz {
+    --voz-color: var(--color-primario, #2563eb);
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%);
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    pointer-events: none;
+}
+
+.asistente-voz > * {
+    pointer-events: auto;
+}
+
+/* ---- Orbe ---------------------------------------------------------------- */
+
+.asistente-voz__controles {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Acceso al chat de voz, pegado al orbe: discreto hasta pasar por encima. */
+.asistente-voz__ver-chat {
+    position: absolute;
+    left: calc(100% + 0.25rem);
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #f8fafc;
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity 150ms ease;
+}
+
+.asistente-voz__controles:hover .asistente-voz__ver-chat,
+.asistente-voz__ver-chat:focus-visible,
+.asistente-voz:not(.asistente-voz--en_espera) .asistente-voz__ver-chat {
+    opacity: 1;
+}
+
+.asistente-voz__orbe {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 200ms ease, opacity 200ms ease;
+}
+
+.asistente-voz__nucleo {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    color: #fff;
+    background: radial-gradient(circle at 30% 30%,
+            color-mix(in srgb, var(--voz-color) 60%, #fff),
+            var(--voz-color) 70%);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--voz-color) 40%, transparent);
+}
+
+/* Halo que crece con el nivel del micrófono (--nivel-micro, 0..1, lo escribe
+   useNivelMicro en el propio botón). */
+.asistente-voz__halo {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: color-mix(in srgb, var(--voz-color) 35%, transparent);
+    transform: scale(calc(1 + var(--nivel-micro, 0) * 0.9));
+    opacity: calc(0.25 + var(--nivel-micro, 0) * 0.75);
+    transition: transform 80ms linear, opacity 80ms linear;
+}
+
+/* En espera: pequeño y discreto, pero vivo (respira y reacciona a la voz). */
+.asistente-voz--en_espera .asistente-voz__orbe {
+    transform: scale(0.72);
+    opacity: 0.75;
+}
+
+.asistente-voz--en_espera .asistente-voz__orbe:hover {
+    opacity: 1;
+}
+
+.asistente-voz--en_espera .asistente-voz__nucleo {
+    animation: asistente-voz-respirar 3.2s ease-in-out infinite;
+}
+
+.asistente-voz--escuchando_orden .asistente-voz__orbe {
+    transform: scale(1.1);
+}
+
+.asistente-voz--procesando .asistente-voz__halo {
+    transform: scale(1.25);
+    opacity: 0.6;
+    background: conic-gradient(from 0deg,
+            transparent,
+            color-mix(in srgb, var(--voz-color) 70%, transparent),
+            transparent 60%);
+    animation: asistente-voz-girar 1.2s linear infinite;
+}
+
+.asistente-voz--respondiendo .asistente-voz__halo {
+    animation: asistente-voz-ondas 1.1s ease-out infinite;
+}
+
+/* En pausa mientras otra pantalla usa la voz: apagado y sin reaccionar al micro. */
+.asistente-voz--pausado .asistente-voz__orbe {
+    opacity: 0.35;
+    filter: grayscale(1);
+}
+
+.asistente-voz--pausado .asistente-voz__nucleo,
+.asistente-voz--pausado .asistente-voz__halo {
+    animation: none;
+}
+
+.asistente-voz--error {
+    --voz-color: #dc2626;
+}
+
+.asistente-voz__girando {
+    animation: asistente-voz-girar 1s linear infinite;
+}
+
+/* ---- Burbuja (transcripción / respuesta) ---------------------------------- */
+
+.asistente-voz__burbuja {
+    width: max-content;
+    max-width: min(32rem, calc(100vw - 2rem));
+    max-height: 40vh;
+    overflow-y: auto;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.92);
+    color: #f8fafc;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(6px);
+    animation: asistente-voz-aparecer 160ms ease-out;
+}
+
+.asistente-voz__burbuja[hidden] {
+    display: none;
+}
+
+.asistente-voz__etiqueta {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--voz-color) 55%, #fff);
+}
+
+.asistente-voz__texto {
+    margin: 0.3rem 0 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.asistente-voz__acciones {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.asistente-voz__acciones:not(:empty) {
+    margin-top: 0.6rem;
+}
+
+.asistente-voz__accion {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid rgba(248, 250, 252, 0.3);
+    border-radius: 9999px;
+    background: transparent;
+    color: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.asistente-voz__accion:hover {
+    background: rgba(248, 250, 252, 0.12);
+}
+
+.asistente-voz__accion--principal {
+    border-color: transparent;
+    background: var(--voz-color);
+}
+
+.asistente-voz__accion--principal:hover {
+    background: color-mix(in srgb, var(--voz-color) 85%, #fff);
+}
+
+.asistente-voz--confirmando .asistente-voz__halo {
+    animation: asistente-voz-ondas 1.8s ease-out infinite;
+}
+
+/* ---- Animaciones ------------------------------------------------------- */
+
+@keyframes asistente-voz-respirar {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(0.94); }
+}
+
+@keyframes asistente-voz-girar {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes asistente-voz-ondas {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes asistente-voz-aparecer {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .asistente-voz__nucleo,
+    .asistente-voz__halo,
+    .asistente-voz__girando,
+    .asistente-voz__burbuja {
+        animation: none !important;
+    }
+}

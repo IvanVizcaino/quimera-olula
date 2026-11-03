@@ -27,6 +27,7 @@ import {
     PatchLineaAlbaran,
     PostAlbaran,
     PostLineasAlbaran,
+    QueryNuevaLineaAlbaran,
 } from "./diseño.ts";
 import { getTraza } from "#/comun/componentes/traza/infraestructura.ts";
 
@@ -87,6 +88,30 @@ interface NuevaLineaAlbaranApi {
     articulo: ArticuloLineaCompraApi;
     cantidad: number;
     pvp_unitario?: number;
+    dto_porcentual?: number;
+    dto_lineal?: number;
+    grupo_iva_producto_id?: string;
+    tipo_irpf?: number;
+}
+
+interface QueryNuevaLineaAlbaranApiReq extends NuevaLineaAlbaranApi {
+    iva_incluido?: boolean;
+}
+
+interface QueryNuevaLineaAlbaranApiRes {
+    id?: string;
+    articulo_id: string | null;
+    descripcion: string;
+    cantidad: number;
+    pvp_unitario: number;
+    dto_porcentual: number;
+    dto_lineal: number;
+    pvp_total: number;
+    grupo_iva_producto_id: string;
+    tipo_iva: number;
+    tipo_recargo: number;
+    tipo_irpf: number;
+    iva_incluido: boolean;
 }
 
 interface NuevoAlbaranApi {
@@ -222,10 +247,46 @@ const cambiosAlbaranAApi = (a: CambiosAlbaran): CambiosAlbaranApi => {
     return cambios;
 };
 
+/**
+ * Los importes a cero se omiten: el servidor distingue «ausente» (toma la
+ * condición del proveedor) de «presente con 0» (la pisa), así que mandarlos
+ * siempre borraría el descuento de `articulosprov`.
+ */
 const nuevaLineaAApi = (linea: NuevaLineaAlbaran): NuevaLineaAlbaranApi => ({
     articulo: articuloLineaApi(linea),
     cantidad: linea.cantidad,
     ...(linea.pvpUnitario === null ? {} : { pvp_unitario: linea.pvpUnitario }),
+    ...(linea.dtoPorcentual ? { dto_porcentual: linea.dtoPorcentual } : {}),
+    ...(linea.dtoLineal ? { dto_lineal: linea.dtoLineal } : {}),
+    ...(linea.grupoIvaProductoId === null
+        ? {}
+        : { grupo_iva_producto_id: linea.grupoIvaProductoId }),
+    ...(linea.tipoIrpf ? { tipo_irpf: linea.tipoIrpf } : {}),
+});
+
+const queryNuevaLineaAApi = (
+    linea: NuevaLineaAlbaran
+): QueryNuevaLineaAlbaranApiReq => ({
+    ...nuevaLineaAApi(linea),
+    iva_incluido: linea.ivaIncluido,
+});
+
+const queryNuevaLineaDesdeApi = (
+    anterior: NuevaLineaAlbaran,
+    api: QueryNuevaLineaAlbaranApiRes
+): NuevaLineaAlbaran => ({
+    ...anterior,
+    ...(anterior.tipoArticulo === "generico" ? {} : { descripcion: api.descripcion }),
+    cantidad: api.cantidad,
+    pvpUnitario: api.pvp_unitario,
+    dtoPorcentual: api.dto_porcentual,
+    dtoLineal: api.dto_lineal,
+    pvpTotal: api.pvp_total,
+    grupoIvaProductoId: api.grupo_iva_producto_id,
+    ivaIncluido: api.iva_incluido,
+    tipoIva: api.tipo_iva,
+    tipoRecargo: api.tipo_recargo,
+    tipoIrpf: api.tipo_irpf,
 });
 
 const cambiosLineaAApi = (linea: CambiosLineaAlbaran): CambiosLineaAlbaranApi => {
@@ -337,6 +398,18 @@ export const postLineaAlbaran = async (
 ): Promise<string> => {
     const [lineaId] = await postLineasAlbaran(id, [linea]);
     return lineaId;
+};
+
+export const queryNuevaLineaAlbaran: QueryNuevaLineaAlbaran = async (id, linea) => {
+    const respuesta = await RestAPI.query<
+        QueryNuevaLineaAlbaranApiReq,
+        QueryNuevaLineaAlbaranApiRes
+    >(
+        `${baseUrl}/${id}/nueva_linea`,
+        queryNuevaLineaAApi(linea),
+        "Error al calcular la nueva línea del albarán"
+    );
+    return queryNuevaLineaDesdeApi(linea, respuesta);
 };
 
 export const patchLineaAlbaran: PatchLineaAlbaran = async (id, lineaId, cambios) => {

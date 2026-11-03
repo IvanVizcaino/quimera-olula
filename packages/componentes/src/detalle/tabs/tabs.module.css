@@ -20,14 +20,25 @@
             border: none;
             outline: none;
             cursor: pointer;
-            padding: 10px 10px;
-            transition: 0.3s;
-            color: var(--color-primario-claro);
-            border-bottom: 2px solid var(--gris-2);
-            font-weight: var(--grosor-letra-6);
+            padding: var(--espaciado-s) var(--espaciado-m);
+            transition: color var(--transicion-rapida), border-color var(--transicion-rapida);
+            color: var(--color-texto-secundario);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            font-weight: var(--grosor-letra-5);
             font-size: var(--tamaño-letra-m);
-            flex: 0 0 25%;
+            flex: 0 0 auto;
+            white-space: nowrap;
             scroll-snap-align: center;
+
+            &:hover:not(:disabled) {
+                color: var(--color-texto-primario);
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--color-primario);
+                outline-offset: -2px;
+            }
 
             &:disabled {
                 opacity: 0.4;
@@ -37,26 +48,29 @@
 
         @media screen and (max-width: 768px) {
             button {
-                padding: 5px 5px;
-                font-size: var(--tamaño-letra-m);
-                margin-bottom: 10px;
-                flex: 0 0 30%;
+                min-height: 2.25rem;
+                margin: 0;
+                padding: 0 var(--espaciado-m);
+                border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+                border-radius: 999px;
+                background: var(--color-superficie);
+                color: var(--color-texto-primario);
+                font-size: var(--tamaño-letra-s);
             }
-
         }
     }
 }
 
 .active {
-    color: var(--color-primario-oscuro) !important;
-    border-bottom: 2px solid var(--color-primario-claro) !important;
+    color: var(--color-primario-texto) !important;
+    border-bottom: 2px solid var(--color-primario) !important;
 }
 
 .tabHeaderSlider {
     display: flex;
     overflow-x: auto;
-    gap: 8px;
-    padding-bottom: 4px;
+    gap: var(--espaciado-xs);
+    border-bottom: var(--tamaño-borde-s) solid var(--color-borde-sutil);
     scrollbar-width: none;
     /* Firefox */
     flex: 1;
@@ -122,4 +136,25 @@
 /* Mostrar flechas solo si hay overflow horizontal */
 .tabSliderWrapper:has(.tabHeaderSlider:overflowing) .arrow {
     display: flex;
+}
+/* Móvil: pestañas como botones redondeados que se desplazan en horizontal */
+@media (max-width: 768px) {
+    .tabHeaderSlider {
+        gap: var(--espaciado-xs);
+        border-bottom: 0;
+        /* Sin relleno lateral: la primera pestaña alineada con el contenido */
+        padding: 0 0 var(--espaciado-xs);
+    }
+
+    .arrow {
+        display: none !important;
+    }
+
+    .active {
+        background: var(--color-primario-texto) !important;
+        border-color: var(--color-primario-texto) !important;
+        border-bottom-width: var(--tamaño-borde-s) !important;
+        color: var(--blanco) !important;
+        font-weight: var(--grosor-letra-6) !important;
+    }
 }

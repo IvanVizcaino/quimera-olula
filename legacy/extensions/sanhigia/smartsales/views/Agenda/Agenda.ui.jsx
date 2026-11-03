@@ -33,7 +33,9 @@ const getList = ({ tareas, tratos, filter, showTratos, showTareas }) => {
     .filter(filter)
     .filter(reg => !reg.idTarea || showTareas)
     .filter(reg => reg.idTarea || showTratos)
-    .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+    .sort((a, b) =>
+      `${a.fecha} ${a.hora ?? ""}`.localeCompare(`${b.fecha} ${b.hora ?? ""}`),
+    )
     .map(reg => item(reg));
 };
 
@@ -65,7 +67,7 @@ const getList = ({ tareas, tratos, filter, showTratos, showTareas }) => {
 function Agenda() {
   const [showTratos, setShowTratos] = useState(true);
   const [showTareas, setShowTareas] = useState(true);
-  const [{ tratos, tareas }, dispatch] = useStateValue();
+  const [{ tratos, tareas, diaSeleccionado, tareasDia, tratosDia }, dispatch] = useStateValue();
   const agente = util.getGlobalSetting("user_data")?.user?.agente?.toString();
 
   useEffect(() => dispatch({ type: "onInit" }), [dispatch]);
@@ -91,7 +93,17 @@ function Agenda() {
     showTratos,
     showTareas,
   });
-  console.log(todayLists);
+  const cargandoDia = tareasDia === null || tratosDia === null;
+  const diaLists = cargandoDia
+    ? []
+    : getList({
+      tareas: tareasDia,
+      tratos: tratosDia,
+      filter: t => t.fecha === diaSeleccionado,
+      showTratos,
+      showTareas,
+    });
+  // console.log(todayLists);
   return (
     <Quimera.Template id="Agenda">
       <Container maxWidth="xs">
@@ -118,8 +130,23 @@ function Agenda() {
                 )
                 : {}
             }
+            seleccionado={diaSeleccionado}
+            onDayClick={fecha => dispatch({ type: "onDiaSeleccionado", payload: { fecha } })}
           />
         </MainBox>
+        {diaSeleccionado && diaSeleccionado !== today && (
+          <MainBox
+            title={util.formatDate(diaSeleccionado)}
+            before
+            callbackCerrado={() => dispatch({ type: "onDiaSeleccionado", payload: { fecha: null } })}
+          >
+            {cargandoDia
+              ? "Cargando..."
+              : diaLists.length
+                ? diaLists
+                : "No hay tratos/tareas para este día"}
+          </MainBox>
+        )}
         <MainBox title="Hoy">
           {todayLists.length ? todayLists : "No hay tratos/tareas para hoy"}
         </MainBox>

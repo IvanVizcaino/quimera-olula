@@ -29,11 +29,14 @@ maestro-detalle {
     padding-inline: var(--padding-horizontal);
 }
 
-/* Maestro y Detalle como columnas flex para que el contenido interno pueda hacer scroll */
+/* Maestro y Detalle como columnas flex para que el contenido interno pueda hacer scroll.
+   overflow-y: auto permite llegar al Listado cuando hay contenido alto encima
+   (p. ej. tarjetas de resumen en móvil). */
 .Maestro {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 /* maestro-detalle>div h2,
@@ -42,34 +45,49 @@ maestro-detalle>div .maestro-botones, */
     padding-inline: var(--padding-horizontal);
 } */
 
-/* Modo tabla (50/50 fijo) */
+/* Modo tabla (100% sin selección → 50/50 al seleccionar) */
 maestro-detalle[tipo="maestro-50"] {
     .Maestro {
         max-height: calc(94vh - var(--alto-header));
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-width: 0;
+        transition: flex-basis 0.3s ease, max-width 0.3s ease;
+    }
+
+    .Maestro.contraido {
         flex: 1 1 50%;
         max-width: 50%;
-        min-width: 0;
     }
 
     .Detalle {
-        /* max-height: calc(94vh - var(--alto-header)); */
+        overflow: hidden;
+        flex: 0 1 0%;
+        max-width: 0%;
+        min-width: 0;
+        opacity: 0;
+        border-left: 1px solid transparent;
+        transition: flex-basis 0.3s ease, max-width 0.3s ease, opacity 0.25s ease, border-color 0.3s ease;
+    }
+
+    .Detalle.expandido {
         overflow-y: auto;
         flex: 1 1 50%;
         max-width: 50%;
-        min-width: 0;
-        border-left: 1px solid var(--color-borde-sutil);
-        /* padding-left: 1rem; */
+        opacity: 1;
+        border-left-color: var(--color-borde-sutil);
+        animation: slideIn 0.3s ease;
     }
 }
 
-/* Modo maestro-dinamico (20/80 al seleccionar) */
+/* Modo maestro-dinamico (100% sin selección → 30/70 al seleccionar) */
 maestro-detalle[tipo="maestro-dinamico"] {
     .Maestro {
         max-height: calc(94vh - var(--alto-header));
-        flex: 1 1 30%;
-        max-width: 30%;
+        flex: 1 1 100%;
+        max-width: 100%;
         min-width: 0;
-        transition: all 0.3s ease;
+        transition: flex-basis 0.3s ease, max-width 0.3s ease;
     }
 
     .Maestro.contraido {
@@ -78,21 +96,22 @@ maestro-detalle[tipo="maestro-dinamico"] {
     }
 
     .Detalle {
-        /* max-height: calc(94vh - var(--alto-header)); */
-        overflow-y: auto;
+        overflow: hidden;
         flex: 0 1 0%;
         max-width: 0%;
         min-width: 0;
         opacity: 0;
-        transition: all 0.3s ease;
+        border-left: 1px solid transparent;
+        transition: flex-basis 0.3s ease, max-width 0.3s ease, opacity 0.25s ease, border-color 0.3s ease;
     }
 
     .Detalle.expandido {
+        overflow-y: auto;
         flex: 1 1 70%;
         max-width: 70%;
         opacity: 1;
-        border-left: 1px solid var(--gris-2);
-        /* padding-left: 1rem; */
+        border-left-color: var(--gris-2);
+        animation: slideIn 0.3s ease;
     }
 }
 
@@ -201,5 +220,11 @@ maestro-detalle[tipo="pantalla-completa"] {
     .selector-modos {
         flex-wrap: wrap;
         justify-content: center;
+    }
+}
+/* Móvil con el detalle abierto: el botón de volver va pegado a la cabecera */
+@media (max-width: 768px) {
+    maestro-detalle:has(> .Detalle.expandido) {
+        padding-top: 0;
     }
 }

@@ -10,11 +10,13 @@ const baseUrlUsuario = `/auth/usuario`;
 
 export const usuarioFromAPI = (c: UsuarioApi): Usuario => ({
     ...c,
+    empresas: c.empresas ?? [],
 });
 
 export const usuarioToApi = (usuario: Usuario): UsuarioAPI => ({
     ...usuario,
     usuario_id: usuario.id,
+    empresas: usuario.empresas ?? [],
 });
 
 export const logout: Logout = async (tokenRefresco: string) => {

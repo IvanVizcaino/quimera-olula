@@ -1,4 +1,4 @@
-.Albaran .TabDatos {
+.ComprasAlbaran .TabDatos {
     quimera-input[nombre="codigo"],
     quimera-input[nombre="facturaId"] {
         grid-column: span 6;

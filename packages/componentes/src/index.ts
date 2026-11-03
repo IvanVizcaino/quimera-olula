@@ -54,4 +54,5 @@ export * from "./vista/Vista.tsx";
 export * from "./arbol_documentos/index.ts";
 export * from "./gestor_documentos/index.ts";
 export * from "./lista_documentos/index.ts";
-
+export * from "./maestro/widgets/diseño.ts";
+export * from "./maestro/widgets/QPanelWidgets.tsx";

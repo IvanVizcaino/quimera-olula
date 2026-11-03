@@ -19,7 +19,37 @@ const OPCIONES_RESPONSABLE = [
     { valor: "mios", descripcion: "Míos" },
 ];
 
+const OPCIONES_TIPO = [
+    { valor: "ENTRADA", descripcion: "Entrada" },
+    { valor: "SALIDA", descripcion: "Salida" },
+    { valor: "TRASPASO", descripcion: "Traspaso" },
+];
+
 const metaFiltroOrden: MetaFiltro = {
+    tipo: {
+        id: "tipo",
+        campo: "tipo",
+        label: "Tipo",
+        filtro: (valor) => {
+            if (!valor || valor === "") return null;
+            return ["tipo", "=", valor as string];
+        },
+        fromFiltro: (filtro) => {
+            const clausula = filtro.find(c => c[0] === "tipo");
+            if (!clausula) return "";
+            return clausula[2] ?? "";
+        },
+        render: (valor, onChange) => (
+            <QSelect
+                label="Tipo"
+                nombre="tipo"
+                valor={(valor as string) ?? ""}
+                onChange={(opcion) => onChange(opcion?.valor ?? "")}
+                opciones={OPCIONES_TIPO}
+                placeholder="Todos"
+            />
+        ),
+    },
     responsable: {
         id: "responsable",
         campo: "responsable_id",

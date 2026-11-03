@@ -5,6 +5,7 @@ export interface Usuario extends Entidad {
   nombre: string;
   email: string;
   grupo_id: string;
+  empresas?: string[];
 };
 
 export interface UsuarioApi {
@@ -12,6 +13,7 @@ export interface UsuarioApi {
   nombre: string;
   email: string;
   grupo_id: string;
+  empresas?: string[];
 };
 
 
@@ -22,6 +24,7 @@ export interface UsuarioAPI extends Entidad {
   nombre: string;
   email: string;
   grupo_id: string;
+  empresas?: string[];
 }
 
 export type GetUsuario = (id: string) => Promise<Usuario>;

@@ -1,5 +1,6 @@
 import { PropsWithChildren, useContext } from "react";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
+import { BusquedaRapida } from "../menu/busqueda-rapida.tsx";
 import { MenuLateral } from "../menu/menu-lateral.tsx";
 import { MenuUsuario } from "../menu/menu-usuario.tsx";
 import { Slot } from "../slot/Slot.tsx";
@@ -8,6 +9,16 @@ import { MenuProvider } from "./MenuContext.tsx";
 import { Pie } from "./Pie.tsx";
 import "./Plantilla.css";
 import { SseSesionGlobal } from "./SseSesionGlobal.tsx";
+import { useMenuControl } from "./useMenuControl.ts";
+
+/** Contenido de la pantalla; `versionPantalla` lo vuelve a montar a petición. */
+const ContenidoPantalla = ({ hijos }: { hijos: React.ReactNode }) => (
+  <Slot key={useMenuControl().versionPantalla} hijos={hijos} />
+);
+
+/** La búsqueda rápida (Ctrl K) se monta solo mientras está abierta. */
+const BusquedaRapidaGlobal = () =>
+  useMenuControl().busquedaAbierta ? <BusquedaRapida /> : null;
 
 export const Plantilla = ({ children }: PropsWithChildren<object>) => {
   const slots = { hijos: children };
@@ -21,6 +32,7 @@ export const Plantilla = ({ children }: PropsWithChildren<object>) => {
     <>
       <MenuProvider>
         <SseSesionGlobal />
+        <BusquedaRapidaGlobal />
 
         <Slot nombre="cabecera" {...slots}>
           <Cabecera />
@@ -28,7 +40,7 @@ export const Plantilla = ({ children }: PropsWithChildren<object>) => {
 
         <section role="main">
           <MenuLateral />
-          <Slot {...slots} />
+          <ContenidoPantalla {...slots} />
           <MenuUsuario />
           {PanelAsistente ? <PanelAsistente /> : null}
         </section>

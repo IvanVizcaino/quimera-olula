@@ -1,0 +1,313 @@
+.TarjetasSaldosConexionBancaria {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: var(--espaciado-l);
+    margin-bottom: var(--espaciado-l);
+}
+
+.TarjetasSaldosConexionBancaria .tarjetas-saldos-resumen,
+.TarjetasSaldosConexionBancaria .tarjetas-saldos-cuentas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14.5rem, 1fr));
+    gap: var(--espaciado-m);
+    align-items: stretch;
+}
+
+@media (max-width: 600px) {
+    .TarjetasSaldosConexionBancaria {
+        gap: var(--espaciado-m);
+        margin-bottom: var(--espaciado-m);
+    }
+
+    .TarjetasSaldosConexionBancaria .tarjetas-saldos-resumen {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--espaciado-s);
+    }
+
+    /* Carrusel compacto: deja sitio a la tabla en pantallas estrechas. */
+    .TarjetasSaldosConexionBancaria .tarjetas-saldos-cuentas {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: var(--espaciado-s);
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: var(--espaciado-xs);
+        margin-inline: calc(-1 * var(--padding-horizontal, 0px));
+        padding-inline: var(--padding-horizontal, var(--espaciado-m));
+    }
+
+    .TarjetasSaldosConexionBancaria .tarjeta-banco {
+        flex: 0 0 min(70vw, 13.5rem);
+        width: min(70vw, 13.5rem);
+        max-width: min(70vw, 13.5rem);
+        min-height: 7.75rem;
+        padding: var(--espaciado-m);
+        scroll-snap-align: start;
+    }
+
+    .TarjetasSaldosConexionBancaria .tarjeta-saldo-resumen {
+        min-height: 4.75rem;
+        padding: var(--espaciado-m);
+        gap: var(--espaciado-xs);
+    }
+
+    .TarjetasSaldosConexionBancaria .tarjeta-saldo-resumen-valor {
+        font-size: 1.15rem;
+    }
+
+    .TarjetasSaldosConexionBancaria .tarjeta-banco-chip {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .TarjetasSaldosConexionBancaria .tarjeta-banco-mascara {
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+    }
+
+    .TarjetasSaldosConexionBancaria .tarjeta-banco-saldo-valor {
+        font-size: 1.15rem;
+    }
+}
+
+/* --- Resumen superior --- */
+
+.TarjetasSaldosConexionBancaria .tarjeta-saldo-resumen {
+    box-sizing: border-box;
+    min-height: 6.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+    padding: var(--espaciado-l);
+    background: var(--color-fondo);
+    border: var(--tamaño-borde-s) solid var(--gris-4);
+    border-radius: var(--redondeo-borde-m);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-saldo-resumen-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-saldo-resumen-titulo {
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-saldo-resumen-valor {
+    font-size: 1.45rem;
+    font-weight: var(--grosor-letra-6);
+    line-height: 1.15;
+    margin-top: auto;
+}
+
+/* --- Tarjetas de cuenta (estilo tarjeta bancaria) --- */
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco {
+    --banco-tono: #0b3d91;
+    --banco-acento: #1a5bb8;
+
+    position: relative;
+    box-sizing: border-box;
+    min-height: 9.5rem;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+    padding: var(--espaciado-m) var(--espaciado-l);
+    border-radius: calc(var(--redondeo-borde-m) + 2px);
+    border: none;
+    color: #f7fafc;
+    background:
+        radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--banco-acento) 55%, transparent) 0%, transparent 55%),
+        linear-gradient(145deg, var(--banco-tono) 0%, color-mix(in srgb, var(--banco-tono) 70%, #0a0a0a) 100%);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--banco-tono) 35%, transparent),
+        0 8px 20px color-mix(in srgb, var(--banco-tono) 22%, transparent);
+}
+
+/* Variante clara: Abanca, etc. (fondo claro + acento corporativo) */
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara {
+    color: #12213a;
+    border: 1px solid color-mix(in srgb, var(--banco-acento) 28%, transparent);
+    background:
+        linear-gradient(180deg, #ffffff 0%, var(--banco-tono) 100%),
+        linear-gradient(145deg, var(--banco-tono), #ffffff);
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--banco-acento) 12%, transparent),
+        0 8px 20px color-mix(in srgb, var(--banco-acento) 10%, transparent);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-brillo {
+    background:
+        linear-gradient(125deg, color-mix(in srgb, var(--banco-acento) 8%, transparent) 0%, transparent 50%);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-chip {
+    background: color-mix(in srgb, var(--banco-acento) 12%, white);
+    color: var(--banco-acento);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-nombre {
+    color: var(--banco-acento);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-mascara,
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-cuenta,
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-saldo-etiqueta,
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-saldo-contable {
+    color: color-mix(in srgb, #12213a 72%, transparent);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-saldo-valor {
+    color: #12213a;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara .tarjeta-banco-alerta {
+    background: color-mix(in srgb, var(--banco-acento) 12%, white);
+    color: var(--banco-acento);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--clara::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    background: var(--banco-acento);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-brillo {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(125deg, color-mix(in srgb, white 18%, transparent) 0%, transparent 42%),
+        radial-gradient(circle at 85% 120%, color-mix(in srgb, white 12%, transparent) 0%, transparent 45%);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-cabecera {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--espaciado-s);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-institucion {
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-s);
+    min-width: 0;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-chip {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, white 18%, transparent);
+    color: color-mix(in srgb, white 92%, transparent);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-nombre {
+    font-size: var(--tamaño-letra-s);
+    font-weight: var(--grosor-letra-6);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-alerta {
+    flex-shrink: 0;
+    font-size: var(--tamaño-letra-xs);
+    font-weight: var(--grosor-letra-5);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, white 18%, transparent);
+    color: #fff;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-alerta--accion {
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-alerta--accion:hover,
+.TarjetasSaldosConexionBancaria .tarjeta-banco-alerta--accion:focus-visible {
+    background: color-mix(in srgb, white 32%, transparent);
+    outline: none;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--reauth {
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--amarillo-5, #e6b800) 70%, transparent),
+        0 8px 20px color-mix(in srgb, var(--banco-tono) 22%, transparent);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco--error {
+    box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--rojo-6, #d64545) 75%, transparent),
+        0 8px 20px color-mix(in srgb, var(--banco-tono) 22%, transparent);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-mascara {
+    position: relative;
+    margin: var(--espaciado-xs) 0 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.95rem;
+    letter-spacing: 0.16em;
+    color: color-mix(in srgb, white 88%, transparent);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-cuenta {
+    position: relative;
+    margin: 0;
+    font-size: var(--tamaño-letra-s);
+    color: color-mix(in srgb, white 72%, transparent);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-saldo {
+    position: relative;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding-top: var(--espaciado-s);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-saldo-etiqueta {
+    font-size: var(--tamaño-letra-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, white 65%, transparent);
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-saldo-valor {
+    font-size: 1.35rem;
+    font-weight: var(--grosor-letra-6);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.TarjetasSaldosConexionBancaria .tarjeta-banco-saldo-contable {
+    font-size: var(--tamaño-letra-xs);
+    color: color-mix(in srgb, white 68%, transparent);
+}

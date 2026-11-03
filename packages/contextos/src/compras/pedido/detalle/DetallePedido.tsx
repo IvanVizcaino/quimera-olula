@@ -1,3 +1,5 @@
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { datosClaveDocumentoCompra } from "#/compras/comun/dominio.ts";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import { CambioProveedor } from "#/compras/comun/componentes/moleculas/CambioProveedor/CambioProveedor.tsx";
@@ -12,7 +14,7 @@ import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { BorrarPedido } from "../borrar/BorrarPedido.tsx";
 import { Pedido } from "../diseño.ts";
-import { pedidoAlbaranable, pedidoPendiente } from "../dominio.ts";
+import { etiquetaEstadoPedido, pedidoAlbaranable, pedidoPendiente } from "../dominio.ts";
 import { getReportPedido, getTrazaPedido } from "../infraestructura.ts";
 import {
     contextoDetallePedidoInicial,
@@ -88,6 +90,8 @@ export const DetallePedido = ({
         <Detalle
             id={id}
             obtenerTitulo={titulo}
+            obtenerEstado={(P: Pedido) => <EtiquetaEstado {...etiquetaEstadoPedido(P)} />}
+            obtenerDatosClave={datosClaveDocumentoCompra}
             setEntidad={() => {}}
             entidad={pedido}
             cerrarDetalle={() => emitir("pedido_deseleccionado", null, true)}
@@ -98,6 +102,18 @@ export const DetallePedido = ({
                 </div>
                 <Tabs
                     children={[
+                        <Tab
+                            key="tab-lineas"
+                            label="Líneas"
+                            children={
+                                <LineasPedido
+                                    pedido={pedido}
+                                    lineas={lineas}
+                                    estado={estado}
+                                    publicar={emitir}
+                                />
+                            }
+                        />,
                         <Tab
                             key="tab-proveedor"
                             label="Proveedor"
@@ -116,12 +132,6 @@ export const DetallePedido = ({
                     ]}
                 />
                 <TotalesDocumento form={formModelo} />
-                <LineasPedido
-                    pedido={pedido}
-                    lineas={lineas}
-                    estado={estado}
-                    publicar={emitir}
-                />
             </div>
 
             {estado === "CAMBIANDO_DIVISA" && (

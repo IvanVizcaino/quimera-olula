@@ -39,7 +39,7 @@ function DashboardCosido({ tipo, useStyles }) {
             </Paper>
           </Box>
         </Hidden>
-        <Grid container spacing={1} direction="column" >
+        <Grid container spacing={1}>
           <Grid size={{ xs: 6, sm: 6, md: 4 }}>
             <Box component="div" className={classes.mediaContainer}>
               <div className={classes.mediaContainerTitle}>Media UP Cosidas</div>

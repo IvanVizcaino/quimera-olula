@@ -1,4 +1,3 @@
-import { TipoCaja } from "#/almacen/comun/componentes/TipoCaja.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
@@ -12,8 +11,7 @@ import { patchCajaProveedor } from "../infraestructura.ts";
 
 const metaCaja: MetaModelo<NuevaCajaProveedor> = {
     campos: {
-        idTipoCaja: { requerido: true },
-        tipoCaja: {  },
+        descripcion: { requerido: true },
         cantidad: { requerido: true, tipo: "numero" },
     },
 };
@@ -30,8 +28,7 @@ export const CambiarCajaProveedor = ({
     publicar: EmitirEvento;
 }) => {
     const inicial: NuevaCajaProveedor = useMemo(() => ({
-        idTipoCaja: caja.idTipoCaja,
-        tipoCaja: caja.tipoCaja,
+        descripcion: caja.tipoCaja,
         cantidad: caja.cantidad,
     }), [caja]);
 
@@ -56,7 +53,7 @@ export const CambiarCajaProveedor = ({
             onCerrar={cancelar}
         >
             <quimera-formulario>
-                <TipoCaja label="Tipo de caja" {...uiProps("idTipoCaja", "tipoCaja")} />
+                <QInput label="Descripción" {...uiProps("descripcion")} />
                 <QInput label="Cantidad" {...uiProps("cantidad")} />
             </quimera-formulario>
             <div className="botones maestro-botones">

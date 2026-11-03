@@ -7,6 +7,7 @@ export const TarjetaCrmContacto = (contacto: CrmContacto) => {
       avatar={<QAvatar nombre={contacto.nombre} />}
       arribaIzquierda={contacto.nombre}
       abajoIzquierda={contacto.email}
+      abajoDerecha={contacto.telefono1}
     />
   );
 };

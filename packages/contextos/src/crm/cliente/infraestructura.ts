@@ -1,5 +1,6 @@
 import UrlsVentasClass from "#/ventas/comun/urls.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
+import { QError } from "@olula/lib/contexto.ts";
 import { Criteria, Filtro, Orden, RespuestaLista } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { criteriaQuery, criteriaQueryUrl } from "@olula/lib/infraestructura.ts";
@@ -84,7 +85,15 @@ export const vincularContactoCliente = async (contactoId: string, clienteId: str
   const payload = {
     contacto_id: contactoId,
   };
-  await RestAPI.patch(`${UrlsCrm.CLIENTE}/${clienteId}/vincular_contacto`, payload, "Error al vincular cliente");
+  try {
+    await RestAPI.patch(`${UrlsCrm.CLIENTE}/${clienteId}/vincular_contacto`, payload, "Error al vincular contacto");
+  } catch (error) {
+    const fallo = error as QError;
+    if (fallo?.estado === 409) {
+      throw { nombre: "Contacto ya vinculado", descripcion: fallo.descripcion, estado: 409 };
+    }
+    throw error;
+  }
 };
 
 export const desvincularContactoCliente = async (contactoId: string, clienteId: string): Promise<void> => {

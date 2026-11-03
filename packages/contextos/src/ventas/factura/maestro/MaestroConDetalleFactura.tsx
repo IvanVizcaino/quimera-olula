@@ -1,3 +1,5 @@
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { TarjetaDocumentoVenta } from "#/ventas/comun/componentes/TarjetaDocumentoVenta.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { MetaTabla } from "@olula/componentes/index.js";
@@ -17,8 +19,12 @@ import {
 import { CrearFactura } from "../crear/CrearFactura.tsx";
 import { DetalleFactura } from "../detalle/DetalleFactura.tsx";
 import { Factura } from "../diseño.ts";
-import { metaTablaFactura as metaTablaBase } from "../dominio.ts";
-import { EstadoExpedicion } from "../vistas/EstadoExpedicion.tsx";
+import {
+  etiquetaEstadoFactura,
+  facturaEditable,
+  metaTablaFactura as metaTablaBase,
+  widgetsFactura,
+} from "../dominio.ts";
 import "./MaestroConDetalleFactura.css";
 import { getMaquina } from "./maquina.ts";
 
@@ -40,8 +46,10 @@ export const MaestroConDetalleFactura = () => {
   const metaTablaFactura = [
     {
       id: "estadoExpedicion",
-      cabecera: "",
-      render: (factura: Factura) => <EstadoExpedicion factura={factura} />,
+      cabecera: "Estado",
+      render: (factura: Factura) => (
+        <EtiquetaEstado {...etiquetaEstadoFactura(factura)} />
+      ),
     },
     ...metaTablaBase,
   ] as MetaTabla<Factura>;
@@ -63,6 +71,20 @@ export const MaestroConDetalleFactura = () => {
             <Listado<Factura>
               metaTabla={metaTablaFactura}
               metaFiltro={metaFiltroFactura}
+              widgets={widgetsFactura}
+              tarjeta={(factura) => (
+                <TarjetaDocumentoVenta
+                  codigo={factura.codigo}
+                  nombreCliente={factura.cliente.nombre_cliente}
+                  fecha={factura.fecha}
+                  total={factura.total}
+                  divisa={factura.divisa_id}
+                  tasaConversion={factura.tasa_conversion}
+                  totalDivisaEmpresa={factura.total_divisa_empresa}
+                  estado={facturaEditable(factura) ? "pendiente" : "cerrado"}
+                  etiquetaEstado={etiquetaEstadoFactura(factura)}
+                />
+              )}
               criteria={ctx.facturas.criteria}
               entidades={ctx.facturas.lista}
               totalEntidades={ctx.facturas.total}

@@ -1,14 +1,11 @@
 import { QSelect } from "@olula/componentes/index.js";
 import { QAutocompletarProps } from "@olula/componentes/moleculas/qautocompletar.tsx";
+import { Criteria } from "@olula/lib/diseño.js";
 import { useEffect, useState } from "react";
+import { ItemListaTransportista } from "../../transportista/diseño.ts";
 import { getItemsListaTransportista } from "../../transportista/infraestructura.ts";
 
 type TransportistaProps = Omit<QAutocompletarProps, "obtenerOpciones">;
-
-type OpcionTransportista = {
-  valor: string;
-  descripcion: string;
-};
 
 export const Transportista = ({
   valor,
@@ -17,15 +14,22 @@ export const Transportista = ({
   onChange,
   ...props
 }: TransportistaProps) => {
-  const [opcionesTransportista, setOpcionesTransportista] = useState<OpcionTransportista[]>([]);
+  const [items, setItems] = useState<ItemListaTransportista[]>([]);
+
+  const criteria: Criteria = {
+    filtro: [],
+    orden: ["descripcion", "ASC"],
+    paginacion: { limite: 1000, pagina: 1 },
+  };
 
   useEffect(() => {
-    const cargarOpcionesTransportista = async () => {
-      const items = await getItemsListaTransportista([], []);
-      setOpcionesTransportista(items.map((item) => ({ valor: item.id, descripcion: item.descripcion })));
-    };
-    cargarOpcionesTransportista();
+    getItemsListaTransportista(criteria).then(setItems);
   }, []);
+
+  const opciones = items.map((item) => ({
+    valor: item.id,
+    descripcion: item.descripcion,
+  }));
 
   return (
     <QSelect
@@ -33,7 +37,7 @@ export const Transportista = ({
       nombre={nombre}
       valor={valor}
       onChange={onChange}
-      opciones={opcionesTransportista}
+      opciones={opciones}
       {...props}
     />
   );

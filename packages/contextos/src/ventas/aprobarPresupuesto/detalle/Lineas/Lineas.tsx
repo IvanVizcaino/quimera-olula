@@ -2,6 +2,7 @@ import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModalConfirmacion } from "@olula/componentes/index.ts";
 import { EmitirEvento, ListaSeleccionable } from "@olula/lib/diseño.ts";
+import { formatearMoneda } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { LineaAprobarPresupuesto as Linea } from "../../diseño.ts";
 import { metaLinea } from "../../dominio.ts";
@@ -32,7 +33,8 @@ const FilaLinea = ({
   return (
     <tr>
       <td>
-        <span>{linea.referencia}</span> <span>{linea.descripcion}</span>
+        <span>{linea.referencia}</span> <span>{linea.descripcion}</span>{" "}
+        <span>{`(${formatearMoneda(linea.pvp_total, "EUR")})`}</span>
       </td>
       <td className="num">
         <QEtiqueta

@@ -77,6 +77,14 @@ export interface NuevaLineaAlbaran extends Modelo {
     descripcionArticulo: string | null;
     cantidad: number;
     pvpUnitario: number | null;
+    dtoPorcentual: number;
+    dtoLineal: number;
+    pvpTotal: number;
+    grupoIvaProductoId: string | null;
+    ivaIncluido: boolean;
+    tipoIva: number;
+    tipoRecargo: number;
+    tipoIrpf: number;
 }
 
 export interface ModeloLineaAlbaran extends LineaAlbaran {
@@ -116,6 +124,14 @@ export type PostLineasAlbaran = (
     id: string,
     lineas: NuevaLineaAlbaran[]
 ) => Promise<string[]>;
+/**
+ * Dry-run del alta de línea: el servidor calcula el coste del proveedor y los
+ * impuestos sin grabar nada, para poder enseñarlos en el modal.
+ */
+export type QueryNuevaLineaAlbaran = (
+    id: string,
+    linea: NuevaLineaAlbaran
+) => Promise<NuevaLineaAlbaran>;
 export type PatchLineaAlbaran = (
     id: string,
     lineaId: string,

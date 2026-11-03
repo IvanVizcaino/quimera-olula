@@ -3,7 +3,7 @@
     justify-content: flex-end;
 }
 
-.CrearPedido {
+.ComprasPedido .CrearPedido {
     quimera-autocompletar[nombre="proveedorPedido"],
     quimera-input[nombre="nombre"] {
         grid-column: span 12;

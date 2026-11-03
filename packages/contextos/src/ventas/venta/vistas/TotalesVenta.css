@@ -28,6 +28,11 @@
     white-space: nowrap;
 }
 
+/* Formato en línea (TPV): "Neto: 82,64 €" */
+.totales-venta--linea .totales-venta-item label::after {
+    content: ":";
+}
+
 .totales-venta-item span {
     min-width: 0;
     overflow-wrap: anywhere;
@@ -64,5 +69,71 @@
         font-size: inherit;
         white-space: nowrap;
         overflow-wrap: normal;
+    }
+}
+/* Formato ticket (documentos): recuadro a la derecha, un concepto por línea y el
+   total destacado al final, como en una factura. */
+.totales-venta--ticket {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--espaciado-s);
+    width: min(20rem, calc(100% - 2 * var(--padding-horizontal)));
+    margin: var(--espaciado-m) var(--padding-horizontal) var(--espaciado-m) auto;
+    padding: var(--espaciado-m) var(--espaciado-l);
+    border: 0;
+    border-radius: var(--redondeo-borde-m);
+    background-color: var(--color-superficie-sunken);
+
+    .botones {
+        justify-content: flex-end;
+        margin: 0;
+    }
+
+    .totales-venta-item {
+        justify-content: space-between;
+        gap: var(--espaciado-m);
+        font-size: var(--tamaño-letra-s);
+
+        label {
+            margin: 0;
+            font-weight: var(--grosor-letra-4);
+            color: var(--color-texto-secundario);
+        }
+
+        span {
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+    }
+
+    .totales-venta-item--total {
+        padding-top: var(--espaciado-s);
+        border-top: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        font-size: var(--tamaño-letra-l);
+        font-weight: var(--grosor-letra-7);
+
+        label {
+            font-weight: inherit;
+            color: var(--color-texto-primario);
+        }
+    }
+
+    .totales-venta-item--divisa-empresa {
+        font-size: var(--tamaño-letra-xs);
+    }
+}
+
+@media (max-width: 768px) {
+    .totales-venta.totales-venta--ticket {
+        flex-direction: column;
+        align-items: stretch;
+        width: auto;
+        margin-left: var(--padding-horizontal);
+        padding: var(--espaciado-m);
+
+        .totales-venta-item {
+            flex: none;
+            justify-content: space-between;
+        }
     }
 }

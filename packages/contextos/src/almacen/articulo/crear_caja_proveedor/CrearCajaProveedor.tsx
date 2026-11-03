@@ -1,4 +1,3 @@
-import { TipoCaja } from "#/almacen/comun/componentes/TipoCaja.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
@@ -12,13 +11,13 @@ import { postCajaProveedor } from "../infraestructura.ts";
 
 const metaNuevaCaja: MetaModelo<NuevaCajaProveedor> = {
     campos: {
-        idTipoCaja: { requerido: true },
+        descripcion: { requerido: true },
         cantidad: { requerido: true, tipo: "numero" },
     },
 };
 
 const nuevaCajaVacia = (): NuevaCajaProveedor => ({
-    idTipoCaja: "",
+    descripcion: "",
     cantidad: 0,
 });
 
@@ -53,7 +52,7 @@ export const CrearCajaProveedor = ({
             onCerrar={cancelar}
         >
             <quimera-formulario>
-                <TipoCaja label="Tipo de caja" {...uiProps("idTipoCaja")} />
+                <QInput label="Descripción" {...uiProps("descripcion")} />
                 <QInput label="Cantidad" {...uiProps("cantidad")} />
             </quimera-formulario>
             <div className="botones maestro-botones">

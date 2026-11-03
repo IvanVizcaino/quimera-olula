@@ -5,12 +5,15 @@ import {
   notificarPanelLateralAbierto,
   solicitarTogglePanelLateral,
 } from "@olula/lib/panel_lateral_events.ts";
+import { modoCapturaVoz, useModoVozActivo } from "@olula/lib/voz/modo_voz.ts";
+import { IconMicrophone, IconMicrophoneOff } from "@tabler/icons-react";
 import { useContext, useEffect } from "react";
 import { Link, useLocation } from "react-router";
 import { QIcono } from "../atomos/qicono.tsx";
 import "./Cabecera.css";
 import { NotificacionesCabecera } from "./NotificacionesCabecera.tsx";
 import { estaAutentificado } from "./autenticacion";
+import { useEsMovil } from "../maestro/useEsMovil.ts";
 import { useMenuControl } from "./useMenuControl";
 
 export type CabeceraProps = {
@@ -46,8 +49,16 @@ export const CabeceraBase = ({
   ExtraLogo,
   mostrarAsistente = false,
 }: CabeceraProps) => {
-  const { menuAbierto, toggleMenu, cerrarMenu } = useMenuControl();
+  const {
+    menuAbierto,
+    toggleMenu,
+    cerrarMenu,
+    alternarLateralExpandido,
+    abrirBusqueda,
+  } = useMenuControl();
+  const esMovil = useEsMovil();
   const autenticado = estaAutentificado();
+  const [modoVoz, setModoVoz] = useModoVozActivo();
 
   useEffect(() => {
     // El panel lateral del asistente (packages/contextos, fuera de este árbol de
@@ -66,8 +77,10 @@ export const CabeceraBase = ({
       <header className="cabecera-principal">
         <button
           id="boton-menu-lateral"
-          aria-label="Abrir menú lateral"
-          onClick={() => toggleMenu("lateral")}
+          aria-label={esMovil ? "Abrir menú lateral" : "Expandir o contraer el menú lateral"}
+          onClick={() =>
+            esMovil ? toggleMenu("lateral") : alternarLateralExpandido()
+          }
         ></button>
 
         <label htmlFor="boton-menu-lateral" id="etiqueta-menu-abierto" />
@@ -79,6 +92,19 @@ export const CabeceraBase = ({
           )}
         </Link>
         {ExtraLogo ? <ExtraLogo /> : null}
+        {autenticado && (
+          <button
+            type="button"
+            id="boton-busqueda-rapida"
+            aria-label="Buscar pantalla (Ctrl K)"
+            onClick={abrirBusqueda}
+          >
+            <QIcono nombre="buscar" tamaño="sm" />
+            <span className="boton-busqueda-texto">Ir a una pantalla…</span>
+            <span className="boton-busqueda-texto-movil">Buscar</span>
+            <kbd>Ctrl K</kbd>
+          </button>
+        )}
         <div id="cabecera-titulo">{Titulo ? <Titulo /> : null}</div>
         <div id="cabecera-acciones">
           <div id="cabecera-acciones-globales">
@@ -88,6 +114,20 @@ export const CabeceraBase = ({
             {AccionesCabecera ? <AccionesCabecera /> : null}
           </div>
         </div>
+        {autenticado && mostrarAsistente && modoCapturaVoz() !== null && (
+          <button
+            type="button"
+            id="boton-modo-voz"
+            className={modoVoz ? "activo" : ""}
+            aria-pressed={modoVoz}
+            aria-label={modoVoz ? "Desactivar modo voz" : "Activar modo voz"}
+            title={modoVoz ? "Modo voz activo — di «Oye Olula». Pulsa para desactivarlo" : "Activar modo voz («Oye Olula»)"}
+            onClick={() => setModoVoz(!modoVoz)}
+          >
+            {/* 16 px: mismo tamaño que los QIcono "sm" del asistente y del usuario */}
+            {modoVoz ? <IconMicrophone size={16} /> : <IconMicrophoneOff size={16} />}
+          </button>
+        )}
         {autenticado && mostrarAsistente && (
           <>
             <button

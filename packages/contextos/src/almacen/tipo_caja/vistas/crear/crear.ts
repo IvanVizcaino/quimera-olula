@@ -6,6 +6,7 @@ export const metaNuevoTipoCaja: MetaModelo<NuevoTipoCaja> = {
         descripcion: { requerido: true },
         sku: { requerido: false },
         capacidad: { requerido: false, tipo: "decimal" },
+        prefijo: { requerido: false },
     },
     onChange: (modelo, campo) => {
         if (campo === "sku" && (modelo.sku === null || modelo.sku === "")) {

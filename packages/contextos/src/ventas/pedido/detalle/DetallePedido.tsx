@@ -1,3 +1,4 @@
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { IndicadorGuardado } from "#/ventas/comun/componentes/IndicadorGuardado.tsx";
 import { CambiarAgente } from "#/ventas/comun/componentes/moleculas/CambiarAgente/CambiarAgente.tsx";
@@ -5,7 +6,11 @@ import { CambiarDescuento } from "#/ventas/comun/componentes/moleculas/CambiarDe
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import "#/ventas/comun/estilos/campos.css";
 import "#/ventas/comun/estilos/detalle_documento.css";
-import { tituloDocumentoVenta } from "#/ventas/venta/dominio.ts";
+import {
+  datosClaveDocumentoVenta,
+  tituloDocumentoVenta,
+} from "#/ventas/venta/dominio.ts";
+import { etiquetaEstadoPedido } from "../maestro/maestro.ts";
 import { TotalesVenta } from "#/ventas/venta/vistas/TotalesVenta.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
@@ -123,6 +128,10 @@ export const DetallePedidoBase = ({
     <Detalle
       id={ctx.pedido.id}
       obtenerTitulo={titulo}
+      obtenerEstado={(pedido: Pedido) => (
+        <EtiquetaEstado {...etiquetaEstadoPedido(pedido)} />
+      )}
+      obtenerDatosClave={datosClaveDocumentoVenta}
       setEntidad={() => {}}
       entidad={ctx.pedido}
       cerrarDetalle={() => emitir("pedido_deseleccionado", null)}
@@ -137,6 +146,15 @@ export const DetallePedidoBase = ({
       </div>
 
       <Tabs>
+        <Tab label="Líneas">
+          <Lineas
+            pedido={ctx.pedido}
+            lineaActiva={lineaActiva}
+            publicar={emitir}
+            estadoPedido={estado}
+          />
+        </Tab>
+
         <Tab label="Cliente">
           <TabCliente pedido={pedido} estado={estado} publicar={emitir} />
         </Tab>
@@ -172,13 +190,6 @@ export const DetallePedidoBase = ({
           porComision={ctx.pedido.por_comision}
         />
       )}
-
-      <Lineas
-        pedido={ctx.pedido}
-        lineaActiva={lineaActiva}
-        publicar={emitir}
-        estadoPedido={estado}
-      />
 
       {estado === "BORRANDO_PEDIDO" && (
         <BorrarPedido pedido={ctx.pedido} publicar={emitir} />

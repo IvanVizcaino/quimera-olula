@@ -1,6 +1,8 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { tokenAcceso } from "@olula/lib/api/token_acceso.ts";
-import { eventoStreamDesdeApi, hiloDesdeApi, mensajesHiloDesdeApi, normalizarRespuestaIa } from "#/asistente/dominio.ts";
+import {
+    eventoStreamDesdeApi, hiloDesdeApi, mensajesHiloDesdeApi, normalizarRespuestaIa, pantallaAApi,
+} from "#/asistente/dominio.ts";
 import { A2uiClientAction, ConsultaIa, EventoStreamIa, HiloIa, MensajesHiloIa, RespuestaIa } from "#/asistente/diseño.ts";
 import { empresaActual } from "#/valores/empresaActual.ts";
 
@@ -14,10 +16,17 @@ export const consultaAApi = (consulta: ConsultaIa) => ({
     pregunta: consulta.pregunta,
     thread_id: consulta.threadId,
     empresa_id: empresaActual(),
+    ...(consulta.canal ? { canal: consulta.canal } : {}),
     ...(consulta.capacidades ? { capacidades: consulta.capacidades } : {}),
     ...(consulta.capacidadesHash ? { capacidades_hash: consulta.capacidadesHash } : {}),
     ...(consulta.contextoApp
-        ? { contexto_app: { ruta_actual: consulta.contextoApp.rutaActual, app: consulta.contextoApp.app } }
+        ? {
+            contexto_app: {
+                ruta_actual: consulta.contextoApp.rutaActual,
+                app: consulta.contextoApp.app,
+                ...(consulta.contextoApp.pantalla ? { pantalla: pantallaAApi(consulta.contextoApp.pantalla) } : {}),
+            },
+        }
         : {}),
     ...(consulta.adjuntos?.length
         ? {

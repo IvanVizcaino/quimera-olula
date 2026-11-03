@@ -13,6 +13,12 @@ export default {
   palette: {
     ...mainTheme.palette,
     mode: "light",
+    warning: {
+      main: "#ff9800",
+    },
+    success: {
+      main: "#4caf50",
+    },
     common: {
       button: "#225DD4",
       seleccionado: "#DC5B80",

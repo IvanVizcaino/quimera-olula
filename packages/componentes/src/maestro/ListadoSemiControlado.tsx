@@ -1,13 +1,15 @@
 import { ClausulaFiltro, Criteria, Entidad } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { useCallback, useEffect, useState } from "react";
-import { QIcono } from "../atomos/qicono.tsx";
 import { MetaTabla, obtenerCols } from "../atomos/qtablacontrolada.tsx";
 import { QTablaControlada } from "../atomos/qtablacontrolada.tsx";
 import { QTarjetas } from "../atomos/qtarjetas.tsx";
 import { QTarjetaMetatabla } from "../moleculas/qtarjeta_metatabla.tsx";
 import { SinDatos } from "../SinDatos/SinDatos.tsx";
 import "./Listado.css";
+import { SelectorModo } from "./SelectorModo.tsx";
+import { useListadoMovilEnDetalle } from "./contexto_maestro.ts";
+import { useEsMovil } from "./useEsMovil.ts";
 import { filtrarEntidad } from "./maestroFiltros/filtro.ts";
 import {
   MaestroFiltrosActivoControlado,
@@ -59,7 +61,7 @@ export const ListadoSemiControlado = <T extends Entidad>({
   totalEntidades,
   seleccionada,
   onSeleccion,
-  modo,
+  modo: modoPantalla,
   modoInicial,
   modosDisponibles,
   onModoChanged,
@@ -67,7 +69,15 @@ export const ListadoSemiControlado = <T extends Entidad>({
   mensajeSinDatos,
 }: MaestroProps<T>) => {
   const [criteria, setCriteria] = useState<Criteria>(criteriaInicial);
-  const [modoEstado, setModoEstado] = useState<Modo>(modo ?? modoInicial ?? "tabla");
+  // En móvil, tarjetas si la pantalla no fija el modo (las tablas no caben).
+  const esMovil = useEsMovil();
+  const tarjetasCompactas = useListadoMovilEnDetalle(esMovil);
+  const modo = tarjetasCompactas ? undefined : modoPantalla;
+  const [modoEstado, setModoEstado] = useState<Modo>(
+    tarjetasCompactas
+      ? "tarjetas"
+      : (modo ?? modoInicial ?? (esMovil ? "tarjetas" : "tabla"))
+  );
   const modoInterno = modo ?? modoEstado;
 
   const puedeTabla = metaTabla !== undefined;
@@ -190,7 +200,10 @@ export const ListadoSemiControlado = <T extends Entidad>({
   }, [idReiniciarCriteria, criteriaInicial, setCriteria]);
 
   return (
-    <div className="Listado">
+    <div
+      className="Listado"
+      data-densidad={tarjetasCompactas ? "compacta" : undefined}
+    >
       {mostrarCabecera && (
         <div className="listado-cabecera">
           <div className="listado-cabecera-izquierda">
@@ -211,20 +224,12 @@ export const ListadoSemiControlado = <T extends Entidad>({
 
           <div className="listado-cabecera-derecha">
             {acciones}
-            {mostrarCambioModo && (
-              <div className="cambio-modo">
-                <span
-                  className="cambio-modo-icono"
-                  onClick={() =>
-                    cambiarModo(modoEfectivo === "tabla" ? "tarjetas" : "tabla")
-                  }
-                >
-                  <QIcono
-                    nombre={modoEfectivo === "tabla" ? "lista" : "tabla"}
-                    tamaño="md"
-                  />
-                </span>
-              </div>
+            {mostrarCambioModo && modoEfectivo && (
+              <SelectorModo
+                modos={modosDisponiblesCalculados}
+                modo={modoEfectivo}
+                onCambio={cambiarModo}
+              />
             )}
           </div>
         </div>

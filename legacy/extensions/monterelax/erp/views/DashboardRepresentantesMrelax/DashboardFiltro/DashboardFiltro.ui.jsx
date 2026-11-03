@@ -28,12 +28,14 @@ function DashboardFiltro({ useStyles }) {
             id="bufferFiltro.fechaDesde"
             field="bufferFiltro.fechaDesde"
             label="Fecha desde"
+            datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
           />
           &nbsp;&nbsp;
           <Field.Date
             id="bufferFiltro.fechaHasta"
             field="bufferFiltro.fechaHasta"
             label="Fecha hasta"
+            datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4, md: 4 }}>

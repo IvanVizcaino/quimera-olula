@@ -29,6 +29,8 @@ export interface Factura extends Venta {
     // automatica?: boolean;
     servicios?: boolean;
     rectificativa_id?: string | null;
+    /** Solo lectura: lo escribe la contabilidad al emitir la factura. */
+    asiento_id?: string | null;
 }
 export interface LineaFactura extends LineaVenta {
     otro_campo?: string;

@@ -2,7 +2,7 @@ import { Button } from "@quimera/comps";
 import { makeStyles } from "@quimera/styles";
 import { ButtonGroup, CircularProgress } from "@quimera/thirdparty";
 import { useStateValue, util } from "quimera";
-import React, { useState } from "react";
+import { useState } from "react";
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -87,8 +87,14 @@ function EstadoTarea({ field, value, onChanged, ...props }) {
       <Button
         id="EstadoTareaNoCompletada"
         className={classesNoCompletada}
-        // onClick={() => fieldValue && onClick(false)}
-        onClick={null}
+        onClick={() =>
+          fieldValue &&
+          !onChanged &&
+          dispatch({
+            type: `on${util.camelId(field)}Changed`,
+            payload: { field, value: false },
+          })
+        }
         disabled={loadingCoords}
       >
         {loadingCoords && fieldValue ? (

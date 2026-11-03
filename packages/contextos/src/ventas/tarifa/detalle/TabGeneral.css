@@ -1,11 +1,11 @@
-.TabGeneral quimera-input[nombre="codigo"] {
+.Tarifa .TabGeneral quimera-input[nombre="codigo"] {
     grid-column: span 3;
 }
 
-.TabGeneral quimera-input[nombre="nombre"] {
+.Tarifa .TabGeneral quimera-input[nombre="nombre"] {
     grid-column: span 6;
 }
 
-.TabGeneral quimera-select[nombre="tarifa/divisa_id"] {
+.Tarifa .TabGeneral quimera-select[nombre="tarifa/divisa_id"] {
     grid-column: span 3;
 }

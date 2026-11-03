@@ -37,6 +37,7 @@ export interface RemesaApi {
     total: number;
     divisa_id: string;
     cuenta_id: string;
+    descripcion_cuenta?: string;
     estado: string;
     empresa_id: string;
     recibos?: ReciboDeRemesaApi[];
@@ -70,6 +71,7 @@ export const remesaDesdeApi = (api: RemesaApi): Remesa => ({
     total: api.total,
     divisaId: api.divisa_id,
     cuentaId: api.cuenta_id,
+    descripcionCuenta: api.descripcion_cuenta ?? "",
     estado: api.estado,
     empresaId: api.empresa_id,
     recibos: (api.recibos ?? []).map(reciboDeRemesaDesdeApi),

@@ -1,5 +1,4 @@
-.TabDatos,
-.TabCliente {
+:is(.Presupuesto, .Pedido, .Albaran, .Factura) :is(.TabDatos, .TabCliente) {
 
     quimera-input[deshabilitado] input,
     quimera-autocompletar quimera-input[deshabilitado] input,

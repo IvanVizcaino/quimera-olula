@@ -35,7 +35,7 @@ export interface ProveedorArticulo extends Entidad {
 }
 
 export interface NuevaCajaProveedor extends Modelo {
-    idTipoCaja: string;
+    descripcion: string;
     cantidad: number;
 }
 

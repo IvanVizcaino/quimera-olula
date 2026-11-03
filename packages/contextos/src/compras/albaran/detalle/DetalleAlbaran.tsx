@@ -1,3 +1,5 @@
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { datosClaveDocumentoCompra } from "#/compras/comun/dominio.ts";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import { CambioProveedor } from "#/compras/comun/componentes/moleculas/CambioProveedor/CambioProveedor.tsx";
@@ -13,7 +15,7 @@ import { BorrarAlbaran } from "../borrar/BorrarAlbaran.tsx";
 import { FacturaGenerada } from "../facturar/FacturaGenerada.tsx";
 import { FacturarAlbaran } from "../facturar/FacturarAlbaran.tsx";
 import { Albaran } from "../diseño.ts";
-import { albaranFacturado } from "../dominio.ts";
+import { albaranFacturado, etiquetaEstadoAlbaran } from "../dominio.ts";
 import { getReportAlbaran, getTrazaAlbaran } from "../infraestructura.ts";
 import {
     contextoDetalleAlbaranInicial,
@@ -71,6 +73,7 @@ export const DetalleAlbaran = ({
             texto: "Facturar",
             onClick: () => emitir("facturado_solicitado"),
             deshabilitado: albaranFacturado(albaran),
+            principal: true,
         },
         {
             icono: "eliminar",
@@ -85,6 +88,8 @@ export const DetalleAlbaran = ({
         <Detalle
             id={id}
             obtenerTitulo={titulo}
+            obtenerEstado={(A: Albaran) => <EtiquetaEstado {...etiquetaEstadoAlbaran(A)} />}
+            obtenerDatosClave={datosClaveDocumentoCompra}
             setEntidad={() => {}}
             entidad={albaran}
             cerrarDetalle={() => emitir("albaran_deseleccionado", null, true)}
@@ -95,6 +100,18 @@ export const DetalleAlbaran = ({
                 </div>
                 <Tabs
                     children={[
+                        <Tab
+                            key="tab-lineas"
+                            label="Líneas"
+                            children={
+                                <LineasAlbaran
+                                    albaran={albaran}
+                                    lineas={lineas}
+                                    estado={estado}
+                                    publicar={emitir}
+                                />
+                            }
+                        />,
                         <Tab
                             key="tab-proveedor"
                             label="Proveedor"
@@ -113,12 +130,6 @@ export const DetalleAlbaran = ({
                     ]}
                 />
                 <TotalesDocumento form={formModelo} />
-                <LineasAlbaran
-                    albaran={albaran}
-                    lineas={lineas}
-                    estado={estado}
-                    publicar={emitir}
-                />
             </div>
 
             {estado === "CAMBIANDO_DIVISA" && (

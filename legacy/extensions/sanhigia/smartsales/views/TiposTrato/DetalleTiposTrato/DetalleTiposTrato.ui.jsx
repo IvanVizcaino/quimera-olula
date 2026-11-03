@@ -31,6 +31,7 @@ function DetalleTiposTrato({ useStyles }) {
     { key: "Email", value: "Email" },
     { key: "Llamada", value: "Llamada" },
     { key: "Whatsapp", value: "Whatsapp" },
+    { key: "Cita", value: "Cita" },
   ];
   const miTarea = tareasTrato.filter(tp => tp.key === tipostratoBuffer.tareaInicialTrato)[0];
 

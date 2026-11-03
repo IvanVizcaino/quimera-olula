@@ -17,8 +17,18 @@ function DashboardFiltro({ useStyles }) {
           fullWidth
           boxStyle={classes.select}
         />
-        <Field.Date id="bufferFiltro.fechaDesde" label="Desde" boxStyle={classes.fecha} />
-        <Field.Date id="bufferFiltro.fechaHasta" label="Hasta" boxStyle={classes.fecha} />
+        <Field.Date
+          id="bufferFiltro.fechaDesde"
+          label="Desde"
+          boxStyle={classes.fecha}
+          datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
+        />
+        <Field.Date
+          id="bufferFiltro.fechaHasta"
+          label="Hasta"
+          boxStyle={classes.fecha}
+          datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
+        />
       </Box>
     </Quimera.Template>
   );

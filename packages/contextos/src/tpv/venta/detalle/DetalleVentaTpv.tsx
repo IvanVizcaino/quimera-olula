@@ -142,7 +142,11 @@ export const DetalleVentaTpv = ({
             ]}
             ></Tabs>
 
-            <TotalesVenta publicar={emitir} modeloVenta={modeloVenta} />
+            <TotalesVenta
+              publicar={emitir}
+              modeloVenta={modeloVenta}
+              formato="linea"
+            />
 
             {estado === "CAMBIANDO_DESCUENTO" && (
                 <CambiarDescuento publicar={emitir} venta={venta}/>

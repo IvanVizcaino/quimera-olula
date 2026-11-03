@@ -5,8 +5,8 @@ import { HistorialHilos } from "#/asistente/vistas/HistorialHilos.tsx";
 import { borrarHilo, listarHilos } from "#/asistente/infraestructura.ts";
 
 const hilos = [
-    { threadId: "hilo-1", titulo: "Presupuesto para Acme", actualizadoEn: "2026-01-01T00:00:00+00:00" },
-    { threadId: "hilo-2", titulo: "Consulta de stock", actualizadoEn: "2026-01-02T00:00:00+00:00" },
+    { threadId: "hilo-1", titulo: "Presupuesto para Acme", actualizadoEn: "2026-01-01T00:00:00+00:00", canal: "web" as const },
+    { threadId: "hilo-2", titulo: "Consulta de stock", actualizadoEn: "2026-01-02T00:00:00+00:00", canal: "web" as const },
 ];
 
 vi.mock("#/asistente/infraestructura.ts", () => ({

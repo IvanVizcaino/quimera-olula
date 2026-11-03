@@ -1,0 +1,40 @@
+.etiqueta-estado {
+    --tono-estado: var(--color-primario-texto);
+
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem var(--espaciado-s);
+    border-radius: 999px;
+    font-size: var(--tamaño-letra-xs);
+    font-weight: var(--grosor-letra-6);
+    line-height: var(--altura-linea-normal);
+    white-space: nowrap;
+    /* Texto oscurecido para llegar a AA (4,5:1) sobre el fondo pastel */
+    color: color-mix(in oklab, var(--tono-estado) 78%, black);
+    background: color-mix(in oklab, var(--tono-estado) 12%, var(--color-superficie));
+
+    &[data-tono="completado"] {
+        --tono-estado: var(--color-exito-oscuro);
+    }
+
+    &[data-tono="pendiente"] {
+        --tono-estado: var(--color-advertencia-oscuro);
+    }
+
+    &[data-tono="parcial"] {
+        --tono-estado: var(--color-primario-texto);
+    }
+
+    &[data-tono="borrador"] {
+        --tono-estado: var(--color-texto-secundario);
+    }
+
+    &[data-tono="error"] {
+        --tono-estado: var(--color-error-oscuro);
+    }
+}
+
+/* Junto a otra etiqueta (p. ej. "Abono") */
+:is(.q-etiqueta, .etiqueta-estado)+.etiqueta-estado {
+    margin-left: var(--espaciado-xs);
+}

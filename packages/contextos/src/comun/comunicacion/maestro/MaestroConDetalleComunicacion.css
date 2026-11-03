@@ -1,5 +1,7 @@
 .MaestroComunicacion {
     height: 100%;
+    /* Bandeja de mensajes: siempre en una columna, sin rejilla */
+    --ancho-min-tarjeta: 100%;
 
     quimera-tarjeta {
         padding: var(--espaciado-l) var(--espaciado-m);

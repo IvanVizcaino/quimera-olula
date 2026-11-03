@@ -50,7 +50,7 @@ function PedidosDetalle({ useStyles }) {
                 </Tabs>
                 {indiceTab === 0 && (
                   <Box>
-                    <Grid container spacing={1} direction="column" >
+                    <Grid container spacing={1}>
                       <Grid size={12}>
                         <Field.Text
                           id={`pedidos.dict.${pedidos.current}.nombreCliente`}
@@ -65,6 +65,7 @@ function PedidosDetalle({ useStyles }) {
                           fullWidth
                           label="Fecha Prev. Inicial"
                           disabled
+                          datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
                         />
                       </Grid>
                       <Grid size={6}>
@@ -73,6 +74,7 @@ function PedidosDetalle({ useStyles }) {
                           fullWidth
                           label="Fecha Prevista"
                           disabled
+                          datePickerProps={{ slotProps: { textField: { variant: "standard" } } }}
                         />
                       </Grid>
                       <Grid size={6}>

@@ -8,6 +8,7 @@ interface ContactoSelectorProps {
   nombre?: string;
   label?: string;
   deshabilitado?: boolean;
+  excluir?: string[];
   onChange: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 
@@ -17,6 +18,7 @@ export const ContactoSelector = ({
   nombre = "contacto_id",
   label = "Seleccionar contacto",
   deshabilitado = false,
+  excluir = [],
   onChange,
 }: ContactoSelectorProps) => {
   const obtenerOpciones = async (valor: string) => {
@@ -32,10 +34,14 @@ export const ContactoSelector = ({
       criteria.orden as Orden
     );
 
-    return contactos.map((contacto) => ({
-      valor: contacto.id,
-      descripcion: contacto.nombre + " - " + contacto.email,
-    }));
+    return contactos
+      .filter((contacto) => !excluir.includes(contacto.id))
+      .map((contacto) => ({
+        valor: contacto.id,
+        descripcion: [contacto.nombre, contacto.email, contacto.telefono1]
+          .filter(Boolean)
+          .join(" - "),
+      }));
   };
 
   return (

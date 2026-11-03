@@ -15,7 +15,7 @@ function FiltroMaster({ useStyles }) {
       <AppBar position="sticky" className={classes.appBar}>
         <Box px={1}>
           <Box>
-            <Grid container spacing={1} direction="column" >
+            <Grid container spacing={1}>
               <Grid size={6}>
                 <Field.Select
                   id="filtro.estado"

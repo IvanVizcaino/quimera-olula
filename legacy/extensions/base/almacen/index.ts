@@ -32,7 +32,7 @@ export default {
   },
   dependencies: [core, login],
   rules: {
-    'Inventarios:visit': (check: (rule: string) => boolean) => check('inventarios'),
+    'Inventarios:visit': (check: (rule: string) => boolean) => check('almacen.inventario'),
   },
 }
 

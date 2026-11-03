@@ -15,7 +15,7 @@ function FiltroMaster({ useStyles }) {
       <AppBar position="sticky" className={classes.appBar}>
         <Box px={1}>
           <Box>
-            <Grid container spacing={1} direction="column" >
+            <Grid container spacing={1}>
               {!filtroReferencia ? (
                 <>
                   <Grid size={6}>

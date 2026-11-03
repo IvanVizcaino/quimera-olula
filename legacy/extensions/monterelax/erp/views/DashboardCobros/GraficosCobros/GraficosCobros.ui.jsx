@@ -9,7 +9,7 @@ function GraficosCobros({ useStyles }) {
 
   return (
     <Quimera.Template id="GraficosCobros">
-      <Grid container spacing={1} direction="column" >
+      <Grid container spacing={1}>
         <Grid size={{ xs: 12, sm: 12, md: 6 }}>
           <Box w={1} border={0}>
             <Chart.Bar chartProps={lineChartRecibosPendientes} />

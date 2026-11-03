@@ -1,87 +1,106 @@
 import { QAviso } from "@olula/componentes/atomos/qaviso.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
-import { MetaTabla, QTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useState } from "react";
-import { CandidatoConciliacion, MovimientoBancario } from "../../diseño.js";
-import { BloqueoConciliarMovimiento, urlRecibo } from "../../dominio.js";
+import {
+    CandidatoConciliacion,
+    CandidatoListaConciliacion,
+    MovimientoBancario,
+    PartidaHuerfana,
+    RemesaCandidata,
+    TipoFiltroCandidato,
+} from "../../diseño.js";
+import {
+    BloqueoConciliarMovimiento,
+    FILTROS_CANDIDATO,
+    filtrarCandidatosPorTipo,
+    listaCandidatosConciliacion,
+} from "../../dominio.js";
 import "./CandidatosConciliacion.css";
-
-const SIN_ORDEN = ["", ""];
+import { SeleccionCandidatos } from "./SeleccionCandidatos.js";
+import { TarjetaCandidato } from "./TarjetaCandidato.js";
 
 /**
- * Sugerencias de recibo para liquidar el movimiento (GET `.../candidatos`).
- * No son un sub-recurso persistido: se recalculan en cada búsqueda, así que
- * no usan ListaEntidades/ListaActivaEntidades, solo el array de detalle.ts.
+ * Candidatos para conciliar a mano, en una sola lista ordenada por fecha descendente:
+ * - Recibos (GET `.../candidatos`) por el importe del movimiento (conciliación
+ *   completa), mayores (parcial) o menores (solo sumados a otros).
+ * - Remesas (GET `.../remesas`): de cobro en un ingreso, de pago en un cargo.
+ * - Partidas contables de la subcuenta bancaria sin movimiento equivalente,
+ *   que se vinculan sin modal (`asiento_vinculado_confirmado`).
+ *
+ * El buscador recarga los recibos en la API y filtra remesas y partidas con el
+ * mismo texto (ver listaCandidatosConciliacion). Las casillas de tipo filtran la lista
+ * ya cargada, sin volver a la API; sin ninguna marcada se ven todos. No son sub-recursos persistidos:
+ * se recalculan en cada carga, así que no usan ListaEntidades, solo los arrays de detalle.ts.
+ *
+ * Con la casilla de cada tarjeta los candidatos pasan a la zona de selección, encima
+ * de la lista, para conciliarlos juntos si suman el movimiento (ver SeleccionCandidatos).
  */
 export const CandidatosConciliacion = ({
     movimiento,
     candidatos,
+    remesas,
+    partidas,
     texto,
+    seleccion,
     bloqueo,
     publicar,
 }: {
     movimiento: MovimientoBancario;
     candidatos: CandidatoConciliacion[];
+    remesas: RemesaCandidata[];
+    partidas: PartidaHuerfana[];
     texto: string;
+    seleccion: CandidatoListaConciliacion[];
     bloqueo: BloqueoConciliarMovimiento;
     publicar: EmitirEvento;
 }) => {
     const [textoLocal, setTextoLocal] = useState(texto);
+    const [tipos, setTipos] = useState<TipoFiltroCandidato[]>([]);
+
+    const cambiarTipo = (tipo: TipoFiltroCandidato, marcado: boolean) =>
+        setTipos((actuales) => marcado ? [...actuales, tipo] : actuales.filter((t) => t !== tipo));
 
     const buscar = () => publicar("candidatos_buscados", textoLocal);
 
-    const metaTablaCandidatos: MetaTabla<CandidatoConciliacion> = [
-        {
-            id: "codigo",
-            cabecera: "Recibo",
-            ancho: "24%",
-            render: (c) => (
-                <div className="recibo-candidato">
-                    <span>{c.codigo}</span>
-                    {c.facturaCodigo && <small>Factura {c.facturaCodigo}</small>}
-                </div>
-            ),
-        },
-        { id: "tercero", cabecera: "Tercero", ancho: "28%", render: (c) => c.tercero ?? "—" },
-        { id: "fechaVencimiento", cabecera: "Vence", tipo: "fecha", ancho: "12%" },
-        {
-            id: "diasDiferencia",
-            cabecera: "Días",
-            ancho: "7%",
-            render: (c) => (c.diasDiferencia > 0 ? `+${c.diasDiferencia}` : `${c.diasDiferencia}`),
-        },
-        { id: "importe", cabecera: "Importe", tipo: "moneda", divisa: movimiento.divisa ?? "EUR", ancho: "11%" },
-        {
-            id: "reciboId",
-            cabecera: "",
-            ancho: "18%",
-            render: (c) => (
-                <div className="acciones-candidato">
-                    <QBoton tamaño="pequeño" variante="borde" enlace={urlRecibo(c.tipoRecibo, c.reciboId)}>
-                        Ver
-                    </QBoton>
-                    <QBoton
-                        tamaño="pequeño"
-                        onClick={() => publicar("conciliacion_solicitada", c)}
-                        deshabilitado={bloqueo.bloqueado}
-                    >
-                        Conciliar
-                    </QBoton>
-                </div>
-            ),
-        },
-    ];
+    const lista = filtrarCandidatosPorTipo(
+        listaCandidatosConciliacion(candidatos, remesas, partidas, texto, seleccion), tipos
+    );
+    const divisa = movimiento.divisa ?? "EUR";
 
     return (
         <div className="CandidatosConciliacion">
             {bloqueo.bloqueado && <QAviso variante="advertencia">{bloqueo.motivo}</QAviso>}
 
+            <div className="botones">
+                <QBoton variante="borde" deshabilitado={bloqueo.bloqueado}
+                    onClick={() => publicar("asiento_solicitado")}>
+                    Asiento manual
+                </QBoton>
+                <QBoton variante="texto" onClick={() => publicar("ignorar_solicitado")}>
+                    Ignorar movimiento
+                </QBoton>
+            </div>
+
+            <h4>Buscar candidatos</h4>
+            <div className="filtros-candidatos">
+                {FILTROS_CANDIDATO.map(({ tipo, etiqueta }) => (
+                    <QCheckbox
+                        key={tipo}
+                        label={etiqueta}
+                        nombre={`filtro-candidatos-${tipo}`}
+                        valor={tipos.includes(tipo)}
+                        condensado
+                        onChange={(valor) => cambiarTipo(tipo, valor === "true")}
+                    />
+                ))}
+            </div>
             <div id="buscador-candidatos">
                 <QInput
                     label=""
-                    placeholder="Buscar por recibo, factura, tercero o NIF"
+                    placeholder="Buscar por recibo, factura, tercero, NIF, remesa o asiento"
                     nombre="textoCandidatos"
                     valor={textoLocal}
                     onChange={(valor) => setTextoLocal(valor)}
@@ -93,22 +112,25 @@ export const CandidatosConciliacion = ({
                 </QBoton>
             </div>
 
-            {candidatos.length === 0 ? (
-                <p className="sin-candidatos">No hay recibos pendientes por este importe.</p>
-            ) : (
-                <QTabla<CandidatoConciliacion>
-                    metaTabla={metaTablaCandidatos}
-                    datos={candidatos}
-                    cargando={false}
-                    orden={SIN_ORDEN}
-                />
+            {seleccion.length > 0 && (
+                <SeleccionCandidatos movimiento={movimiento} seleccion={seleccion} divisa={divisa}
+                    bloqueado={bloqueo.bloqueado} publicar={publicar} />
             )}
 
-            <div className="botones">
-                <QBoton variante="texto" onClick={() => publicar("ignorar_solicitado")}>
-                    Ignorar movimiento
-                </QBoton>
-            </div>
+            {lista.length === 0 ? (
+                <p className="sin-candidatos">
+                    {tipos.length > 0
+                        ? "No hay candidatos de los tipos marcados."
+                        : "No hay recibos, remesas ni partidas contables candidatas."}
+                </p>
+            ) : (
+                <ul className="lista-candidatos">
+                    {lista.map((c) => (
+                        <TarjetaCandidato key={c.id} candidato={c} movimiento={movimiento} divisa={divisa}
+                            bloqueado={bloqueo.bloqueado} publicar={publicar} />
+                    ))}
+                </ul>
+            )}
         </div>
     );
 };

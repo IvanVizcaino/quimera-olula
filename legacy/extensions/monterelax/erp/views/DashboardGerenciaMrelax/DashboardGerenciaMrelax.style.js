@@ -81,6 +81,9 @@ export default parent => {
           pointerEvents: "none",
           listStyle: "none",
         },
+        "& details summary strong": {
+          fontWeight: 700,
+        },
         "& details hr": {
           borderColor: theme.custom.menu.accent,
         },

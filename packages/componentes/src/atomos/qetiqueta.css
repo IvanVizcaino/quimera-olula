@@ -33,6 +33,16 @@
     background-color: var(--color-primario-claro);
 }
 
+.q-etiqueta.neutro {
+    background-color: var(--color-fondo);
+    box-shadow: inset 0 0 0 1px var(--color-borde-sutil);
+}
+
+.q-etiqueta.gris {
+    background-color: var(--color-deshabilitado-claro);
+    color: var(--color-texto-deshabilitado);
+}
+
 .q-etiqueta:hover {
     filter: saturate(1.15) brightness(0.98);
     transform: translateY(-1px);

@@ -18,6 +18,14 @@ export const getMaquina: () => Maquina<EstadoMaestroConexionBancaria, ContextoMa
             siguiente_pagina: [maestro.Conexiones.filtrar, maestro.ampliarConexiones],
 
             conectar_banco_solicitado: "CONECTANDO",
+
+            reautenticar_conexion_solicitada: [maestro.prepararReautenticacion],
+        },
+
+        REAUTENTICANDO: {
+            conexion_bancaria_reautenticada: [maestro.aplicarReautenticacion],
+
+            reautenticacion_cancelada: [maestro.cancelarReautenticacion],
         },
 
         CONECTANDO: {

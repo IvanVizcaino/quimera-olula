@@ -5,6 +5,7 @@ export interface TipoCaja extends Entidad {
     descripcion: string;
     sku: string | null;
     capacidad: number | null;
+    prefijo: string | null;
 }
 
 /**
@@ -14,6 +15,7 @@ export interface NuevoTipoCaja extends Modelo {
     descripcion: string;
     sku: string | null;
     capacidad: number | null;
+    prefijo: string | null;
 }
 
 /**
@@ -25,6 +27,7 @@ export type CambiosTipoCaja = {
     descripcion?: string;
     sku?: string | null;
     capacidad?: number | null;
+    prefijo?: string | null;
 };
 
 /**

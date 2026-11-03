@@ -1,4 +1,4 @@
-.Factura .TabDatos {
+.ComprasFactura .TabDatos {
     quimera-input[nombre="codigo"],
     quimera-input[nombre="automatica"] {
         grid-column: span 6;
@@ -27,8 +27,7 @@
         grid-column: span 6;
     }
 
-    quimera-input[nombre="codigoRectificativa"],
-    quimera-input[nombre="asientoId"] {
+    quimera-input[nombre="codigoRectificativa"] {
         grid-column: span 6;
     }
 

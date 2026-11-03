@@ -15,7 +15,7 @@ export default mergeConfig(config, {
         alias: {
             '#': '@olula/ctx',
             'use-db-state': new URL('./node_modules/use-db-state', import.meta.url).pathname,
-            '@olula/lib': import.meta.dirname + '/../../packages/lib/src'
+            '@olula/lib': import.meta.dirname + '/../../packages/contextos/lib/src'
         }
     },
     css: {

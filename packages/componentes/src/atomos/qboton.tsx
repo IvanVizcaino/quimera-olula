@@ -1,5 +1,7 @@
 import { MouseEventHandler, PropsWithChildren } from "react";
 import { Link } from "react-router";
+import { iconoAccionBoton } from "./icono_accion.ts";
+import { QIcono } from "./qicono.tsx";
 import "./qboton.css";
 
 type QBotonProps = {
@@ -18,6 +20,20 @@ type QBotonProps = {
   onMouseEnter?: React.MouseEventHandler<HTMLButtonElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLButtonElement>;
   props?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+};
+
+const Contenido = ({ contenido }: { contenido: React.ReactNode }) => {
+  const icono =
+    typeof contenido === "string" ? iconoAccionBoton(contenido) : undefined;
+  if (!icono) return <>{contenido}</>;
+  return (
+    <>
+      <span className="qboton-icono" data-icono={icono} aria-hidden="true">
+        <QIcono nombre={icono} tamaño="sm" />
+      </span>
+      <span className="qboton-texto">{contenido}</span>
+    </>
+  );
 };
 
 export const QBoton = ({
@@ -43,7 +59,7 @@ export const QBoton = ({
     return (
       <quimera-boton {...attrs}>
         <Link to={enlace} onClick={onClick} aria-disabled={deshabilitado || undefined}>
-          {texto || children}
+          <Contenido contenido={texto || children} />
         </Link>
       </quimera-boton>
     );
@@ -58,7 +74,7 @@ export const QBoton = ({
         onMouseLeave={onMouseLeave}
         {...props}
       >
-        {texto || children}
+        <Contenido contenido={texto || children} />
       </button>
     </quimera-boton>
   );

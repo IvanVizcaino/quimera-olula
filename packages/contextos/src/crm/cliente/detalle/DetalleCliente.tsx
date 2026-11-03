@@ -56,16 +56,19 @@ export const DetalleCliente = ({
     >
       {!!clienteId && (
         <div className="DetalleCliente">
-          <QuimeraAcciones
-            vertical
-            acciones={[
-              {
-                texto: "Borrar",
-                onClick: () => emitir("borrado_cliente_solicitado"),
-                advertencia: true,
-              },
-            ]}
-          />
+          <div className="maestro-botones">
+            <QuimeraAcciones
+              vertical
+              acciones={[
+                {
+                  icono: "eliminar",
+                  texto: "Borrar",
+                  onClick: () => emitir("borrado_cliente_solicitado"),
+                  advertencia: true,
+                },
+              ]}
+            />
+          </div>
 
           <Tabs>
             <Tab label="General">

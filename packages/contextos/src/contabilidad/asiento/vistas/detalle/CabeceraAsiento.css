@@ -1,0 +1,42 @@
+/*
+ * CabeceraAsiento.css — posicionado de los campos de la cabecera del asiento.
+ * Grid de 12 columnas (quimera-formulario). Toda fila suma 12:
+ *   Fila 1: ejercicio (3) + numero (2) + fecha (3) + manual (4)
+ *   Fila 2: tipoDocumento (5) + documento (7)
+ *   Fila 3: concepto (12)
+ */
+.CabeceraAsiento {
+    quimera-input[nombre="ejercicio"] {
+        grid-column: 1 / span 3;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="numero"] {
+        grid-column: span 2;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="fecha"] {
+        grid-column: span 3;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="manual"] {
+        grid-column: span 4;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="tipoDocumento"] {
+        grid-column: 1 / span 5;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="documento"] {
+        grid-column: span 7;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="concepto"] {
+        grid-column: 1 / span 12;
+    }
+}

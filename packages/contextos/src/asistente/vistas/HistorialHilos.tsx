@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { IconMessageCircle, IconTrash } from "@tabler/icons-react";
+import { IconMessageCircle, IconMicrophone, IconTrash } from "@tabler/icons-react";
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
 import { borrarHilo, listarHilos } from "#/asistente/infraestructura.ts";
 import type { HiloIa } from "#/asistente/diseño.ts";
+import { hiloDeVoz } from "#/asistente/dominio.ts";
 import "./HistorialHilos.css";
 
 interface Props {
@@ -39,10 +40,14 @@ export function HistorialHilos({ threadIdActivo, onSeleccionar, onHiloActivoBorr
     if (hilos === null) return <p className="asistente-historial__estado">Cargando conversaciones…</p>;
     if (hilos.length === 0) return <p className="asistente-historial__estado">Todavía no tienes conversaciones guardadas.</p>;
 
+    // El hilo de voz (modo manos libres) va siempre el primero: es uno fijo por usuario.
+    const hiloVoz = hiloDeVoz(hilos);
+    const hilosOrdenados = hiloVoz ? [hiloVoz, ...hilos.filter(h => h !== hiloVoz)] : hilos;
+
     return (
         <>
             <ul className="asistente-historial__lista">
-                {hilos.map(hilo => (
+                {hilosOrdenados.map(hilo => (
                     <li key={hilo.threadId} className="asistente-historial__fila">
                         <button
                             type="button"
@@ -52,8 +57,10 @@ export function HistorialHilos({ threadIdActivo, onSeleccionar, onHiloActivoBorr
                             }
                             onClick={() => onSeleccionar(hilo.threadId)}
                         >
-                            <IconMessageCircle size={15} />
-                            <span className="asistente-historial__titulo">{hilo.titulo}</span>
+                            {hilo === hiloVoz ? <IconMicrophone size={15} /> : <IconMessageCircle size={15} />}
+                            <span className="asistente-historial__titulo">
+                                {hilo === hiloVoz ? "Conversación por voz" : hilo.titulo}
+                            </span>
                         </button>
                         <button
                             type="button"

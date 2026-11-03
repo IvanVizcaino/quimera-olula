@@ -45,9 +45,9 @@ export default {
   },
   rules: {
     "albaranescli:firmaalbaranes": (check: (rule: string) => boolean) =>
-      check("albaranescli/firmaalbaranes"),
+      check("ventas.albaran.firmaalbaranes"),
     "albaranescli:firmapuesto": (check: (rule: string) => boolean) =>
-      check("albaranescli/firmapuesto"),
+      check("ventas.albaran.firmapuesto"),
   },
   schemas,
 };

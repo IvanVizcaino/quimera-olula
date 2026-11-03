@@ -8,6 +8,8 @@ export const nuevaLineaOrdenVacia: NuevaLineaOrden = {
     idCajaOrigen: null,
     idUbicacionDestino: null,
     idCajaDestino: null,
+    pasosPick: null,
+    pasosDrop: null,
 };
 
 export const nuevaLineaOrdenDesdeOrden = (orden: OrdenAlmacen): NuevaLineaOrden => ({
@@ -17,4 +19,6 @@ export const nuevaLineaOrdenDesdeOrden = (orden: OrdenAlmacen): NuevaLineaOrden 
     idCajaOrigen: orden.idCajaOrigen,
     idUbicacionDestino: orden.idUbicacionDestino,
     idCajaDestino: orden.idCajaDestino,
+    pasosPick: null,
+    pasosDrop: null,
 });

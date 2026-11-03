@@ -1,0 +1,12 @@
+.ConectarWealthReader {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+    /* load.js ajusta la altura del iframe; se le deja sitio desde el principio. */
+    min-width: min(36rem, 90vw);
+
+    iframe {
+        min-height: 32rem;
+        border: none;
+    }
+}

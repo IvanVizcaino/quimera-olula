@@ -1,3 +1,4 @@
+import { EstadoEtiqueta } from "#/comun/diseño.ts";
 import { MetaModelo } from "@olula/lib/dominio.ts";
 import { articuloDeLineaValido, getTipoArticulo } from "../comun/dominio.ts";
 import {
@@ -85,3 +86,9 @@ export const camposConCambiosServidor = [
     'tipoIrpf',
     'grupoIvaProductoId',
 ] as const satisfies readonly (keyof NuevaLineaPedido)[];
+
+export const etiquetaEstadoPedido = (pedido: Pedido): EstadoEtiqueta => {
+    if (pedido.recibido === "Sí") return { texto: "Recibido", tono: "completado" };
+    if (pedido.recibido === "Parcial") return { texto: "Parcial", tono: "parcial" };
+    return { texto: "Pendiente", tono: "pendiente" };
+};

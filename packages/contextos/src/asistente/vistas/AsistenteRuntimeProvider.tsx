@@ -17,12 +17,13 @@ import {
 import { MessageProcessor } from "@a2ui/web_core/v0_9";
 import type { SurfaceModel } from "@a2ui/web_core/v0_9";
 import type { ReactComponentImplementation } from "@a2ui/react/v0_9";
+import { describirPantalla, ejecutarAccionPantalla } from "@olula/lib/controles_pantalla.ts";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
 import { catalogoAsistente } from "#/asistente/vistas/catalogo/catalogo.ts";
 import { consultarIa, consultarIaStream, enviarAccionA2ui, obtenerMensajesHilo } from "#/asistente/infraestructura.ts";
 import {
-    accionNavegacionConNombreCorto, adjuntosParaEnviar, construirCapacidades, mensajeVacio,
+    accionNavegacionConNombreCorto, adjuntosParaEnviar, construirCapacidades, construirContextoPantalla, mensajeVacio,
 } from "#/asistente/dominio.ts";
 import { getMockRespuestaIa } from "#/asistente/vistas/mocks/a2ui_mocks.ts";
 import type {
@@ -211,6 +212,12 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
                     ? { capacidadesHash: hashConocido }
                     : { capacidades }),
                 ...(adjuntos?.length ? { adjuntos } : {}),
+                // Lo que hay en pantalla junto al chat: "este pedido", "filtra por…".
+                contextoApp: {
+                    rutaActual: window.location.pathname,
+                    pantalla: construirContextoPantalla(
+                        window.location.pathname, window.location.search, describirPantalla(), capacidades),
+                },
             };
         },
         [capacidades]
@@ -237,6 +244,8 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
             if (respuesta.descarga) {
                 setDescargaPorMensaje(prev => ({ ...prev, [assistantId]: respuesta.descarga! }));
             }
+            // Acciones sobre la pantalla de al lado (filtrar, abrir, cambiar de pestaña…).
+            (respuesta.accionesPantalla ?? []).forEach(ejecutarAccionPantalla);
         },
         [establecerThreadId, procesarMensajesA2ui, capacidades]
     );
@@ -360,6 +369,8 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
                                 setAccionNavegacionPorMensaje(prev => ({ ...prev, [assistantId]: accion }));
                             } else if (evento.tipo === "descarga") {
                                 setDescargaPorMensaje(prev => ({ ...prev, [assistantId]: evento.descarga }));
+                            } else if (evento.tipo === "accion_pantalla") {
+                                ejecutarAccionPantalla(evento.accionPantalla);
                             } else if (evento.tipo === "fin") {
                                 establecerThreadId(evento.threadId);
                                 if (evento.necesitaCapacidades) {

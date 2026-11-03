@@ -1,4 +1,5 @@
 import { RestAPI } from "@olula/lib/api/rest_api.js";
+import { empresaActual } from "../../valores/empresaActual.ts";
 import { Filtro, Orden, Paginacion } from "@olula/lib/diseño.js";
 import { criteriaQuery } from "@olula/lib/infraestructura.js";
 import Rrhh_Urls from "../comun/urls.ts";
@@ -144,7 +145,11 @@ interface ResultadoVerificacionJornadaApi {
 const verificacionUrl = new Rrhh_Urls().JORNADA + "/verificar";
 
 export const getVerificarFirma: GetVerificarFirma = async (desde: string | null) => {
-    const query = desde ? `?desde=${encodeURIComponent(desde)}` : '';
+    const params = new URLSearchParams();
+    if (desde) params.set('desde', desde);
+    const empresa = empresaActual();
+    if (empresa) params.set('empresa_id', empresa);
+    const query = params.size > 0 ? `?${params.toString()}` : '';
     const respuesta = await RestAPI.get<{ datos: ResultadoVerificacionJornadaApi }>(verificacionUrl + query);
     const datos = respuesta.datos;
     return {

@@ -8,7 +8,6 @@
     }
 
     .recibo-conciliado,
-    .recibo-sugerido,
     .movimiento-ignorado {
         display: flex;
         flex-direction: column;
@@ -49,6 +48,83 @@
             flex-direction: row;
             gap: var(--espaciado-xs);
         }
+    }
+
+    .items-recibo-conciliados {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+    }
+
+    .item-recibo-conciliado {
+        padding: var(--espaciado-s) var(--espaciado-m);
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-xs);
+
+        .tipo-item-recibo {
+            margin: 0 0 var(--espaciado-s);
+            font-size: var(--tamaño-letra-s);
+            font-weight: var(--grosor-letra-6);
+            color: var(--color-texto-primario);
+        }
+    }
+
+    /* Fila 1: Código (3) + Tercero (5) + Importe (4) = 12 */
+    quimera-input[nombre="ir-codigo"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="ir-tercero"] {
+        grid-column: span 5;
+    }
+
+    quimera-input[nombre="ir-importe"] {
+        grid-column: span 4;
+    }
+
+    /* Fila 2, alineada con la 1: Fecha emisión bajo Código (3) y Fecha de
+       cobro/pago bajo Cliente/Proveedor (5) */
+    quimera-input[nombre="ir-fecha-emision"] {
+        grid-column: 1 / span 3;
+    }
+
+    quimera-input[nombre="ir-fecha-cobro"] {
+        grid-column: 4 / span 5;
+    }
+
+    /* Remesa — Fila 1: Remesa (3) + Fecha de cargo (4) + Total remesa (5) = 12 */
+    quimera-input[nombre="ir-remesa"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="ir-fecha-cargo"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="ir-total-remesa"] {
+        grid-column: span 5;
+    }
+
+    /* Remesa — Fila 2: Recibos pagados (6) + Estado remesa (6) = 12 */
+    quimera-input[nombre="ir-recibos-remesa"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="ir-estado-remesa"] {
+        grid-column: span 6;
+    }
+
+    /* Asiento vinculado — Fila única: Número (3) + Fecha (4) + Importe (5) = 12 */
+    quimera-input[nombre="av-numero"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="av-fecha"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="av-importe"] {
+        grid-column: span 5;
     }
 
     /* Fila: Origen (3) + Conciliado por (4) + Conciliado el (5) = 12 */

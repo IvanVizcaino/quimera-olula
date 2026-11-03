@@ -136,6 +136,7 @@ export const getMockRespuestaIa = (consulta: ConsultaIa): RespuestaIa => {
             necesitaCapacidades: false,
             accionNavegacion: null,
             descarga: null,
+            accionesPantalla: [],
             adjuntos: [],
             encolado: false,
         };
@@ -150,6 +151,7 @@ export const getMockRespuestaIa = (consulta: ConsultaIa): RespuestaIa => {
             necesitaCapacidades: false,
             accionNavegacion: null,
             descarga: null,
+            accionesPantalla: [],
             adjuntos: [],
             encolado: false,
         };
@@ -164,6 +166,7 @@ export const getMockRespuestaIa = (consulta: ConsultaIa): RespuestaIa => {
             necesitaCapacidades: false,
             accionNavegacion: null,
             descarga: null,
+            accionesPantalla: [],
             adjuntos: [],
             encolado: false,
         };
@@ -178,6 +181,7 @@ export const getMockRespuestaIa = (consulta: ConsultaIa): RespuestaIa => {
             necesitaCapacidades: false,
             accionNavegacion: { ruta: "/ventas/pedido", parametros: {}, descripcion: "Pedidos" },
             descarga: null,
+            accionesPantalla: [],
             adjuntos: [],
             encolado: false,
         };
@@ -191,6 +195,7 @@ export const getMockRespuestaIa = (consulta: ConsultaIa): RespuestaIa => {
         necesitaCapacidades: false,
         accionNavegacion: null,
         descarga: null,
+        accionesPantalla: [],
         adjuntos: [],
         encolado: false,
     };

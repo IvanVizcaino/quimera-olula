@@ -1,0 +1,131 @@
+import { Modelo } from "@olula/lib/diseño.ts";
+import { MetaModelo } from "@olula/lib/dominio.ts";
+import { LineaNuevaEntradaDesdePedido } from "../../diseño.ts";
+
+// ---------------------------------------------------------------------------
+// Paso 1 — cantidades y lotes detectados
+// ---------------------------------------------------------------------------
+
+export interface LineaEditableEntrada extends Modelo {
+    rowId: string;           // identificador local, no se envía a la API
+    linea_pedido_id: string;
+    cantidad: number;
+    lote_id: string;
+    caducidad: string | null;
+    lote_registrado: boolean; // true si el lote existe en BD (cargado desde API)
+}
+
+export const metaLineaEditableEntrada: MetaModelo<LineaEditableEntrada> = {
+    campos: {
+        cantidad: {
+            tipo: "numero",
+            requerido: true,
+            positivo: true,
+            validacion: (m) => (m.cantidad > 0 ? true : "La cantidad debe ser mayor que 0"),
+        },
+    },
+};
+
+export const lineaEditableDesdeDetectada = (
+    l: LineaNuevaEntradaDesdePedido
+): LineaEditableEntrada => ({
+    rowId: crypto.randomUUID(),
+    linea_pedido_id: l.linea_pedido_id,
+    cantidad: l.cantidad,
+    lote_id: l.lote_id ?? "",
+    caducidad: l.caducidad ?? null,
+    lote_registrado: false,
+});
+
+export const crearLineaEditableVacia = (linea_pedido_id: string): LineaEditableEntrada => ({
+    rowId: crypto.randomUUID(),
+    linea_pedido_id,
+    cantidad: 0,
+    lote_id: "",
+    caducidad: null,
+    lote_registrado: false,
+});
+
+// ---------------------------------------------------------------------------
+// Paso 2 — cajas destino
+// ---------------------------------------------------------------------------
+
+export interface LineaCajaEntrada extends Modelo {
+    rowId: string;           // mismo rowId que LineaEditableEntrada
+    tipo_caja_id: string;    // "" → null en API (Sin Caja)
+    cantidad_caja: number | null;
+    num_cajas: number | null;
+    // Modo palet
+    palet_num: number | null;
+    subcaja_compra_id: string | null;
+}
+
+export const metaLineaCajaEntrada: MetaModelo<LineaCajaEntrada> = {
+    campos: {
+        tipo_caja_id: {},
+        cantidad_caja: {
+            tipo: "numero",
+            validacion: (m) =>
+                m.tipo_caja_id === "" || (m.cantidad_caja != null && m.cantidad_caja > 0)
+                    ? true
+                    : "La cantidad por caja debe ser mayor que 0",
+        },
+        num_cajas: {
+            tipo: "numero",
+            validacion: (m) =>
+                m.tipo_caja_id === "" || (m.num_cajas != null && m.num_cajas > 0)
+                    ? true
+                    : "El número de cajas debe ser mayor que 0",
+        },
+    },
+};
+
+export const inicializarLineaCaja = (linea: LineaEditableEntrada): LineaCajaEntrada => ({
+    rowId: linea.rowId,
+    tipo_caja_id: "",
+    cantidad_caja: null,
+    num_cajas: null,
+    palet_num: null,
+    subcaja_compra_id: null,
+});
+
+/**
+ * Convierte una LineaEditableEntrada y su configuración de caja en una única
+ * LineaNuevaEntradaDesdePedido con la cantidad total y num_cajas agregado.
+ */
+export const expandirLineaEnCajas = (
+    linea: LineaEditableEntrada,
+    caja: LineaCajaEntrada
+): LineaNuevaEntradaDesdePedido[] => {
+    const lote_id = linea.lote_id !== "" ? linea.lote_id : null;
+    const tipo_caja_id = caja.tipo_caja_id !== "" ? caja.tipo_caja_id : null;
+
+    return [{
+        linea_pedido_id: linea.linea_pedido_id,
+        cantidad: linea.cantidad,
+        lote_id,
+        caducidad: linea.caducidad,
+        tipo_caja_id,
+        num_cajas: caja.num_cajas,
+        subcaja_compra_id: caja.subcaja_compra_id ?? null,
+        palet_num: caja.palet_num ?? null,
+    }];
+};
+
+// ---------------------------------------------------------------------------
+// Paso 2 — configuración de palets por SKU
+// ---------------------------------------------------------------------------
+
+export interface ConfigPaletSku {
+    linea_pedido_id: string;
+    es_palet: boolean;
+    num_palets: number;
+    subcaja_compra_id: string | null;
+}
+
+export const configPaletSkuVacia = (linea_pedido_id: string): ConfigPaletSku => ({
+    linea_pedido_id,
+    es_palet: false,
+    num_palets: 1,
+    subcaja_compra_id: null,
+});

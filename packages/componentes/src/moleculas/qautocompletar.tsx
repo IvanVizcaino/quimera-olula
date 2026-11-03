@@ -24,6 +24,7 @@ export type QAutocompletarProps<T extends OpcionBase = OpcionBase> = Omit<
   obtenerOpciones: (texto: string, id?: string) => Promise<T[]>;
   soloLectura?: boolean;
   enlace?: string;
+  permitirValorLibre?: boolean;
   onChange?: (
     opcion: T | null,
     evento: React.ChangeEvent<HTMLElement>
@@ -75,6 +76,7 @@ export const QAutocompletar = <T extends OpcionBase = OpcionBase>({
   enlace,
   opcional,
   deshabilitado,
+  permitirValorLibre = false,
   ...props
 }: QAutocompletarProps<T>) => {
   const attrs = {
@@ -203,6 +205,11 @@ export const QAutocompletar = <T extends OpcionBase = OpcionBase>({
       valorReal.current!.value = opcion.valor;
       onChange?.(opcion, e as unknown as React.ChangeEvent<HTMLElement>);
       onBlur?.(opcion, e);
+    } else if (permitirValorLibre && valor !== "") {
+      valorReal.current!.value = valor;
+      const opcionLibre = { valor, descripcion: valor } as T;
+      onChange?.(opcionLibre, e as unknown as React.ChangeEvent<HTMLElement>);
+      onBlur?.(opcionLibre, e);
     } else {
       if (valorReal.current!.value !== "") {
         valorReal.current!.value = "";

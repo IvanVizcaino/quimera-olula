@@ -7,31 +7,41 @@ quimera-tarjetas {
     display: block;
     max-height: calc(94vh - var(--alto-header) - 6rem);
     overflow-y: auto;
+    background: var(--color-fondo-maestro);
+    border-radius: var(--redondeo-borde-s);
 
+    /* Contenedor de las tarjetas: el propio .lista-contenedor-scroll o, con scroll
+       infinito, el div interno de InfiniteScroll. */
     .lista-contenedor-scroll {
+        padding: var(--espaciado-m);
+    }
+
+    .lista-contenedor-scroll:not(:has(> .infinite-scroll-component__outerdiv)),
+    .infinite-scroll-component {
         display: flex;
         flex-direction: column;
-        gap: var(--espaciado-xs);
-        padding: 0 var(--espaciado-s);
+        gap: var(--hueco-tarjetas);
+    }
+}
+
+/* Maestro a todo el ancho (sin detalle abierto): rejilla de tarjetas */
+.Maestro:not(.contraido) quimera-tarjetas {
+
+    .lista-contenedor-scroll:not(:has(> .infinite-scroll-component__outerdiv)),
+    .infinite-scroll-component {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(var(--ancho-min-tarjeta), 100%), 1fr));
+        align-content: start;
+
+        >.cargando {
+            grid-column: 1 / -1;
+        }
     }
 }
 
 @media (max-width: 768px) {
     quimera-tarjetas .lista-contenedor-scroll {
-        padding: var(--espaciado-m) 0;
-    }
-}
-
-quimera-tarjeta.seleccionada {
-    border-color: var(--color-primario);
-    box-shadow: var(--sombra-s);
-    background: var(--color-superficie-elevada);
-
-    &::before {
-        opacity: 1;
-        background: linear-gradient(135deg,
-                color-mix(in oklab, var(--color-primario) 22%, transparent) 0%,
-                transparent 50%);
+        padding: var(--espaciado-s);
     }
 }
 
@@ -46,45 +56,36 @@ quimera-tarjetas .no-datos {
 
 quimera-tarjeta {
     position: relative;
-    isolation: isolate;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg,
-            var(--color-superficie) 0%,
-            var(--color-superficie-elevada) 100%);
+    background: var(--color-superficie);
     border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
     border-radius: var(--redondeo-borde-m);
     box-shadow: var(--sombra-xs);
     margin: 0;
-    padding: var(--espaciado-xxs) var(--espaciado-m);
-    transition: all 0.2s ease;
+    padding: var(--espaciado-tarjeta);
+    transition: box-shadow var(--transicion-rapida), border-color var(--transicion-rapida);
     cursor: pointer;
     overflow: hidden;
 
-    &::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: linear-gradient(135deg,
-                color-mix(in oklab, var(--color-primario) 16%, transparent) 0%,
-                transparent 45%);
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-
     &:hover {
         box-shadow: var(--sombra-s);
-        border-color: var(--color-primario-claro);
-        /* transform: translateY(-1px); */
-
-        &::before {
-            opacity: 1;
-        }
+        border-color: var(--color-borde-fuerte);
     }
+}
+
+quimera-tarjeta.seleccionada {
+    border-color: var(--color-primario);
+    box-shadow: var(--halo-seleccion);
 }
 
 quimera-tarjeta:has(quimera-acciones.abierto) {
     z-index: 10;
     overflow: visible;
+}
+
+/* Maestro: mismo margen lateral que la tabla */
+.Maestro .Listado>quimera-tarjetas {
+    margin: 0 var(--padding-horizontal) var(--espaciado-m);
+    width: auto;
 }

@@ -43,3 +43,26 @@ export const incluirConexionCreadaPorId: ProcesarMaestro = async (contexto, payl
         },
     };
 };
+
+/** Desde la lista o desde las tarjetas de saldos, que solo conocen el id de la conexión. */
+export const prepararReautenticacion: ProcesarMaestro = async (contexto, payload) => {
+    const id = payload as string;
+    const conexion = contexto.conexiones.lista.find((c) => c.id === id) ?? await getConexionBancaria(id);
+    return { ...contexto, estado: "REAUTENTICANDO", conexionReautenticando: conexion };
+};
+
+export const aplicarReautenticacion: ProcesarMaestro = async (contexto, payload) => {
+    const conexion = await getConexionBancaria(payload as string);
+    return {
+        ...Conexiones.cambiar(contexto, conexion),
+        estado: "INICIAL",
+        conexionReautenticando: null,
+        refresco: contexto.refresco + 1,
+    };
+};
+
+export const cancelarReautenticacion: ProcesarMaestro = async (contexto) => ({
+    ...contexto,
+    estado: "INICIAL",
+    conexionReautenticando: null,
+});

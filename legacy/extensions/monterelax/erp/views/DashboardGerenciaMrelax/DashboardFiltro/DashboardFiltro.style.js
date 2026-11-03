@@ -5,7 +5,7 @@ export default parent => {
     return {
       ..._p,
       fecha: {
-        maxWidth: 150,
+        maxWidth: 190,
         flexGrow: 0,
         marginLeft: theme.spacing(0.5),
         marginRight: theme.spacing(0.5),

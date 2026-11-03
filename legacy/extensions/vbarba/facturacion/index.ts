@@ -76,10 +76,10 @@ export default {
     app: AppMenu,
   },
   rules: {
-    "facturascli:visit": (check: (rule: string) => boolean) => check("facturascli"),
-    "pedidoscli:visit": (check: (rule: string) => boolean) => check("pedidoscli"),
-    "albaranescli:visit": (check: (rule: string) => boolean) => check("albaranescli"),
-    "presupuestoscli:visit": (check: (rule: string) => boolean) => check("presupuestoscli"),
+    "facturascli:visit": (check: (rule: string) => boolean) => check("ventas.factura.leer"),
+    "pedidoscli:visit": (check: (rule: string) => boolean) => check("ventas.pedido.leer"),
+    "albaranescli:visit": (check: (rule: string) => boolean) => check("ventas.albaran.leer"),
+    "presupuestoscli:visit": (check: (rule: string) => boolean) => check("ventas.presupuesto.leer"),
   },
   schemas,
 };

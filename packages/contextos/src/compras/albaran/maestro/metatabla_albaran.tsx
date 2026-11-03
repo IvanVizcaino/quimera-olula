@@ -1,39 +1,22 @@
-import { ColumnaEstadoTabla } from "#/comun/componentes/ColumnaEstadoTabla.tsx";
-import { MetaTabla, QIcono } from "@olula/componentes/index.js";
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { MetaTabla } from "@olula/componentes/index.js";
 import { Albaran } from "../diseño.ts";
-import { albaranFacturado } from "../dominio.ts";
+import { etiquetaEstadoAlbaran } from "../dominio.ts";
 
 export const metaTablaAlbaran: MetaTabla<Albaran> = [
   {
     id: "facturaId",
-    cabecera: "",
+    cabecera: "Estado",
     render: (albaran: Albaran) => (
-      <ColumnaEstadoTabla
-        estados={{
-          facturado: (
-            <QIcono
-              nombre="circulo_relleno"
-              tamaño="sm"
-              color="var(--color-deshabilitado-oscuro)"
-            />
-          ),
-          pendiente: (
-            <QIcono
-              nombre="circulo_relleno"
-              tamaño="sm"
-              color="var(--color-exito-oscuro)"
-            />
-          ),
-        }}
-        estadoActual={albaranFacturado(albaran) ? "facturado" : "pendiente"}
-      />
+      <EtiquetaEstado {...etiquetaEstadoAlbaran(albaran)} />
     ),
   },
-  { id: "codigo", cabecera: "Código", prioridad: "alta" },
-  { id: "nombreProveedor", cabecera: "Proveedor", prioridad: "alta" },
+  { id: "codigo", cabecera: "Código", prioridad: "alta", estilo: "secundario" },
+  { id: "nombreProveedor", cabecera: "Proveedor", prioridad: "alta", estilo: "destacado" },
   { id: "fecha", cabecera: "Fecha", tipo: "fecha", prioridad: "alta" },
   {
     id: "total",
+    estilo: "destacado",
     cabecera: "Total",
     tipo: "moneda",
     prioridad: "alta",

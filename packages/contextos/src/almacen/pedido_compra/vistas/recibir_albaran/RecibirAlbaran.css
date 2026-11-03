@@ -1,0 +1,50 @@
+.recibir-albaran {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.recibir-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.recibir-tabla th,
+.recibir-tabla td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--color-borde, #ddd);
+    text-align: left;
+}
+
+.recibir-tabla th {
+    font-weight: var(--grosor-letra-5);
+    background: var(--color-fondo-cabecera, #f5f5f5);
+}
+
+.recibir-cantidad {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.recibir-faltan {
+    color: var(--color-error, #d32f2f);
+    font-weight: 600;
+}
+
+.recibir-sobran {
+    color: var(--color-aviso, #f9a825);
+    font-weight: 600;
+}
+
+.recibir-lote td {
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario, #666);
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+    border-bottom: none;
+}
+
+.recibir-lote-label {
+    padding-left: 1.5rem !important;
+}

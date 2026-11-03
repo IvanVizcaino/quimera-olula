@@ -57,6 +57,7 @@ export const CrearTipoCaja = ({
             <div className="CrearTipoCaja">
                 <quimera-formulario>
                     <QInput label="Descripción" {...uiProps("descripcion")} ref={focus} />
+                    <QInput label="Prefijo" {...uiProps("prefijo")} maxLength={2} />
                     <Articulo label="SKU" {...uiProps("sku")} />
                     <QInput label="Capacidad" {...uiProps("capacidad")}
                         deshabilitado={!tipoCaja.sku}

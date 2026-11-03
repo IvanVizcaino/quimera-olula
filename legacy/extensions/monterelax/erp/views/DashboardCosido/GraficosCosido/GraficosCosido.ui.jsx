@@ -8,14 +8,14 @@ function GraficosCosido({ useStyles }) {
 
   return (
     <Quimera.Template id="GraficosCosido">
-      <Grid container spacing={1} direction="column" >
+      <Grid container spacing={1}>
         <Grid size={{ xs: 12, sm: 12, md: 6 }}>
           <Chart.Bar chartProps={datosGraficoPendientes} />
         </Grid>
         <Grid size={{ xs: 12, sm: 12, md: 6 }}>
           <Chart.Bar chartProps={datosGraficoMedia} />
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 6 }}>
+        <Grid size={12}>
           <Chart.Bar chartProps={datosGraficoTotales} />
         </Grid>
       </Grid>

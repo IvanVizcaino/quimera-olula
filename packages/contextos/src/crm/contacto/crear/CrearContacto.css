@@ -1,9 +1,13 @@
 .CrearContacto {
     quimera-input[nombre="nombre"] {
-        grid-column: 1 / span 6;
+        grid-column: 1 / span 12;
     }
 
     quimera-input[nombre="email"] {
+        grid-column: 1 / span 6;
+    }
+
+    quimera-input[nombre="telefono1"] {
         grid-column: span 6;
     }
 }

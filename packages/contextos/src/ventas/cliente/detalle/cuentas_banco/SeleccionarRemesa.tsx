@@ -1,4 +1,4 @@
-import { CuentaBancaria } from "#/empresa/comun/componentes/cuenta_bancaria.tsx";
+import { CuentaBancaria } from "#/tesoreria/comun/componentes/cuenta_bancaria.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useState } from "react";
 import "./SeleccionarRemesa.css";

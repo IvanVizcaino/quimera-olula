@@ -1,15 +1,17 @@
-quimera-textarea[nombre="observaciones"] {
-    grid-column: span 12;
-}
+.Factura .TabObservaciones {
+    quimera-textarea[nombre="observaciones"] {
+        grid-column: span 12;
+    }
 
-quimera-checkbox[nombre="automatica"] {
-    grid-column: span 2;
-}
+    quimera-checkbox[nombre="automatica"] {
+        grid-column: span 2;
+    }
 
-quimera-checkbox[nombre="servicios"] {
-    grid-column: span 2;
-}
+    quimera-checkbox[nombre="servicios"] {
+        grid-column: span 2;
+    }
 
-quimera-checkbox[nombre="rectificativa"] {
-    grid-column: span 2;
+    quimera-checkbox[nombre="rectificativa"] {
+        grid-column: span 2;
+    }
 }

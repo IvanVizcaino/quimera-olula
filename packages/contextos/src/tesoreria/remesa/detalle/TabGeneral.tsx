@@ -1,3 +1,4 @@
+import { CuentaBancaria } from "#/tesoreria/comun/componentes/cuenta_bancaria.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { FormModelo } from "@olula/lib/dominio.js";
 import "./TabGeneral.css";
@@ -16,7 +17,11 @@ export const TabGeneral = ({ form }: TabGeneralProps) => {
                 <QInput label="Fecha" {...uiProps("fecha")} />
                 <QInput label="Fecha de cargo" {...uiProps("fechaCargo")} />
                 <QInput label="Estado" {...uiProps("estado")} />
-                <QInput label="Cuenta" {...uiProps("cuentaId")} />
+                <CuentaBancaria
+                    label="Cuenta"
+                    {...uiProps("cuentaId", "descripcionCuenta")}
+                    soloLectura
+                />
                 <QInput label="Total" {...uiProps("total")} />
                 <QInput label="Divisa" {...uiProps("divisaId")} />
                 <QInput label="Empresa" {...uiProps("empresaId")} />

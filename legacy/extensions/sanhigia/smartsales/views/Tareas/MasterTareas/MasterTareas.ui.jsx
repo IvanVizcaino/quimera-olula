@@ -18,6 +18,10 @@ const iconTipoTarea = {
     content: <img src="/img/whatsapp-icon.svg" width="32px" height="32px" alt="Whatsapp Logo" />,
     color: "#46C756",
   },
+  "Cita": {
+    icon: "groups",
+    color: "#76ccfd",
+  },
   "-": {
     icon: "groups",
   },

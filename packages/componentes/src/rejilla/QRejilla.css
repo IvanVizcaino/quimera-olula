@@ -1,0 +1,97 @@
+.qrejilla {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-rows: var(--alto-fila);
+    gap: var(--separacion-rejilla);
+
+    .qrejilla-elemento {
+        position: relative;
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+
+        > :not(button) {
+            flex: 1;
+            min-height: 0;
+        }
+
+        &[data-arrastrando] {
+            z-index: 2;
+            opacity: 0.85;
+            box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+            border-radius: var(--redondeo-borde-m);
+        }
+    }
+
+    .qrejilla-destino {
+        border: 2px dashed var(--color-primario);
+        border-radius: var(--redondeo-borde-m);
+        background: color-mix(in srgb, var(--color-primario) 10%, transparent);
+        pointer-events: none;
+    }
+
+    &[data-editable] .qrejilla-elemento > :not(button) {
+        outline: 2px dashed var(--color-borde-fuerte);
+        outline-offset: -2px;
+        border-radius: var(--redondeo-borde-m);
+    }
+
+    .qrejilla-mover {
+        position: absolute;
+        top: var(--espaciado-xs);
+        left: var(--espaciado-xs);
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border: 1px solid var(--color-borde-fuerte);
+        border-radius: var(--redondeo-borde-s);
+        background: var(--color-superficie-elevada);
+        color: var(--color-texto-secundario);
+        cursor: grab;
+        touch-action: none;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+
+    .qrejilla-tamaño {
+        position: absolute;
+        right: 2px;
+        bottom: 2px;
+        z-index: 1;
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0;
+        border: none;
+        border-right: 3px solid var(--color-primario);
+        border-bottom: 3px solid var(--color-primario);
+        border-bottom-right-radius: var(--redondeo-borde-s);
+        background: transparent;
+        cursor: nwse-resize;
+        touch-action: none;
+    }
+
+    .qrejilla-mover:focus-visible,
+    .qrejilla-tamaño:focus-visible {
+        outline: 2px solid var(--color-borde-focus);
+        outline-offset: 2px;
+    }
+}
+
+@media (max-width: 768px) {
+    .qrejilla {
+        grid-template-columns: minmax(0, 1fr);
+        grid-auto-rows: auto;
+
+        .qrejilla-elemento {
+            grid-column: 1 / -1 !important;
+            grid-row: auto !important;
+            min-height: calc(var(--alto-fila) * 2);
+        }
+    }
+}

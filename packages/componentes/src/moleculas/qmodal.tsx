@@ -1,3 +1,4 @@
+import { useControlPantalla } from "@olula/lib/controles_pantalla.ts";
 import { PropsWithChildren, useEffect, useId, useRef } from "react";
 import { QBoton } from "../atomos/qboton.tsx";
 import { QIcono } from "../atomos/qicono.tsx";
@@ -31,6 +32,17 @@ export const QModal = ({
   const titleId = useId();
   const cerradoPorEstadoRef = useRef(false);
   const attrs: Record<string, string> = { nombre };
+
+  // "Cierra" por voz / desde el asistente (ver controles_pantalla.ts) — igual que la
+  // X: nunca si el modal bloquea el cierre.
+  useControlPantalla("modal", () => ({
+    describir: () => ({ tipo: "modal", id: "", titulo: titulo ?? nombre }),
+    ejecutar: (accion) => {
+      if (accion !== "cerrar" || bloquearCierre) return { ok: false, mensaje: "Esta ventana no se puede cerrar así." };
+      onCerrar();
+      return { ok: true, mensaje: "Cerrado." };
+    },
+  }), abierto);
 
   if (pantallaCompletaMovil) {
     attrs["data-pantalla-completa-movil"] = "";

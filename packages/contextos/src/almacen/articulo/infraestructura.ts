@@ -151,7 +151,7 @@ const baseUrlCajaProveedor = (articuloId: string, proveedorId: string) =>
 export const postCajaProveedor: PostCajaProveedor = async (articuloId, proveedorId, nueva: NuevaCajaProveedor) => {
     await RestAPI.post(
         `${baseUrlCajaProveedor(articuloId, proveedorId)}/crear_caja`,
-        { tipo_caja_id: nueva.idTipoCaja, cantidad: nueva.cantidad },
+        { descripcion: nueva.descripcion, cantidad: nueva.cantidad },
         "Error al crear la caja"
     );
 };
@@ -165,7 +165,7 @@ export const deleteCajaProveedor: DeleteCajaProveedor = async (articuloId, prove
 
 export const patchCajaProveedor: PatchCajaProveedor = async (articuloId, proveedorId, cajaId, cambios: CambiosCajaProveedor) => {
     const body: Record<string, unknown> = {};
-    if (cambios.idTipoCaja !== undefined) body.tipo_caja_id = cambios.idTipoCaja;
+    if (cambios.descripcion !== undefined) body.descripcion = cambios.descripcion;
     if (cambios.cantidad !== undefined) body.cantidad = cambios.cantidad;
     await RestAPI.patch(
         `${baseUrlCajaProveedor(articuloId, proveedorId)}/cambiar_caja/${cajaId}`,

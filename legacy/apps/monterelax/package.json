@@ -13,7 +13,6 @@
     "@quimera-extension/core": "workspace:*",
     "@quimera-extension/login": "workspace:*",
     "@quimera-extension/monterelax-erp": "workspace:*",
-    "@quimera-extension/monterelax-area_clientes": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

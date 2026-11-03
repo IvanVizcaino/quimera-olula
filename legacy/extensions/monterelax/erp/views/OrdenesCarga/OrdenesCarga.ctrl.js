@@ -132,6 +132,16 @@ export const bunch = parent => ({
       },
     },
   ],
+  onCerrarAlbaranesGeneradosClicked: [
+    {
+      type: "setStateKeys",
+      plug: () => ({ keys: { albaranesGenerados: false, albaranes: [] } }),
+    },
+    {
+      type: "grape",
+      name: "cargarOrdenesCarga",
+    },
+  ],
   onErrorAlbaranes: [
     {
       type: "setStateKeys",
@@ -190,6 +200,19 @@ export const bunch = parent => ({
           errorAlbaranes: true,
           dialogTitle: "Error",
           dialogMsg: "Ha ocurrido un error al intentar imprimir los albaranes",
+        },
+      }),
+    },
+  ],
+  onErrorReportOlula: [
+    {
+      type: "setStateKeys",
+      plug: payload => ({
+        keys: {
+          errorAlbaranes: true,
+          dialogTitle: "Error",
+          dialogMsg:
+            payload?.descripcion || payload?.nombre || "No se ha podido completar la operación",
         },
       }),
     },

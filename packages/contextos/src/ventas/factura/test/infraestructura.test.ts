@@ -33,6 +33,7 @@ const facturaApi: FacturaAPI = {
     automatica: false,
     servicios: false,
     rectificativa_id: null,
+    asiento_id: "128",
     grupo_iva_negocio_id: "GENERAL",
     por_comision: 0,
     observaciones: "",
@@ -41,6 +42,14 @@ const facturaApi: FacturaAPI = {
 
 describe("facturaDesdeAPI mapea la cabecera", () => {
     const factura = facturaDesdeAPI(facturaApi);
+
+    test("el asiento contable llega para la pestaña de Contabilidad", () => {
+        expect(factura.asiento_id).toBe("128");
+    });
+
+    test("una factura sin contabilizar lo deja a null", () => {
+        expect(facturaDesdeAPI({ ...facturaApi, asiento_id: null }).asiento_id).toBeNull();
+    });
 
     test("el grupo de IVA de negocio llega tal cual y no se pisa", () => {
         expect(factura.grupo_iva_negocio_id).toBe("GENERAL");

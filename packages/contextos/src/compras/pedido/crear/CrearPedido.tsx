@@ -1,4 +1,5 @@
 import { Proveedor } from "#/compras/comun/componentes/proveedor.tsx";
+import { EmpresaActual } from "#/comun/componentes/empresaActual.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
@@ -62,6 +63,7 @@ export const CrearPedido = ({ publicar }: { publicar: EmitirEvento }) => {
             </div>
             <div className="CrearPedido">
                 <quimera-formulario>
+                    <EmpresaActual />
                     {modoNoRegistrado ? (
                         <>
                             <QInput

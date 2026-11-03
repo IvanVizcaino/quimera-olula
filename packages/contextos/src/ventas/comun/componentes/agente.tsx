@@ -18,7 +18,7 @@ export const Agente = ({
   valor,
   nombre = "agente_id",
   label = "Agente",
-  enlace = "/ventas/agente",
+  enlace = "/ventas/agente?id={id}",
   onChange,
   ...props
 }: AgenteProps) => {

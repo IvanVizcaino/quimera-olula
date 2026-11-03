@@ -1,12 +1,6 @@
+import { Icon, IconButton } from "@quimera/comps";
 import { makeStyles } from "@quimera/styles";
 import { useState } from "react";
-
-const today = new Date();
-const firstDay = new Date();
-firstDay.setDate(1);
-const first = firstDay.getDay() || 7;
-const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-const last = lastDay.getDate();
 
 const months = [
   "Enero",
@@ -23,16 +17,41 @@ const months = [
   "Diciembre",
 ];
 
-const dayArray = new Array(last).fill(null).map((i, idx) => idx + 1);
-new Array(first - 1).fill(null).forEach(_ => dayArray.unshift("."));
-new Array(7 - lastDay.getDay()).fill(null).forEach(_ => dayArray.push("."));
+const pad = n => n.toString().padStart(2, "0");
+const isoDate = (year, month, day) => `${year}-${pad(month + 1)}-${pad(day)}`;
+
+const todayIso = () => {
+  const now = new Date();
+
+  return isoDate(now.getFullYear(), now.getMonth(), now.getDate());
+};
+
+const getDayArray = (year, month) => {
+  const first = new Date(year, month, 1).getDay() || 7;
+  const lastDay = new Date(year, month + 1, 0);
+  const dayArray = new Array(lastDay.getDate()).fill(null).map((_, idx) => idx + 1);
+  new Array(first - 1).fill(null).forEach(_ => dayArray.unshift("."));
+  new Array((7 - lastDay.getDay()) % 7).fill(null).forEach(_ => dayArray.push("."));
+
+  return dayArray;
+};
 
 const useStyles = makeStyles(theme => ({
   wrapper: {
     padding: "8px 0",
   },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 10px",
+  },
   title: {
     fontSize: "1.3em",
+    margin: 0,
+    cursor: "pointer",
+    flexGrow: 1,
+    textAlign: "center",
   },
   list: {
     listStyle: "none",
@@ -46,6 +65,9 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "column",
     textAlign: "center",
   },
+  selectable: {
+    cursor: "pointer",
+  },
   past: {
     color: theme.palette.grey[400],
   },
@@ -55,6 +77,10 @@ const useStyles = makeStyles(theme => ({
   today: {
     color: "white",
     backgroundColor: "red",
+  },
+  selected: {
+    color: "white",
+    backgroundColor: "#505050",
   },
   day: {
     borderRadius: "100%",
@@ -88,20 +114,26 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Day = ({ item, tareas, tratos }) => {
+const Day = ({ item, fecha, hoy, seleccionado, tareas, tratos, onClick }) => {
   const classes = useStyles();
+  const esHoy = fecha === hoy;
+  const seleccionable = item !== "." && !esHoy;
 
   let dayClasses = classes.day;
   item === "." && (dayClasses += ` ${classes.past}`);
-  item < today.getDate() && (dayClasses += ` ${classes.past}`);
-  item > today.getDate() && (dayClasses += ` ${classes.future}`);
-  item === today.getDate() && (dayClasses += ` ${classes.today}`);
+  item !== "." && fecha < hoy && (dayClasses += ` ${classes.past}`);
+  item !== "." && fecha > hoy && (dayClasses += ` ${classes.future}`);
+  esHoy && (dayClasses += ` ${classes.today}`);
+  seleccionable && fecha === seleccionado && (dayClasses += ` ${classes.selected}`);
 
   return (
-    <li className={classes.item}>
-      <span className={dayClasses}>{item === "." ? "." : item.toString().padStart(2, "0")}</span>
+    <li
+      className={`${classes.item} ${seleccionable ? classes.selectable : ""}`}
+      onClick={() => seleccionable && onClick(fecha)}
+    >
+      <span className={dayClasses}>{item === "." ? "." : pad(item)}</span>
       <span className={classes.points}>
-        {item !== today.getDate() &&
+        {!esHoy &&
           tareas &&
           new Array(tareas).fill(null).map((t, idx) => (
             idx < 5 && (
@@ -110,7 +142,7 @@ const Day = ({ item, tareas, tratos }) => {
               </span>
             )
           ))}
-        {item !== today.getDate() &&
+        {!esHoy &&
           tratos &&
           new Array(tratos).fill(null).map((t, idx) => (
             idx < 5 && (
@@ -124,36 +156,66 @@ const Day = ({ item, tareas, tratos }) => {
   );
 };
 
-export default function Calendar({ tareas, tratos }) {
-  const [full, setFull] = useState(false);
+export default function Calendar({ tareas, tratos, seleccionado, onDayClick }) {
   const classes = useStyles();
-  const week = parseInt(dayArray.findIndex(i => i === today.getDate()) / 7);
+  const hoy = todayIso();
+  const [full, setFull] = useState(false);
+  const [visible, setVisible] = useState(() => {
+    const now = new Date();
+
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+
+  const dayArray = getDayArray(visible.year, visible.month);
+  const fechaDe = item => (item === "." ? null : isoDate(visible.year, visible.month, item));
+
+  const foco = seleccionado ?? hoy;
+  const idxFoco = dayArray.findIndex(i => fechaDe(i) === foco);
+  const week = parseInt(Math.max(idxFoco, 0) / 7);
   const days = full ? dayArray : dayArray.slice(week * 7, week * 7 + 7);
 
+  const cambiarMes = delta => {
+    const fecha = new Date(visible.year, visible.month + delta, 1);
+    setVisible({ year: fecha.getFullYear(), month: fecha.getMonth() });
+  };
+
+  const toggleFull = () => {
+    if (full) {
+      const [year, month] = foco.split("-").map(n => parseInt(n));
+      setVisible({ year, month: month - 1 });
+    }
+    setFull(!full);
+  };
+
   return (
-    <div className={classes.wrapper} onClick={() => setFull(!full)}>
-      {full && (
-        <h1 className={classes.title}>{`${months[today.getMonth()]} ${today.getFullYear()}`}</h1>
-      )}
+    <div className={classes.wrapper}>
+      <div className={classes.header}>
+        {full && (
+          <IconButton size="small" onClick={() => cambiarMes(-1)}>
+            <Icon>chevron_left</Icon>
+          </IconButton>
+        )}
+        <h1 className={classes.title} onClick={toggleFull}>
+          {`${months[visible.month]} ${visible.year}`}
+          <Icon style={{ verticalAlign: "middle" }}>{full ? "expand_less" : "expand_more"}</Icon>
+        </h1>
+        {full && (
+          <IconButton size="small" onClick={() => cambiarMes(1)}>
+            <Icon>chevron_right</Icon>
+          </IconButton>
+        )}
+      </div>
       <ol className={classes.list}>
         {days.map((i, idx) => (
           <Day
             key={idx}
             item={i}
-            tareas={
-              tareas[
-              `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${i
-                .toString()
-                .padStart(2, "0")}`
-              ]
-            }
-            tratos={
-              tratos[
-              `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, "0")}-${i
-                .toString()
-                .padStart(2, "0")}`
-              ]
-            }
+            fecha={fechaDe(i)}
+            hoy={hoy}
+            seleccionado={seleccionado}
+            tareas={tareas[fechaDe(i)]}
+            tratos={tratos[fechaDe(i)]}
+            onClick={fecha => onDayClick?.(fecha === seleccionado ? null : fecha)}
           />
         ))}
       </ol>

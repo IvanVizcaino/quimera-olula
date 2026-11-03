@@ -2,7 +2,7 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { plugin } from "@olula/lib/dominio.ts";
+import { formatearMoneda, plugin } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 
 import { LineaAlbaranar, LoteAlbaranar } from "../../../diseño.ts";
@@ -38,7 +38,8 @@ const FilaLinea = ({
             <tr>
                 <td>
                     <span>{linea.sku}</span>{" "}
-                    <span>{linea.descripcion}</span>
+                    <span>{linea.descripcion}</span>{" "}
+                    <span>{`(${formatearMoneda(linea.pvpTotal, "EUR")})`}</span>
                 </td>
                 <td className="num">
                     <QEtiqueta

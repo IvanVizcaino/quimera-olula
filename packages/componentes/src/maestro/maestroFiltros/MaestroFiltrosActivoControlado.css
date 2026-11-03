@@ -1,114 +1,322 @@
+/* Filtros del listado: botón + chips en la cabecera, panel flotante al abrir
+   (hoja inferior en móvil). El panel no desplaza la tabla. */
 .MaestroFiltrosControlado {
-    margin: var(--espaciado-xs);
-    max-width: 350px;
-
-    .campo-filtro {
-        display: flex;
-        gap: 0.5rem;
-
-        label {
-            text-align: left;
-        }
-    }
-
-    quimera-boton {
-        align-self: center;
-    }
-
-    .interval {
-        width: 100%;
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    footer {
-        grid-column: 1 / span 12;
-        display: flex;
-        justify-content: flex-end;
-    }
-}
-
-/* Solo cerrado: fila con el botón "Filtros (N)" y el icono de limpiar
-   centrados verticalmente. No se toca la regla base de arriba (afectaría
-   también al panel abierto, que ya se organiza como grid). */
-.MaestroFiltrosControlado:not([data-abierto]) {
+    /* El panel se ancla a la cabecera del listado (Listado.css), no al botón: así
+       con el maestro estrecho ocupa justo su ancho y no se corta. */
     display: flex;
     align-items: center;
     gap: var(--espaciado-xs);
+    min-width: 0;
+    flex: 1 1 auto;
+
+    > button,
+    .filtros-chips button {
+        font: inherit;
+        cursor: pointer;
+    }
+
+    button:focus-visible {
+        outline: 2px solid var(--color-primario);
+        outline-offset: 1px;
+    }
 }
 
-/* Mismo estilo que el icono de cambiar modo listado (Listado.css:
-   .cambio-modo/.cambio-modo-icono), copiado aquí en vez de reutilizar esas
-   clases directamente para no acoplar este componente al de Listado. */
-.limpiar-filtros {
-    display: inline-flex;
-    align-self: center;
-}
-
-.limpiar-filtros-icono {
-    cursor: pointer;
+.filtros-boton {
+    flex: none;
     display: inline-flex;
     align-items: center;
-    line-height: 0.1;
-    fill: var(--color-primario);
+    gap: var(--espaciado-xs);
+    height: 2rem;
+    padding: 0 var(--espaciado-s);
+    border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+    border-radius: var(--redondeo-borde-s);
+    background: var(--color-superficie);
+    color: var(--color-primario-texto);
+    font-size: var(--tamaño-letra-s);
+    font-weight: var(--grosor-letra-6);
+
+    quimera-icono {
+        fill: currentColor;
+        color: currentColor;
+    }
+
+    &:hover {
+        border-color: var(--color-primario-texto);
+    }
+
+    &[aria-expanded="true"] {
+        background: var(--color-primario-texto);
+        border-color: var(--color-primario-texto);
+        color: var(--blanco);
+
+        .filtros-contador {
+            background: var(--blanco);
+            color: var(--color-primario-texto);
+        }
+    }
 }
 
-/* Panel abierto: ocupa el ancho que le deja la cabecera y reparte los campos
-   en columnas. El techo real lo sigue marcando el cap de .Maestro según
-   modoDisposicion (30% / 50% / 100%). */
-.MaestroFiltrosControlado[data-abierto] {
-    /* Único parámetro a tocar si el reparto no convence. */
-    --filtro-columna-min: 200px;
+.filtros-contador {
+    min-width: 1.125rem;
+    height: 1.125rem;
+    padding: 0 0.3rem;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: var(--color-primario-texto);
+    color: var(--blanco);
+    font-size: var(--tamaño-letra-xs);
+    line-height: 1.125rem;
+    text-align: center;
+}
 
-    max-width: none;
-    flex: 1 1 auto;
+/* Chips: una sola línea; lo que no cabe se corta (el contador ya dice cuántos). */
+.filtros-chips {
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-xs);
     min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+
+    > li {
+        flex: none;
+    }
+}
+
+.filtros-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--espaciado-xxs);
+    max-width: 16rem;
+    height: 1.625rem;
+    padding: 0 var(--espaciado-xxs) 0 var(--espaciado-s);
+    border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+    border-radius: 999px;
+    background: light-dark(#eef4f4, var(--gris-7));
+    font-size: var(--tamaño-letra-xs);
+
+    &:not(:has(button)) {
+        padding-right: var(--espaciado-s);
+    }
+
+    .filtros-chip-etiqueta {
+        flex: none;
+        color: var(--color-texto-secundario);
+    }
+
+    .filtros-chip-texto {
+        min-width: 0;
+        font-weight: var(--grosor-letra-6);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    button {
+        flex: none;
+        width: 1.375rem;
+        height: 1.375rem;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--color-texto-secundario);
+        font-size: var(--tamaño-letra-m);
+        line-height: 1;
+
+        &:hover {
+            background: light-dark(#dbe7e7, var(--gris-6));
+            color: var(--color-texto-primario);
+        }
+    }
+}
+
+.filtros-limpiar {
+    border: 0;
+    background: transparent;
+    padding: 0 var(--espaciado-xxs);
+    color: var(--color-texto-secundario);
+    font: inherit;
+    font-size: var(--tamaño-letra-xs);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Panel flotante bajo el botón */
+.filtros-fondo {
+    display: none;
+}
+
+.filtros-panel {
+    position: absolute;
+    top: calc(100% + var(--espaciado-xs));
+    left: var(--padding-horizontal);
+    z-index: 30;
+    width: min(40rem, calc(100vw - 2rem));
+    display: flex;
+    flex-direction: column;
+    background: var(--color-superficie);
+    border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+    border-radius: var(--redondeo-borde-l);
+    box-shadow: 0 16px 40px rgb(30 40 42 / 0.18);
+
+    .filtros-panel-cabecera {
+        display: none;
+    }
 
     quimera-formulario {
-        /* auto-FILL, no auto-fit: con auto-fit las pistas vacías colapsan y un
-           listado con pocos filtros los estira a media cabecera. Con auto-fill
-           las pistas se mantienen y cada campo ocupa una.
-           El track mínimo es el mayor entre --filtro-columna-min y un tercio del
-           ancho, así en pantalla-completa nunca salen más de 3 columnas.
-           min(100%, ...) evita desbordar si el panel es más estrecho que el mínimo. */
-        grid-template-columns: repeat(auto-fill,
-                minmax(min(100%,
-                        max(var(--filtro-columna-min),
-                            (100% - 2 * var(--gap-formulario)) / 3)),
-                    1fr));
-        padding-bottom: var(--espaciado-s);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--espaciado-m) var(--espaciado-l);
+        padding: var(--espaciado-m) var(--espaciado-l);
+        max-height: min(60vh, 32rem);
+        overflow-y: auto;
     }
 
-    quimera-formulario>.campo-filtro {
+    quimera-formulario > .campo-filtro {
         grid-column: auto;
         min-width: 0;
-    }
+        display: flex;
+        align-items: flex-end;
+        gap: var(--espaciado-xs);
 
-    /* El campo y sus extras (botón x, "Manual") van siempre en la misma línea:
-       qform.css le pone width:100% al input, así que hay que dejarlo encoger. */
-    quimera-formulario>.campo-filtro> :not(quimera-boton) {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
+        &[data-ancho] {
+            grid-column: 1 / -1;
+        }
 
-    quimera-formulario>.campo-filtro>quimera-boton {
-        flex: 0 0 auto;
-    }
+        /* qform.css le pone width:100% al input: hay que dejarlo encoger junto
+           al botón «Manual» de las fechas. */
+        > :not(quimera-boton) {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
 
-    .interval {
-        flex-wrap: wrap;
+        /* Botones del propio campo («Manual» de las fechas): secundarios, con
+           borde, para que no compitan con Aplicar. Se estilan aquí y no en el
+           átomo, que se usa también fuera de los filtros. */
+        > quimera-boton {
+            flex: none;
+
+            :is(button, a) {
+                background: transparent;
+                color: var(--color-primario-texto);
+                border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+                font-weight: var(--grosor-letra-5);
+
+                &:hover {
+                    border-color: var(--color-primario-texto);
+                }
+            }
+        }
     }
 
     footer {
-        margin-top: var(--espaciado-s);
+        display: flex;
+        align-items: center;
         gap: var(--espaciado-s);
+        padding: var(--espaciado-s) var(--espaciado-l);
+        border-top: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        background: var(--color-superficie-sunken);
+        border-radius: 0 0 var(--redondeo-borde-l) var(--redondeo-borde-l);
+
+        .filtros-limpiar {
+            font-size: var(--tamaño-letra-s);
+        }
+    }
+
+    .filtros-panel-hueco {
+        flex: 1;
     }
 }
 
-/* Bajo 768px qform.css fuerza `grid-column: 1 / -1 !important` a todos los hijos.
-   Declaramos 1 track para que auto-fit no deje columnas fantasma. */
+/* Maestro estrecho junto al detalle: el panel a su ancho y en una columna */
+.Maestro.contraido .filtros-panel {
+    width: auto;
+    right: var(--padding-horizontal);
+
+    quimera-formulario {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Móvil: chips en fila desplazable y el panel como hoja inferior */
 @media (max-width: 768px) {
-    .MaestroFiltrosControlado[data-abierto] quimera-formulario {
-        grid-template-columns: 1fr;
+    .MaestroFiltrosControlado {
+        flex-basis: 100%;
+    }
+
+    .filtros-chips {
+        overflow-x: auto;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .filtros-fondo {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        background: rgb(28 34 36 / 0.42);
+    }
+
+    .filtros-panel {
+        position: fixed;
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 41;
+        width: auto;
+        max-height: 86dvh;
+        border-radius: var(--redondeo-borde-l) var(--redondeo-borde-l) 0 0;
+
+        .filtros-panel-cabecera {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--espaciado-s) var(--padding-horizontal);
+            border-bottom: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+            font-size: var(--tamaño-letra-l);
+            font-weight: var(--grosor-letra-6);
+
+            button {
+                border: 0;
+                background: transparent;
+                padding: var(--espaciado-xs);
+                cursor: pointer;
+            }
+        }
+
+        quimera-formulario {
+            grid-template-columns: minmax(0, 1fr);
+            max-height: none;
+            flex: 1;
+            padding: var(--espaciado-m) var(--padding-horizontal);
+        }
+
+        footer {
+            padding: var(--espaciado-s) var(--padding-horizontal) var(--espaciado-m);
+            border-radius: 0;
+        }
+
+        /* Solo «Aplicar (N)», ancho: para cerrar ya están la × y el fondo */
+        footer .filtros-panel-hueco,
+        footer quimera-boton:not(:last-child) {
+            display: none;
+        }
+
+        footer quimera-boton:last-child {
+            flex: 1;
+            display: flex;
+
+            button {
+                flex: 1;
+                min-height: 2.75rem;
+                font-size: var(--tamaño-letra-m);
+            }
+        }
     }
 }

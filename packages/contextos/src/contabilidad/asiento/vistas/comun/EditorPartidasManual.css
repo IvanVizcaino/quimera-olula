@@ -1,0 +1,177 @@
+/*
+ * EditorPartidasManual.css — tabla editable de partidas del asiento manual.
+ *
+ * Estructura del componente:
+ *   .EditorPartidasManual
+ *     table
+ *       colgroup                              (anchos de columna)
+ *       thead > tr > th                       (Subcuenta | Debe | Haber | Concepto | IVA | —)
+ *       tbody                                 (UNA POR PARTIDA)
+ *         tr.EditorPartidasManual-filaPartida
+ *         tr.EditorPartidasManual-filaIva     (solo si la partida es de IVA)
+ *           .EditorPartidasManual-ivaCampos
+ *     .EditorPartidasManual-pie               (botón añadir + totales)
+ *
+ * Estética tomada de almacen/articulo/detalle/proveedores/ProveedoresArticulo.css
+ * y de la fila de expansión de componentes/atomos/qtabla.css.
+ */
+
+.EditorPartidasManual {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+
+    table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        border-spacing: 0;
+        font-size: var(--tamaño-letra-s);
+    }
+
+    /* ── Anchos de columna ────────────────────────────────────────────────── */
+
+    .col-subcuenta {
+        width: 26%;
+    }
+
+    .col-importe {
+        width: 14%;
+    }
+
+    .col-concepto {
+        width: 30%;
+    }
+
+    .col-iva {
+        width: 8%;
+    }
+
+    .col-acciones {
+        width: 8%;
+    }
+
+    /* ── Cabecera ─────────────────────────────────────────────────────────── */
+
+    thead tr {
+        background-color: var(--color-head-tabla);
+    }
+
+    th {
+        padding: var(--espaciado-xs) var(--espaciado-s);
+        font-size: var(--tamaño-letra-s);
+        font-weight: var(--grosor-letra-5);
+        color: var(--color-texto-secundario);
+        text-align: left;
+        white-space: nowrap;
+        border-bottom: var(--tamaño-borde-s) solid var(--color-borde-fuerte);
+    }
+
+    td {
+        padding: var(--espaciado-s);
+        vertical-align: middle;
+    }
+
+    /* ── Separación entre partidas ────────────────────────────────────────── */
+    /* Cada partida es una tbody, así que la línea cae entre partidas y nunca
+       entre una partida y su propio bloque de IVA. */
+
+    tbody:not(:last-of-type) {
+        border-bottom: var(--tamaño-borde-m) solid var(--color-borde-fuerte);
+    }
+
+    tbody .EditorPartidasManual-filaPartida > td {
+        padding-top: var(--espaciado-m);
+        padding-bottom: var(--espaciado-m);
+    }
+
+    /* Con bloque de IVA desplegado, la fila de la partida se pega a él. */
+    tbody:has(.EditorPartidasManual-filaIva) .EditorPartidasManual-filaPartida > td {
+        padding-bottom: var(--espaciado-xs);
+    }
+
+    /* ── Alineación de los campos de la partida ───────────────────────────── */
+    /* Las cabeceras de columna ya hacen de etiqueta. El <span class="etiqueta">
+       de QInput va vacío, pero en Concepto se rellena con "(opcional)" y en las
+       demás no: eso es lo que descuadraba los campos entre sí. */
+
+    .EditorPartidasManual-filaPartida quimera-input .etiqueta,
+    .EditorPartidasManual-filaPartida quimera-autocompletar .etiqueta {
+        display: none;
+    }
+
+    /* La partida es de IVA o no según su subcuenta: se muestra, no se marca. */
+    .EditorPartidasManual-etiquetaIva {
+        display: block;
+        text-align: center;
+        font-size: var(--tamaño-letra-xs);
+        font-weight: var(--grosor-letra-5);
+        color: var(--color-texto-secundario);
+        white-space: nowrap;
+    }
+
+    .EditorPartidasManual-etiquetaIva[data-iva="si"] {
+        color: var(--color-texto-primario);
+    }
+
+    .EditorPartidasManual-acciones {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    /* ── Bloque de IVA: cuelga de su partida ──────────────────────────────── */
+
+    .EditorPartidasManual-filaIva > td {
+        padding: 0 var(--espaciado-s) var(--espaciado-m) var(--espaciado-l);
+        white-space: normal;
+    }
+
+    .EditorPartidasManual-ivaCampos {
+        display: flex;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s);
+        padding: var(--espaciado-s) var(--espaciado-m);
+        background-color: var(--color-superficie-elevada);
+        border-left: var(--tamaño-borde-m) solid var(--color-borde-fuerte);
+        border-radius: var(--redondeo-borde-xs);
+
+        /* flex-end alinea los campos aunque sus etiquetas ocupen distinto alto. */
+        quimera-input,
+        quimera-autocompletar {
+            flex: 1;
+            min-width: 120px;
+        }
+    }
+
+    /* ── Pie: añadir partida y totales ────────────────────────────────────── */
+
+    .EditorPartidasManual-pie {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-m);
+        flex-wrap: wrap;
+        padding-top: var(--espaciado-s);
+        border-top: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .descuadre {
+        color: var(--color-error);
+    }
+}
+
+/*
+ * El alta y la edición de asiento llevan una tabla de seis columnas con inputs:
+ * con el ancho que da por defecto qmodal.css se queda muy apretada. Se fija solo
+ * en escritorio; por debajo de 1025px el CSS genérico ya ocupa casi todo el
+ * viewport. El tope queda por debajo del max-width 1280px del dialog, que tiene
+ * overflow-x oculto y cortaría la tabla.
+ */
+@media (min-width: 1025px) {
+    quimera-modal[nombre="crearAsientoManual"] dialog,
+    quimera-modal[nombre="cambiarAsientoManual"] dialog {
+        width: clamp(900px, 80vw, 1200px);
+    }
+}

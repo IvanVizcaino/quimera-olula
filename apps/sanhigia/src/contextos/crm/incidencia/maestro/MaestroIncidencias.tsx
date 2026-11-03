@@ -1,4 +1,5 @@
 import { PrioridadIncidencia } from "#/crm/comun/componentes/PrioridadIncidencia.tsx";
+import { Agente } from "#/ventas/comun/componentes/agente.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QAvatar, QIcono, QTarjetaGenerica } from "@olula/componentes/index.js";
@@ -98,6 +99,24 @@ export const MaestroIncidencias = () => {
                     <TipoIncidenciaSanhigia
                       valor={(valor as string) ?? ""}
                       onChange={(opcion) => onChange(opcion?.valor ?? "")}
+                    />
+                  ),
+                },
+                agente_id: {
+                  id: "agente_id",
+                  label: "Agente",
+                  filtro: (v) => {
+                    const valor = v as string | null;
+                    return valor ? (["agente_id", "=", valor] as ClausulaFiltro) : null;
+                  },
+                  fromFiltro: (filtro) => {
+                    const clausula = filtro.find(([campo]) => campo === "agente_id");
+                    return clausula ? clausula[2] : null;
+                  },
+                  render: (valor, onChange) => (
+                    <Agente
+                      valor={(valor as string) ?? ""}
+                      onChange={(opcion) => onChange(opcion?.valor ?? null)}
                     />
                   ),
                 },

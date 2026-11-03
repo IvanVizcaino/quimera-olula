@@ -4,6 +4,7 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useContext } from "react";
+import { EmpresasUsuario } from "../../comun/componentes/empresas_usuario.tsx";
 import { Grupo } from "../../comun/componentes/grupo.tsx";
 import { Usuario } from "../diseño.ts";
 import { metaNuevoUsuario, nuevoUsuarioVacio } from "../dominio.ts";
@@ -43,6 +44,7 @@ export const CrearUsuario = ({
           <QInput label="Nombre" {...usuario.uiProps("nombre")} />
           <QInput label="Email" {...usuario.uiProps("email")} />
           <Grupo {...usuario.uiProps("grupo_id")} />
+          <EmpresasUsuario {...usuario.uiProps("empresas")} />
         </quimera-formulario>
         <div className="botones">
           <QBoton onClick={crear} deshabilitado={!usuario.valido}>

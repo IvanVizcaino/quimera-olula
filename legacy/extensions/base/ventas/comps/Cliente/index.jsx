@@ -10,7 +10,7 @@ function Cliente({ filtros = [], id, estatico, ...props }) {
 
   const getOptions = useCallback((text, key) => {
     const schema = schemas.clientes;
-    const filtroBase = key ? [["codcliente", "eq", key]] : [["nombre", "like", text ?? ""]];
+    const filtroBase = key ? [["codcliente", "eq", key]] : [["nombre", "like_ua", text ?? ""]];
 
     function construyeFiltro(filtroBasico, filtrosProp) {
       const clausulaBaja = filtrosProp?.incluir_baja ? [] : [["debaja", "eq", false]];

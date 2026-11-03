@@ -14,7 +14,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { Articulo } from "../../../../comun/componentes/Articulo.tsx";
 import { Ubicacion } from "../../../../comun/componentes/Ubicacion.tsx";
 import { plugin } from "@olula/lib/dominio.js";
-import { getSkuLote, registrarLecturaOrden } from "../../../infraestructura.ts";
+import { getSkuLote, registrarLecturasOrden } from "../../../infraestructura.ts";
 import { getLecturaOrdenVacia, getMetaLecturaOrden } from "./lectura_orden.ts";
 import "./LecturaLineaOrden.css";
 import { LecturaSkuLote } from "./LecturaSkuLote.tsx";
@@ -91,7 +91,7 @@ export const LecturaOrden = ({
 
     const registrar = useCallback(async () => {
         await intentar(() =>
-            registrarLecturaOrden(orden.id, {
+            registrarLecturasOrden(orden.id, [{
                 sku: modelo.sku,
                 idLote: modelo.idLote,
                 idLinea: null,
@@ -106,7 +106,7 @@ export const LecturaOrden = ({
                     ? modelo.idUbicacionOrigen
                     : null,
                 idCajaOrigen: mostrarOrigen ? modelo.idCajaOrigen : null,
-            })
+            }])
         );
         publicar("lectura_registrada");
         init();

@@ -151,6 +151,12 @@ export const TabGeneral = ({
           descripcion={modelo.nombreCliente}
           onChange={handleClienteChange}
         />
+        <QInput
+          label="Agente del cliente"
+          nombre="nombreAgente"
+          valor={modelo.nombreAgente}
+          deshabilitado
+        />
         <CategoriaIncidencia
           valor={modelo.categoriaIncidencia || ""}
           onChange={handleCategoriaChange}
