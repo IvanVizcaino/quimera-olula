@@ -8,8 +8,8 @@ const conParametros = (ruta: string, parametros: Record<string, string | null | 
 };
 
 export const rutasSmartsales = {
-    hoy: "/ss/hoy",
-    tareasAtrasadas: "/ss/hoy/atrasadas",
+    hoy: "/ss/dashboard",
+    tareasAtrasadas: "/ss/dashboard/atrasadas",
     agenda: "/ss/mi-agenda",
     clientes: "/ss/mis-clientes",
     fichaCliente: (codCliente: string) => `/ss/mis-clientes/${codCliente}`,

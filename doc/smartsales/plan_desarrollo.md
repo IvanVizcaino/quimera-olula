@@ -4,6 +4,18 @@ Plan para implementar la [lista de desarrollos](lista_desarrollos_nueva_ui_smart
 
 El estado del backend se ha verificado contra `extensiones_2.5.0/fun_jsenar/build/src` (build del 2026-10-28). Las referencias de fichero son relativas a `build/src/facturacion/`.
 
+## Estado (2026-10-29)
+
+Fases 0 a 6 desarrolladas. Tests de dominio, eslint y type-check de `smartsales/` en verde. Nada probado todavía contra pinebooapi ni la base de datos.
+
+| Pendiente | Situación |
+|---|---|
+| Mapa (PAN3-01) | Hecho (2026-11-03): `QMapa` compartido en `packages/componentes/src/mapa/` (maplibre + OpenFreeMap), usado en `MapaClientes` (mapa y resultados de prospección). Falta probarlo en móvil (ver §6.3) |
+| PDF de pedidos y facturas (PAN4-05) | Falta el nombre del informe Jasper del ERP |
+| Gráfico de Rendimiento (PAN10-02) | Barras en CSS; decidir si se usa `recharts` |
+| Objetivos por familia (PAN10-03) | Comprobar en la base de datos que `sh_familiasbonificacion.objetivo` está relleno |
+| Campañas del comercial | Decidir el alcance de clientes cuando crea la campaña un supervisor y si se excluyen los clientes de baja |
+
 ---
 
 ## 1. Dónde se trabaja
@@ -211,3 +223,107 @@ Hecho en `build/src` y guardado en el parche (2026-10-28), salvo los datos de `s
 | Cierre automático de visitas: hora de fin y qué pasa si era la última tarea del trato | Cliente | Hora de fin = hora de inicio y el trato queda abierto |
 | Campañas del comercial: valor de `cuentamarketing` o campo `codagentecreador` | Equipo | — |
 | Aplicación de los cambios de esquema en el despliegue | Equipo | — |
+
+---
+
+## 6. Siguiente iteración: ruta de inicio, estilo de la maqueta y mapa
+
+### 6.1 Hoy pasa a `/ss/dashboard`
+
+Hoy la ruta `/ss/dashboard` es la del dashboard legacy: está en `legacy/extensions/sanhigia/smartsales/index.ts:186` (`"/ss/dashboard": { view: "Dashboard" }`) y `crearRouterLegacy` monta la app legacy en esa misma ruta. La nueva pantalla Hoy está en `/ss/hoy`.
+
+| Dónde | Cambio |
+|---|---|
+| `legacy/extensions/sanhigia/smartsales/index.ts` | `"/ss/dashboard"` → `"/ss/dashboard-legacy"` (nombre a confirmar) |
+| `legacy/.../static/appmenu.js` | URL del menú legacy a `/ss/dashboard-legacy` |
+| `smartsales/router_factory.ts` | `"ss/hoy"` → `"ss/dashboard"` y `"ss/hoy/atrasadas"` → `"ss/dashboard/atrasadas"` |
+| `smartsales/comun/rutas.ts` | `hoy` y `tareasAtrasadas` a las rutas nuevas |
+| `smartsales/menu.ts` | "Hoy" a `/ss/dashboard`; "Dashboard" a `/ss/dashboard-legacy` o se quita |
+
+Sin cambios, y pasan a llevar a la nueva Hoy: el logo (`componentes/ExtraLogoSanhigia.tsx`) y los botones "volver" de las vistas legacy de Tratos, TratosMkt, TratosFarma y Tareas, y su Header.
+
+Se renombra la ruta legacy en vez de dejar las dos con la misma: si coinciden, gana la que React Router ordene primero, y la app legacy seguiría resolviendo `/ss/dashboard` por su cuenta.
+
+### 6.2 Estilo de la maqueta
+
+Hoy SmartSales usa el tema genérico de quimera (`--color-primario` = `--mg-4`, gris verdoso `#6C9099`). La maqueta usa el rojo de Sanhigía.
+
+**Tokens (primer paso, bloquea el resto)**
+- Redefinir en `.LayoutSmartsales` los tokens del tema (`--color-primario`, `-oscuro`, `-claro`, `-hover`, `-selected`) con el rojo de marca. Así `QBoton`, `QModal` y el resto de componentes de `@olula/componentes` salen en rojo dentro de SmartSales sin cambiar el resto de la app.
+- Rojo de marca: hex a confirmar con la guía de Sanhigía (en la maqueta se ve en torno a `#E30613`). Rojo suave para fondos de aviso y para el tiempo transcurrido de COM-01.
+- Fondo de página gris claro y tarjetas blancas con radio de unos 12 px y sombra suave.
+
+**Layout**
+- Cabecera roja con el logo "Sanhigia SmartSales" y la campana (comunicaciones). Hay que decidir si en móvil sustituye a la cabecera del shell de quimera.
+- Barra inferior: destino activo en rojo y botón (+) rojo, circular y elevado (ya está montada; solo cambian los colores).
+
+**Componentes comunes nuevos en `smartsales/comun/componentes/`**
+- `Pestañas`, de tipo segmentado: la activa como pastilla roja con texto blanco. Se usa en Día/Semana/Mes, Mis tratos/Todos, Resumen/Actividad/Tratos/Documentos y Recomendados/Trabajados/Resultados. Ahora cada pantalla tiene su propio `role="tablist"`.
+- Chips con color fijo por significado:
+
+  | Chip | Color |
+  |---|---|
+  | Visita | verde |
+  | Llamada, Email | azul |
+  | Atrasada | rojo |
+  | En curso | naranja |
+  | Afinidad Muy alta / Alta | verde |
+  | Afinidad Media | naranja |
+
+- Icono en cuadrado de color para las filas de listas (campañas, tratos, oportunidades). Botones de acción circulares en la ficha (Llamar, Email, WhatsApp, Cómo llegar).
+- Botón principal a todo el ancho ("+ Añadir a la agenda", "Ver cliente", "Guardar y cerrar") y secundario con borde rojo.
+- Cifras KPI grandes en negrita, con el objetivo en gris debajo y la variación en rojo o verde.
+- Agenda: tira de días de la semana con el día elegido en rojo.
+
+**Pantallas**
+
+Una pasada por pantalla, en el orden de la maqueta (1 → 13), comparando con la imagen. Conviene hacerla a la vez que cada módulo se rehace según la plantilla, para no repetir el trabajo.
+
+**Diferencias entre la maqueta y la lista de desarrollos.** Manda la lista, salvo que el cliente diga otra cosa:
+
+| Maqueta | Lista |
+|---|---|
+| Tipo de tarea "Otro" | Sin "Otro" (PAN5-01) |
+| Campo "Resultado" en visita en curso y finalizar visita | Sin resultado (PAN6-01) |
+| Probabilidad (%) y etapas (Propuesta, En negociación) en Tratos | Sin probabilidad ni etapas (PAN9-01) |
+| Pestaña "Año" en Objetivo de nuevos clientes | Solo trimestres (PAN11-01) |
+| (+) con "Nueva visita", "Nueva tarea" y "Nuevo cliente" | "Nueva tarea o visita" y "Nuevo contacto"; no se dan de alta clientes (NAV-02) |
+| (+) con "Nueva campaña" | La lista no la incluye; ya se ha añadido |
+
+### 6.3 Mapa: ¿vale lo que ya hay?
+
+Hay dos piezas:
+
+| Pieza | Qué es | ¿Sirve? |
+|---|---|---|
+| `smartsales/comun/componentes/Mapa.tsx` | Plano SVG provisional sin teselas. Interfaz: `centro`, `radioKm`, `puntos`, `seleccionado`, `onSeleccionar`, `onMover` | La interfaz sí; el dibujo no |
+| `packages/contextos/src/comun/dashboard/vistas/componentes/Mapa.tsx` | maplibre-gl 6.14 con teselas de OpenFreeMap (sin clave y con uso comercial permitido; se cambia con `VITE_MAPA_ESTILO`). Carga diferida, worker configurado para Vite, popups con nodos DOM | La librería y su configuración sí; el componente no, porque está atado a los datos del dashboard (burbujas por provincia) |
+
+**Conclusión:** maplibre cubre todo lo que piden PAN3-01, PAN3-03 y PAN13-01: pines, popup, pan y zoom con recarga de la zona, centrar en un cliente y posición del comercial. No hace falta otra librería ni pagar teselas.
+
+**Plan**
+1. Componente genérico de mapa sobre maplibre con la interfaz del SVG actual, para que Mapa, Resultados y Campañas no cambien. Hay dos sitios posibles:
+   - en `packages/componentes`, recomendado: lo pueden reutilizar otras apps y el dashboard puede migrar a él más adelante;
+   - en `smartsales/comun/componentes`, añadiendo `maplibre-gl` a `apps/sanhigia/package.json`.
+2. Copiar del mapa del dashboard la configuración del worker, el estilo y la carga diferida.
+3. Ajustes para móvil:
+   - sin `cooperativeGestures`, porque el mapa ocupa la pantalla;
+   - pines de color según la afinidad y pin elegido resaltado;
+   - punto azul con la posición del comercial.
+4. `onMover`: al acabar el movimiento (`moveend`), pasar los límites visibles a centro y radio, que es lo que espera `get_clientes_mapa`.
+5. Comprobar que el tamaño del bundle sigue bien (maplibre solo se carga en las pantallas con mapa) y que el mapa funciona con HTTPS y permiso de ubicación en el móvil.
+
+### 6.4 Orden propuesto
+
+1. Rutas (6.1). Es pequeño e independiente.
+2. Tokens, layout y componentes comunes de estilo (6.2).
+3. Componente de mapa (6.3).
+4. Pasada de estilo pantalla a pantalla, junto con la alineación de cada módulo a la plantilla.
+
+**Decidido (2026-11-03)**
+- Ruta legacy: `/ss/dashboard-legacy`. Se mantiene en el menú como "Dashboard". **Hecho.**
+- Rojo de marca: no hay guía. Se usa `#e30613` (sacado de la maqueta) en la variable `--rojo-sanhigia` de `LayoutSmartsales.css`; para cambiarlo basta con tocar esa variable. **Hecho.**
+- Cabecera: la general de la app, no una propia de SmartSales.
+- Componente de mapa: compartido, en `packages/componentes`. **Hecho** (`QMapa`).
+- Estilos comunes en `LayoutSmartsales.css` (fondo gris, `.tarjeta` blanca con sombra, `.pestañas` en pastilla roja), tarjeta de tarea con icono y color por tipo, afinidad "Alta" en verde, y pasada de estilo de Hoy. **Hecho.** Siguiente: Agenda (pantalla 2).
+- SmartSales prioriza la vista móvil. Por eso, maestro y detalle van como páginas separadas por ruta, no como `MaestroConDetalle`. Hay que añadir esa variante a `_plantilla/modulo/` antes de rehacer los módulos.

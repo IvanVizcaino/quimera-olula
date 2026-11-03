@@ -1,7 +1,7 @@
 export const menuSmartsales = {
     "SmartSales": { icono: "fichero" },
-    "SmartSales/Hoy": { url: "/ss/hoy", regla: "crm.trato" },
-    "SmartSales/Dashboard": { url: "/ss/dashboard", regla: "crm.trato" },
+    "SmartSales/Hoy": { url: "/ss/dashboard", regla: "crm.trato" },
+    "SmartSales/Dashboard": { url: "/ss/dashboard-legacy", regla: "crm.trato" },
     "SmartSales/Tipos de trato": { url: "/ss/tipostrato", regla: "crm.campana.leer" },
     "SmartSales/Business Intelligence": { url: "/ss/bi", regla: "crm.informe.bi" },
     "SmartSales/Campañas": { url: "/ss/campanias", regla: "crm.campana.leer" },

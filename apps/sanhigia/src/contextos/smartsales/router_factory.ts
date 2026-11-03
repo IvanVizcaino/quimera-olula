@@ -1,27 +1,27 @@
-import { Agenda } from "./agenda/vistas/Agenda.tsx";
-import { Campanias } from "./campanias/vistas/Campanias.tsx";
-import { DetalleCampania } from "./campanias/vistas/DetalleCampania.tsx";
-import { NuevaCampania } from "./campanias/vistas/NuevaCampania.tsx";
-import { Clientes } from "./clientes/vistas/Clientes.tsx";
-import { FichaCliente } from "./clientes/vistas/FichaCliente.tsx";
-import { FichaContacto } from "./contacto/vistas/FichaContacto.tsx";
-import { NuevoContacto } from "./contacto/vistas/NuevoContacto.tsx";
-import { Hoy } from "./hoy/vistas/Hoy.tsx";
-import { TareasAtrasadas } from "./hoy/vistas/TareasAtrasadas.tsx";
-import { NuevaTarea } from "./nueva_tarea/vistas/NuevaTarea.tsx";
-import { Objetivos } from "./objetivos/vistas/Objetivos.tsx";
-import { FiltrosProspeccion } from "./prospeccion/vistas/FiltrosProspeccion.tsx";
-import { MapaClientes } from "./prospeccion/vistas/MapaClientes.tsx";
-import { Rendimiento } from "./rendimiento/vistas/Rendimiento.tsx";
-import { DetalleTrato } from "./trato/vistas/DetalleTrato.tsx";
-import { NuevoTrato } from "./tratos/vistas/NuevoTrato.tsx";
-import { Tratos } from "./tratos/vistas/Tratos.tsx";
-import { Visita } from "./visita/vistas/Visita.tsx";
+import { Agenda } from "./agenda/detalle/Agenda.tsx";
+import { Campanias } from "./campanias/maestro/Campanias.tsx";
+import { DetalleCampania } from "./campanias/detalle/DetalleCampania.tsx";
+import { NuevaCampania } from "./campanias/crear/NuevaCampania.tsx";
+import { Clientes } from "./clientes/maestro/Clientes.tsx";
+import { FichaCliente } from "./clientes/detalle/FichaCliente.tsx";
+import { FichaContacto } from "./contacto/detalle/FichaContacto.tsx";
+import { NuevoContacto } from "./contacto/crear/NuevoContacto.tsx";
+import { Hoy } from "./hoy/detalle/Hoy.tsx";
+import { TareasAtrasadas } from "./hoy/maestro/TareasAtrasadas.tsx";
+import { NuevaTarea } from "./nueva_tarea/crear/NuevaTarea.tsx";
+import { Objetivos } from "./objetivos/detalle/Objetivos.tsx";
+import { FiltrosProspeccion } from "./prospeccion/maestro/FiltrosProspeccion.tsx";
+import { MapaClientes } from "./prospeccion/maestro/MapaClientes.tsx";
+import { Rendimiento } from "./rendimiento/detalle/Rendimiento.tsx";
+import { DetalleTrato } from "./trato/detalle/DetalleTrato.tsx";
+import { NuevoTrato } from "./tratos/crear/NuevoTrato.tsx";
+import { Tratos } from "./tratos/maestro/Tratos.tsx";
+import { Visita } from "./visita/detalle/Visita.tsx";
 
 export class RouterFactorySmartsalesSanhigia {
     static router = {
-        "ss/hoy": Hoy,
-        "ss/hoy/atrasadas": TareasAtrasadas,
+        "ss/dashboard": Hoy,
+        "ss/dashboard/atrasadas": TareasAtrasadas,
         "ss/mi-agenda": Agenda,
         "ss/mi-tarea/nueva": NuevaTarea,
         "ss/mi-tarea/:id": Visita,

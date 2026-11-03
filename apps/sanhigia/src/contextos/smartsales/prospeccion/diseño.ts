@@ -1,4 +1,4 @@
-import { ArticuloElegido } from "../comun/vistas/ListaArticulos.tsx";
+import { ArticuloElegido } from "../comun/componentes/ListaArticulos.tsx";
 
 export type Capital = {
     nombre: string;
