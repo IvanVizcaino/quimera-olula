@@ -1,7 +1,9 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
+import { QMapa } from "@olula/componentes/mapa/qmapa.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
@@ -50,20 +52,41 @@ export const Visita = () => {
     return (
         <LayoutSmartsales>
             <div className="Visita">
-                <header>
-                    <h1>{estado === "FINALIZANDO" ? `Finalizar ${visita ? "visita" : "tarea"}` : tarea.nombreCliente ?? tarea.titulo}</h1>
-                    <span className="subtitulo">
-                        {textoTipoTarea[tarea.tipo]} · {tarea.fecha} {tarea.hora?.slice(0, 5)}
+                <h1>
+                    {estado === "FINALIZANDO"
+                        ? `Finalizar ${visita ? "visita" : "tarea"}`
+                        : `${visita ? "Visita" : "Tarea"}${estado === "EN_CURSO" ? " en curso" : ""}`}
+                </h1>
+
+                <header className="tarjeta cabecera-visita">
+                    <span className="icono">
+                        <QIcono nombre={visita ? "calendario_evento" : "tarea"} />
                     </span>
-                    {tarea.enCurso && tarea.horaInicio && (
-                        <span className="en-curso">En curso desde las {tarea.horaInicio.slice(0, 5)}</span>
-                    )}
+                    <div>
+                        <strong>{tarea.nombreCliente ?? tarea.titulo}</strong>
+                        <span className="subtitulo">
+                            {textoTipoTarea[tarea.tipo]} · {tarea.fecha} {tarea.hora?.slice(0, 5)}
+                        </span>
+                        {tarea.enCurso && tarea.horaInicio && (
+                            <span className="en-curso">En curso desde las {tarea.horaInicio.slice(0, 5)}</span>
+                        )}
+                    </div>
                 </header>
+
+                {estado === "EN_CURSO" && tarea.posicionInicio && (
+                    <section className="tarjeta ubicacion-inicio">
+                        <QMapa centro={tarea.posicionInicio} radioKm={0.5} puntos={[]} posicion={tarea.posicionInicio} />
+                        <span className="secundario">
+                            <QIcono nombre="casa" tamaño="sm" /> Ubicación registrada
+                            {tarea.horaInicio && ` a las ${tarea.horaInicio.slice(0, 5)}`}
+                        </span>
+                    </section>
+                )}
 
                 {estado === "TERMINADA" && <p>Esta tarea ya está completada.</p>}
 
                 {estado === "PENDIENTE" && (
-                    <section className="acciones-principales">
+                    <section className="tarjeta acciones-principales">
                         <p className="titulo-tarea">{tarea.titulo}</p>
                         {tarea.nota && <p className="nota-previa">{tarea.nota}</p>}
                         {visita ? (
@@ -79,7 +102,7 @@ export const Visita = () => {
                 )}
 
                 {(estado === "EN_CURSO" || estado === "FINALIZANDO") && (
-                    <section className="formulario">
+                    <section className="tarjeta formulario">
                         {estado === "FINALIZANDO" && (
                             <QInput
                                 label="Hora de fin"
@@ -100,13 +123,24 @@ export const Visita = () => {
                         <NotaDictada valor={ctx.nota} maximo={MAX_NOTA} onChange={(nota) => cambiar({ nota })} />
 
                         {estado === "FINALIZANDO" && tarea.idTrato && (
-                            <QSelect
-                                label="Siguiente paso"
-                                nombre="siguiente_paso"
-                                valor={ctx.siguientePaso}
-                                opciones={siguientesPasos}
-                                onChange={(opcion) => opcion && cambiar({ siguientePaso: opcion.valor as SiguientePaso })}
-                            />
+                            <>
+                                <span className="etiqueta" id="siguiente-paso">
+                                    Siguiente paso
+                                </span>
+                                <div className="opciones" role="radiogroup" aria-labelledby="siguiente-paso">
+                                    {siguientesPasos.map(({ valor, descripcion }) => (
+                                        <button
+                                            key={valor}
+                                            type="button"
+                                            role="radio"
+                                            aria-checked={ctx.siguientePaso === valor}
+                                            onClick={() => cambiar({ siguientePaso: valor })}
+                                        >
+                                            {descripcion}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
                         )}
                         {estado === "FINALIZANDO" && (
                             <QCheckbox
@@ -124,10 +158,12 @@ export const Visita = () => {
                                 </QBoton>
                             ) : (
                                 <>
-                                    <QBoton variante="borde" onClick={() => emitir("volver")}>
+                                    <QBoton variante="borde" ancho onClick={() => emitir("volver")}>
                                         Volver
                                     </QBoton>
-                                    <QBoton onClick={() => emitir("guardar")}>Guardar y cerrar</QBoton>
+                                    <QBoton ancho onClick={() => emitir("guardar")}>
+                                        Guardar y cerrar
+                                    </QBoton>
                                 </>
                             )}
                         </div>
@@ -135,7 +171,7 @@ export const Visita = () => {
                 )}
 
                 {estado === "CERRANDO_TRATO" && (
-                    <section className="formulario">
+                    <section className="tarjeta formulario">
                         <p>Era la última tarea pendiente del trato. ¿Cómo ha terminado?</p>
                         <QSelect
                             label="Estado del trato"
@@ -157,10 +193,12 @@ export const Visita = () => {
                             />
                         )}
                         <div className="acciones">
-                            <QBoton variante="borde" onClick={() => emitir("mantener_abierto")}>
+                            <QBoton variante="borde" ancho onClick={() => emitir("mantener_abierto")}>
                                 Dejar abierto
                             </QBoton>
-                            <QBoton onClick={() => emitir("cerrar_trato")}>Cerrar trato</QBoton>
+                            <QBoton ancho onClick={() => emitir("cerrar_trato")}>
+                                Cerrar trato
+                            </QBoton>
                         </div>
                     </section>
                 )}

@@ -1,5 +1,6 @@
 import { Contexto } from "@olula/lib/diseño.ts";
 import { TipoTarea } from "../comun/diseño.ts";
+import { Posicion } from "../comun/geolocalizacion.ts";
 
 export type TareaVisita = {
     id: string;
@@ -11,6 +12,7 @@ export type TareaVisita = {
     enCurso: boolean;
     fechaInicio: string | null;
     horaInicio: string | null;
+    posicionInicio: Posicion | null;
     nota: string;
     idTrato: string | null;
     codCliente: string | null;
@@ -28,6 +30,8 @@ export type TareaVisitaAPI = {
     encurso: boolean | null;
     fechainicio: string | null;
     horainicio: string | null;
+    latitudinicio: number | null;
+    longitudinicio: number | null;
     nota: string | null;
     idtrato: number | null;
     codcliente: string | null;

@@ -18,6 +18,7 @@ const tarea = (datos: Partial<TareaVisita> = {}): TareaVisita => ({
     enCurso: false,
     fechaInicio: null,
     horaInicio: null,
+    posicionInicio: null,
     nota: "",
     idTrato: "40",
     codCliente: "000123",

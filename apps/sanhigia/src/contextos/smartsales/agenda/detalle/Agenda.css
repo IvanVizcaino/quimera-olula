@@ -26,12 +26,6 @@
     font-size: 0.85rem;
 }
 
-.Agenda .cabecera-agenda {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .Agenda .navegacion {
     display: flex;
     align-items: center;
@@ -73,9 +67,9 @@
     gap: 0.125rem;
     min-height: 3rem;
     padding: 0.25rem;
-    border: 1px solid var(--color-deshabilitado);
-    border-radius: 0.375rem;
-    background: var(--color-fondo);
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+    background: var(--color-superficie);
     color: var(--color-texto-primario);
     cursor: pointer;
 }
@@ -85,7 +79,8 @@
 }
 
 .Agenda .rejilla-mes .dia.hoy {
-    border-color: var(--color-primario-oscuro);
+    border-color: var(--color-primario);
+    color: var(--color-primario);
     font-weight: 700;
 }
 
@@ -94,10 +89,69 @@
     padding: 0 0.25rem;
     border-radius: 0.625rem;
     font-size: 0.7rem;
-    color: var(--color-texto-menu);
-    background: var(--color-primario-oscuro);
+    color: var(--blanco, #fff);
+    background: var(--color-texto-secundario);
 }
 
 .Agenda .rejilla-mes .contador.atrasadas {
-    background: var(--color-error);
+    background: var(--color-primario);
+}
+
+.Agenda .tira-semana {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+}
+
+.Agenda .tira-semana button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.5rem 0;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    background: var(--color-superficie);
+    box-shadow: var(--sombra-xs);
+    color: var(--color-texto-primario);
+    font: inherit;
+    cursor: pointer;
+}
+
+.Agenda .tira-semana .nombre {
+    font-size: 0.7rem;
+    color: inherit;
+    opacity: 0.75;
+    text-transform: capitalize;
+}
+
+.Agenda .tira-semana .numero {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.Agenda .tira-semana button.hoy {
+    border-color: var(--color-primario);
+    color: var(--color-primario);
+}
+
+.Agenda .tira-semana button[aria-pressed="true"] {
+    background: var(--color-primario);
+    color: var(--blanco, #fff);
+}
+
+.Agenda .tarjeta.tareas {
+    padding-inline: 0;
+}
+
+.Agenda .tarjeta.tareas > h2,
+.Agenda .tarjeta.tareas h3,
+.Agenda .tarjeta.tareas .vacio,
+.Agenda .tarjeta.tareas > quimera-boton {
+    padding-inline: 1rem;
+}
+
+.Agenda .tarjeta.tareas > h2:first-child,
+.Agenda .tarjeta.tareas > .dia:first-child h3 {
+    margin-top: 0;
 }

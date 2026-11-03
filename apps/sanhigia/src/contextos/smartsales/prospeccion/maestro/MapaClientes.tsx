@@ -1,4 +1,5 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { QMapa } from "@olula/componentes/mapa/qmapa.tsx";
 import { QAutocompletar } from "@olula/componentes/moleculas/qautocompletar.tsx";
@@ -116,25 +117,45 @@ export const MapaClientes = () => {
                             <strong>{elegido.nombre}</strong>
                             {elegido.afinidad !== null && <EtiquetaAfinidad score={elegido.afinidad} conPorcentaje />}
                         </div>
-                        <span className="secundario">{[elegido.direccion, elegido.codPostal, elegido.ciudad].filter(Boolean).join(", ")}</span>
-                        <span className="secundario">
-                            {distancia(elegido).toFixed(1)} km · {textoVentas(elegido)}
+                        <span className="secundario direccion">
+                            <QIcono nombre="casa" tamaño="sm" />
+                            {[elegido.direccion, elegido.codPostal, elegido.ciudad].filter(Boolean).join(", ")}
                         </span>
+                        <div className="casillas">
+                            <div>
+                                <span className="secundario">Ventas 12m</span>
+                                <strong>{elegido.ventas12Meses ? euros.format(elegido.ventas12Meses) : "—"}</strong>
+                            </div>
+                            <div>
+                                <span className="secundario">Última compra</span>
+                                <strong>{fecha(elegido.ultimaCompra)}</strong>
+                            </div>
+                            <div>
+                                <span className="secundario">Distancia</span>
+                                <strong>{distancia(elegido).toFixed(1)} km</strong>
+                            </div>
+                        </div>
                         {oportunidades.length > 0 && (
-                            <ul className="oportunidades">
-                                {oportunidades.map((o) => (
-                                    <li key={o.codSubfamilia}>
-                                        <span>{o.descripcion}</span>
-                                        <EtiquetaAfinidad score={o.score} />
-                                    </li>
-                                ))}
-                            </ul>
+                            <>
+                                <h3>Oportunidades</h3>
+                                <ul className="oportunidades">
+                                    {oportunidades.map((o) => (
+                                        <li key={o.codSubfamilia}>
+                                            <span className="icono">
+                                                <QIcono nombre="paquete" tamaño="sm" />
+                                            </span>
+                                            <span>{o.descripcion}</span>
+                                            <strong className="porcentaje">{Math.round(o.score * 100)} %</strong>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
                         )}
-                        <div className="acciones">
-                            <QBoton variante="borde" tamaño="pequeño" enlace={rutasSmartsales.fichaCliente(elegido.codCliente)}>
+                        <div className="acciones-ancho">
+                            <QBoton variante="borde" ancho enlace={rutasSmartsales.fichaCliente(elegido.codCliente)}>
                                 Ver cliente
                             </QBoton>
-                            <QBoton tamaño="pequeño" enlace={rutasSmartsales.nuevaTareaPara(elegido.codCliente)}>
+                            <QBoton ancho enlace={rutasSmartsales.nuevaTareaPara(elegido.codCliente)}>
                                 + Añadir visita
                             </QBoton>
                         </div>
@@ -161,20 +182,24 @@ export const MapaClientes = () => {
                     <ul className="lista-clientes">
                         {clientes.map((cliente) => (
                             <li key={cliente.codCliente} className={cliente.codCliente === seleccionado ? "seleccionado" : undefined}>
-                                <div className="fila">
-                                    <Link to={rutasSmartsales.fichaCliente(cliente.codCliente)}>
-                                        <strong>{cliente.nombre}</strong>
-                                    </Link>
+                                <button
+                                    type="button"
+                                    className="icono"
+                                    aria-label={`Ver ${cliente.nombre} en el mapa`}
+                                    onClick={() => setSeleccionado(cliente.codCliente)}
+                                >
+                                    <QIcono nombre="casa" tamaño="sm" />
+                                </button>
+                                <Link to={rutasSmartsales.fichaCliente(cliente.codCliente)} className="datos">
+                                    <strong>{cliente.nombre}</strong>
+                                    <span className="secundario">
+                                        {[cliente.ciudad, `${distancia(cliente).toFixed(1)} km`].filter(Boolean).join(" · ")}
+                                    </span>
+                                    <span className="secundario">{textoVentas(cliente)}</span>
+                                </Link>
+                                <div className="lado">
                                     {cliente.afinidad !== null && <EtiquetaAfinidad score={cliente.afinidad} conPorcentaje />}
-                                </div>
-                                <span className="secundario">
-                                    {[cliente.ciudad, `${distancia(cliente).toFixed(1)} km`, textoVentas(cliente)].filter(Boolean).join(" · ")}
-                                </span>
-                                <div className="acciones">
-                                    <QBoton variante="borde" tamaño="pequeño" onClick={() => setSeleccionado(cliente.codCliente)}>
-                                        Ver en el mapa
-                                    </QBoton>
-                                    <QBoton variante="borde" tamaño="pequeño" enlace={rutasSmartsales.nuevaTareaPara(cliente.codCliente)}>
+                                    <QBoton tamaño="pequeño" enlace={rutasSmartsales.nuevaTareaPara(cliente.codCliente)}>
                                         + Visita
                                     </QBoton>
                                 </div>

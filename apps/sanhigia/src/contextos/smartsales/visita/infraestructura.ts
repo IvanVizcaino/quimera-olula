@@ -12,6 +12,8 @@ const camposTarea = [
     "encurso",
     "fechainicio",
     "horainicio",
+    "latitudinicio",
+    "longitudinicio",
     "nota",
     "idtrato",
     "codcliente",
@@ -30,6 +32,10 @@ const tareaDesdeAPI = (tarea: TareaVisitaAPI): TareaVisita => ({
     enCurso: !!tarea.encurso,
     fechaInicio: tarea.fechainicio?.slice(0, 10) ?? null,
     horaInicio: tarea.horainicio,
+    posicionInicio:
+        tarea.latitudinicio !== null && tarea.longitudinicio !== null
+            ? { latitud: Number(tarea.latitudinicio), longitud: Number(tarea.longitudinicio) }
+            : null,
     nota: tarea.nota ?? "",
     idTrato: tarea.idtrato ? String(tarea.idtrato) : null,
     codCliente: tarea.codcliente ?? tarea.codclienteincidencia,

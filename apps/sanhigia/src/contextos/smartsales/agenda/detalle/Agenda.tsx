@@ -16,6 +16,7 @@ import {
     agruparPorDia,
     bloquesProximas,
     desplazar,
+    diasDeLaSemana,
     rangoProximas,
     rangoVista,
     textoFecha,
@@ -44,6 +45,32 @@ const ListaPorDia = ({ tareas, vacio }: { tareas: Tarea[]; vacio: string }) => {
                 </section>
             ))}
         </>
+    );
+};
+
+const diaCorto = new Intl.DateTimeFormat("es-ES", { weekday: "short" });
+
+const TiraSemana = ({ referencia, onElegirDia }: { referencia: Date; onElegirDia: (dia: Date) => void }) => {
+    const hoy = fechaIso(new Date());
+    const elegido = fechaIso(referencia);
+    return (
+        <div className="tira-semana">
+            {diasDeLaSemana(referencia).map((dia) => {
+                const iso = fechaIso(dia);
+                return (
+                    <button
+                        key={iso}
+                        type="button"
+                        aria-pressed={iso === elegido}
+                        className={iso === hoy ? "hoy" : undefined}
+                        onClick={() => onElegirDia(dia)}
+                    >
+                        <span className="nombre">{diaCorto.format(dia)}</span>
+                        <span className="numero">{dia.getDate()}</span>
+                    </button>
+                );
+            })}
+        </div>
     );
 };
 
@@ -122,12 +149,7 @@ export const Agenda = () => {
     return (
         <LayoutSmartsales>
             <div className="Agenda">
-                <header className="cabecera-agenda">
-                    <h1>Agenda</h1>
-                    <QBoton enlace={rutasSmartsales.nuevaTarea} tamaño="pequeño">
-                        + Añadir a la agenda
-                    </QBoton>
-                </header>
+                <h1>Agenda</h1>
 
                 <SelectorAgente />
 
@@ -158,6 +180,16 @@ export const Agenda = () => {
                     </QBoton>
                 </div>
 
+                {vista !== "mes" && (
+                    <TiraSemana
+                        referencia={referencia}
+                        onElegirDia={(dia) => {
+                            setReferencia(dia);
+                            setVista("dia");
+                        }}
+                    />
+                )}
+
                 {vista === "mes" ? (
                     <RejillaMes
                         referencia={referencia}
@@ -168,12 +200,16 @@ export const Agenda = () => {
                         }}
                     />
                 ) : (
-                    <div className="tareas">
+                    <div className="tarjeta tareas">
                         <ListaPorDia tareas={tareas} vacio="No hay tareas en este periodo" />
                     </div>
                 )}
 
-                <section className="bloques">
+                <QBoton enlace={rutasSmartsales.nuevaTarea} ancho>
+                    + Añadir a la agenda
+                </QBoton>
+
+                <section className="tarjeta tareas bloques">
                     <h2>Hoy</h2>
                     {bloques.hoy.length === 0 && <p className="vacio">Sin tareas</p>}
                     {bloques.hoy.map((tarea) => (
@@ -188,7 +224,7 @@ export const Agenda = () => {
                     <ListaPorDia tareas={bloques.proximamente} vacio="Sin tareas en los próximos 30 días" />
                 </section>
 
-                <section className="historial">
+                <section className="tarjeta tareas historial">
                     <h2>Historial de tareas completadas</h2>
                     {historial === null ? (
                         <QBoton variante="borde" tamaño="pequeño" onClick={() => verHistorial().catch(() => undefined)}>

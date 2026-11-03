@@ -114,115 +114,120 @@ export const NuevaTarea = () => {
             <div className="NuevaTarea">
                 <h1>Nueva visita o tarea</h1>
 
-                <QAutocompletar
-                    label="Cliente"
-                    nombre="cliente"
-                    valor={formulario.cliente?.codigo ?? ""}
-                    descripcion={formulario.cliente?.nombre}
-                    obtenerOpciones={async (texto) =>
-                        (await buscarClientes(texto)).map((c) => ({ valor: c.codigo, descripcion: c.nombre }))
-                    }
-                    onChange={(opcion) =>
-                        cambiar({ cliente: opcion ? { codigo: opcion.valor, nombre: opcion.descripcion } : null, idTrato: null })
-                    }
-                />
-
-                {formulario.cliente && (
-                    <QSelect
-                        label="Trato"
-                        nombre="trato"
-                        valor={formulario.idTrato ?? SIN_TRATO}
-                        opciones={opcionesTrato}
-                        onChange={(opcion) => cambiar({ idTrato: opcion?.valor || null })}
-                    />
-                )}
-
-                <div className="tipos" role="radiogroup" aria-label="Tipo de tarea">
-                    {TIPOS.map((tipo) => (
-                        <button
-                            key={tipo}
-                            type="button"
-                            role="radio"
-                            aria-checked={formulario.tipo === tipo}
-                            onClick={() => cambiar({ tipo })}
-                        >
-                            {textoTipoTarea[tipo]}
-                        </button>
-                    ))}
-                </div>
-
-                <div className="fila">
-                    <QInput label="Fecha" nombre="fecha" tipo="fecha" valor={formulario.fecha} onChange={(fecha) => cambiar({ fecha })} />
-                    <QInput label="Hora" nombre="hora" tipo="hora" valor={formulario.hora} onChange={(hora) => cambiar({ hora })} />
-                </div>
-
-                <QSelect
-                    label="Motivo"
-                    nombre="motivo"
-                    valor={formulario.idMotivo ?? ""}
-                    opcional
-                    opciones={motivos.map((m) => ({ valor: m.id, descripcion: m.descripcion }))}
-                    onChange={(opcion) => cambiar({ idMotivo: opcion?.valor || null })}
-                />
-
-                <div className="fila">
-                    <QSelect
-                        label="Producto"
-                        nombre="nivel_producto"
-                        valor={nivelProducto}
-                        opciones={nivelesProducto}
-                        onChange={(opcion) => {
-                            if (!opcion) return;
-                            setNivelProducto(opcion.valor as TipoProducto);
-                            cambiar({ producto: null });
-                        }}
-                    />
+                <section className="tarjeta formulario">
                     <QAutocompletar
-                        key={nivelProducto}
-                        label={nivelesProducto.find((n) => n.valor === nivelProducto)?.descripcion ?? ""}
-                        nombre="producto"
-                        opcional
-                        valor={formulario.producto?.codigo ?? ""}
-                        descripcion={formulario.producto?.descripcion}
+                        label="Cliente"
+                        nombre="cliente"
+                        valor={formulario.cliente?.codigo ?? ""}
+                        descripcion={formulario.cliente?.nombre}
                         obtenerOpciones={async (texto) =>
-                            (await buscarProductos(nivelProducto, texto)).map((p) => ({ valor: p.codigo, descripcion: p.descripcion }))
+                            (await buscarClientes(texto)).map((c) => ({ valor: c.codigo, descripcion: c.nombre }))
                         }
                         onChange={(opcion) =>
-                            cambiar({
-                                producto: opcion ? { tipo: nivelProducto, codigo: opcion.valor, descripcion: opcion.descripcion } : null,
-                            })
+                            cambiar({ cliente: opcion ? { codigo: opcion.valor, nombre: opcion.descripcion } : null, idTrato: null })
                         }
                     />
-                </div>
 
-                {sugerencias.length > 0 && (
-                    <section className="sugerencias">
-                        <h2>Sugerencias para este cliente</h2>
-                        <ul>
-                            {sugerenciasVisibles(sugerencias, todasSugerencias).map((s) => (
-                                <li key={s.codSubfamilia}>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setNivelProducto("subfamilia");
-                                            cambiar({ producto: { tipo: "subfamilia", codigo: s.codSubfamilia, descripcion: s.descripcion } });
-                                        }}
-                                    >
-                                        <span>{s.descripcion}</span>
-                                        <EtiquetaAfinidad score={s.score} conPorcentaje />
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                        {!todasSugerencias && sugerenciasVisibles(sugerencias, true).length > sugerenciasVisibles(sugerencias, false).length && (
-                            <QBoton variante="texto" tamaño="pequeño" onClick={() => setTodasSugerencias(true)}>
-                                Ver más
-                            </QBoton>
-                        )}
-                    </section>
-                )}
+                    {formulario.cliente && (
+                        <QSelect
+                            label="Trato"
+                            nombre="trato"
+                            valor={formulario.idTrato ?? SIN_TRATO}
+                            opciones={opcionesTrato}
+                            onChange={(opcion) => cambiar({ idTrato: opcion?.valor || null })}
+                        />
+                    )}
 
-                <NotaDictada label="Notas" valor={formulario.nota} maximo={MAX_NOTA} onChange={(nota) => cambiar({ nota })} />
+                    <span className="etiqueta" id="tipo-tarea">
+                        Tipo de tarea
+                    </span>
+                    <div className="tipos" role="radiogroup" aria-labelledby="tipo-tarea">
+                        {TIPOS.map((tipo) => (
+                            <button
+                                key={tipo}
+                                type="button"
+                                role="radio"
+                                aria-checked={formulario.tipo === tipo}
+                                onClick={() => cambiar({ tipo })}
+                            >
+                                {textoTipoTarea[tipo]}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="fila">
+                        <QInput label="Fecha" nombre="fecha" tipo="fecha" valor={formulario.fecha} onChange={(fecha) => cambiar({ fecha })} />
+                        <QInput label="Hora" nombre="hora" tipo="hora" valor={formulario.hora} onChange={(hora) => cambiar({ hora })} />
+                    </div>
+
+                    <QSelect
+                        label="Motivo"
+                        nombre="motivo"
+                        valor={formulario.idMotivo ?? ""}
+                        opcional
+                        opciones={motivos.map((m) => ({ valor: m.id, descripcion: m.descripcion }))}
+                        onChange={(opcion) => cambiar({ idMotivo: opcion?.valor || null })}
+                    />
+
+                    <div className="fila">
+                        <QSelect
+                            label="Producto"
+                            nombre="nivel_producto"
+                            valor={nivelProducto}
+                            opciones={nivelesProducto}
+                            onChange={(opcion) => {
+                                if (!opcion) return;
+                                setNivelProducto(opcion.valor as TipoProducto);
+                                cambiar({ producto: null });
+                            }}
+                        />
+                        <QAutocompletar
+                            key={nivelProducto}
+                            label={nivelesProducto.find((n) => n.valor === nivelProducto)?.descripcion ?? ""}
+                            nombre="producto"
+                            opcional
+                            valor={formulario.producto?.codigo ?? ""}
+                            descripcion={formulario.producto?.descripcion}
+                            obtenerOpciones={async (texto) =>
+                                (await buscarProductos(nivelProducto, texto)).map((p) => ({ valor: p.codigo, descripcion: p.descripcion }))
+                            }
+                            onChange={(opcion) =>
+                                cambiar({
+                                    producto: opcion ? { tipo: nivelProducto, codigo: opcion.valor, descripcion: opcion.descripcion } : null,
+                                })
+                            }
+                        />
+                    </div>
+
+                    {sugerencias.length > 0 && (
+                        <section className="sugerencias">
+                            <h2>Sugerencias para este cliente</h2>
+                            <ul>
+                                {sugerenciasVisibles(sugerencias, todasSugerencias).map((s) => (
+                                    <li key={s.codSubfamilia}>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setNivelProducto("subfamilia");
+                                                cambiar({ producto: { tipo: "subfamilia", codigo: s.codSubfamilia, descripcion: s.descripcion } });
+                                            }}
+                                        >
+                                            <span>{s.descripcion}</span>
+                                            <EtiquetaAfinidad score={s.score} conPorcentaje />
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                            {!todasSugerencias && sugerenciasVisibles(sugerencias, true).length > sugerenciasVisibles(sugerencias, false).length && (
+                                <QBoton variante="texto" tamaño="pequeño" onClick={() => setTodasSugerencias(true)}>
+                                    Ver más
+                                </QBoton>
+                            )}
+                        </section>
+                    )}
+
+                    <NotaDictada label="Notas" valor={formulario.nota} maximo={MAX_NOTA} onChange={(nota) => cambiar({ nota })} />
+                </section>
 
                 {errores.length > 0 && (
                     <ul className="errores">
@@ -233,10 +238,10 @@ export const NuevaTarea = () => {
                 )}
 
                 <div className="acciones">
-                    <QBoton variante="borde" onClick={() => navigate(-1)}>
+                    <QBoton variante="borde" ancho onClick={() => navigate(-1)}>
                         Cancelar
                     </QBoton>
-                    <QBoton deshabilitado={guardando} onClick={() => guardar()}>
+                    <QBoton ancho deshabilitado={guardando} onClick={() => guardar()}>
                         Guardar
                     </QBoton>
                 </div>

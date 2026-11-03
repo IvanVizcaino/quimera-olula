@@ -1,5 +1,5 @@
 import { Tarea } from "../comun/diseño.ts";
-import { agruparPorDia, bloquesProximas, desplazar, rangoVista } from "./dominio.ts";
+import { agruparPorDia, bloquesProximas, desplazar, diasDeLaSemana, rangoVista } from "./dominio.ts";
 
 const tarea = (id: string, fecha: string, hora = "10:00:00"): Tarea => ({
     id,
@@ -61,5 +61,16 @@ describe("bloquesProximas", () => {
         expect(bloques.hoy.map((t) => t.id)).toEqual(["hoy"]);
         expect(bloques.mañana.map((t) => t.id)).toEqual(["mañana"]);
         expect(bloques.proximamente.map((t) => t.id)).toEqual(["luego"]);
+    });
+});
+
+describe("diasDeLaSemana", () => {
+    test("devuelve de lunes a domingo de la semana de referencia", () => {
+        const dias = diasDeLaSemana(miercoles).map((dia) => dia.getDate());
+        expect(dias).toEqual([26, 27, 28, 29, 30, 31, 1]);
+    });
+
+    test("el domingo pertenece a la semana que empieza el lunes anterior", () => {
+        expect(diasDeLaSemana(new Date(2026, 10, 1))[0].getDate()).toBe(26);
     });
 });

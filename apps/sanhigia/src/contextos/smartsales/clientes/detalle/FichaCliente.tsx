@@ -159,15 +159,18 @@ export const FichaCliente = () => {
 
                         {resumen.proximasAcciones === 0 && (
                             <div className="sin-proxima-accion">
-                                <strong>Sin próxima acción</strong>
-                                <span>Este cliente no tiene ninguna tarea futura programada.</span>
-                                <QBoton enlace={rutasSmartsales.nuevaTareaPara(codCliente)} tamaño="pequeño">
+                                <QIcono nombre="relojarena" />
+                                <div>
+                                    <strong>Sin próxima acción</strong>
+                                    <span>Este cliente no tiene ninguna tarea futura programada.</span>
+                                </div>
+                                <QBoton enlace={rutasSmartsales.nuevaTareaPara(codCliente)} variante="borde" tamaño="pequeño">
                                     + Programar visita
                                 </QBoton>
                             </div>
                         )}
 
-                        <section>
+                        <section className="tarjeta">
                             <h2>Oportunidades recomendadas</h2>
                             {oportunidades.length === 0 && <p className="vacio">Sin recomendaciones para este cliente</p>}
                             <ul className="oportunidades">
@@ -190,7 +193,7 @@ export const FichaCliente = () => {
                 )}
 
                 {pestaña === "actividad" && (
-                    <section>
+                    <section className="tarjeta tareas">
                         {tareas?.length === 0 && <p className="vacio">Sin tareas con este cliente</p>}
                         {tareas?.map((tarea) => (
                             <TarjetaTarea key={tarea.id} tarea={tarea} />
@@ -199,8 +202,8 @@ export const FichaCliente = () => {
                 )}
 
                 {pestaña === "tratos" && tratos?.length === 0 && <p className="vacio">Sin tratos con este cliente</p>}
-                {pestaña === "tratos" && (
-                    <ul className="lista">
+                {pestaña === "tratos" && !!tratos?.length && (
+                    <ul className="lista tarjeta">
                         {tratos?.map((trato) => (
                             <li key={trato.id}>
                                 <Link to={rutasSmartsales.trato(trato.id)}>
@@ -218,7 +221,7 @@ export const FichaCliente = () => {
                     documentos?.map((lista, indice) => {
                         const tipo = (["presupuesto", "pedido", "factura"] as TipoDocumento[])[indice];
                         return (
-                            <section key={tipo}>
+                            <section key={tipo} className="tarjeta">
                                 <h2>{tituloDocumentos[tipo]}</h2>
                                 {lista.length === 0 && <p className="vacio">Sin documentos</p>}
                                 <ul className="lista">

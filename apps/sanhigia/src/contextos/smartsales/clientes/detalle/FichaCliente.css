@@ -1,5 +1,5 @@
 .FichaCliente h2 {
-    margin: 0.5rem 0;
+    margin: 0 0 0.5rem;
     font-size: 1.05rem;
 }
 
@@ -18,13 +18,20 @@
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
-    padding: 0.5rem 0.25rem;
-    border-radius: 0.5rem;
+    padding: 0.25rem;
     font-size: 0.75rem;
-    color: var(--color-primario-oscuro);
-    background: var(--color-fondo);
-    border: 1px solid var(--color-deshabilitado);
+    color: var(--color-texto-primario);
     text-decoration: none;
+}
+
+.FichaCliente .accion > :first-child {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    color: var(--color-primario);
+    background: var(--color-primario-selected);
 }
 
 .FichaCliente .accion.deshabilitada {
@@ -47,12 +54,14 @@
     display: flex;
     flex-direction: column;
     padding: 0.75rem;
-    border: 1px solid var(--color-deshabilitado);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
+    background: var(--color-superficie);
+    box-shadow: var(--sombra-xs);
 }
 
 .FichaCliente .casilla strong {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 800;
 }
 
 .FichaCliente .casilla span {
@@ -61,18 +70,48 @@
 }
 
 .FichaCliente .sin-proxima-accion {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 0.5rem 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: var(--color-primario);
+    background: var(--color-primario-selected);
+    box-shadow: inset 0 0 0 1px var(--color-primario-claro);
+}
+
+.FichaCliente .sin-proxima-accion > div {
     display: flex;
     flex-direction: column;
-    align-items: start;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-error);
-    background: color-mix(in srgb, var(--color-error) 8%, var(--color-fondo));
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario);
 }
 
 .FichaCliente .sin-proxima-accion strong {
-    color: var(--color-error);
+    color: var(--color-primario);
+}
+
+.FichaCliente .sin-proxima-accion > quimera-boton {
+    grid-column: 2;
+    justify-self: start;
+}
+
+.FichaCliente .tarjeta.tareas {
+    padding-inline: 0;
+}
+
+.FichaCliente .tarjeta.tareas > .vacio {
+    padding-inline: 1rem;
+}
+
+.FichaCliente .lista.tarjeta {
+    padding: 0 1rem;
+}
+
+.FichaCliente .lista.tarjeta > li:last-child > a,
+.FichaCliente .lista > li:last-child.documento {
+    border-bottom: none;
 }
 
 .FichaCliente .oportunidades {
@@ -90,5 +129,5 @@
     align-items: center;
     gap: 0.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--color-deshabilitado);
+    border-bottom: 1px solid var(--color-borde-sutil);
 }

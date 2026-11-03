@@ -21,6 +21,9 @@ export const rangoVista = (vista: VistaAgenda, referencia: Date): RangoFechas =>
     };
 };
 
+export const diasDeLaSemana = (referencia: Date): Date[] =>
+    Array.from({ length: 7 }, (_, i) => sumarDias(lunesDe(referencia), i));
+
 export const desplazar = (vista: VistaAgenda, referencia: Date, pasos: number): Date => {
     if (vista === "dia") return sumarDias(referencia, pasos);
     if (vista === "semana") return sumarDias(referencia, pasos * 7);
