@@ -31,10 +31,25 @@
 }
 
 .Rendimiento .resumen {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
+}
+
+.Rendimiento .resumen .cifras + .cifras {
+    padding-left: 1rem;
+    border-left: 1px solid var(--color-borde-sutil);
+}
+
+.Rendimiento .progreso {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.Rendimiento .porcentaje {
+    color: var(--color-primario);
 }
 
 .Rendimiento .cifras {
@@ -45,7 +60,7 @@
 
 .Rendimiento .cifra {
     font-size: 1.6rem;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .Rendimiento .variacion {
@@ -69,7 +84,11 @@
 
 .Rendimiento .familias details {
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--color-deshabilitado);
+    border-bottom: 1px solid var(--color-borde-sutil);
+}
+
+.Rendimiento .familias li:last-child details {
+    border-bottom: none;
 }
 
 .Rendimiento .familias summary {
@@ -144,11 +163,11 @@
     left: -0.125rem;
     right: -0.125rem;
     height: 2px;
-    background: var(--color-error);
+    background: var(--color-texto-primario);
 }
 
 .GraficoMensual .clave.objetivo::before {
-    background: var(--color-error);
+    background: var(--color-texto-primario);
 }
 
 .GraficoMensual .mes {

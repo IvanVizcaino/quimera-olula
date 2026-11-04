@@ -77,18 +77,21 @@ export const Objetivos = () => {
 
                 {totales && (
                     <section className="tarjeta total">
-                        <div className="cifras">
-                            <span className="cifra">
-                                {totales.alcanzada} / {totales.objetivo}
-                            </span>
-                            <span className="secundario">clientes nuevos conseguidos</span>
+                        <span className="secundario">Nuevos clientes conseguidos</span>
+                        <span className="cifra">
+                            {totales.alcanzada} <span className="objetivo">/ {totales.objetivo}</span>
+                        </span>
+                        <div className="progreso">
+                            <IndicadorProgreso conseguido={porcentajeConseguido(totales.alcanzada, totales.objetivo)} tiempo={tiempo} />
+                            <strong className="porcentaje">
+                                {Math.round(porcentajeConseguido(totales.alcanzada, totales.objetivo) ?? 0)} %
+                            </strong>
                         </div>
-                        <IndicadorProgreso forma="circulo" conseguido={porcentajeConseguido(totales.alcanzada, totales.objetivo)} tiempo={tiempo} />
                     </section>
                 )}
 
                 <section className="tarjeta">
-                    <h2>Nuevos clientes por familia</h2>
+                    <h2>Por familia de producto</h2>
                     {objetivos && <ListaKpi bloque={objetivos.nuevosClientes} textoVacio="Sin objetivos de clientes nuevos en este periodo" />}
                 </section>
 
@@ -116,18 +119,12 @@ export const Objetivos = () => {
                 </section>
 
                 <section className="tarjeta">
-                    <header>
-                        <h2>Clientes recomendados</h2>
-                        {recomendados === null && (
-                            <QBoton
-                                tamaño="pequeño"
-                                deshabilitado={buscando || sinProductos}
-                                onClick={() => verRecomendados(null).catch(() => undefined)}
-                            >
-                                Ver clientes recomendados
-                            </QBoton>
-                        )}
-                    </header>
+                    <h2>Clientes recomendados</h2>
+                    {recomendados === null && (
+                        <QBoton ancho deshabilitado={buscando || sinProductos} onClick={() => verRecomendados(null).catch(() => undefined)}>
+                            Ver clientes recomendados
+                        </QBoton>
+                    )}
                     {recomendados?.length === 0 && <p className="vacio">Sin recomendaciones para estas familias</p>}
                     <ul className="lista">
                         {recomendados?.map((cliente) => (
@@ -141,7 +138,7 @@ export const Objetivos = () => {
                         ))}
                     </ul>
                     {siguiente && (
-                        <QBoton variante="borde" tamaño="pequeño" deshabilitado={buscando} onClick={() => verRecomendados(siguiente).catch(() => undefined)}>
+                        <QBoton variante="borde" ancho deshabilitado={buscando} onClick={() => verRecomendados(siguiente).catch(() => undefined)}>
                             Ver más
                         </QBoton>
                     )}

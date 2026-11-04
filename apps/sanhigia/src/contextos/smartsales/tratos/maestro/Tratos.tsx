@@ -1,5 +1,6 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
+import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { useContext, useEffect, useState } from "react";
@@ -19,11 +20,16 @@ const ESPERA_FILTROS = 400;
 
 const euros = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 
-const chips: Record<Exclude<OrigenTrato, null>, { texto: string; variante: "primario" | "advertencia" | "exito" }> = {
-    mkt: { texto: "mkt", variante: "primario" },
-    farma: { texto: "farma", variante: "exito" },
-    campaña: { texto: "campaña", variante: "advertencia" },
+const chips: Record<Exclude<OrigenTrato, null>, string> = {
+    mkt: "mkt",
+    farma: "farma",
+    campaña: "campaña",
 };
+
+const varianteEstado = (estado: string) => (estado === "Ganado" ? "exito" : estado === "Perdido" ? "error" : "advertencia");
+
+const fechaCorta = (iso: string | null) =>
+    iso ? new Date(`${iso.slice(0, 10)}T00:00:00`).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" }) : "—";
 
 const filtrosIniciales: Omit<FiltrosTratos, "agente"> = {
     estado: "abiertos",
@@ -115,23 +121,33 @@ export const Tratos = () => {
                 )}
 
                 {tratos.length === 0 && <p className="vacio">No hay tratos con estos filtros</p>}
-                <ul className="lista">
-                    {tratos.map((trato) => (
-                        <li key={trato.id}>
-                            <Link to={rutasSmartsales.trato(trato.id)}>
-                                <span className="titulo">
-                                    <strong>{trato.titulo}</strong>
-                                    {trato.origen && <QEtiqueta variante={chips[trato.origen].variante}>{chips[trato.origen].texto}</QEtiqueta>}
-                                </span>
-                                <span className="secundario">{[trato.cliente, trato.contacto].filter(Boolean).join(" · ")}</span>
-                                <span className="secundario">
-                                    {textoEstadoTrato(trato.estado)} · {trato.fecha ? new Date(`${trato.fecha.slice(0, 10)}T00:00:00`).toLocaleDateString("es-ES") : "—"}
-                                </span>
-                                <span className="valor">{euros.format(trato.valor)}</span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                {tratos.length > 0 && (
+                    <ul className="tarjeta lista">
+                        {tratos.map((trato) => (
+                            <li key={trato.id}>
+                                <Link to={rutasSmartsales.trato(trato.id)}>
+                                    <span className="icono">
+                                        <QIcono nombre="documento_nuevo" tamaño="sm" />
+                                    </span>
+                                    <span className="datos">
+                                        <span className="titulo">
+                                            <strong>{trato.titulo}</strong>
+                                            {trato.origen && (
+                                                <QEtiqueta variante="neutro">{chips[trato.origen]}</QEtiqueta>
+                                            )}
+                                        </span>
+                                        <span className="secundario">{[trato.cliente, trato.contacto].filter(Boolean).join(" · ")}</span>
+                                        <span className="secundario">Valor: {euros.format(trato.valor)}</span>
+                                    </span>
+                                    <span className="lado">
+                                        <QEtiqueta variante={varianteEstado(trato.estado)}>{textoEstadoTrato(trato.estado)}</QEtiqueta>
+                                        <span className="secundario">{fechaCorta(trato.fecha)}</span>
+                                    </span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
         </LayoutSmartsales>
     );

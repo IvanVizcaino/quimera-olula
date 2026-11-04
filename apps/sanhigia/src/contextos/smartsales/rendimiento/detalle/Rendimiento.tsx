@@ -70,17 +70,28 @@ export const Rendimiento = () => {
                     {!completo && <p className="vacio">Elige un periodo</p>}
                     {completo && !ventas && <p className="vacio">Cargando…</p>}
                     {completo && ventas && (
-                        <div className="resumen">
-                            <div className="cifras">
-                                <span className="cifra">{euros.format(ventas.ventas)}</span>
-                                <span className="secundario">de {euros.format(ventas.objetivo)}</span>
-                                <span className="secundario">
-                                    <Variacion actual={ventas.ventas} anterior={ventas.ventasAñoAnterior} /> vs año anterior (
-                                    {euros.format(ventas.ventasAñoAnterior)})
-                                </span>
+                        <>
+                            <div className="resumen">
+                                <div className="cifras">
+                                    <span className="secundario">Ventas realizadas</span>
+                                    <span className="cifra">{euros.format(ventas.ventas)}</span>
+                                </div>
+                                <div className="cifras">
+                                    <span className="secundario">Objetivo</span>
+                                    <span className="cifra">{euros.format(ventas.objetivo)}</span>
+                                </div>
                             </div>
-                            <IndicadorProgreso forma="circulo" conseguido={porcentajeConseguido(ventas.ventas, ventas.objetivo)} tiempo={tiempo} />
-                        </div>
+                            <div className="progreso">
+                                <IndicadorProgreso conseguido={porcentajeConseguido(ventas.ventas, ventas.objetivo)} tiempo={tiempo} />
+                                <strong className="porcentaje">
+                                    {Math.round(porcentajeConseguido(ventas.ventas, ventas.objetivo) ?? 0)} %
+                                </strong>
+                            </div>
+                            <span className="secundario">
+                                <Variacion actual={ventas.ventas} anterior={ventas.ventasAñoAnterior} /> vs año anterior (
+                                {euros.format(ventas.ventasAñoAnterior)})
+                            </span>
+                        </>
                     )}
                 </section>
 

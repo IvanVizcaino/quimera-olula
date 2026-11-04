@@ -185,10 +185,10 @@ export const NuevoTrato = () => {
                 )}
 
                 <div className="acciones">
-                    <QBoton variante="borde" onClick={() => navigate(-1)}>
+                    <QBoton variante="borde" ancho onClick={() => navigate(-1)}>
                         Cancelar
                     </QBoton>
-                    <QBoton deshabilitado={guardando} onClick={() => guardar()}>
+                    <QBoton ancho deshabilitado={guardando} onClick={() => guardar()}>
                         Crear trato
                     </QBoton>
                 </div>

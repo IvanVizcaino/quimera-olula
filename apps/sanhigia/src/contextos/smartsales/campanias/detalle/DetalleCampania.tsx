@@ -1,4 +1,5 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -41,29 +42,28 @@ const TarjetaCliente = ({ cliente, posicion, conVisita }: { cliente: ClienteCamp
     const distancia = posicion ? distanciaKm(posicion, cliente.latitud, cliente.longitud) : null;
     return (
         <li className="cliente-campania">
-            <div className="fila">
-                <Link to={rutasSmartsales.fichaCliente(cliente.codCliente)}>
-                    <strong>{cliente.nombre}</strong>
-                </Link>
-                {cliente.afinidad !== null && <EtiquetaAfinidad score={cliente.afinidad} conPorcentaje />}
-            </div>
-            <span className="secundario">
-                {[
-                    cliente.ciudad,
-                    distancia !== null && `${distancia.toFixed(1)} km`,
-                    cliente.ventas12Meses > 0 ? `${euros.format(cliente.ventas12Meses)} en 12 meses` : `Última compra ${fecha(cliente.ultimaCompra)}`,
-                    cliente.estado !== "-" && cliente.estado,
-                ]
-                    .filter(Boolean)
-                    .join(" · ")}
+            <span className="icono">
+                <QIcono nombre="estrella" tamaño="sm" />
             </span>
-            {conVisita && (
-                <div className="acciones">
-                    <QBoton variante="borde" tamaño="pequeño" enlace={rutasSmartsales.nuevaTareaPara(cliente.codCliente, cliente.idTrato)}>
+            <Link to={rutasSmartsales.fichaCliente(cliente.codCliente)} className="datos">
+                <strong>{cliente.nombre}</strong>
+                <span className="secundario">
+                    {[cliente.ciudad, distancia !== null && `${distancia.toFixed(1)} km`, cliente.estado !== "-" && cliente.estado]
+                        .filter(Boolean)
+                        .join(" · ")}
+                </span>
+                <span className="secundario">
+                    {cliente.ventas12Meses > 0 ? `Ventas 12m: ${euros.format(cliente.ventas12Meses)}` : `Última compra ${fecha(cliente.ultimaCompra)}`}
+                </span>
+            </Link>
+            <div className="lado">
+                {cliente.afinidad !== null && <EtiquetaAfinidad score={cliente.afinidad} conPorcentaje />}
+                {conVisita && (
+                    <QBoton tamaño="pequeño" enlace={rutasSmartsales.nuevaTareaPara(cliente.codCliente, cliente.idTrato)}>
                         + Visita
                     </QBoton>
-                </div>
-            )}
+                )}
+            </div>
         </li>
     );
 };
@@ -124,7 +124,7 @@ export const DetalleCampania = () => {
 
                 {pestaña === "recomendados" && recomendados(resumen.clientes).length === 0 && <p className="vacio">Todos los clientes están trabajados</p>}
                 {pestaña === "recomendados" && (
-                    <ul className="lista-clientes">
+                    <ul className="tarjeta lista-clientes">
                         {recomendados(resumen.clientes).map((cliente) => (
                             <TarjetaCliente key={cliente.idTrato} cliente={cliente} posicion={posicion} conVisita />
                         ))}
@@ -133,7 +133,7 @@ export const DetalleCampania = () => {
 
                 {pestaña === "trabajados" && trabajados(resumen.clientes).length === 0 && <p className="vacio">Todavía no hay clientes trabajados</p>}
                 {pestaña === "trabajados" && (
-                    <ul className="lista-clientes">
+                    <ul className="tarjeta lista-clientes">
                         {trabajados(resumen.clientes).map((cliente) => (
                             <TarjetaCliente key={cliente.idTrato} cliente={cliente} posicion={posicion} conVisita={false} />
                         ))}
