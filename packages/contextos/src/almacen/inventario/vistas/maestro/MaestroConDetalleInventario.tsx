@@ -1,0 +1,89 @@
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
+import { MetaTabla } from "@olula/componentes/index.js";
+import { Listado } from "@olula/componentes/maestro/Listado.js";
+import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
+import { criteriaDefecto, formatearFechaString } from "@olula/lib/dominio.js";
+import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
+import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
+import { useEffect, useMemo } from "react";
+import { Inventario } from "../../diseño.ts";
+import { CrearInventario } from "../crear/CrearInventario.tsx";
+import { DetalleInventario } from "../detalle/DetalleInventario.tsx";
+import { getMaquina } from "./maquina.ts";
+
+const metaTablaInventario: MetaTabla<Inventario> = [
+    { id: "id", cabecera: "Código" },
+    { id: "almacenId", cabecera: "Almacén" },
+    { id: "fecha", cabecera: "Fecha", render: (i: Inventario) => formatearFechaString(i.fecha) },
+    { id: "hora", cabecera: "Hora" },
+    { id: "observaciones", cabecera: "Observaciones" },
+];
+
+export const MaestroConDetalleInventario = () => {
+    const criteriaBase = useMemo(() => criteriaDefecto, []);
+
+    const { id, criteria } = getUrlParams();
+    const criteriaInicial = criteria.filtro.length > 0 ? criteria : criteriaBase;
+
+    const { ctx, emitir } = useMaquina(getMaquina, {
+        estado: "INICIAL",
+        inventarios: listaActivaEntidadesInicial<Inventario>(id, criteriaInicial),
+    });
+
+    const { estado, inventarios } = ctx;
+
+    useUrlParams(inventarios.activo, inventarios.criteria);
+
+    useEffect(() => {
+        emitir("recarga_de_inventarios_solicitada", inventarios.criteria);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return (
+        <div className="Inventario">
+            <MaestroDetalle<Inventario>
+                Maestro={
+                    <>
+                        <h2>Inventarios</h2>
+                        <Listado<Inventario>
+                            metaTabla={metaTablaInventario}
+                            criteria={inventarios.criteria}
+                            modoInicial="tarjetas"
+                            tarjeta={TarjetaInventario}
+                            entidades={inventarios.lista}
+                            totalEntidades={inventarios.total}
+                            seleccionada={inventarios.activo}
+                            renderAcciones={() => (
+                                <div className="maestro-botones">
+                                    <QBoton onClick={() => emitir("crear_inventario_solicitado")}>
+                                        Nuevo inventario
+                                    </QBoton>
+                                </div>
+                            )}
+                            onSeleccion={(payload) => emitir("inventario_seleccionado", payload)}
+                            onCriteriaChanged={(payload) => emitir("criteria_cambiado", payload)}
+                            onSiguientePagina={(payload) => emitir("siguiente_pagina", payload)}
+                        />
+                    </>
+                }
+                Detalle={<DetalleInventario id={inventarios.activo} publicar={emitir} />}
+                seleccionada={inventarios.activo}
+                modoDisposicion="maestro-50"
+            />
+
+            {estado === "CREANDO" && <CrearInventario publicar={emitir} />}
+        </div>
+    );
+};
+
+const TarjetaInventario = (inventario: Inventario) => (
+    <div className="tarjeta-inventario" key={inventario.id}>
+        <div className="tarjeta-inventario-codigo">
+            {inventario.id} · {inventario.almacen ?? inventario.almacenId}
+        </div>
+        <div className="tarjeta-inventario-fecha">
+            {formatearFechaString(inventario.fecha)} {inventario.hora}
+        </div>
+    </div>
+);

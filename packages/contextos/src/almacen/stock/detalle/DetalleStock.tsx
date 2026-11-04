@@ -1,4 +1,5 @@
 import { MovimientosStockUbicacion } from "#/almacen/comun/componentes/MovimientosStockUbicacion.tsx";
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -8,9 +9,12 @@ import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { criteriaDefecto, formatearFechaString, formatearNumero } from "@olula/lib/dominio.ts";
 import { useEffect } from "react";
 import { Stock, StockUbicacion } from "../diseño.ts";
-import { stockVacio } from "../dominio.ts";
+import { BorrarRegularizacionStock } from "../borrar_regularizacion/BorrarRegularizacionStock.tsx";
+import { RegularizarStock } from "../regularizar/RegularizarStock.tsx";
 import "./DetalleStock.css";
+import { contextoDetalleStockInicial } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
+import { RegularizacionesStock } from "./regularizaciones/RegularizacionesStock.tsx";
 
 const titulo = (stock: Stock) => stock.articulo as string;
 
@@ -58,10 +62,7 @@ export const DetalleStock = ({
 }) => {
     const { ctx, emitir } = useMaquina(
         getMaquina,
-        {
-            estado: "INICIAL",
-            stock: { ...stockVacio },
-        },
+        contextoDetalleStockInicial,
         publicar
     );
 
@@ -82,6 +83,9 @@ export const DetalleStock = ({
             cerrarDetalle={() => emitir("stock_deseleccionado", null, true)}
         >
             <div className="DetalleStock">
+                <div className="maestro-botones">
+                    <QBoton onClick={() => emitir("regularizar_solicitado")}>Regularizar</QBoton>
+                </div>
                 <quimera-formulario>
                     <QInput label="Artículo"     nombre="articulo"    valor={stock.articulo ?? ""}               soloLectura />
                     <QInput label="Referencia"   nombre="articulo_id" valor={String(stock.articuloId ?? "")}     soloLectura />
@@ -98,8 +102,22 @@ export const DetalleStock = ({
                     <QInput label="Hora últ. regularización"  nombre="horaUltReg"     valor={stock.horaUltimaRegularizacion?.slice(0, 8) ?? ""} soloLectura />
                     <QInput label="Cantidad últ. regularización" nombre="cantidadUltReg" valor={numero(stock.cantidadUltimaRegularizacion)} soloLectura />
                 </quimera-formulario>
+                <RegularizacionesStock
+                    regularizaciones={ctx.regularizaciones}
+                    onBorrar={(r) => emitir("borrar_regularizacion_solicitado", r)}
+                />
                 <UbicacionesStock ubicaciones={stock.ubicaciones} />
             </div>
+
+            {ctx.estado === "REGULARIZANDO" && (
+                <RegularizarStock stock={stock} publicar={emitir} />
+            )}
+            {ctx.estado === "BORRANDO_REGULARIZACION" && ctx.regularizacionActiva && (
+                <BorrarRegularizacionStock
+                    regularizacion={ctx.regularizacionActiva}
+                    publicar={emitir}
+                />
+            )}
         </Detalle>
     );
 };

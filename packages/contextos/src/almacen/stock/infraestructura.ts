@@ -2,9 +2,20 @@ import { baseUrlStockUbicacion, StockUbicacionItemApi } from "#/almacen/ubicacio
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Filtro } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
-import { GetStock, GetStocks, StockAPI, StockItem, StockUbicacion } from "./diseño.ts";
+import {
+    DeleteRegularizacionStock,
+    GetRegularizacionesStock,
+    GetStock,
+    GetStocks,
+    PostRegularizacionStock,
+    RegularizacionStock,
+    StockAPI,
+    StockItem,
+    StockUbicacion,
+} from "./diseño.ts";
 
 const baseUrlStock = `/almacen/stock`;
+const baseUrlRegularizacion = `/almacen/regularizacion_stock`;
 
 export const stockItemFromApi = (stockApi: StockAPI): StockItem => ({
     id: stockApi.id,
@@ -59,4 +70,72 @@ export const getStocks: GetStocks = async (filtro, orden, paginacion?) => {
     const q = criteriaQuery(filtro, orden, paginacion);
     const respuesta = await RestAPI.get<{ datos: StockAPI[]; total: number }>(baseUrlStock + q);
     return { datos: respuesta.datos.map(stockItemFromApi), total: respuesta.total };
+};
+
+export interface RegularizacionStockApi {
+    id: string;
+    stock_id: string;
+    almacen_id: string;
+    articulo_id: string;
+    descripcion: string | null;
+    fecha: string;
+    hora: string;
+    cantidad_inicial: number;
+    cantidad_final: number;
+    motivo: string | null;
+    inventario_id: string | null;
+}
+
+export const regularizacionStockDesdeApi = (api: RegularizacionStockApi): RegularizacionStock => ({
+    id: api.id,
+    stockId: api.stock_id,
+    almacenId: api.almacen_id,
+    articuloId: api.articulo_id,
+    descripcion: api.descripcion,
+    fecha: api.fecha,
+    hora: api.hora,
+    cantidadInicial: api.cantidad_inicial,
+    cantidadFinal: api.cantidad_final,
+    motivo: api.motivo,
+    inventarioId: api.inventario_id,
+});
+
+/** Fecha local (no UTC) en formato ISO "AAAA-MM-DD". */
+export const fechaLocalAApi = (fecha: Date): string => {
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    return `${fecha.getFullYear()}-${mes}-${dia}`;
+};
+
+export const getRegularizacionesStock: GetRegularizacionesStock = async (stockId) => {
+    const respuesta = await RestAPI.getQuery<RegularizacionStock, RegularizacionStockApi>(
+        baseUrlRegularizacion,
+        {
+            filtro: [["stock_id", "==", stockId]],
+            orden: [],
+            paginacion: { limite: 100, pagina: 1 },
+        },
+        regularizacionStockDesdeApi,
+    );
+    return respuesta.datos;
+};
+
+export const postRegularizacionStock: PostRegularizacionStock = async (stock, nueva) => {
+    const respuesta = await RestAPI.post(
+        baseUrlRegularizacion,
+        {
+            almacen_id: stock.almacenId,
+            articulo_id: stock.articuloId,
+            cantidad: nueva.cantidad,
+            fecha: fechaLocalAApi(nueva.fecha),
+            hora: nueva.hora,
+            motivo: nueva.motivo || null,
+        },
+        "Error al regularizar el stock"
+    );
+    return respuesta.id;
+};
+
+export const deleteRegularizacionStock: DeleteRegularizacionStock = async (id) => {
+    await RestAPI.delete(`${baseUrlRegularizacion}/${id}`, "Error al borrar la regularización");
 };
