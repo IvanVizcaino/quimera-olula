@@ -1,6 +1,7 @@
 export type ClienteLista = {
     codigo: string;
     nombre: string;
+    activo: boolean;
 };
 
 export type ContactoLista = {

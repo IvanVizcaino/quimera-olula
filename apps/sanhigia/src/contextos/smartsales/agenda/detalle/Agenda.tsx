@@ -145,6 +145,7 @@ export const Agenda = () => {
     const verHistorial = async () => setHistorial(await intentar(() => getTareasCompletadas(agenteSeguido)));
 
     const bloques = bloquesProximas(proximas, new Date());
+    const viendoHoy = vista === "dia" && fechaIso(referencia) === fechaIso(new Date());
 
     return (
         <LayoutSmartsales>
@@ -210,11 +211,15 @@ export const Agenda = () => {
                 </QBoton>
 
                 <section className="tarjeta tareas bloques">
-                    <h2>Hoy</h2>
-                    {bloques.hoy.length === 0 && <p className="vacio">Sin tareas</p>}
-                    {bloques.hoy.map((tarea) => (
-                        <TarjetaTarea key={tarea.id} tarea={tarea} />
-                    ))}
+                    {!viendoHoy && (
+                        <>
+                            <h2>Hoy</h2>
+                            {bloques.hoy.length === 0 && <p className="vacio">Sin tareas</p>}
+                            {bloques.hoy.map((tarea) => (
+                                <TarjetaTarea key={tarea.id} tarea={tarea} />
+                            ))}
+                        </>
+                    )}
                     <h2>Mañana</h2>
                     {bloques.mañana.length === 0 && <p className="vacio">Sin tareas</p>}
                     {bloques.mañana.map((tarea) => (

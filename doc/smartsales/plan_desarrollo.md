@@ -322,7 +322,7 @@ Hay dos piezas:
 
 **Decidido (2026-11-03)**
 - Ruta legacy: `/ss/dashboard-legacy`. Se mantiene en el menú como "Dashboard". **Hecho.**
-- Rojo de marca: no hay guía. Se usa `#e30613` (sacado de la maqueta) en la variable `--rojo-sanhigia` de `LayoutSmartsales.css`; para cambiarlo basta con tocar esa variable. **Hecho.**
+- Rojo de marca: no hay guía. Se usa `#c8202f` (indicado por Juanma el 2026-11-04; antes `#e30613`, sacado de la maqueta) en la variable `--rojo-sanhigia` de `LayoutSmartsales.css`; para cambiarlo basta con tocar esa variable. **Hecho.**
 - Cabecera: la general de la app, no una propia de SmartSales.
 - Componente de mapa: compartido, en `packages/componentes`. **Hecho** (`QMapa`).
 - Estilos comunes en `LayoutSmartsales.css` (fondo gris, `.tarjeta` blanca con sombra, `.pestañas` en pastilla roja), tarjeta de tarea con icono y color por tipo, afinidad "Alta" en verde, y pasada de estilo de Hoy, Agenda, Mapa/Resultados, Ficha de cliente, Crear visita/tarea, Visita (en curso y finalizar, con mapa de la ubicación de inicio), Campañas, Tratos (lista y alta), Rendimiento y Objetivo de nuevos clientes. **Hecho.** Siguiente: Filtros de prospección (pantalla 12).

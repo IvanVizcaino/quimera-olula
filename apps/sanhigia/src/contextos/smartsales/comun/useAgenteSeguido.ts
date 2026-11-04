@@ -9,10 +9,20 @@ type DatosAgentes = {
 
 let carga: Promise<DatosAgentes> | null = null;
 let agenteElegido: string | null = null;
+let sesion: string | null = null;
 const suscriptores = new Set<() => void>();
 
+const comprobarSesion = () => {
+    const actual = localStorage.getItem("token-refresco");
+    if (actual === sesion) return;
+    sesion = actual;
+    carga = null;
+    agenteElegido = null;
+};
+
 const cargarDatos = () => {
-    carga ??= Promise.all([getUsuarioSmartsales(), getAgentesPermitidos()])
+    comprobarSesion();
+    carga ??=Promise.all([getUsuarioSmartsales(), getAgentesPermitidos()])
         .then(([usuario, agentes]) => ({ usuario, agentes }))
         .catch((error) => {
             carga = null;

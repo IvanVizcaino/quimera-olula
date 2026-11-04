@@ -1,4 +1,5 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { useContext, useEffect, useState } from "react";
@@ -61,9 +62,12 @@ export const Clientes = () => {
                     {pestaña === "clientes" &&
                         clientes.map((cliente) => (
                             <li key={cliente.codigo}>
-                                <Link to={rutasSmartsales.fichaCliente(cliente.codigo)}>
-                                    <strong>{cliente.nombre}</strong>
-                                    <span className="secundario">{cliente.codigo}</span>
+                                <Link to={rutasSmartsales.fichaCliente(cliente.codigo)} className="cliente">
+                                    <span className="datos">
+                                        <strong>{cliente.nombre}</strong>
+                                        <span className="secundario">{cliente.codigo}</span>
+                                    </span>
+                                    <QEtiqueta variante={cliente.activo ? "exito" : "gris"}>{cliente.activo ? "Activo" : "Inactivo"}</QEtiqueta>
                                 </Link>
                             </li>
                         ))}

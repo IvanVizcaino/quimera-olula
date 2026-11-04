@@ -17,17 +17,17 @@ const LIMITE = 50;
 const filtroTexto = (campo: string, texto: string) => (texto ? { and: [[campo, "like", texto]] } : undefined);
 
 export const getClientes = async (texto: string): Promise<ClienteLista[]> => {
-    const respuesta = await LegacyAPI.get<{ data: { codcliente: string; nombre: string }[] }>(
+    const respuesta = await LegacyAPI.get<{ data: { codcliente: string; nombre: string; activo: boolean | null }[] }>(
         legacyUrl("clientes", {
             params: {
                 filter: filtroTexto("nombre", texto),
-                fields: ["codcliente", "nombre"],
+                fields: ["codcliente", "nombre", "activo"],
                 order: { field: "nombre", direction: "ASC" },
                 page: { limit: LIMITE },
             },
         })
     );
-    return respuesta.data.map((c) => ({ codigo: c.codcliente, nombre: c.nombre }));
+    return respuesta.data.map((c) => ({ codigo: c.codcliente, nombre: c.nombre, activo: !!c.activo }));
 };
 
 type ContactoAPI = {
@@ -42,7 +42,7 @@ type ContactoAPI = {
 export const getContactos = async (texto: string): Promise<ContactoLista[]> => {
     const respuesta = await LegacyAPI.get<{ data: ContactoAPI[] }>(
         legacyUrl("contactos", {
-            action: "get_contactos_with_summary",
+            action: "get_contactos_smartsales",
             staticAction: true,
             params: { filter: filtroTexto("nombre", texto), page: { limit: LIMITE } },
         })

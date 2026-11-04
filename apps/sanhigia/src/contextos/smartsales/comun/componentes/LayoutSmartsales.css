@@ -1,5 +1,5 @@
 .LayoutSmartsales {
-    --rojo-sanhigia: #e30613;
+    --rojo-sanhigia: #c8202f;
     --color-primario: var(--rojo-sanhigia);
     --color-primario-oscuro: var(--rojo-sanhigia);
     --color-primario-claro: color-mix(in srgb, var(--rojo-sanhigia) 45%, white);
@@ -90,9 +90,13 @@
     justify-self: center;
     display: grid;
     place-items: center;
+    box-sizing: border-box;
     width: 3.25rem;
-    aspect-ratio: 1;
+    height: 3.25rem;
+    min-width: 0;
+    min-height: 0;
     margin-top: -1.5rem;
+    padding: 0;
     border: none;
     border-radius: 50%;
     color: var(--color-texto-menu);
@@ -140,4 +144,9 @@
 
 .LayoutSmartsales .acciones-rapidas a > :first-child {
     color: var(--color-primario);
+}
+
+.LayoutSmartsales .boton-mas quimera-icono {
+    display: block;
+    line-height: 0;
 }

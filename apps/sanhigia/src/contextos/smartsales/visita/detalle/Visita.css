@@ -59,7 +59,7 @@
     gap: 0.75rem;
 }
 
-.Visita .etiqueta {
+.Visita .titulo-campo {
     margin-bottom: -0.5rem;
     font-size: 0.85rem;
     color: var(--color-texto-secundario);

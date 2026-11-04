@@ -27,7 +27,7 @@ import {
 import "./NuevaTarea.css";
 
 const TIPOS: TipoTarea[] = ["Cita", "Llamada", "Email", "Whatsapp"];
-const SIN_TRATO = "";
+const SIN_TRATO = "sin_trato";
 
 const nivelesProducto: { valor: TipoProducto; descripcion: string }[] = [
     { valor: "articulo", descripcion: "Artículo" },
@@ -134,11 +134,11 @@ export const NuevaTarea = () => {
                             nombre="trato"
                             valor={formulario.idTrato ?? SIN_TRATO}
                             opciones={opcionesTrato}
-                            onChange={(opcion) => cambiar({ idTrato: opcion?.valor || null })}
+                            onChange={(opcion) => cambiar({ idTrato: opcion && opcion.valor !== SIN_TRATO ? opcion.valor : null })}
                         />
                     )}
 
-                    <span className="etiqueta" id="tipo-tarea">
+                    <span className="titulo-campo" id="tipo-tarea">
                         Tipo de tarea
                     </span>
                     <div className="tipos" role="radiogroup" aria-labelledby="tipo-tarea">
@@ -201,7 +201,14 @@ export const NuevaTarea = () => {
 
                     {sugerencias.length > 0 && (
                         <section className="sugerencias">
-                            <h2>Sugerencias para este cliente</h2>
+                            <header>
+                                <h2>Sugerencias para este cliente</h2>
+                                {sugerenciasVisibles(sugerencias, true).length > sugerenciasVisibles(sugerencias, false).length && (
+                                    <QBoton variante="texto" tamaño="pequeño" onClick={() => setTodasSugerencias(!todasSugerencias)}>
+                                        {todasSugerencias ? "Ver menos" : "Ver más"}
+                                    </QBoton>
+                                )}
+                            </header>
                             <ul>
                                 {sugerenciasVisibles(sugerencias, todasSugerencias).map((s) => (
                                     <li key={s.codSubfamilia}>
@@ -218,11 +225,6 @@ export const NuevaTarea = () => {
                                     </li>
                                 ))}
                             </ul>
-                            {!todasSugerencias && sugerenciasVisibles(sugerencias, true).length > sugerenciasVisibles(sugerencias, false).length && (
-                                <QBoton variante="texto" tamaño="pequeño" onClick={() => setTodasSugerencias(true)}>
-                                    Ver más
-                                </QBoton>
-                            )}
                         </section>
                     )}
 

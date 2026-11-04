@@ -1,5 +1,5 @@
 export const menuSmartsales = {
-    "SmartSales": { icono: "fichero" },
+    "SmartSales": { icono: "menu_crm" },
     "SmartSales/Hoy": { url: "/ss/dashboard", regla: "crm.trato" },
     "SmartSales/Dashboard": { url: "/ss/dashboard-legacy", regla: "crm.trato" },
     "SmartSales/Tipos de trato": { url: "/ss/tipostrato", regla: "crm.campana.leer" },

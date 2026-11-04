@@ -124,7 +124,7 @@ export const Visita = () => {
 
                         {estado === "FINALIZANDO" && tarea.idTrato && (
                             <>
-                                <span className="etiqueta" id="siguiente-paso">
+                                <span className="titulo-campo" id="siguiente-paso">
                                     Siguiente paso
                                 </span>
                                 <div className="opciones" role="radiogroup" aria-labelledby="siguiente-paso">

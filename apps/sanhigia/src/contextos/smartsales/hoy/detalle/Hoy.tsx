@@ -34,6 +34,8 @@ const AvisoEnlace = ({ texto, total, ruta }: { texto: string; total: number; rut
     </Link>
 );
 
+const MAX_ANTERIORES = 3;
+
 export const Hoy = () => {
     const { intentar } = useContext(ContextoError);
     const { agentes, agentePropio, agenteSeguido, cargando } = useAgenteSeguido();
@@ -153,9 +155,14 @@ export const Hoy = () => {
                         <TarjetaTarea key={tarea.id} tarea={tarea} />
                     ))}
                     {anteriores.length > 0 && <h3>Atrasadas de días anteriores</h3>}
-                    {anteriores.map((tarea) => (
-                        <TarjetaTarea key={tarea.id} tarea={tarea} />
+                    {anteriores.slice(0, MAX_ANTERIORES).map((tarea) => (
+                        <TarjetaTarea key={tarea.id} tarea={tarea} conFecha />
                     ))}
+                    {anteriores.length > MAX_ANTERIORES && (
+                        <Link to={rutasSmartsales.tareasAtrasadas} className="ver-todas">
+                            Ver las {anteriores.length} atrasadas
+                        </Link>
+                    )}
                 </section>
 
                 <section className="tarjeta">
