@@ -127,7 +127,7 @@ export const getAlbaranes: GetAlbaranes = async (
 export const postAlbaran: PostAlbaran = async (albaran) => {
   const payload = {
     cliente: payloadCambioCliente(albaran),
-    empresa_id: empresaActual(),
+    empresa_id: albaran.empresa_id || empresaActual(),
   };
   return await RestAPI.post(baseUrl, payload, "Error al guardar albarán").then((respuesta) => respuesta.id);
 };

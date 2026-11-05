@@ -1,4 +1,5 @@
 export const menuComun = {
+    "Dashboards": { icono: "grafico_barras", url: "/comun/dashboard", area: "Sistema" },
     "Asistente IA": { icono: "asistente", area: "Sistema" },
     "Asistente IA/Chat": { url: "/comun/asistente" },
     "Asistente IA/Memoria del asistente": { url: "/comun/ia-memoria", regla: "comun.ia_memoria" },

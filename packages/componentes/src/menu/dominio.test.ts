@@ -121,3 +121,34 @@ describe("menú lateral y búsqueda rápida", () => {
     ).toBe("C1 · B123");
   });
 });
+
+describe("menú: entradas condicionadas a un plugin", () => {
+  const conPlugins = (plugins: Record<string, string>) =>
+    localStorage.setItem("whoami", JSON.stringify({ plugins }));
+
+  const menuTesoreria: ElementoMenu[] = [
+    {
+      nombre: "Tesorería",
+      subelementos: [
+        { nombre: "Remesas de cobro", url: "/tesoreria/remesa" },
+        { nombre: "Remesas de pago", url: "/tesoreria/remesa_pago", plugin: "remesa_pago" },
+      ],
+    },
+  ];
+
+  const urls = () => aplanarMenu(menuTesoreria, todo).map((p) => p.url);
+
+  afterEach(() => localStorage.removeItem("whoami"));
+
+  test("se muestra si el plugin está activo", () => {
+    conPlugins({ remesa_pago: "Activo" });
+    expect(urls()).toEqual(["/tesoreria/remesa", "/tesoreria/remesa_pago"]);
+  });
+
+  test("se oculta si el plugin está inactivo o no viene", () => {
+    conPlugins({ remesa_pago: "inactivo" });
+    expect(urls()).toEqual(["/tesoreria/remesa"]);
+    localStorage.removeItem("whoami");
+    expect(urls()).toEqual(["/tesoreria/remesa"]);
+  });
+});

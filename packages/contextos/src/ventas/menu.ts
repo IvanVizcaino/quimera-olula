@@ -1,5 +1,6 @@
 export const menuVentas = {
     "Ventas": { icono: "menu_ventas", area: "Comercial" },
+    "Ventas/Resumen": { url: "/dashboard/ventas" },
     "Ventas/Clientes": { url: "/ventas/cliente", regla: "ventas.cliente.leer" },
     "Ventas/Presupuestos": { url: "/ventas/presupuesto", regla: "ventas.presupuesto.leer" },
     "Ventas/Pedidos": {

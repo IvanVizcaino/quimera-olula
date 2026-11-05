@@ -1,5 +1,6 @@
 export const menuAlmacen = {
     "Almacén": { icono: "menu_almacen", area: "Operaciones" },
+    "Almacén/Resumen": { url: "/dashboard/almacen" },
     "Almacén/Artículos": { url: "/almacen/articulo", regla: "almacen.articulo" },
     "Almacén/Almacenes": { url: "/almacen/almacenes", regla: "almacen.almacen" },
     "Almacén/Cajas": { url: "/almacen/cajas", regla: "almacen.caja" },

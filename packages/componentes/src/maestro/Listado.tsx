@@ -127,7 +127,7 @@ export const Listado = <T extends Entidad>({
     ...configBase,
     widgets: widgetsUsuario.widgets,
   };
-  const { valores: valoresWidgets, cargando: cargandoWidgets } =
+  const { valores: valoresWidgets, series: seriesWidgets, cargando: cargandoWidgets } =
     useTotalesWidgets(configWidgets, criteria.filtro, totalEntidades);
   const [personalizandoWidgets, setPersonalizandoWidgets] = useState(false);
   const [densidad, setDensidad] = usePreferencia<Densidad>(
@@ -400,6 +400,7 @@ export const Listado = <T extends Entidad>({
             widgets={configWidgets.widgets}
             campos={configWidgets.campos}
             valores={valoresWidgets}
+            series={seriesWidgets}
             cargando={cargandoWidgets}
             onPersonalizar={
               widgetsUsuario.personalizable

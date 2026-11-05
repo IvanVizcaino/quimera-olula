@@ -16,6 +16,8 @@ const asientoDeFactura = (): Asiento => ({
     concepto: "Factura de compra 2026/17",
     importe: 121,
     manual: false,
+    tipoDocumento: "Factura de proveedor",
+    documento: "FRA-17",
     partidas: [
         {
             id: "1",

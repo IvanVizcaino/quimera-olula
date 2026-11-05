@@ -1,5 +1,6 @@
 export const menuCrm = {
     "CRM": { icono: "menu_crm", area: "Comercial" },
+    "CRM/Resumen": { url: "/dashboard/crm" },
     "CRM/Oportunidades de venta": { url: "/crm/oportunidadventa", regla: "crm.oportunidad_venta.leer" },
     "CRM/Clientes": { url: "/crm/cliente", regla: "crm.cliente.leer" },
     "CRM/Contactos": { url: "/crm/contacto", regla: "crm.contacto.leer" },

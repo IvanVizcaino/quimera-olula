@@ -1,20 +1,23 @@
 import { QBoton } from "../../atomos/qboton.tsx";
 import { QTarjetaResumen } from "../../atomos/qtarjeta_resumen.tsx";
-import { CampoWidget, DefinicionWidget, ValoresWidgets } from "./diseño.ts";
+import { CampoWidget, DefinicionWidget, SeriesWidgets, ValoresWidgets } from "./diseño.ts";
 import { formatearValorWidget, pieWidget } from "./dominio.ts";
 import "./QPanelWidgets.css";
+import { WidgetCompacto } from "./WidgetCompacto.tsx";
 
 /** Fila de totales encima del listado, calculados con el filtro activo. */
 export const QPanelWidgets = ({
   widgets,
   campos = [],
   valores,
+  series = {},
   cargando,
   onPersonalizar,
 }: {
   widgets: DefinicionWidget[];
   campos?: CampoWidget[];
   valores: ValoresWidgets;
+  series?: SeriesWidgets;
   cargando: boolean;
   onPersonalizar?: () => void;
 }) => (
@@ -40,6 +43,18 @@ export const QPanelWidgets = ({
       >
         {widgets.map((widget) => {
           const valor = valores[widget.id];
+          if ((widget.tipo ?? "tarjeta") !== "tarjeta") {
+            return (
+              <WidgetCompacto
+                key={widget.id}
+                widget={widget}
+                valor={valor}
+                puntos={series[widget.id] ?? []}
+                pie={pieWidget(widget, campos)}
+                cargando={cargando}
+              />
+            );
+          }
           return (
             <QTarjetaResumen
               key={widget.id}

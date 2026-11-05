@@ -1,0 +1,23 @@
+.TabGeneral {
+
+    /* Fila 1: Tipo (3) + Fecha (3) + Fecha de pago (3) + Estado (3) = 12 */
+    quimera-input[nombre="tipo"],
+    quimera-input[nombre="fecha"],
+    quimera-input[nombre="fechaPago"],
+    quimera-input[nombre="estado"] {
+        grid-column: span 3;
+    }
+
+    /* Fila 2: Cuenta (6) + Total (3) + Divisa (3) = 12 */
+    quimera-autocompletar[nombre="cuentaId"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="total"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="divisaId"] {
+        grid-column: span 3;
+    }
+}

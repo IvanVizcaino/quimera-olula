@@ -20,6 +20,18 @@ export const CabeceraAsiento = ({ asiento }: { asiento: Asiento }) => (
                 valor={asiento.manual ? "Manual" : "Automático"}
                 soloLectura
             />
+            <QInput
+                label="Tipo de documento"
+                nombre="tipoDocumento"
+                valor={asiento.tipoDocumento}
+                soloLectura
+            />
+            <QInput
+                label="Documento"
+                nombre="documento"
+                valor={asiento.documento}
+                soloLectura
+            />
             <QInput label="Concepto" nombre="concepto" valor={asiento.concepto} soloLectura />
         </quimera-formulario>
     </div>

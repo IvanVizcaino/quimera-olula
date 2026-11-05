@@ -3,6 +3,7 @@ import {
   ElementoMenu,
   ElementoMenuHijo,
   ElementoMenuPadre,
+  pluginsActivos,
 } from "@olula/lib/menu.ts";
 
 /** Pantalla del menú ya aplanada (grupo › pantalla) para buscar y listar. */
@@ -50,7 +51,8 @@ export const aplanarMenu = (
   menu: ElementoMenu[],
   puede: (regla: string | string[]) => boolean
 ): PantallaMenu[] => {
-  const visible = (e: ElementoMenu) => !e.regla || puede(e.regla);
+  const visible = (e: ElementoMenu) =>
+    (!e.regla || puede(e.regla)) && pluginsActivos(e);
   const pantalla = (hijo: ElementoMenuHijo, grupo: string): PantallaMenu => ({
     nombre: hijo.nombre,
     grupo,

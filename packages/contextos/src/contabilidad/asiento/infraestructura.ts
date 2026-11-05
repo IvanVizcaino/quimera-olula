@@ -29,6 +29,8 @@ interface ItemAsientoApi {
     concepto: string;
     importe: number;
     manual: boolean;
+    tipo_documento: string | null;
+    documento: string | null;
 }
 
 interface PartidaAsientoApi {
@@ -82,6 +84,8 @@ export const itemAsientoDesdeApi = (api: ItemAsientoApi): ItemAsiento => ({
     concepto: api.concepto,
     importe: api.importe,
     manual: api.manual,
+    tipoDocumento: api.tipo_documento ?? "",
+    documento: api.documento ?? "",
 });
 
 export const asientoDesdeApi = (api: AsientoDetalleApi): Asiento => ({
@@ -122,6 +126,8 @@ export const postAsientoManual: PostAsientoManual = async (nuevo) => {
             ejercicio_id: nuevo.ejercicioId,
             fecha: fechaAApi(nuevo.fecha),
             concepto: nuevo.concepto,
+            tipo_documento: nuevo.tipoDocumento || null,
+            documento: nuevo.documento || null,
             partidas: nuevo.partidas.map(partidaManualAApi),
         },
         "Error al crear asiento manual"
@@ -136,6 +142,9 @@ export const patchAsientoManual: PatchAsientoManual = async (id, cambios) => {
     const body: Record<string, unknown> = {};
     if (cambios.fecha) body.fecha = fechaAApi(cambios.fecha);
     if (cambios.concepto !== undefined) body.concepto = cambios.concepto;
+    // "" significa «sin documento»: el servidor lo normaliza a null.
+    if (cambios.tipoDocumento !== undefined) body.tipo_documento = cambios.tipoDocumento || null;
+    if (cambios.documento !== undefined) body.documento = cambios.documento || null;
     if (cambios.partidas) body.partidas = cambios.partidas.map(partidaManualAApi);
 
     const respuesta = (await RestAPI.patch(

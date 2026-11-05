@@ -6,7 +6,9 @@ import {
   DefinicionWidget,
   FormatoWidget,
   OperacionWidget,
+  PuntoWidget,
   RecursoAgregable,
+  TipoWidget,
 } from "./diseño.ts";
 
 /** Parámetro `metricas` del servidor: `suma:total`, `conteo`... */
@@ -89,7 +91,8 @@ export const nuevoWidget = (
   operacion: OperacionWidget,
   campo: CampoWidget | undefined,
   existentes: DefinicionWidget[],
-  formato?: FormatoWidget
+  formato?: FormatoWidget,
+  compacto: Pick<DefinicionWidget, "tipo" | "agrupar" | "meta"> = {}
 ): DefinicionWidget => {
   const base = `${operacion}_${campo?.id ?? "registros"}`;
   let id = base;
@@ -103,7 +106,94 @@ export const nuevoWidget = (
       operacion === "conteo"
         ? "numero"
         : (formato ?? campo?.formato ?? "numero"),
+    ...(compacto.tipo && compacto.tipo !== "tarjeta" ? { tipo: compacto.tipo } : {}),
+    ...(compacto.agrupar ? { agrupar: compacto.agrupar } : {}),
+    ...(compacto.tipo === "objetivo" && compacto.meta ? { meta: compacto.meta } : {}),
   };
+};
+
+export const tiposWidget: { valor: TipoWidget; descripcion: string }[] = [
+  { valor: "tarjeta", descripcion: "Tarjeta (un valor)" },
+  { valor: "temporal", descripcion: "Evolución por meses" },
+  { valor: "circular", descripcion: "Reparto (anillo)" },
+  { valor: "ranking", descripcion: "Los 3 primeros" },
+  { valor: "objetivo", descripcion: "Objetivo (barra de progreso)" },
+];
+
+export const esAgrupado = (widget: DefinicionWidget): boolean =>
+  ["temporal", "circular", "ranking"].includes(widget.tipo ?? "tarjeta") &&
+  Boolean(widget.agrupar);
+
+/**
+ * Parámetros de agrupación para un widget agrupado (además de metricas y el filtro del
+ * listado): los 12 meses más recientes del temporal, las 6 mayores del anillo (el resto
+ * se ve como «Otros» con el total) y las 3 primeras del ranking.
+ */
+export const agrupacionWidget = (widget: DefinicionWidget): string => {
+  const alias = aliasWidget(widget);
+  const parametros =
+    widget.tipo === "temporal"
+      ? { agrupar: `${widget.agrupar}:mes`, orden: `${widget.agrupar}:desc`, limite: "12" }
+      : { agrupar: widget.agrupar ?? "", orden: `${alias}:desc`, limite: widget.tipo === "ranking" ? "3" : "6" };
+  return new URLSearchParams(parametros).toString();
+};
+
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+const MESES_TEMPORAL = 12;
+
+const etiquetaMes = (año: number, mes: number) => `${MESES[mes - 1]} ${String(año).slice(2)}`;
+
+/**
+ * Meses seguidos, sin saltarse los vacíos (a 0): hasta 12 que acaban en el último mes con
+ * datos del filtro. El servidor da los 12 más recientes CON datos, así que dentro de esa
+ * ventana no falta ninguno; si hay menos, la ventana empieza en el primero que haya.
+ */
+const mesesSeguidos = (puntos: PuntoWidget[]): PuntoWidget[] => {
+  const mesDe = (clave: string) => {
+    const [año, mes] = clave.split("-").map(Number);
+    return año * 12 + (mes - 1);
+  };
+  const validos = puntos.filter((p) => !Number.isNaN(mesDe(p.clave)));
+  if (validos.length === 0) return puntos;
+  const porMes = new Map(validos.map((p) => [mesDe(p.clave), p]));
+  const ultimo = mesDe(validos[validos.length - 1].clave);
+  const primero = Math.max(mesDe(validos[0].clave), ultimo - (MESES_TEMPORAL - 1));
+  const serie: PuntoWidget[] = [];
+  for (let n = primero; n <= ultimo; n++) {
+    const año = Math.floor(n / 12);
+    const mes = (n % 12) + 1;
+    serie.push(
+      porMes.get(n) ?? {
+        clave: `${año}-${String(mes).padStart(2, "0")}-01`,
+        etiqueta: etiquetaMes(año, mes),
+        valor: 0,
+      }
+    );
+  }
+  return serie;
+};
+
+/** Grupos del servidor → puntos: el temporal en meses seguidos, en orden cronológico. */
+export const puntosWidget = (
+  widget: DefinicionWidget,
+  grupos: Record<string, unknown>[]
+): PuntoWidget[] => {
+  const dimension = widget.agrupar ?? "";
+  const alias = aliasWidget(widget);
+  const puntos = grupos.map((grupo) => {
+    const clave = String(grupo[dimension] ?? "");
+    const nombre = grupo[`${dimension}_nombre`];
+    const [año, mes] = clave.split("-").map(Number);
+    const etiqueta =
+      widget.tipo === "temporal" && año && mes
+        ? etiquetaMes(año, mes)
+        : nombre
+          ? String(nombre)
+          : clave || "Sin valor";
+    return { clave, etiqueta, valor: Number(grupo[alias] ?? 0) };
+  });
+  return widget.tipo === "temporal" ? mesesSeguidos(puntos.reverse()) : puntos;
 };
 
 export const MAX_WIDGETS = 8;
@@ -126,7 +216,8 @@ export const recursoParaRuta = (
   return homonimo ?? candidatos.find((r) => !r.id.endsWith(".linea"));
 };
 
-const pareceImporte = (id: string) =>
+/** Heurística por el nombre de la medida: ¿es un importe (se formatea como moneda)? */
+export const pareceImporte = (id: string) =>
   /total|neto|importe|saldo|precio|pvp|coste|cobrad|pagad|pendiente/i.test(id);
 
 const enMayuscula = (texto: string) =>
@@ -160,4 +251,35 @@ export const formatearValorWidget = (
   if (valor === null || valor === undefined) return "—";
   if (widget.formato === "moneda") return formatearMoneda(valor, "EUR");
   return valor.toLocaleString("es-ES", { maximumFractionDigits: 2 });
+};
+
+const AGRUPACIONES_PREFERIDAS = [
+  "agente", "cliente", "proveedor", "estado", "serie", "forma_pago", "almacen",
+  "familia", "comunidad", "provincia",
+];
+
+/**
+ * Dimensiones por las que tiene sentido agrupar un reparto o un ranking: sin ids, sin el
+ * código del propio documento (cada uno es único) ni el nombre copiado que acompaña a un
+ * código (ya sale como etiqueta); primero las más útiles.
+ */
+export const dimensionesAgrupables = (
+  dimensiones: NonNullable<RecursoAgregable["dimensiones"]>,
+  recursoId: string
+): NonNullable<RecursoAgregable["dimensiones"]> => {
+  const documento = recursoId.split(".")[1];
+  const ids = new Set(dimensiones.map((d) => d.id));
+  const posicion = (id: string) => {
+    const i = AGRUPACIONES_PREFERIDAS.indexOf(id);
+    return i === -1 ? AGRUPACIONES_PREFERIDAS.length : i;
+  };
+  return dimensiones
+    .filter(
+      (d) =>
+        d.tipo !== "fecha" &&
+        d.tipo !== "numero" &&
+        d.id !== documento &&
+        !(d.id.startsWith("nombre_") && ids.has(d.id.replace("nombre_", "")))
+    )
+    .sort((a, b) => posicion(a.id) - posicion(b.id));
 };

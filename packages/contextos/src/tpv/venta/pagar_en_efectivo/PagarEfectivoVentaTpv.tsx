@@ -3,6 +3,7 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import { formatearMoneda, redondeaMoneda } from "@olula/lib/dominio.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
@@ -25,6 +26,8 @@ export const PagarEfectivoVentaTpv = ({
 }) => {
   const pendiente = redondeaMoneda(venta.total - venta.pagado, venta.divisa_id);
 
+  const enviarEfectivoEntregado = (FactoryObj.app.TPV?.venta_enviarEfectivoEntregado as boolean | undefined) ?? false;
+
   const { modelo, uiProps, valido, set } = useModelo(
     metaNuevoPagoEfectivo,
     nuevoPagoEfectivoInicial
@@ -45,6 +48,8 @@ export const PagarEfectivoVentaTpv = ({
         postPago(venta.id, {
           importe: Math.min(pendiente, modelo.importe),
           formaPago: "EFECTIVO",
+          // Solo al cobrar: en devoluciones no hay entregado ni cambio
+          entregado: enviarEfectivoEntregado && pendiente > 0 ? Number(modelo.importe) : undefined,
         })
       );
       setPagando(true);

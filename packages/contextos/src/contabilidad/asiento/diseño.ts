@@ -8,6 +8,9 @@ export interface ItemAsiento extends Entidad {
     concepto: string;
     importe: number;
     manual: boolean;
+    /** Documento de origen. Vacío en el asiento manual que no lo informa. */
+    tipoDocumento: string;
+    documento: string;
 }
 
 export interface PartidaAsiento extends Entidad {
@@ -57,10 +60,14 @@ export interface NuevoAsientoManual extends Modelo {
     ejercicioId: string;
     fecha: Date;
     concepto: string;
+    tipoDocumento: string;
+    documento: string;
     partidas: PartidaManualInput[];
 }
 
-export type CambiosAsientoManual = Partial<Pick<NuevoAsientoManual, "fecha" | "concepto" | "partidas">>;
+export type CambiosAsientoManual = Partial<
+    Pick<NuevoAsientoManual, "fecha" | "concepto" | "partidas" | "tipoDocumento" | "documento">
+>;
 
 export type GetAsiento = (id: string) => Promise<Asiento>;
 export type GetAsientos = (criteria: Criteria) => RespuestaLista<ItemAsiento>;

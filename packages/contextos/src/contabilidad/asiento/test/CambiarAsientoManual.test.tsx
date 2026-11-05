@@ -67,6 +67,8 @@ const asientoCuadradoDe100 = (): Asiento => ({
     concepto: "Compra de material",
     importe: 100,
     manual: true,
+    tipoDocumento: "",
+    documento: "",
     partidas: [
         {
             id: "1",

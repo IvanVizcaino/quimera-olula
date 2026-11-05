@@ -31,6 +31,10 @@ export const metaNuevoAsientoManual: MetaModelo<NuevoAsientoManual> = {
             requerido: true,
             validacion: (m) => (m.concepto.trim().length > 0 ? true : "Indica un concepto"),
         },
+        // Opcionales e independientes: un asiento manual normal no tiene
+        // documento de origen.
+        tipoDocumento: { requerido: false },
+        documento: { requerido: false },
         partidas: { itemMeta: metaPartidaManual, minItems: 2 },
     },
     validacion: (m) =>
@@ -50,6 +54,8 @@ export const nuevoAsientoManualVacio = (ejercicioId: string): NuevoAsientoManual
     ejercicioId,
     fecha: new Date(),
     concepto: "",
+    tipoDocumento: "",
+    documento: "",
     partidas: [partidaManualVacia(), partidaManualVacia()],
 });
 
@@ -61,6 +67,8 @@ export const asientoVacio = (): Asiento => ({
     concepto: "",
     importe: 0,
     manual: false,
+    tipoDocumento: "",
+    documento: "",
     partidas: [],
 });
 

@@ -1,0 +1,592 @@
+.pagina-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-l);
+    padding: var(--espaciado-l) var(--espaciado-xl) var(--espaciado-3xl);
+    min-width: 0;
+
+    .pagina-dashboard-cabecera {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--espaciado-m);
+    }
+
+    .pagina-dashboard-titulo {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xxs);
+        min-width: min(100%, 20rem);
+
+        h1 {
+            margin: 0;
+            font-size: var(--tamaño-letra-xxl);
+        }
+    }
+
+    .pagina-dashboard-subtitulo {
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+    }
+
+    .pagina-dashboard-botones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s);
+    }
+
+    .pagina-dashboard-aviso {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+        margin: 0;
+        padding: var(--espaciado-s) var(--espaciado-m);
+        border-radius: var(--redondeo-borde-m);
+        background: var(--color-advertencia-claro);
+        color: var(--color-texto-primario);
+        font-size: var(--tamaño-letra-s);
+    }
+
+    .pagina-dashboard-cuerpo {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: var(--espaciado-l);
+    }
+
+    .pagina-dashboard-rejilla {
+        flex: 999 1 36rem;
+        min-width: 0;
+    }
+
+    .pagina-dashboard-vacio {
+        padding: var(--espaciado-3xl) var(--espaciado-l);
+        border: 2px dashed var(--color-borde-fuerte);
+        border-radius: var(--redondeo-borde-m);
+        text-align: center;
+        color: var(--color-texto-secundario);
+    }
+
+    .pagina-dashboard-editable {
+        position: relative;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        > .dashboard-componente,
+        > quimera-tarjeta-resumen {
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* Hueco para los botones de edición junto al título. */
+        .dashboard-componente-titulo,
+        quimera-tarjeta-resumen .titulo {
+            padding-inline: 2.75rem 4.75rem;
+        }
+    }
+
+    /* En las tarjetas (88 px) taparían el importe: aparecen al pasar el ratón o con el foco. */
+    .pagina-dashboard-editable:has(> quimera-tarjeta-resumen) {
+        .pagina-dashboard-acciones-componente {
+            opacity: 0;
+            transition: opacity var(--transicion-normal);
+        }
+
+        &:hover .pagina-dashboard-acciones-componente,
+        &:focus-within .pagina-dashboard-acciones-componente {
+            opacity: 1;
+        }
+    }
+
+    /* Arriba a la derecha, en la línea del título: no tapa ejes ni la esquina de tamaño. */
+    .pagina-dashboard-acciones-componente {
+        position: absolute;
+        top: var(--espaciado-xs);
+        right: var(--espaciado-xs);
+        display: flex;
+        gap: var(--espaciado-xxs);
+
+        button {
+            display: grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid var(--color-borde-fuerte);
+            border-radius: var(--redondeo-borde-s);
+            background: var(--color-superficie-elevada);
+            color: var(--color-texto-secundario);
+            cursor: pointer;
+
+            &:hover { color: var(--color-texto-primario); }
+            &[data-destructivo]:hover { color: var(--color-error-texto); }
+            &:focus-visible {
+                outline: 2px solid var(--color-borde-focus);
+                outline-offset: 2px;
+            }
+        }
+    }
+}
+
+/* --- Componente ------------------------------------------------------------ */
+
+.dashboard-componente {
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+    padding: var(--espaciado-m);
+    background: var(--color-fondo);
+    border: 1px solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-m);
+    overflow: hidden;
+
+    .dashboard-componente-titulo {
+        margin: 0;
+        font-size: var(--tamaño-letra-m);
+        font-weight: var(--grosor-letra-6);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dashboard-componente-periodo {
+        font-size: var(--tamaño-letra-s);
+        font-weight: var(--grosor-letra-4);
+        color: var(--color-texto-secundario);
+    }
+
+    .dashboard-componente-cuerpo {
+        flex: 1;
+        min-height: 0;
+        position: relative;
+    }
+
+    .dashboard-componente-estado {
+        margin: 0;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+
+        &[data-error] {
+            color: var(--color-error-texto);
+        }
+    }
+
+    .dashboard-componente-cargando {
+        height: 100%;
+        border-radius: var(--redondeo-borde-s);
+        background: linear-gradient(90deg,
+                var(--color-superficie-sunken) 25%,
+                var(--color-superficie) 50%,
+                var(--color-superficie-sunken) 75%);
+        background-size: 200% 100%;
+        animation: dashboard-cargando 1.4s ease-in-out infinite;
+    }
+
+    .dashboard-componente-pie {
+        font-size: var(--tamaño-letra-xs);
+        color: var(--color-texto-secundario);
+    }
+
+    .recharts-cartesian-axis-tick-value,
+    .recharts-legend-item-text {
+        fill: var(--color-texto-secundario);
+        color: var(--color-texto-secundario);
+        font-size: var(--tamaño-letra-xs);
+    }
+
+    .recharts-cartesian-grid line {
+        stroke: var(--color-borde-sutil);
+    }
+}
+
+@keyframes dashboard-cargando {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-componente .dashboard-componente-cargando {
+        animation: none;
+    }
+}
+
+/* Misma cáscara que los widgets del maestro: título izq.; valor, variación y pie der. */
+.pagina-dashboard quimera-tarjeta-resumen,
+.configurar-componente quimera-tarjeta-resumen {
+    height: 100%;
+    box-sizing: border-box;
+    background: var(--color-superficie);
+    border-color: var(--color-borde-tabla);
+    padding: var(--espaciado-s) var(--espaciado-m);
+    gap: 0;
+    justify-content: flex-start;
+    container-type: inline-size;
+
+    .titulo {
+        font-size: var(--tamaño-letra-xs);
+        font-weight: var(--grosor-letra-5);
+        text-transform: none;
+        letter-spacing: normal;
+        color: var(--color-texto-secundario);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .valor,
+    .pie,
+    .comparacion {
+        text-align: right;
+    }
+
+    .comparacion {
+        justify-content: flex-end;
+        margin-top: 0;
+    }
+
+    .valor {
+        /* Que quepa el importe entero: se achica con el ancho de la tarjeta. */
+        font-size: clamp(1rem, 12cqi, var(--tamaño-letra-xl));
+        font-weight: var(--grosor-letra-7);
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+
+    .pie {
+        margin-top: auto;
+        flex-shrink: 0;
+    }
+}
+
+.dashboard-objetivo-barra {
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--color-superficie-sunken);
+    overflow: hidden;
+
+    div {
+        height: 100%;
+    }
+}
+
+.dashboard-circular {
+    height: 100%;
+    display: flex;
+    gap: var(--espaciado-m);
+    align-items: center;
+
+    > :first-child {
+        flex: 1 1 50%;
+        min-width: 0;
+    }
+}
+
+.dashboard-leyenda {
+    flex: 1 1 50%;
+    min-width: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+    font-size: var(--tamaño-letra-s);
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-xs);
+    }
+
+    .dashboard-leyenda-color {
+        flex: none;
+        width: 0.7rem;
+        height: 0.7rem;
+        border-radius: 2px;
+    }
+
+    .dashboard-leyenda-texto {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dashboard-leyenda-valor {
+        font-variant-numeric: tabular-nums;
+        color: var(--color-texto-secundario);
+    }
+}
+
+.dashboard-tabla {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+
+    quimera-tabla {
+        flex: 1;
+        min-height: 0;
+        /* Cabeceras y celdas un poco más compactas dentro del dashboard. */
+        th[data-modo="columna"],
+        td {
+            padding: var(--espaciado-xs) var(--espaciado-s);
+        }
+    }
+
+    .dashboard-tabla-mas {
+        flex-shrink: 0;
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-primario);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.dashboard-texto {
+    margin: 0;
+    white-space: pre-line;
+}
+
+/* --- Catálogo -------------------------------------------------------------- */
+
+.catalogo-componentes {
+    flex: 1 1 16rem;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+    padding: var(--espaciado-m);
+    border: 1px solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-m);
+    background: var(--color-fondo);
+
+    h2 {
+        margin: 0;
+        font-size: var(--tamaño-letra-l);
+    }
+
+    h3 {
+        margin: 0 0 var(--espaciado-xs);
+        font-size: var(--tamaño-letra-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-texto-secundario);
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+    }
+
+    button {
+        width: 100%;
+        min-height: 2.75rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: var(--espaciado-s);
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-s);
+        background: var(--color-fondo);
+        color: var(--color-texto-primario);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        strong {
+            font-size: var(--tamaño-letra-s);
+        }
+
+        span {
+            font-size: var(--tamaño-letra-xs);
+            color: var(--color-texto-secundario);
+        }
+
+        &:hover:not(:disabled) {
+            border-color: var(--color-primario);
+        }
+
+        &:disabled {
+            cursor: default;
+            opacity: 0.6;
+        }
+    }
+
+    .catalogo-componentes-pronto {
+        margin-left: var(--espaciado-xs);
+        padding: 0 var(--espaciado-xs);
+        border-radius: 999px;
+        background: var(--color-superficie-sunken);
+        font-weight: var(--grosor-letra-4);
+    }
+
+    .catalogo-componentes-lleno {
+        margin: 0;
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+    }
+}
+
+/* --- Lista de dashboards ---------------------------------------------------- */
+
+.lista-dashboards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--espaciado-xl);
+
+    h2 {
+        margin: 0 0 var(--espaciado-s);
+        font-size: var(--tamaño-letra-l);
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+    }
+
+    a {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: var(--espaciado-m);
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-m);
+        background: var(--color-fondo);
+        color: var(--color-texto-primario);
+        text-decoration: none;
+
+        span {
+            font-size: var(--tamaño-letra-s);
+            color: var(--color-texto-secundario);
+        }
+
+        &:hover {
+            border-color: var(--color-primario);
+        }
+    }
+
+    .lista-dashboards-vacio {
+        margin: 0;
+        color: var(--color-texto-secundario);
+    }
+}
+
+/* --- Exportar a PDF (imprimir) ------------------------------------------- */
+
+@media print {
+    .pagina-dashboard {
+        padding: 0;
+
+        .pagina-dashboard-botones,
+        .pagina-dashboard-aviso {
+            display: none;
+        }
+    }
+
+    .dashboard-componente {
+        break-inside: avoid;
+    }
+}
+
+/* --- Mapa ------------------------------------------------------------------- */
+
+.dashboard-mapa {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+
+    .dashboard-mapa-lienzo {
+        flex: 1;
+        min-height: 12rem;
+        border-radius: var(--redondeo-borde-s);
+        overflow: hidden;
+    }
+
+    .dashboard-mapa-aviso,
+    .dashboard-mapa-pie {
+        margin: 0;
+        font-size: var(--tamaño-letra-xs);
+        color: var(--color-texto-secundario);
+    }
+}
+
+.dashboard-mapa-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: var(--tamaño-letra-s);
+    color: #212529;
+
+    span {
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+/* --- Embudo ----------------------------------------------------------------- */
+
+.dashboard-embudo {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--espaciado-s);
+    font-size: var(--tamaño-letra-s);
+
+    li {
+        display: grid;
+        grid-template-columns: minmax(5rem, auto) 1fr auto;
+        align-items: center;
+        gap: var(--espaciado-s);
+    }
+
+    .dashboard-embudo-pista {
+        height: 1.25rem;
+        border-radius: var(--redondeo-borde-xs);
+        background: var(--color-superficie-sunken);
+        overflow: hidden;
+    }
+
+    .dashboard-embudo-barra {
+        display: block;
+        height: 100%;
+        border-radius: var(--redondeo-borde-xs);
+    }
+
+    .dashboard-embudo-valor {
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .dashboard-embudo-conversion {
+        color: var(--color-texto-secundario);
+    }
+}

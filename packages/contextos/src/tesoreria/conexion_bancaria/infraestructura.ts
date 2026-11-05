@@ -143,13 +143,15 @@ export const getConexionesBancarias: GetConexionesBancarias = async (criteria) =
  */
 export const postIniciarConexionBancaria: PostIniciarConexionBancaria = async (conexionId, tiposProducto) => {
     const respuesta = await RestAPI.query<
-        { id?: string; tipos_producto?: TipoProductoBancario[] },
+        { id?: string; tipos_producto?: TipoProductoBancario[]; origen?: string },
         IniciarConexionBancariaApi
     >(
         `${baseUrl}/iniciar`,
         {
             ...(conexionId ? { id: conexionId } : {}),
             ...(tiposProducto ? { tipos_producto: tiposProducto } : {}),
+            // Wealth Reader autoriza el widget por este origin; si ≠ API lo registra.
+            origen: window.location.origin,
         },
         "Error al iniciar la conexión con el banco"
     );

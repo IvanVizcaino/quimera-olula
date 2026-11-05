@@ -1,27 +1,32 @@
 import { Filtro } from "@olula/lib/diseño.ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QBoton } from "../../atomos/qboton.tsx";
 import { QIcono } from "../../atomos/qicono.tsx";
 import { QInput } from "../../atomos/qinput.tsx";
 import { QSelect } from "../../atomos/qselect.tsx";
-import { QTarjetaResumen } from "../../atomos/qtarjeta_resumen.tsx";
+
 import { QModal } from "../../moleculas/qmodal.tsx";
 import {
   ConfigWidgets,
   DefinicionWidget,
   FormatoWidget,
   OperacionWidget,
+  RecursoAgregable,
+  TipoWidget,
 } from "./diseño.ts";
 import {
-  formatearValorWidget,
   formatosWidget,
   MAX_WIDGETS,
   nuevoWidget,
   operacionesWidget,
+  dimensionesAgrupables,
   pieWidget,
+  tiposWidget,
 } from "./dominio.ts";
+import { getRecursosAgregables } from "./infraestructura.ts";
 import "./PersonalizarWidgets.css";
 import { useTotalesWidgets } from "./useTotalesWidgets.ts";
+import { WidgetCompacto } from "./WidgetCompacto.tsx";
 
 type PersonalizarWidgetsProps = {
   config: ConfigWidgets;
@@ -53,6 +58,40 @@ export const PersonalizarWidgets = ({
   const [formatoElegido, setFormatoElegido] = useState<FormatoWidget>();
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [tipo, setTipo] = useState<TipoWidget>("tarjeta");
+  const [agrupar, setAgrupar] = useState("");
+  const [meta, setMeta] = useState("");
+  const [dimensiones, setDimensiones] = useState<
+    NonNullable<RecursoAgregable["dimensiones"]>
+  >([]);
+
+  // Las dimensiones del recurso (para agrupar), del registro que ya se pidió al abrir.
+  useEffect(() => {
+    let cancelado = false;
+    getRecursosAgregables().then((recursos) => {
+      if (cancelado) return;
+      setDimensiones(recursos.find((r) => r.id === config.recurso)?.dimensiones ?? []);
+    });
+    return () => {
+      cancelado = true;
+    };
+  }, [config.recurso]);
+
+  const fechas = dimensiones.filter((d) => d.tipo === "fecha");
+  const categorias = dimensionesAgrupables(dimensiones, config.recurso);
+  const opcionesAgrupar = tipo === "temporal" ? fechas : categorias;
+  const agruparValido = opcionesAgrupar.some((d) => d.id === agrupar)
+    ? agrupar
+    : opcionesAgrupar[0]?.id;
+  const necesitaAgrupar = tipo === "temporal" || tipo === "circular" || tipo === "ranking";
+  const metaValida = Number(meta.replace(",", ".")) || undefined;
+  const incompleto =
+    (necesitaAgrupar && !agruparValido) || (tipo === "objetivo" && !metaValida);
+  const compacto = {
+    tipo,
+    agrupar: necesitaAgrupar ? agruparValido : undefined,
+    meta: metaValida,
+  };
 
   const campo = config.campos.find((c) => c.id === campoId);
   const formato = formatoElegido ?? campo?.formato ?? "numero";
@@ -61,9 +100,10 @@ export const PersonalizarWidgets = ({
     operacion,
     campo,
     borrador,
-    formato
+    formato,
+    compacto
   );
-  const { valores, cargando } = useTotalesWidgets(
+  const { valores, series, cargando } = useTotalesWidgets(
     { ...config, widgets: [propuesto] },
     filtro
   );
@@ -80,10 +120,10 @@ export const PersonalizarWidgets = ({
   };
 
   const anadir = () => {
-    if (!titulo.trim() || lleno) return;
+    if (!titulo.trim() || lleno || incompleto) return;
     setBorrador([
       ...borrador,
-      nuevoWidget(titulo, operacion, campo, borrador, formato),
+      nuevoWidget(titulo, operacion, campo, borrador, formato, compacto),
     ]);
     setTitulo("");
   };
@@ -127,6 +167,8 @@ export const PersonalizarWidgets = ({
                   <span className="titulo">{widget.titulo}</span>
                   <span className="descripcion">
                     {pieWidget(widget, config.campos)}
+                    {widget.tipo && widget.tipo !== "tarjeta" &&
+                      ` · ${tiposWidget.find((t) => t.valor === widget.tipo)?.descripcion}`}
                   </span>
                 </div>
                 {idsPorDefecto.has(widget.id) && (
@@ -169,6 +211,35 @@ export const PersonalizarWidgets = ({
           className="personalizar-widgets-nuevo"
         >
           <h3 id="widget-nuevo">Nuevo widget</h3>
+          <QSelect
+            label="Tipo"
+            nombre="tipo_widget"
+            valor={tipo}
+            opciones={tiposWidget}
+            onChange={(opcion) => opcion && setTipo(opcion.valor as TipoWidget)}
+          />
+          {necesitaAgrupar && (
+            <QSelect
+              label={tipo === "temporal" ? "Por meses de" : "Agrupar por"}
+              nombre="agrupar_widget"
+              valor={agruparValido ?? ""}
+              placeholder="Sin dimensiones disponibles"
+              opciones={opcionesAgrupar.map((d) => ({
+                valor: d.id,
+                descripcion: d.descripcion,
+              }))}
+              onChange={(opcion) => opcion && setAgrupar(opcion.valor)}
+            />
+          )}
+          {tipo === "objetivo" && (
+            <QInput
+              label="Meta"
+              nombre="meta_widget"
+              tipo="decimal"
+              valor={meta}
+              onChange={(valor) => setMeta(valor)}
+            />
+          )}
           <QInput
             label="Título"
             nombre="titulo_widget"
@@ -219,17 +290,18 @@ export const PersonalizarWidgets = ({
 
           <div className="personalizar-widgets-previa">
             <span>Vista previa</span>
-            <QTarjetaResumen
-              titulo={propuesto.titulo}
-              valor={formatearValorWidget(valores[propuesto.id], propuesto)}
+            <WidgetCompacto
+              widget={propuesto}
+              valor={valores[propuesto.id]}
+              puntos={series[propuesto.id] ?? []}
               pie={pieWidget(propuesto, config.campos)}
-              cargando={cargando}
+              cargando={cargando || incompleto}
             />
           </div>
 
           <QBoton
             variante="borde"
-            deshabilitado={!titulo.trim() || lleno}
+            deshabilitado={!titulo.trim() || lleno || incompleto}
             onClick={anadir}
           >
             Añadir al panel

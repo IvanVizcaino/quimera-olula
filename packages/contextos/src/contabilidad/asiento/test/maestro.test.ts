@@ -17,6 +17,8 @@ const asiento = (id: string, numero: number): ItemAsiento => ({
     concepto: `Asiento ${numero}`,
     importe: 100,
     manual: true,
+    tipoDocumento: "",
+    documento: "",
 });
 
 const criteria = { ...criteriaDefecto, filtro: [["ejercicio_id", "eq", "2026"]] } as never;

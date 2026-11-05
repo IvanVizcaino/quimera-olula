@@ -6,6 +6,9 @@ export type OperacionWidget =
 
 export type FormatoWidget = "moneda" | "numero";
 
+/** Cómo se pinta en la fila de widgets (todos de una fila de alto). */
+export type TipoWidget = "tarjeta" | "temporal" | "circular" | "ranking" | "objetivo";
+
 export type DefinicionWidget = {
   id: string;
   titulo: string;
@@ -17,6 +20,12 @@ export type DefinicionWidget = {
   formato: FormatoWidget;
   /** Texto bajo el valor; por defecto se deriva de la operación. */
   pie?: string;
+  /** Por defecto, tarjeta. */
+  tipo?: TipoWidget;
+  /** Temporal: dimensión de fecha (por meses); circular y ranking: dimensión a agrupar. */
+  agrupar?: string;
+  /** Objetivo: valor de la meta. */
+  meta?: number;
 };
 
 /** Medida del recurso que el usuario puede elegir al personalizar. */
@@ -45,6 +54,7 @@ export type RecursoAgregable = {
   /** Pantalla del maestro (p. ej. `/ventas/factura`). */
   ruta: string;
   medidas: { id: string; descripcion: string }[];
+  dimensiones?: { id: string; descripcion: string; tipo: string }[];
 };
 
 /** De dónde sale la configuración que ve el usuario. */
@@ -52,3 +62,8 @@ export type OrigenWidgets = "usuario" | "empresa" | null;
 
 /** Valor por widget: número, `null` si el servidor no lo puede calcular con ese filtro. */
 export type ValoresWidgets = Record<string, number | null>;
+
+/** Puntos de un widget agrupado: meses del temporal o categorías de circular y ranking. */
+export type PuntoWidget = { clave: string; etiqueta: string; valor: number };
+
+export type SeriesWidgets = Record<string, PuntoWidget[]>;

@@ -56,6 +56,8 @@ describe("metaNuevoAsientoManual", () => {
         ejercicioId: "2025",
         fecha: new Date("2025-06-01T12:00:00"),
         concepto: "Asiento de prueba",
+        tipoDocumento: "",
+        documento: "",
         partidas: [
             partida({ subcuentaId: 1, debe: 100 }),
             partida({ subcuentaId: 2, haber: 100 }),

@@ -26,6 +26,8 @@ describe("mappers asiento API", () => {
             concepto: "Ajuste",
             importe: 150.5,
             manual: true,
+            tipo_documento: null,
+            documento: null,
         });
 
         expect(item.id).toBe("99");
@@ -33,6 +35,26 @@ describe("mappers asiento API", () => {
         expect(item.ejercicioId).toBe("2026");
         expect(item.manual).toBe(true);
         expect(item.fecha.getFullYear()).toBe(2026);
+        // Sin documento, el null del API se normaliza a "" para el formulario.
+        expect(item.tipoDocumento).toBe("");
+        expect(item.documento).toBe("");
+    });
+
+    test("itemAsientoDesdeApi trae el documento de origen cuando lo hay", () => {
+        const item = itemAsientoDesdeApi({
+            id: 99,
+            numero: 12,
+            ejercicio_id: "2026",
+            fecha: "2026-03-01",
+            concepto: "Ajuste",
+            importe: 150.5,
+            manual: true,
+            tipo_documento: "Factura de cliente",
+            documento: "FRA-2026-001",
+        });
+
+        expect(item.tipoDocumento).toBe("Factura de cliente");
+        expect(item.documento).toBe("FRA-2026-001");
     });
 
     test("asientoDesdeApi incluye partidas", () => {
@@ -44,6 +66,8 @@ describe("mappers asiento API", () => {
             concepto: "Test",
             importe: 200,
             manual: false,
+            tipo_documento: null,
+            documento: null,
             partidas: [
                 {
                     id: 10,
