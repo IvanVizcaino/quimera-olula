@@ -38,6 +38,7 @@ export const CrearContacto = ({ publicar }: { publicar: EmitirEvento }) => {
         <quimera-formulario>
           <QInput label="Nombre" {...uiProps("nombre")} />
           <QInput label="Email" {...uiProps("email")} />
+          <QInput label="Teléfono" {...uiProps("telefono1")} />
         </quimera-formulario>
 
         <div className="botones">

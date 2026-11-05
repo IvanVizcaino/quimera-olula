@@ -73,40 +73,82 @@ const metaTablaLineasOrden = (orden: OrdenAlmacen, publicar: EmitirEvento): Meta
             { id: "sku", cabecera: "SKU" },
             { id: "articulo", cabecera: "Descripción", tipo: "texto" },
             { id: "loteId", cabecera: "Lote" },
-            ...(orden.abierta
-                ? [{ id: "cantidadReal" as const, cabecera: "Cantidad real" }]
-                : [{
-                    id: "cantidadPrevista" as const,
-                    cabecera: "Cantidad",
-                    tipo: 'numero' as const,
-                    render: (linea: LineaOrdenAlmacen) => {
-                        const real = linea.cantidadReal ?? 0;
-                        const prevista = linea.cantidadPrevista;
-                        const variante = real === 0 ? "error" : real < prevista ? "advertencia" : "exito";
+            {
+                id: "cantidadPrevista" as const,
+                cabecera: "Cantidad",
+                tipo: 'numero' as const,
+                render: (linea: LineaOrdenAlmacen) => {
+                    const prevista = linea.cantidadPrevista;
+                    if (orden.tipo === "TRASPASO") {
+                        const pick = (linea.cantidadPick ?? 0) + (linea.cantidadReal ?? 0);
+                        const drop = linea.cantidadReal ?? 0;
+                        const variantePick = pick === 0 ? "error" : pick < prevista ? "advertencia" : "exito";
+                        const varianteDrop = drop === 0 ? "error" : drop < prevista ? "advertencia" : "exito";
                         return (
-                            <QEtiqueta variante={variante}>{real} / {prevista}</QEtiqueta>
+                            <span style={{ display: "flex", gap: "4px" }}>
+                                {orden.pasosPick && <QEtiqueta variante={variantePick}>P {pick}/{prevista}</QEtiqueta>}
+                                {orden.pasosDrop && <QEtiqueta variante={varianteDrop}>D {drop}/{prevista}</QEtiqueta>}
+                            </span>
                         );
-                    },
-
-                }]
-            ),
+                    }
+                    // Para órdenes con pasosPick (SALIDA pick-only), mostrar cantidadPick
+                    const tienePick = !!(linea.pasosPick ?? orden.pasosPick);
+                    if (tienePick) {
+                        const pick = linea.cantidadPick ?? 0;
+                        const variante = pick === 0 ? "error" : pick < prevista ? "advertencia" : "exito";
+                        return (
+                            <QEtiqueta variante={variante}>{pick} / {prevista}</QEtiqueta>
+                        );
+                    }
+                    const real = linea.cantidadReal ?? 0;
+                    const variante = real === 0 ? "error" : real < prevista ? "advertencia" : "exito";
+                    return (
+                        <QEtiqueta variante={variante}>{real} / {prevista}</QEtiqueta>
+                    );
+                },
+            },
             ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{ id: "ubicacionOrigen" as const, cabecera: "Ubi.Origen" }] : []),
             ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{ id: "cajaOrigen" as const, cabecera: "LPN Origen" }] : []),
             ...(sgaActivo && orden.tipo !== "SALIDA" ? [{ id: "ubicacionDestino" as const, cabecera: "Ubi.Destino" }] : []),
             ...(sgaActivo && orden.tipo !== "SALIDA" ? [{ id: "cajaDestino" as const, cabecera: "LPN Destino" }] : []),
             {
-                id: "acciones",
+                id: "acciones_pick",
                 cabecera: "",
-                render: (linea: LineaOrdenAlmacen) => (
-                    <QBoton
-                        onClick={(e) => {
-                            e?.stopPropagation();
-                            publicar("lectura_guion_linea_solicitada", linea);
-                        }}
-                    >
-                        Leer
-                    </QBoton>
-                ),
+                render: (linea: LineaOrdenAlmacen) => {
+                    const tienePick = !!(linea.pasosPick ?? orden.pasosPick);
+                    if (!tienePick) return null;
+                    const pickPendiente = (linea.cantidadPick ?? 0) < linea.cantidadPrevista;
+                    return (
+                        <QBoton
+                            deshabilitado={!pickPendiente}
+                            onClick={(e) => {
+                                e?.stopPropagation();
+                                publicar("lectura_guion_pick_linea_solicitada", linea);
+                            }}
+                        >
+                            Leer pick
+                        </QBoton>
+                    );
+                },
+            },
+            {
+                id: "acciones_drop",
+                cabecera: "",
+                render: (linea: LineaOrdenAlmacen) => {
+                    const tienePick = !!(linea.pasosPick ?? orden.pasosPick);
+                    const pickCompleto = !tienePick || (linea.cantidadPick ?? 0) >= linea.cantidadPrevista;
+                    return (
+                        <QBoton
+                            deshabilitado={!pickCompleto}
+                            onClick={(e) => {
+                                e?.stopPropagation();
+                                publicar("lectura_guion_drop_linea_solicitada", linea);
+                            }}
+                        >
+                            Leer drop
+                        </QBoton>
+                    );
+                },
             },
         ],
         expansion: ExpansionLecturas(orden, publicar),

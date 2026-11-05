@@ -1,5 +1,7 @@
 import { PaginaAsistente } from "#/asistente/vistas/PaginaAsistente.tsx";
 import { MaestroConDetalleComunicacion } from "./comunicacion/maestro/MaestroConDetalleComunicacion.tsx";
+import { PaginaDashboard, PaginaDashboardModulo } from "./dashboard/vistas/pagina/PaginaDashboard.tsx";
+import { PaginaDashboards } from "./dashboard/vistas/PaginaDashboards.tsx";
 import { MaestroConDetalleCredencialExterna } from "./credencial_externa/maestro/MaestroConDetalleCredencialExterna.tsx";
 import { PaginaHitlCola } from "./ia/hitl_cola/maestro/PaginaHitlCola.tsx";
 import { MaestroConDetalleIaFlujo } from "./ia_flujo/maestro/MaestroConDetalleIaFlujo.tsx";
@@ -20,5 +22,8 @@ export class RouterFactoryComunOlula {
         "comun/credencial-externa": MaestroConDetalleCredencialExterna,
         "comun/credencial-externa/:id": MaestroConDetalleCredencialExterna,
         "comun/hitl-cola": PaginaHitlCola,
+        "comun/dashboard": PaginaDashboards,
+        "comun/dashboard/:id": PaginaDashboard,
+        "dashboard/:clave": PaginaDashboardModulo,
     };
 }

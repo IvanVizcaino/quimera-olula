@@ -1,13 +1,13 @@
-import { Caja } from "#/almacen/comun/componentes/Caja.tsx";
 import { pitidoError } from "#/almacen/comun/audio.ts";
+import { Caja } from "#/almacen/comun/componentes/Caja.tsx";
 import { LineaOrdenAlmacen, OrdenAlmacen } from "#/almacen/orden/diseño.ts";
-import { registrarLecturaOrden } from "#/almacen/orden/infraestructura.ts";
+import { registrarLecturaCajaOrden, registrarLecturasOrden } from "#/almacen/orden/infraestructura.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
-import { desbloquearTTS } from "@olula/lib/voz/useSintesisVoz.ts";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { desbloquearTTS } from "@olula/lib/voz/useSintesisVoz.ts";
 import { ComponentProps, useCallback, useContext, useEffect, useState } from "react";
 import "./LeerCajasEntrada.css";
 
@@ -21,15 +21,15 @@ export const iniciarAudioLectura = () => {
     desbloquearTTS();
 };
 
-const encontrarLineaParaCaja = (
+const encontrarLineasParaCaja = (
     caja: Pick<OpcionCaja, "sku" | "idLote">,
     lineas: LineaOrdenAlmacen[],
-): LineaOrdenAlmacen | null =>
-    lineas.find((linea) => {
+): LineaOrdenAlmacen[] =>
+    lineas.filter((linea) => {
         if (linea.sku && caja.sku !== linea.sku) return false;
-        if (linea.loteId && caja.idLote !== linea.loteId) return false;
+        if (caja.idLote && caja.idLote !== linea.loteId) return false;
         return true;
-    }) ?? null;
+    });
 
 export const LeerCajasEntrada = ({
     orden,
@@ -48,8 +48,27 @@ export const LeerCajasEntrada = ({
 
     const procesarCaja = useCallback(
         async (opcion: OpcionCaja) => {
-            const linea = encontrarLineaParaCaja(opcion, orden.lineas);
-            if (!linea) {
+            if (!opcion.sku) {
+                // PALET: el servidor genera movimientos recursivamente por sub-cajas
+                let registrado = false;
+                await intentar(async () => {
+                    await registrarLecturaCajaOrden(orden.id, {
+                        cajaId: opcion.id,
+                        cajaCompleta: true,
+                        idUbicacionDestino: null,
+                        idCajaDestino: null,
+                    });
+                    registrado = true;
+                    setResultado({ exito: true, mensaje: `Palé ${opcion.lpn} registrado` });
+                    await publicar("lectura_registrada");
+                });
+                if (!registrado) pitidoError();
+                setClaveCaja((k) => k + 1);
+                return;
+            }
+
+            const lineasEncontradas = encontrarLineasParaCaja(opcion, orden.lineas);
+            if (lineasEncontradas.length === 0) {
                 pitidoError();
                 setResultado({
                     exito: false,
@@ -59,25 +78,29 @@ export const LeerCajasEntrada = ({
                 return;
             }
 
-            const cantidad = opcion.capacidad ?? linea.cantidadPrevista;
             let registrado = false;
+            console.log("Opcion caja:", opcion);
             await intentar(async () => {
-                await registrarLecturaOrden(orden.id, {
+                await registrarLecturasOrden(orden.id, lineasEncontradas.map((linea) => ({
                     sku: opcion.sku ?? linea.sku,
                     articulo: linea.articulo,
-                    idLote: opcion.idLote !== undefined ? opcion.idLote : linea.loteId,
+                    idLote: opcion.idLote ? opcion.idLote : linea.loteId,
                     idLinea: linea.id,
                     cajaCompleta: true,
-                    cantidad,
+                    cantidad: opcion.capacidad || linea.cantidadPrevista,
                     idCajaOrigen: null,
                     idUbicacionOrigen: null,
                     idCajaDestino: opcion.id,
                     idUbicacionDestino: linea.idUbicacionDestino,
-                });
+                })));
                 registrado = true;
+                const primera = lineasEncontradas[0];
                 setResultado({
                     exito: true,
-                    mensaje: `Caja ${opcion.lpn} registrada (${cantidad} uds · ${linea.sku} - ${linea.articulo})`,
+                    mensaje:
+                        lineasEncontradas.length === 1
+                            ? `Caja ${opcion.lpn} registrada (${opcion.capacidad || primera.cantidadPrevista} uds · ${primera.sku} - ${primera.articulo})`
+                            : `Caja ${opcion.lpn} registrada en ${lineasEncontradas.length} líneas`,
                 });
                 await publicar("lectura_registrada");
             });

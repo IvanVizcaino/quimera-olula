@@ -21,6 +21,8 @@ export const ordenVacia = (): OrdenAlmacen => ({
     idCajaDestino: null,
     lineas: [],
     lecturasCaja: [],
+    pasosPick: null,
+    pasosDrop: null,
 });
 
 export const lineaOrdenVacia = (): LineaOrdenAlmacen => ({
@@ -40,6 +42,8 @@ export const lineaOrdenVacia = (): LineaOrdenAlmacen => ({
     lecturas: [],
     porLotes: false,
     idLineaPick: null,
+    pasosPick: null,
+    pasosDrop: null,
 });
 
 const onOrdenCambiada = (orden: OrdenAlmacen, campo: string, _: unknown, otros?: Record<string, unknown>) => {

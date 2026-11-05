@@ -1,0 +1,97 @@
+quimera-tarjeta-resumen {
+    /* Temporal: el periodo abajo a la izquierda y el pie a la derecha. */
+    &[data-tipo="temporal"] .pie {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+    }
+
+    .widget-compacto-periodo {
+        white-space: nowrap;
+    }
+
+    .widget-compacto-fila {
+        display: flex;
+        flex-direction: row-reverse;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--espaciado-xxs) var(--espaciado-m);
+
+        .valor {
+            flex: none;
+        }
+    }
+
+    .widget-compacto-tendencia {
+        flex: 1;
+        min-width: 3rem;
+        height: 1.5rem;
+    }
+
+    .widget-compacto-progreso {
+        height: 0.5rem;
+        border-radius: 999px;
+        background: var(--color-superficie-sunken);
+        overflow: hidden;
+
+        div {
+            height: 100%;
+        }
+    }
+
+    .widget-compacto-anillo {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+
+        svg {
+            flex: none;
+            width: 3rem;
+            height: 3rem;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            min-width: 0;
+            font-size: var(--tamaño-letra-xs);
+
+            li {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            span {
+                color: var(--color-texto-secundario);
+            }
+        }
+    }
+
+    .widget-compacto-ranking {
+        margin: 0;
+        padding-left: 1.1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: var(--tamaño-letra-s);
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--espaciado-s);
+        }
+
+        span {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        strong {
+            font-variant-numeric: tabular-nums;
+        }
+    }
+}

@@ -16,7 +16,13 @@ const formatearSaldo = (importe: number | null, divisa: string | null): string =
 const mascaraCuenta = (cuenta: SaldoCuentaConexionBancaria): string =>
     cuenta.mascara ? `···· ${cuenta.mascara}` : "····";
 
-const TarjetaCuenta = ({ cuenta }: { cuenta: SaldoCuentaConexionBancaria }) => {
+const TarjetaCuenta = ({
+    cuenta,
+    onReautenticar,
+}: {
+    cuenta: SaldoCuentaConexionBancaria;
+    onReautenticar?: (conexionId: string) => void;
+}) => {
     const paleta = paletaBancoEspana(cuenta.institucionNombre);
     const saldo = formatearSaldo(cuenta.saldoDisponible ?? cuenta.saldoActual, cuenta.divisa);
     const contableDistinto =
@@ -52,7 +58,15 @@ const TarjetaCuenta = ({ cuenta }: { cuenta: SaldoCuentaConexionBancaria }) => {
                         {cuenta.institucionNombre ?? "Banco"}
                     </span>
                 </div>
-                {alerta && (
+                {alerta === "reauth" && onReautenticar ? (
+                    <button
+                        type="button"
+                        className="tarjeta-banco-alerta tarjeta-banco-alerta--accion"
+                        onClick={() => onReautenticar(cuenta.conexionId)}
+                    >
+                        Reautenticar
+                    </button>
+                ) : alerta && (
                     <span className="tarjeta-banco-alerta">
                         {alerta === "reauth" ? "Reautenticar" : "Error"}
                     </span>
@@ -103,8 +117,11 @@ const MAX_REINTENTOS_REFRESCO = 2;
  */
 export const TarjetasSaldosConexionBancaria = ({
     refrescarClave = 0,
+    onReautenticar,
 }: {
     refrescarClave?: number;
+    /** Si se indica, la alerta "Reautenticar" de una cuenta abre la reautenticación de su conexión. */
+    onReautenticar?: (conexionId: string) => void;
 }) => {
     const [resumen, setResumen] = useState<ResumenSaldosConexionBancaria | null>(null);
 
@@ -138,7 +155,7 @@ export const TarjetasSaldosConexionBancaria = ({
     if (!resumen || resumen.cuentas.length === 0) return null;
 
     const divisa = resumen.divisa ?? DIVISA_DEFECTO;
-    const cuentasActivas = resumen.cuentas.filter((c) => c.activa);
+    const cuentasActivas = resumen.cuentas.filter((c) => c.activa && c.tipo !== "loans");
 
     return (
         <div className="TarjetasSaldosConexionBancaria">
@@ -161,7 +178,7 @@ export const TarjetasSaldosConexionBancaria = ({
 
             <div className="tarjetas-saldos-cuentas">
                 {cuentasActivas.map((cuenta) => (
-                    <TarjetaCuenta key={cuenta.cuentaId} cuenta={cuenta} />
+                    <TarjetaCuenta key={cuenta.cuentaId} cuenta={cuenta} onReautenticar={onReautenticar} />
                 ))}
             </div>
         </div>

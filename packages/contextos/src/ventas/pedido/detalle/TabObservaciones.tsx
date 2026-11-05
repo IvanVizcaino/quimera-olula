@@ -13,7 +13,7 @@ export const TabObservaciones = <T extends Pedido>({
   const { uiProps } = pedido;
 
   return (
-    <>
+    <div className="TabObservaciones">
       <quimera-formulario>
         <QTextArea
           label="Observaciones"
@@ -21,6 +21,6 @@ export const TabObservaciones = <T extends Pedido>({
           {...uiProps("observaciones")}
         />
       </quimera-formulario>
-    </>
+    </div>
   );
 };

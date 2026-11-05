@@ -5,9 +5,14 @@ import { QuimeraAcciones } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useEffect } from "react";
+import { proveedorBancarioUI } from "../../comun/proveedor_bancario/registro.js";
+import { ConfigurarPrestamoConexionBancaria } from "../configurar_prestamo/ConfigurarPrestamoConexionBancaria.js";
+import { CuotasPrestamoConexionBancaria } from "../cuotas_prestamo/CuotasPrestamoConexionBancaria.js";
 import { ConexionBancaria } from "../diseño.js";
-import { nombreInstitucion, requiereReautenticacion } from "../dominio.js";
+import { esPrestamo, nombreInstitucion, requiereReautenticacion } from "../dominio.js";
 import { CuentasConexionBancaria } from "./cuentas/CuentasConexionBancaria.js";
+import { PrestamosConexionBancaria } from "./prestamos/PrestamosConexionBancaria.js";
+import { ProductosConexionBancaria } from "./productos/ProductosConexionBancaria.js";
 import { contextoDetalleConexionBancariaInicial, metaConexionBancaria } from "./detalle.js";
 import "./DetalleConexionBancaria.css";
 import { DesconectarConexionBancaria } from "../desconectar/DesconectarConexionBancaria.js";
@@ -17,8 +22,10 @@ import { TabGeneral } from "./TabGeneral.js";
 
 /**
  * Detalle de solo lectura salvo por la asociación de cuentas (ver
- * detalle/cuentas/CuentasConexionBancaria.tsx, que se auto-guarda por fila).
- * No hay edición de la cabecera: la gestiona el proveedor bancario.
+ * detalle/cuentas/CuentasConexionBancaria.tsx, que se auto-guarda por fila),
+ * los tipos de producto que se leen (proveedores que cobran por producto) y
+ * las subcuentas de los préstamos. No hay edición de la cabecera: la gestiona
+ * el proveedor bancario.
  */
 export const DetalleConexionBancaria = ({
     id,
@@ -36,7 +43,7 @@ export const DetalleConexionBancaria = ({
 
     const formModelo = useModelo(metaConexionBancaria, ctx.conexion);
 
-    const { estado, conexion } = ctx;
+    const { estado, conexion, prestamos, prestamoSeleccionado } = ctx;
 
     useEffect(() => {
         emitir("conexion_bancaria_id_cambiado", id, true);
@@ -46,6 +53,8 @@ export const DetalleConexionBancaria = ({
     if (!ctx.conexion.id) return null;
 
     const titulo = (c: ConexionBancaria) => nombreInstitucion(c);
+    const eligeTiposProducto = Boolean(proveedorBancarioUI(conexion.proveedor)?.eligeTiposProducto);
+    const cuentas = conexion.cuentas.filter((cuenta) => !esPrestamo(cuenta));
 
     const acciones = [
         requiereReautenticacion(conexion) && {
@@ -77,16 +86,28 @@ export const DetalleConexionBancaria = ({
                         key="tab-general"
                         children={<TabGeneral form={formModelo} />}
                     />,
-                    <Tab label={`Cuentas (${conexion.cuentas.length})`}
+                    <Tab label={`Cuentas (${cuentas.length})`}
                         key="tab-cuentas"
                         children={
                             <CuentasConexionBancaria
                                 conexionId={conexion.id}
-                                cuentas={conexion.cuentas}
+                                cuentas={cuentas}
                                 publicar={emitir}
                             />
                         }
                     />,
+                    ...(prestamos.length > 0 ? [
+                        <Tab label={`Préstamos (${prestamos.length})`}
+                            key="tab-prestamos"
+                            children={<PrestamosConexionBancaria prestamos={prestamos} publicar={emitir} />}
+                        />,
+                    ] : []),
+                    ...(eligeTiposProducto ? [
+                        <Tab label="Productos"
+                            key="tab-productos"
+                            children={<ProductosConexionBancaria conexion={conexion} publicar={emitir} />}
+                        />,
+                    ] : []),
                 ]} />
             </div>
 
@@ -95,6 +116,14 @@ export const DetalleConexionBancaria = ({
                     conexion={ctx.conexion}
                     publicar={emitir}
                 />
+            )}
+
+            {estado === "CONFIGURANDO_PRESTAMO" && prestamoSeleccionado && (
+                <ConfigurarPrestamoConexionBancaria prestamo={prestamoSeleccionado} publicar={emitir} />
+            )}
+
+            {estado === "VIENDO_CUOTAS" && prestamoSeleccionado && (
+                <CuotasPrestamoConexionBancaria prestamo={prestamoSeleccionado} publicar={emitir} />
             )}
 
             {estado === "DESCONECTANDO" && (

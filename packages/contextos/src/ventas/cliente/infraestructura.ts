@@ -243,12 +243,13 @@ export const cuentaBancoFromAPI = (c: CuentaBancoAPI): CuentaBanco => ({
 export const getCrmContactosCliente = async (clienteId: string): Promise<CrmContacto[]> =>
   await RestAPI.get<{ datos: CrmContacto[] }>(`${UrlsCrm.CLIENTE}/${clienteId}/contactos`).then((respuesta) => respuesta.datos);
 
-export const postCrmContacto = async (contacto: NuevoCrmContacto): Promise<string> => {
+export const postCrmContactoCliente = async (clienteId: string, contacto: NuevoCrmContacto): Promise<string> => {
   const payload = {
     nombre: contacto.nombre,
     email: contacto.email,
+    telefono1: contacto.telefono1,
   };
-  return await RestAPI.post(`${UrlsCrm.CONTACTO}`, payload, "Error al crear contacto").then((respuesta) => respuesta.id);
+  return await RestAPI.post(`${UrlsCrm.CLIENTE}/${clienteId}/contacto`, payload, "Error al crear contacto").then((respuesta) => respuesta.id);
 };
 
 export const getCrmContactos = async (filtro: Filtro, orden: Orden): Promise<CrmContacto[]> => {
@@ -260,6 +261,7 @@ export const patchCrmContacto = async (contacto: CrmContacto): Promise<void> => 
   const payload = {
     nombre: contacto.nombre,
     email: contacto.email,
+    telefono1: contacto.telefono1,
   };
   await RestAPI.patch(`${UrlsCrm.CONTACTO}/${contacto.id}`, payload, "Error al actualizar contacto");
 };

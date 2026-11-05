@@ -43,6 +43,7 @@ interface FacturaAPI {
     automatica: boolean;
     servicios: boolean;
     rectificativa_id: string | null;
+    asiento_id: string | null;
     grupo_iva_negocio_id: string;
     por_comision?: number;
     por_comision_agente?: number | null;
@@ -118,7 +119,7 @@ export const postFactura: PostFactura = async (factura) => {
 
     const payload = {
         cliente,
-        empresa_id: empresaActual()
+        empresa_id: factura.empresa_id || empresaActual()
     };
     return await RestAPI.post(baseUrl, payload, "Error al crear factura").then((respuesta) => respuesta.id);
 };

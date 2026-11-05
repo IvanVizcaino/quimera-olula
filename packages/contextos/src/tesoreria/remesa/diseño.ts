@@ -25,6 +25,7 @@ export interface Remesa extends Entidad {
     total: number;
     divisaId: string;
     cuentaId: string;
+    descripcionCuenta: string;
     estado: string;
     empresaId: string;
     recibos: ReciboDeRemesa[];

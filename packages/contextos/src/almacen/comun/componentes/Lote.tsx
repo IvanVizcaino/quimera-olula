@@ -4,6 +4,20 @@ import { Criteria, Filtro } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 
 
+interface TagLoteApi {
+    id: string;
+    sku: string;
+    caducidad: string | null;
+}
+
+interface TagLote {
+    id: string;
+    sku: string;
+    caducidad: string | null;
+}
+
+export type TagLoteOpcion = { valor: string; descripcion: string } & TagLote;
+
 interface LoteProps {
   valor: string;
   sku?: string;
@@ -11,7 +25,8 @@ interface LoteProps {
   label?: string;
   autoFocus?: boolean;
   ref?: React.RefObject<HTMLInputElement | null>;
-  onChange: (opcion: { valor: string; descripcion: string } | null) => void;
+  permitirNuevo?: boolean;
+  onChange: (opcion: TagLoteOpcion | null) => void;
 }
 
 export const Lote = ({
@@ -19,13 +34,14 @@ export const Lote = ({
   sku,
   nombre = "lote_id",
   label = "Lote",
+  permitirNuevo = false,
   onChange,
   ...props
 }: LoteProps) => {
 
     const obtenerOpciones = async (texto: string) => {
 
-        const filtro:Filtro = sku
+        const filtro: Filtro = sku
             ? {
                 and: [
                     ['sku', "=", sku],
@@ -45,6 +61,7 @@ export const Lote = ({
         return lotes.map((lote) => ({
             valor: lote.id,
             descripcion: lote.id,
+            ...lote,
         }));
     };
 
@@ -56,24 +73,27 @@ export const Lote = ({
             valor={valor}
             obtenerOpciones={obtenerOpciones}
             descripcion={valor}
+            permitirValorLibre={permitirNuevo}
             {...props}
         />
     );
 };
 
 
-interface TagLoteApi {
-    id: string;
-}
-
 const url = `/almacen/lote`;
 
+const tagLoteApiATagLote = (api: TagLoteApi): TagLote => ({
+    id: api.id,
+    sku: api.sku,
+    caducidad: api.caducidad ?? null,
+});
 
-const getTagsLote = async (criteria: Criteria): Promise<TagLoteApi[]> => {
+const getTagsLote = async (criteria: Criteria): Promise<TagLote[]> => {
 
-    const respuesta = await RestAPI.getQuery<TagLoteApi, TagLoteApi>(
+    const respuesta = await RestAPI.getQuery<TagLote, TagLoteApi>(
         url,
         criteria,
+        tagLoteApiATagLote,
     )
     return respuesta.datos
 };

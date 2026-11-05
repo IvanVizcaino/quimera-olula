@@ -3,6 +3,7 @@ import { IconMessageChatbot, IconX } from "@tabler/icons-react";
 import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import {
     ASISTENTE_ABRIR_HILO_EVENT,
+    ASISTENTE_PREGUNTAR_EVENT,
     PANEL_LATERAL_ABIERTO_EVENT,
     PANEL_LATERAL_TOGGLE_EVENT,
     notificarPanelLateralAbierto,
@@ -10,7 +11,7 @@ import {
 import { preferencias } from "@olula/lib/preferencias.ts";
 import { construirUrlNavegacion } from "#/asistente/dominio.ts";
 import type { AccionNavegacion } from "#/asistente/diseño.ts";
-import { AsistenteRuntimeProvider } from "#/asistente/vistas/AsistenteRuntimeProvider.tsx";
+import { AsistenteRuntimeProvider, useAsistenteContext } from "#/asistente/vistas/AsistenteRuntimeProvider.tsx";
 import { Chat } from "#/asistente/vistas/Chat.tsx";
 import { AsistenteVozBase } from "#/asistente/vistas/modo_voz/AsistenteVoz.tsx";
 import { useSesionActiva } from "#/asistente/useSesionActiva.ts";
@@ -67,10 +68,42 @@ const useAbrirHiloSolicitado = (abrir: () => void) => {
     return clave;
 };
 
+/**
+ * Pregunta pedida desde fuera del panel (búsqueda rápida): abre el panel y la guarda
+ * hasta que el chat está montado; EnviarPreguntaPendiente la envía.
+ */
+const usePreguntaSolicitada = (abrir: () => void) => {
+    const [pregunta, setPregunta] = useState<string | null>(null);
+    useEffect(() => {
+        const alPreguntar = (e: Event) => {
+            // Conversación nueva: que el panel no restaure al abrirse la anterior
+            // (se cargaría a la vez que se envía la pregunta).
+            preferencias.set("asistente.threadIdActivo", null);
+            setPregunta((e as CustomEvent<string>).detail);
+            abrir();
+        };
+        window.addEventListener(ASISTENTE_PREGUNTAR_EVENT, alPreguntar);
+        return () => window.removeEventListener(ASISTENTE_PREGUNTAR_EVENT, alPreguntar);
+    }, [abrir]);
+    return { pregunta, enviada: useCallback(() => setPregunta(null), []) };
+};
+
+const EnviarPreguntaPendiente = ({ pregunta, enviada }: { pregunta: string | null; enviada: () => void }) => {
+    const { enviarMensaje, isRunning, nuevaConversacion } = useAsistenteContext();
+    useEffect(() => {
+        if (!pregunta || isRunning) return;
+        enviada();
+        nuevaConversacion();
+        void enviarMensaje(pregunta);
+    }, [pregunta, isRunning, enviarMensaje, enviada, nuevaConversacion]);
+    return null;
+};
+
 const PanelAsistenteFlotante = ({ navigate }: PanelAsistenteModoProps) => {
     const [abierto, setAbierto] = useState(false);
     const onAccionNavegacion = usePreparar(navigate);
     const claveHilo = useAbrirHiloSolicitado(useCallback(() => setAbierto(true), []));
+    const { pregunta, enviada } = usePreguntaSolicitada(useCallback(() => setAbierto(true), []));
 
     return (
         <div className="asistente-panel">
@@ -86,6 +119,7 @@ const PanelAsistenteFlotante = ({ navigate }: PanelAsistenteModoProps) => {
             {abierto && (
                 <div className="asistente-panel__drawer">
                     <AsistenteRuntimeProvider key={claveHilo} onAccionNavegacion={onAccionNavegacion}>
+                        <EnviarPreguntaPendiente pregunta={pregunta} enviada={enviada} />
                         <Chat onCerrar={() => setAbierto(false)} />
                     </AsistenteRuntimeProvider>
                 </div>
@@ -98,6 +132,7 @@ const PanelAsistenteLateral = ({ navigate }: PanelAsistenteModoProps) => {
     const [abierto, setAbierto] = useState(false);
     const onAccionNavegacion = usePreparar(navigate);
     const claveHilo = useAbrirHiloSolicitado(useCallback(() => setAbierto(true), []));
+    const { pregunta, enviada } = usePreguntaSolicitada(useCallback(() => setAbierto(true), []));
 
     useEffect(() => {
         const alSolicitarToggle = (e: Event) => {
@@ -122,6 +157,7 @@ const PanelAsistenteLateral = ({ navigate }: PanelAsistenteModoProps) => {
         <panel-asistente className={abierto ? "activo" : ""}>
             {abierto && (
                 <AsistenteRuntimeProvider key={claveHilo} onAccionNavegacion={onAccionNavegacion}>
+                    <EnviarPreguntaPendiente pregunta={pregunta} enviada={enviada} />
                     <Chat onCerrar={() => setAbierto(false)} />
                 </AsistenteRuntimeProvider>
             )}

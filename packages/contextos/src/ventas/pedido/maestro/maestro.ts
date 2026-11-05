@@ -1,3 +1,4 @@
+import { EstadoEtiqueta } from "#/comun/diseño.ts";
 import { EstadoDocumento } from "#/ventas/comun/componentes/TarjetaDocumentoVenta.tsx";
 import { pedidoEsEditable } from "#/ventas/pedido/dominio.ts";
 import { postAlbaranarPedidos } from "#/ventas/pedido/infraestructura.ts";
@@ -106,3 +107,12 @@ export const albaranarPedidos: ProcesarPedidos = async (contexto) => {
 
 const mensajeDeError = (error: unknown): string =>
     error instanceof Error ? error.message : String(error);
+
+const etiquetasServido: Record<EstadoDocumento, EstadoEtiqueta> = {
+    pendiente: { texto: "Pendiente", tono: "pendiente" },
+    parcial: { texto: "Parcial", tono: "parcial" },
+    cerrado: { texto: "Servido", tono: "completado" },
+};
+
+export const etiquetaEstadoPedido = (pedido: { servido?: string }): EstadoEtiqueta =>
+    etiquetasServido[estadoServidoPedido(pedido)];

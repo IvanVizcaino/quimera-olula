@@ -28,6 +28,7 @@ export const TabGeneral = ({
         <div className="TabGeneral">
             <quimera-formulario>
                 <QInput label="Descripción" {...uiProps("descripcion")} />
+                <QInput label="Prefijo" {...uiProps("prefijo")} maxLength={2} />
             </quimera-formulario>
 
             <div className="tipo-caja-sku-seccion">

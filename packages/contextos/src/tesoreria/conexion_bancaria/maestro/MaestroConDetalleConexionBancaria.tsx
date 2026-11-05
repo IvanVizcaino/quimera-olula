@@ -9,15 +9,17 @@ import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js"
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect, useMemo } from "react";
 import { ColumnaEstadoTabla } from "#/comun/componentes/ColumnaEstadoTabla.tsx";
+import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { ConectarBancoConexionBancaria } from "../conectar_banco/ConectarBancoConexionBancaria.js";
 import { DetalleConexionBancaria } from "../detalle/DetalleConexionBancaria.js";
 import { ConexionBancaria } from "../diseño.js";
-import { nombreInstitucion } from "../dominio.js";
+import { nombreInstitucion, requiereReautenticacion } from "../dominio.js";
+import { ReautenticarBancoConexionBancaria } from "../reautenticar/ReautenticarBancoConexionBancaria.js";
 import "./MaestroConDetalleConexionBancaria.css";
 import { getMaquina } from "./maquina.js";
 import { TarjetasSaldosConexionBancaria } from "./TarjetasSaldosConexionBancaria.js";
 
-const metaTablaConexionBancaria: MetaTabla<ConexionBancaria> = [
+const metaTablaConexionBancaria = (emitir: EmitirEvento): MetaTabla<ConexionBancaria> => [
     {
         id: 'estado',
         cabecera: '',
@@ -49,6 +51,22 @@ const metaTablaConexionBancaria: MetaTabla<ConexionBancaria> = [
         cabecera: 'Última sincronización',
         render: (c: ConexionBancaria) => (c.ultimaSincronizacion ? formatearFechaHora(c.ultimaSincronizacion) : '-'),
     },
+    {
+        id: 'acciones',
+        cabecera: '',
+        render: (c: ConexionBancaria) => (requiereReautenticacion(c) ? (
+            <QBoton
+                tamaño="pequeño"
+                onClick={(evento) => {
+                    // Sin stopPropagation el clic también seleccionaría la fila.
+                    evento.stopPropagation();
+                    emitir("reautenticar_conexion_solicitada", c.id);
+                }}
+            >
+                Reautenticar
+            </QBoton>
+        ) : null),
+    },
 ];
 
 /**
@@ -57,7 +75,9 @@ const metaTablaConexionBancaria: MetaTabla<ConexionBancaria> = [
  * "Conectar banco" no abre un modal propio: dispara el estado CONECTANDO, que
  * monta <ConectarBancoConexionBancaria> — un componente sin UI propia que pide
  * los datos de inicio al backend y abre el widget del proveedor bancario
- * activo (ver ese fichero y comun/proveedor_bancario/).
+ * activo (ver ese fichero y comun/proveedor_bancario/). Una conexión que hay
+ * que reautenticar (token caducado…) tiene su botón en la fila y en su tarjeta
+ * de saldos, sin tener que abrir el detalle.
  */
 export const MaestroConDetalleConexionBancaria = () => {
 
@@ -69,9 +89,12 @@ export const MaestroConDetalleConexionBancaria = () => {
     const { ctx, emitir } = useMaquina(getMaquina, {
         estado: "INICIAL",
         conexiones: listaActivaEntidadesInicial<ConexionBancaria>(id, criteriaInicial),
+        conexionReautenticando: null,
+        refresco: 0,
     });
 
-    const { estado, conexiones } = ctx;
+    const { estado, conexiones, conexionReautenticando, refresco } = ctx;
+    const metaTabla = useMemo(() => metaTablaConexionBancaria(emitir), [emitir]);
 
     useUrlParams(conexiones.activo, conexiones.criteria);
 
@@ -86,9 +109,12 @@ export const MaestroConDetalleConexionBancaria = () => {
                 Maestro={
                     <>
                         <h2>Conexiones bancarias</h2>
-                        <TarjetasSaldosConexionBancaria refrescarClave={conexiones.total} />
+                        <TarjetasSaldosConexionBancaria
+                            refrescarClave={conexiones.total + refresco}
+                            onReautenticar={(conexionId) => emitir("reautenticar_conexion_solicitada", conexionId)}
+                        />
                         <Listado<ConexionBancaria>
-                            metaTabla={metaTablaConexionBancaria}
+                            metaTabla={metaTabla}
                             criteria={conexiones.criteria}
                             modoInicial="tabla"
                             tarjeta={TarjetaConexionBancaria}
@@ -108,13 +134,23 @@ export const MaestroConDetalleConexionBancaria = () => {
                         />
                     </>
                 }
-                Detalle={<DetalleConexionBancaria id={conexiones.activo} publicar={emitir} />}
+                Detalle={
+                    <DetalleConexionBancaria
+                        key={`${conexiones.activo}-${refresco}`}
+                        id={conexiones.activo}
+                        publicar={emitir}
+                    />
+                }
                 seleccionada={conexiones.activo}
                 modoDisposicion="maestro-50"
             />
 
             {estado === "CONECTANDO" && (
                 <ConectarBancoConexionBancaria publicar={emitir} />
+            )}
+
+            {estado === "REAUTENTICANDO" && conexionReautenticando && (
+                <ReautenticarBancoConexionBancaria conexion={conexionReautenticando} publicar={emitir} />
             )}
         </div>
     );

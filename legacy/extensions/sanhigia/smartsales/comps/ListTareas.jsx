@@ -30,6 +30,7 @@ const tipos = {
   },
   Cita: {
     icon: "groups",
+    class: "info",
   },
 };
 

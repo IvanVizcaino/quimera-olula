@@ -262,6 +262,9 @@ export const bunch = parent => ({
             completada: value,
             latitudFin: value ? latitud : null,
             longitudFin: value ? longitud : null,
+            fechaFin: value ? tareaBuffer.fechaFin : null,
+            horaFin: value ? tareaBuffer.horaFin : null,
+            direccionFin: value ? tareaBuffer.direccionFin : null,
           },
         },
       }),
@@ -269,8 +272,14 @@ export const bunch = parent => ({
     {
       // condition: ({ value }, { tareaBuffer }) =>
       //   !!value && !tareaBuffer.fechaFin && !tareaBuffer.horaFin,
+      condition: ({ value }) => !!value,
       type: "grape",
       name: "abrirModalFechaHoraFin",
+    },
+    {
+      condition: ({ value }) => !value,
+      type: "grape",
+      name: "descompletarTarea",
     },
   ],
   completarTarea: [
@@ -280,6 +289,16 @@ export const bunch = parent => ({
       plug: payload => ({
         ...payload,
         fields: ["completada", "latitudFin", "longitudFin", "fechaFin", "horaFin"],
+      }),
+    },
+  ],
+  descompletarTarea: [
+    {
+      type: "grape",
+      name: "onSeccionConfirmada",
+      plug: payload => ({
+        ...payload,
+        fields: ["completada", "latitudFin", "longitudFin", "fechaFin", "horaFin", "direccionFin"],
       }),
     },
   ],

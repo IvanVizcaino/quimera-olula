@@ -117,6 +117,26 @@ export const onOrdenTerminada: ProcesarDetalle = async (contexto) => {
     return refrescarOrden(contexto);
 };
 
+export const refrescarOrdenConCierre: ProcesarDetalle = async (contexto) => {
+    const orden = await getOrden(contexto.orden.id);
+    const nuevoContexto = {
+        ...contexto,
+        orden,
+        lineas: {
+            ...contexto.lineas,
+            lista: orden.lineas,
+            total: orden.lineas.length,
+        },
+    };
+    if (orden.estado === "TERMINADA") {
+        return [
+            { ...nuevoContexto, estado: 'ABIERTA' as EstadoOrdenAlmacen },
+            [["orden_cambiada", orden]] as [[string, unknown]],
+        ];
+    }
+    return [nuevoContexto, [["orden_cambiada", orden]] as [[string, unknown]]];
+};
+
 export const onCajaCreada: ProcesarDetalle = async (contexto, payload) => {
     const idCaja = payload as string;
     await patchOrden(contexto.orden.id, { idCajaDestino: idCaja });

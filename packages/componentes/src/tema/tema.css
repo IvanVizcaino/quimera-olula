@@ -21,6 +21,9 @@
 
     --color-primario: light-dark(var(--mg-4), var(--mg-4));
     --color-error: light-dark(var(--rojo-7), var(--rojo-6));
+    /* Rojo para texto e iconos de acciones destructivas (AA sobre blanco) y su fondo suave */
+    --color-error-texto: light-dark(var(--rojo-9), var(--rojo-4));
+    --color-error-suave: light-dark(var(--rojo-1), color-mix(in srgb, var(--rojo-9) 25%, transparent));
     --color-advertencia: light-dark(var(--naranja-7), var(--naranja-6));
     --color-exito: light-dark(var(--verde-7), var(--verde-6));
     --color-deshabilitado: light-dark(var(--gris-3), var(--gris-6));
@@ -74,6 +77,18 @@
     --color-accion: light-dark(var(--naranja-7), var(--naranja-5));
     --color-accion-claro: light-dark(var(--naranja-2), var(--naranja-3));
     --color-accion-oscuro: light-dark(var(--naranja-9), var(--naranja-7));
+
+    /* Primario para texto y fondos con texto blanco: contraste AA (≥ 4,5:1) */
+    --color-primario-texto: light-dark(#3f5f67, var(--mg-6));
+
+    /* Maestros: fondo del listado, tarjetas y tabla */
+    --color-fondo-maestro: var(--color-superficie-sunken);
+    --espaciado-tarjeta: var(--espaciado-m) var(--espaciado-l);
+    --hueco-tarjetas: var(--espaciado-m);
+    --ancho-min-tarjeta: 340px;
+    --halo-seleccion: 0 0 0 3px color-mix(in oklab, var(--color-primario) 25%, transparent);
+    --alto-fila-tabla: 2.75rem;
+    --color-borde-tabla: light-dark(var(--gris-2), var(--gris-7));
 
     --width-menu: 275px;
 

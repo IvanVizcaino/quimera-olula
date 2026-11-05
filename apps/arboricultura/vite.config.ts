@@ -8,7 +8,7 @@ export default mergeConfig(config, {
     resolve: {
         alias: {
             '#': '@olula/ctx',
-            '@olula/lib': import.meta.dirname + '/../../packages/lib/src',
+            '@olula/lib': import.meta.dirname + '/../../packages/contextos/lib/src',
         }
     }
 });

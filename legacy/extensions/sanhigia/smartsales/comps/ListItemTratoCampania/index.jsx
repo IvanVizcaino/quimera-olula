@@ -215,6 +215,13 @@ function ListItemTratoCampania({ selected = false, trato, modelName, callbackCam
             disabled={false}
             onClick={() => navigate(`/ss/trato/${trato.idTrato}/tarea/nueva/whatsapp`)}
           />
+          <ButtonContacto
+            className={`${classes.icon}`}
+            icon="groups"
+            klass="info"
+            disabled={false}
+            onClick={() => navigate(`/ss/trato/${trato.idTrato}/tarea/nueva/cita`)}
+          />
         </Box>
       </Collapse>
     </Box>

@@ -26,6 +26,7 @@ export interface Incidencia extends Entidad {
     categoriaIncidencia: CategoriaIncidencia;
     subCategoriaIncidencia: string;
     agenteId: string;
+    nombreAgente: string;
 }
 
 export type GetIncidencia = (id: string) => Promise<Incidencia>;

@@ -128,7 +128,7 @@ export const getPedidos: GetPedidos = async (
 export const postPedido: PostPedido = async (pedido) => {
     const payload = {
         cliente: payloadCambioCliente(pedido),
-        empresa_id: empresaActual()
+        empresa_id: pedido.empresa_id || empresaActual()
     }
     return await RestAPI.post(baseUrl, payload, "Error al crear pedido").then((respuesta) => respuesta.id);
 }

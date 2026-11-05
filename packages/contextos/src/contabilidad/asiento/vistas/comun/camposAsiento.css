@@ -1,0 +1,45 @@
+/*
+ * camposAsiento.css — posicionado de la cabecera en los modales de alta y
+ * edición de asiento manual. Lo comparten los dos formularios.
+ *
+ * Grid de 12 columnas (quimera-formulario). Toda fila suma 12:
+ *   Alta:    Fila 1: ejercicioId (3) + fecha (3) + tipoDocumento (3) + documento (3)
+ *   Edición: Fila 1: fecha (3) + tipoDocumento (4) + documento (5)
+ *            Fila 2: concepto (12)
+ */
+.CamposAsientoManual {
+    quimera-input[nombre="ejercicioId"] {
+        grid-column: span 3;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="fecha"] {
+        grid-column: span 3;
+        min-width: 0;
+    }
+
+    quimera-select[nombre="tipoDocumento"] {
+        grid-column: span 3;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="documento"] {
+        grid-column: span 3;
+        min-width: 0;
+    }
+
+    quimera-input[nombre="concepto"] {
+        grid-column: 1 / span 12;
+    }
+}
+
+/* En edición no hay campo de ejercicio: se reparte su espacio. */
+.CamposAsientoManual--cambiar {
+    quimera-select[nombre="tipoDocumento"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="documento"] {
+        grid-column: span 5;
+    }
+}

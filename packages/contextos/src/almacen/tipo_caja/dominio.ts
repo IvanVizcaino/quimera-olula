@@ -8,6 +8,7 @@ export const tipoCajaInicial = (): TipoCaja => ({
     descripcion: "",
     sku: null,
     capacidad: null,
+    prefijo: null,
 });
 
 /**
@@ -19,4 +20,5 @@ export const nuevoTipoCajaInicial: NuevoTipoCaja = {
     descripcion: "",
     sku: null,
     capacidad: null,
+    prefijo: null,
 };

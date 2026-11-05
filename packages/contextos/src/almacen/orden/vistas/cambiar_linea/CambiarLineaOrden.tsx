@@ -20,6 +20,9 @@ export const CambiarLineaOrden = ({
 }) => {
     const { modelo, uiProps, valido } = useModelo(metaNuevaLinea, linea);
 
+    const mostrarOrigen = orden.tipo === "SALIDA" || orden.tipo === "TRASPASO";
+    const mostrarDestino = orden.tipo === "ENTRADA" || orden.tipo === "TRASPASO";
+
     const guardar_ = useCallback(async () => {
         await patchLineaOrden(orden.id, linea.id, modelo);
         publicar("linea_cambiada", modelo);
@@ -43,6 +46,35 @@ export const CambiarLineaOrden = ({
                     <QInput label="SKU" {...uiProps("sku")} />
                     <QInput label="Cantidad prevista" {...uiProps("cantidadPrevista")} />
                     <QInput label="Cantidad real" {...uiProps("cantidadReal")} soloLectura />
+                    {mostrarOrigen && (
+                        <>
+                            <label>Pasos pick</label>
+                            <select
+                                value={modelo.pasosPick ?? ""}
+                                onChange={(e) => uiProps("pasosPick").onChange(e.target.value || null)}
+                            >
+                                <option value="">Sin pasos</option>
+                                <option value="LOTE-CAJAS">Lote → Caja etiqueta</option>
+                                <option value="CAJA-CAJAS">Caja origen → Caja etiqueta</option>
+                            </select>
+                        </>
+                    )}
+                    {mostrarDestino && (
+                        <>
+                            <label>Pasos drop</label>
+                            <select
+                                value={modelo.pasosDrop ?? ""}
+                                onChange={(e) => uiProps("pasosDrop").onChange(e.target.value || null)}
+                            >
+                                <option value="">Sin pasos</option>
+                                <option value="CAJAS-UBICACION">Caja → Ubicación</option>
+                                <option value="SKU-CANTIDAD">SKU → Cantidad</option>
+                                <option value="LOTE-CANTIDAD">Lote → Cantidad</option>
+                                <option value="CAJAS">Leer cajas</option>
+                                <option value="PALET">Leer palés</option>
+                            </select>
+                        </>
+                    )}
                 </quimera-formulario>
                 <div className="botones maestro-botones">
                     <QBoton onClick={guardar} deshabilitado={!valido}>

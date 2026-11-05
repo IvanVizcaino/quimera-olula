@@ -132,6 +132,16 @@ export const bunch = parent => ({
       },
     },
   ],
+  onCerrarAlbaranesGeneradosClicked: [
+    {
+      type: "setStateKeys",
+      plug: () => ({ keys: { albaranesGenerados: false, albaranes: [] } }),
+    },
+    {
+      type: "grape",
+      name: "cargarOrdenesCarga",
+    },
+  ],
   onErrorAlbaranes: [
     {
       type: "setStateKeys",
@@ -202,7 +212,7 @@ export const bunch = parent => ({
           errorAlbaranes: true,
           dialogTitle: "Error",
           dialogMsg:
-            payload?.descripcion || "No se ha podido obtener el informe de la orden de carga",
+            payload?.descripcion || payload?.nombre || "No se ha podido completar la operación",
         },
       }),
     },

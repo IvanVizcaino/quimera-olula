@@ -24,8 +24,15 @@ const paginacionControlador = (
     limite
   );
 
+  const desde = (pagina - 1) * limite + 1;
+  const hasta = Math.min(pagina * limite, totalEntidades);
+
   return (
     <quimera-tabla-paginacion>
+      <span className="paginacion-rango">
+        {desde.toLocaleString("es-ES")}–{hasta.toLocaleString("es-ES")} de{" "}
+        {totalEntidades.toLocaleString("es-ES")}
+      </span>
       <QBoton
         deshabilitado={pagina === 1 || totalPaginas === 0}
         tamaño="pequeño"
@@ -48,9 +55,9 @@ const paginacionControlador = (
         <QBoton
           key={numPagina}
           tamaño="pequeño"
-          deshabilitado={numPagina === pagina}
-          variante={numPagina === pagina ? "borde" : "texto"}
-          onClick={() => onPaginacion?.(numPagina, limite)}
+          variante={numPagina === pagina ? "solido" : "texto"}
+          props={numPagina === pagina ? { "aria-current": "page" } : undefined}
+          onClick={() => numPagina !== pagina && onPaginacion?.(numPagina, limite)}
         >
           {numPagina}
         </QBoton>

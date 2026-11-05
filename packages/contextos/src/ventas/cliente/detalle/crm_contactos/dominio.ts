@@ -9,33 +9,37 @@ import {
     deleteCrmContacto,
     getCrmContactosCliente,
     patchCrmContacto,
-    postCrmContacto,
+    postCrmContactoCliente,
 } from "../../infraestructura.ts";
 import { ContextoCrmContactos, EstadoCrmContactos } from "./diseño.ts";
 
 export const metaCrmContacto: MetaModelo<CrmContacto> = {
     campos: {
         nombre: { requerido: true },
-        email: { requerido: true, tipo: "email" },
+        email: { requerido: false, tipo: "email" },
+        telefono1: { requerido: false, tipo: "telefono" },
     }
 };
 
 export const metaNuevoCrmContacto: MetaModelo<NuevoCrmContacto> = {
     campos: {
         nombre: { requerido: true },
-        email: { requerido: true, tipo: "email" },
+        email: { requerido: false, tipo: "email" },
+        telefono1: { requerido: false, tipo: "telefono" },
     }
 };
 
 export const nuevoCrmContactoVacio: NuevoCrmContacto = {
     nombre: '',
     email: '',
+    telefono1: '',
 }
 
 export const metaTablaCrmContactos = [
     { id: "id", cabecera: "ID" },
     { id: "nombre", cabecera: "Nombre" },
     { id: "email", cabecera: "Email" },
+    { id: "telefono1", cabecera: "Teléfono" },
 ];
 
 
@@ -63,8 +67,8 @@ export const activarContacto: ProcesarCrmContactos = async (contexto, payload) =
 }
 
 export const crearContacto: ProcesarCrmContactos = async (contexto, payload) => {
-    const nuevoContacto = payload as CrmContacto;
-    await postCrmContacto(nuevoContacto);
+    const nuevoContacto = payload as NuevoCrmContacto;
+    await postCrmContactoCliente(contexto.clienteId, nuevoContacto);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,

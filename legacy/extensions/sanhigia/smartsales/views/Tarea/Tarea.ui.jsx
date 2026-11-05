@@ -180,6 +180,12 @@ function Tarea({ desdeMasterTareas, idTarea, idCampania, tipoTarea, refreshCallb
             disabled={tarea?.tipo !== "Whatsapp" || !telefono}
             onClick={() => window.open(`https://wa.me/34${telefono}`, "_blank")}
           />
+          <ButtonContacto
+            icon="groups"
+            klass="info"
+            disabled={tarea?.tipo !== "Cita"}
+          // onClick={() => window.open(`https://wa.me/34${telefono}`, "_blank")}
+          />
         </MainBox>
 
         <EstadoTarea
@@ -223,6 +229,12 @@ function Tarea({ desdeMasterTareas, idTarea, idCampania, tipoTarea, refreshCallb
               klass="success_alt"
               disabled={false}
               onClick={() => navigate(urlSiguenteTarea("whatsapp"))}
+            />
+            <ButtonContacto
+              icon="groups"
+              klass="info"
+              disabled={false}
+              onClick={() => navigate(urlSiguenteTarea("cita"))}
             />
           </Box>
         </DialogContent>

@@ -1,11 +1,8 @@
-import { QAvatar, QEtiqueta, QTarjetaGenerica } from "@olula/componentes/index.js";
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { QAvatar, QTarjetaGenerica } from "@olula/componentes/index.js";
 import { formatearFechaDate, formatearMoneda } from "@olula/lib/dominio.ts";
 import { Pedido } from "../diseño.ts";
-
-const varianteRecibido: Record<string, "exito" | "advertencia" | "primario"> = {
-  "Sí": "exito",
-  Parcial: "advertencia",
-};
+import { etiquetaEstadoPedido } from "../dominio.ts";
 
 export const TarjetaPedido = (pedido: Pedido) => (
   <QTarjetaGenerica
@@ -14,13 +11,7 @@ export const TarjetaPedido = (pedido: Pedido) => (
       pedido.codigo +
       (pedido.nombreProveedor ? ` · ${pedido.nombreProveedor}` : "")
     }
-    arribaDerecha={
-      pedido.recibido && pedido.recibido !== "No" ? (
-        <QEtiqueta variante={varianteRecibido[pedido.recibido] ?? "primario"}>
-          {`Recibido: ${pedido.recibido}`}
-        </QEtiqueta>
-      ) : undefined
-    }
+    arribaDerecha={<EtiquetaEstado {...etiquetaEstadoPedido(pedido)} />}
     abajoIzquierda={pedido.fecha ? formatearFechaDate(pedido.fecha) : ""}
     abajoDerecha={formatearMoneda(pedido.total, pedido.divisaId)}
   />

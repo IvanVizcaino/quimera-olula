@@ -90,11 +90,13 @@ export interface CrmContacto extends Entidad {
   id: string;
   nombre: string;
   email: string;
+  telefono1: string;
 };
 
 export type NuevoCrmContacto = {
   nombre: string;
   email: string;
+  telefono1: string;
 };
 
 

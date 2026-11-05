@@ -202,3 +202,9 @@ export const deleteEmpresa: DeleteEmpresa = async (id) => {
         "Error al eliminar empresa",
     );
 };
+
+export const getEmpresasBasicas = async (): Promise<{ id: string; nombre: string }[]> => {
+    const url = new Empresa_Urls().EMPRESAS_BASICAS;
+    const respuesta = await RestAPI.get<{ datos: { id: string; nombre: string }[] }>(url);
+    return respuesta.datos.map(e => ({ id: String(e.id), nombre: e.nombre }));
+};

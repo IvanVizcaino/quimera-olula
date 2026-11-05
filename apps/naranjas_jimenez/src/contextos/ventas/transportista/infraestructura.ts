@@ -15,9 +15,9 @@ const itemListaTransportistaDesdeApi = (item: ItemListaTransportistaApi): ItemLi
     descripcion: item.descripcion
 })
 
-export const getItemsListaTransportista: GetItemsListaTransportista = async (filtro, orden) => {
+export const getItemsListaTransportista: GetItemsListaTransportista = async (criteria) => {
 
     return RestAPI.get<{ datos: ItemListaTransportistaApi[] }>(
-        `${baseUrl}/items_lista` + criteriaQuery(filtro, orden)
+        `${baseUrl}/items_lista` + criteriaQuery(criteria.filtro, criteria.orden, criteria.paginacion)
     ).then((respuesta) => respuesta.datos.map(itemListaTransportistaDesdeApi));
 }

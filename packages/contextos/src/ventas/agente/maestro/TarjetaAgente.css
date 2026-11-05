@@ -1,0 +1,4 @@
+.q-etiqueta.tarjeta-agente-comision {
+    line-height: var(--altura-linea-compacta);
+    font-variant-numeric: tabular-nums;
+}

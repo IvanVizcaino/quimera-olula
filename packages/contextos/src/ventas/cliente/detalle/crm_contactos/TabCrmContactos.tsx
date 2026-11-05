@@ -84,7 +84,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         onCerrar={() => emitir("alta_cancelada")}
         titulo="Nuevo Contacto CRM"
       >
-        <CrearCrmContactos emitir={emitir} />
+        {estado === "alta" && <CrearCrmContactos emitir={emitir} />}
       </QModal>
 
       <QModal
@@ -93,7 +93,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         onCerrar={() => emitir("edicion_cancelada")}
         titulo="Editar Contacto CRM"
       >
-        {ctx.contactoActivo && (
+        {estado === "edicion" && ctx.contactoActivo && (
           <EdicionCrmContactos contacto={ctx.contactoActivo} emitir={emitir} />
         )}
       </QModal>
@@ -109,6 +109,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
           descripcion=""
           nombre="cliente/contacto_id"
           label="Seleccionar contacto"
+          excluir={ctx.contactos.map((contacto) => contacto.id)}
           onChange={(contacto) => setContactoSeleccionado(contacto)}
         />
         <div className="botones">

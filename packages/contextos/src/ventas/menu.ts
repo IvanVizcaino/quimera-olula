@@ -1,5 +1,6 @@
 export const menuVentas = {
-    "Ventas": { icono: "fichero" },
+    "Ventas": { icono: "menu_ventas", area: "Comercial" },
+    "Ventas/Resumen": { url: "/dashboard/ventas" },
     "Ventas/Clientes": { url: "/ventas/cliente", regla: "ventas.cliente.leer" },
     "Ventas/Presupuestos": { url: "/ventas/presupuesto", regla: "ventas.presupuesto.leer" },
     "Ventas/Pedidos": {
@@ -12,8 +13,9 @@ export const menuVentas = {
             id: "id del pedido para consultar el pedido",
         },
     },
-    "Ventas/Albaranes": { url: "/ventas/albaran", regla: "ventas.albaran.leer" },
-    "Ventas/Facturas": { url: "/ventas/factura", regla: "ventas.factura.leer" },
+    "Ventas/Albaranes": { alias: ["entregas"], url: "/ventas/albaran", regla: "ventas.albaran.leer" },
+    "Ventas/Facturas": { alias: ["facturación", "emitidas"], url: "/ventas/factura", regla: "ventas.factura.leer" },
     "Ventas/Artículos": { url: "/ventas/articulo", regla: "ventas.articulo" },
     "Ventas/Tarifas": { url: "/ventas/tarifa", regla: "ventas.tarifa.leer" },
+    "Ventas/Agentes": { url: "/ventas/agente", regla: "ventas.agente" },
 };

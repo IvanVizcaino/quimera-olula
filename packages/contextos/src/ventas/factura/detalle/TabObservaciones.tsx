@@ -12,7 +12,7 @@ export const TabObservaciones = ({ factura }: TabClienteProps) => {
   const { uiProps, modelo } = factura;
 
   return (
-    <>
+    <div className="TabObservaciones">
       <quimera-formulario>
         <QTextArea
           label="Observaciones"
@@ -28,6 +28,6 @@ export const TabObservaciones = ({ factura }: TabClienteProps) => {
           deshabilitado
         />
       </quimera-formulario>
-    </>
+    </div>
   );
 };

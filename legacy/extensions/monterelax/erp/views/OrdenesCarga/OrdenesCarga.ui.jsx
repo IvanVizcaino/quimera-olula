@@ -1,11 +1,11 @@
 // import { Grid, Button, Column, Field, Table, Dialog, DialogContent, IconButton, Icon, Typography } from '@quimera/comps'
+import { descargarDocumento } from "@olula/lib/api/documentos.ts";
 import { Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon, IconButton, Typography } from "@quimera/comps";
-import { Avatar, LinearProgress, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText } from "@quimera/thirdparty";
-import { imprimir_blob } from "@olula/lib/impresion.ts";
+import { Avatar, Button as BotonMUI, LinearProgress, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText } from "@quimera/thirdparty";
 import Quimera, { navigate, useAppValue, useStateValue, util } from "quimera";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { getReportOrdenCarga } from "./report_olula";
+import { getReportAlbaranesOrdenCarga, terminarOrdenCarga } from "./report_olula";
 
 function OrdenesCarga({ useStyles }) {
   const [
@@ -39,10 +39,14 @@ function OrdenesCarga({ useStyles }) {
     return () => appDispatch({ type: "setNombrePaginaActual", payload: { nombre: "" } });
   }, [appDispatch]);
 
-  const imprimirReportOrden = async idOrden => {
+  const [ordenAConfirmar, setOrdenAConfirmar] = useState(null);
+
+  const descargarAlbaranesYTerminar = async idOrden => {
     try {
-      const blob = await getReportOrdenCarga(idOrden);
-      await imprimir_blob(blob);
+      const blob = await getReportAlbaranesOrdenCarga(idOrden);
+      await descargarDocumento(blob, `${idOrden}.pdf`);
+      await terminarOrdenCarga(idOrden);
+      dispatch({ type: "cargarOrdenesCarga" });
     } catch (error) {
       dispatch({ type: "onErrorReportOlula", payload: error });
     }
@@ -92,31 +96,33 @@ function OrdenesCarga({ useStyles }) {
               ></ListItemText>
               {
                 <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    aria-label="informe de la orden de carga"
-                    title="Informe de la orden de carga"
-                    onClick={event => {
-                      event.stopPropagation();
-                      imprimirReportOrden(ordencarga.idorden);
-                    }}
-                  >
-                    <Icon>picture_as_pdf</Icon>
-                  </IconButton>
                   {ordencarga.estado === "ALBARANADA" && (
-                    <IconButton
-                      visible={ordencarga.estado === "ALBARANADA"}
-                      edge="end"
-                      aria-label="imprimir"
-                      onClick={() =>
-                        dispatch({
-                          type: "onImprimirClicked",
-                          payload: { data: ordencarga.idorden },
-                        })
-                      }
-                    >
-                      <Icon>print</Icon>
-                    </IconButton>
+                    <>
+                      <IconButton
+                        edge="end"
+                        aria-label="albaranes de la orden de carga"
+                        title="Albaranes de la orden de carga"
+                        onClick={event => {
+                          event.stopPropagation();
+                          setOrdenAConfirmar(ordencarga.idorden);
+                        }}
+                      >
+                        <Icon>picture_as_pdf</Icon>
+                      </IconButton>
+                      <IconButton
+                        visible={ordencarga.estado === "ALBARANADA"}
+                        edge="end"
+                        aria-label="imprimir"
+                        onClick={() =>
+                          dispatch({
+                            type: "onImprimirClicked",
+                            payload: { data: ordencarga.idorden },
+                          })
+                        }
+                      >
+                        <Icon>print</Icon>
+                      </IconButton>
+                    </>
                   )}
                   {ordencarga.estado !== "ALBARANADA" && (
                     <IconButton
@@ -138,6 +144,27 @@ function OrdenesCarga({ useStyles }) {
             </ListItem>
           ))}
         </List>
+        <Dialog open={ordenAConfirmar !== null} maxWidth="md">
+          <DialogTitle id="form-dialog-title">Albaranes de la orden de carga</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="form-dialog-description">
+              {`Se van a descargar los albaranes de la orden de carga ${ordenAConfirmar} ¿Desea continuar?`}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <BotonMUI
+              onClick={() => {
+                const idOrden = ordenAConfirmar;
+                setOrdenAConfirmar(null);
+                descargarAlbaranesYTerminar(idOrden);
+              }}
+            >
+              Sí
+            </BotonMUI>
+            <BotonMUI onClick={() => setOrdenAConfirmar(null)}>No</BotonMUI>
+          </DialogActions>
+        </Dialog>
+
         {/* Son varios diálogos los que aparecen en el proceso. Van en orden de aparición */}
         <Dialog open={abrirDialogoConfirmacion} maxWidth="md">
           <DialogTitle id="form-dialog-title">{dialogTitle}</DialogTitle>
@@ -192,11 +219,8 @@ function OrdenesCarga({ useStyles }) {
                 </ListItem>
               ))}
             </List>
-            <DialogContentText id="form-dialog-question">
-              Se procedera a imprimir los albaranes
-            </DialogContentText>
             <DialogActions>
-              <Button id="confirmarImpresion" text="OK" />
+              <Button id="cerrarAlbaranesGenerados" text="OK" />
             </DialogActions>
           </DialogContent>
         </Dialog>

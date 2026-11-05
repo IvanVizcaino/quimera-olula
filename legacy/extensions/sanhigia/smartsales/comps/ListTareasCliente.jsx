@@ -1,9 +1,9 @@
-import { Box, QListItem, QTitleBox, Typography, Icon } from "@quimera/comps";
+import { Box, QListItem, QTitleBox, Typography } from "@quimera/comps";
 import { makeStyles } from "@quimera/styles";
 import { Divider } from "@quimera/thirdparty";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useStateValue, util } from "quimera";
 import { navigate } from "hookrouter";
+import { useStateValue, util } from "quimera";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const useStyles = makeStyles(theme => ({
   box: {
@@ -26,6 +26,10 @@ const iconTipoTarea = {
     // icon: 'whatsapp',
     content: <img src="/img/whatsapp-icon.svg" width="32px" height="32px" alt="Whatsapp Logo" />,
     color: "#46C756",
+  },
+  "Cita": {
+    icon: "groups",
+    color: "#76ccfd",
   },
   "-": {
     icon: "groups",

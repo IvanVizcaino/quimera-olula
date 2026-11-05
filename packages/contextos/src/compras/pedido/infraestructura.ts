@@ -95,15 +95,8 @@ interface NuevaLineaPedidoApi {
     tipo_irpf?: number;
 }
 
-interface QueryNuevaLineaPedidoApiReq {
-    articulo: ArticuloLineaCompraApi;
-    cantidad: number;
-    pvp_unitario?: number;
-    dto_porcentual?: number;
-    dto_lineal?: number;
-    grupo_iva_producto_id?: string;
+interface QueryNuevaLineaPedidoApiReq extends NuevaLineaPedidoApi {
     iva_incluido?: boolean;
-    tipo_irpf?: number;
 }
 
 interface QueryNuevaLineaPedidoApiRes {
@@ -252,29 +245,28 @@ const cambiosPedidoAApi = (p: CambiosPedido): CambiosPedidoApi => {
     return cambios;
 };
 
+/**
+ * Los importes a cero se omiten: el servidor distingue «ausente» (toma la
+ * condición del proveedor) de «presente con 0» (la pisa), así que mandarlos
+ * siempre borraría el descuento de `articulosprov`.
+ */
 const nuevaLineaAApi = (linea: NuevaLineaPedido): NuevaLineaPedidoApi => ({
     articulo: articuloLineaApi(linea),
     cantidad: linea.cantidad,
     ...(linea.pvpUnitario === null ? {} : { pvp_unitario: linea.pvpUnitario }),
-    dto_porcentual: linea.dtoPorcentual,
-    dto_lineal: linea.dtoLineal,
+    ...(linea.dtoPorcentual ? { dto_porcentual: linea.dtoPorcentual } : {}),
+    ...(linea.dtoLineal ? { dto_lineal: linea.dtoLineal } : {}),
     ...(linea.grupoIvaProductoId === null
         ? {}
         : { grupo_iva_producto_id: linea.grupoIvaProductoId }),
-    tipo_irpf: linea.tipoIrpf,
+    ...(linea.tipoIrpf ? { tipo_irpf: linea.tipoIrpf } : {}),
 });
 
-const queryNuevaLineaAApi = (linea: NuevaLineaPedido): QueryNuevaLineaPedidoApiReq => ({
-    articulo: articuloLineaApi(linea),
-    cantidad: linea.cantidad,
-    ...(linea.pvpUnitario === null ? {} : { pvp_unitario: linea.pvpUnitario }),
-    dto_porcentual: linea.dtoPorcentual,
-    dto_lineal: linea.dtoLineal,
-    ...(linea.grupoIvaProductoId === null
-        ? {}
-        : { grupo_iva_producto_id: linea.grupoIvaProductoId }),
+const queryNuevaLineaAApi = (
+    linea: NuevaLineaPedido
+): QueryNuevaLineaPedidoApiReq => ({
+    ...nuevaLineaAApi(linea),
     iva_incluido: linea.ivaIncluido,
-    tipo_irpf: linea.tipoIrpf,
 });
 
 const queryNuevaLineaDesdeApi = (

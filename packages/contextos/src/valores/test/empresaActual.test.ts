@@ -5,14 +5,18 @@ const conWhoAmI = (whoami: unknown) =>
     localStorage.setItem("whoami", JSON.stringify(whoami));
 
 describe("empresaActual sale del whoami", () => {
-    afterEach(() => localStorage.removeItem("whoami"));
+    afterEach(() => {
+        localStorage.removeItem("whoami");
+        localStorage.removeItem("empresa_actual");
+    });
 
     test("toma la empresa del usuario", () => {
         conWhoAmI({ usuario_id: "juanma", empresas: [{ id: "1", nombre: "Yeboyebo" }] });
         expect(empresaActual()).toBe("1");
     });
 
-    test("con varias empresas se queda con la primera", () => {
+    test("con varias empresas y empresa almacenada válida la devuelve", () => {
+        localStorage.setItem("empresa_actual", "7");
         conWhoAmI({
             empresas: [
                 { id: "7", nombre: "Segunda sociedad" },
@@ -20,6 +24,16 @@ describe("empresaActual sale del whoami", () => {
             ],
         });
         expect(empresaActual()).toBe("7");
+    });
+
+    test("con varias empresas y sin empresa almacenada devuelve vacío", () => {
+        conWhoAmI({
+            empresas: [
+                { id: "7", nombre: "Segunda sociedad" },
+                { id: "1", nombre: "Yeboyebo" },
+            ],
+        });
+        expect(empresaActual()).toBe("");
     });
 
     test("sin whoami no inventa una empresa", () => {

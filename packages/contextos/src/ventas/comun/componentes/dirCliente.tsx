@@ -8,6 +8,7 @@ interface DireccionesProps {
   nombre?: string;
   label?: string;
   deshabilitado?: boolean;
+  valorDefecto?: "facturacion" | "envio";
   onChange: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 
@@ -17,6 +18,7 @@ export const DirCliente = ({
   nombre = "direccion_id",
   label = "Dirección",
   deshabilitado = false,
+  valorDefecto = "facturacion",
   onChange,
   ...props
 }: DireccionesProps) => {
@@ -28,6 +30,8 @@ export const DirCliente = ({
   onChangeRef.current = onChange;
   const valorRef = useRef(valor);
   valorRef.current = valor;
+  const valorDefectoRef = useRef(valorDefecto);
+  valorDefectoRef.current = valorDefecto;
 
   useEffect(() => {
     const fetchDirecciones = async () => {
@@ -47,12 +51,16 @@ export const DirCliente = ({
       // solo se respeta si pertenece a este cliente.
       if (opciones.some((o) => o.valor === valorRef.current)) return;
 
-      const facturacion = direcciones.find((d) => d.dir_facturacion);
-      if (!facturacion) return;
+      if (!valorDefectoRef.current) return;
+
+      const dirDefecto = direcciones.find((d) =>
+        valorDefectoRef.current === "facturacion" ? d.dir_facturacion : d.dir_envio
+      );
+      if (!dirDefecto) return;
 
       onChangeRef.current({
-        valor: facturacion.id,
-        descripcion: formatearDireccionUnaLinea(facturacion),
+        valor: dirDefecto.id,
+        descripcion: formatearDireccionUnaLinea(dirDefecto),
       });
     };
 

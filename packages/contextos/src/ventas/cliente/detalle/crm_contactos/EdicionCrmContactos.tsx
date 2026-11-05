@@ -4,6 +4,7 @@ import { useFocus } from "@olula/lib/useFocus.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { CrmContacto } from "../../diseño.ts";
 import { metaCrmContacto } from "./dominio.ts";
+import "./CrmContactos.css";
 
 interface EdicionCrmContactosProps {
   contacto: CrmContacto;
@@ -26,6 +27,7 @@ export const EdicionCrmContactos = ({
       <quimera-formulario>
         <QInput label="Nombre" {...uiProps("nombre")} ref={focus} />
         <QInput label="Email" {...uiProps("email")} />
+        <QInput label="Teléfono" {...uiProps("telefono1")} />
       </quimera-formulario>
       <div className="botones">
         <QBoton onClick={guardar} deshabilitado={!valido}>

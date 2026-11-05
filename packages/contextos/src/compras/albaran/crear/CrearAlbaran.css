@@ -3,7 +3,7 @@
     justify-content: flex-end;
 }
 
-.CrearAlbaran {
+.ComprasAlbaran .CrearAlbaran {
     quimera-autocompletar[nombre="proveedorAlbaran"],
     quimera-input[nombre="nombre"] {
         grid-column: span 12;

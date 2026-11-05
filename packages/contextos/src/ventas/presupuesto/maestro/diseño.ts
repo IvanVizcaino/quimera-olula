@@ -7,11 +7,13 @@ export type { ContextoMaestroPresupuesto, EstadoMaestroPresupuesto, Presupuesto 
 export const metaTablaPresupuesto: MetaTabla<Presupuesto> = [
     {
         id: "codigo",
+        estilo: "secundario",
         cabecera: "Código",
         prioridad: "alta",
     },
     {
         id: "nombre_cliente",
+        estilo: "destacado",
         cabecera: "Cliente",
         prioridad: "alta",
         render: (p) => p.cliente.nombre_cliente,
@@ -24,6 +26,7 @@ export const metaTablaPresupuesto: MetaTabla<Presupuesto> = [
     },
     {
         id: "total",
+        estilo: "destacado",
         cabecera: "Total",
         tipo: "moneda",
         prioridad: "alta",

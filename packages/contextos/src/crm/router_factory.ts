@@ -1,3 +1,4 @@
+import { MaestroConDetalleAgente } from "#/ventas/agente/maestro/MaestroConDetalleAgente.tsx"
 import { MaestroAcciones } from "./accion/maestro/MaestroAcciones.tsx"
 import { MaestroClientes } from "./cliente/maestro/MaestroClientes.tsx"
 import { MaestroContactos } from "./contacto/maestro/MaestroContactos.tsx"
@@ -14,6 +15,7 @@ export class RouterFactoryCrmOlula {
         "crm/accion": MaestroAcciones,
         "crm/lead": MaestroLeads,
         "crm/incidencia": MaestroIncidencias,
+        "crm/agente": MaestroConDetalleAgente,
         "crm/otros": OtrosCrm
     }
 }

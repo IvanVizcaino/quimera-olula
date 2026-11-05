@@ -1,0 +1,120 @@
+.panel-widgets {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+    margin-bottom: var(--espaciado-m);
+
+    .panel-widgets-rejilla {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+        gap: var(--espaciado-m);
+        /* Con pocos widgets no se estiran a toda la fila: ~18rem por widget */
+        max-width: calc(var(--numero-widgets, 4) * 18rem);
+    }
+
+    .panel-widgets-cabecera {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+        min-height: 1.75rem;
+
+        h3 {
+            margin: 0;
+            font-size: var(--tamaño-letra-xs);
+            font-weight: var(--grosor-letra-6);
+            color: var(--color-texto-secundario);
+
+            span {
+                font-weight: var(--grosor-letra-4);
+            }
+        }
+    }
+
+    quimera-tarjeta-resumen {
+        background: var(--color-superficie);
+        border-color: var(--color-borde-tabla);
+        padding: var(--espaciado-m) var(--espaciado-l);
+        gap: var(--espaciado-xxs);
+
+        .titulo {
+            font-size: var(--tamaño-letra-xs);
+            font-weight: var(--grosor-letra-5);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        /* Cabecera a la izquierda; valor y pie a la derecha, como las cifras */
+        .valor,
+        .pie {
+            text-align: right;
+        }
+
+        .comparacion {
+            justify-content: flex-end;
+        }
+
+        /* El número se ajusta al ancho de la tarjeta para no cortarse */
+        container-type: inline-size;
+
+        .valor {
+            font-size: min(var(--tamaño-letra-xl), 9cqi);
+            font-weight: var(--grosor-letra-7);
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+}
+
+/* Margen lateral propio: el de MaestroDetalle.css solo aplica cuando la tabla ya
+   está pintada y el panel saltaría al terminar de cargar. */
+.Maestro .panel-widgets {
+    padding-inline: var(--padding-horizontal);
+}
+
+/* Maestro contraído junto al detalle: solo los dos primeros, en pequeño */
+.Maestro.contraido .panel-widgets {
+    .panel-widgets-cabecera {
+        display: none;
+    }
+
+    .panel-widgets-rejilla {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--espaciado-s);
+    }
+
+    quimera-tarjeta-resumen {
+        padding: var(--espaciado-s) var(--espaciado-m);
+
+        .valor {
+            font-size: min(var(--tamaño-letra-l), 9cqi);
+        }
+
+        .pie {
+            display: none;
+        }
+    }
+
+    quimera-tarjeta-resumen:nth-child(n + 3) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .panel-widgets .panel-widgets-rejilla {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--espaciado-s);
+
+        /* Menos relleno y un mínimo legible: el importe no queda por debajo del título */
+        quimera-tarjeta-resumen {
+            padding: var(--espaciado-s) var(--espaciado-m);
+        }
+
+        .valor {
+            font-size: clamp(0.9375rem, 11cqi, var(--tamaño-letra-l));
+        }
+    }
+}

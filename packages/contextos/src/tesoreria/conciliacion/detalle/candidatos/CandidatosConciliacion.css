@@ -3,6 +3,19 @@
     flex-direction: column;
     gap: var(--espaciado-m);
 
+    /* Los campos de formulario ocupan todo el ancho por defecto: aquí van en fila. */
+    .filtros-candidatos {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--espaciado-xs) var(--espaciado-m);
+
+        quimera-checkbox,
+        quimera-checkbox label {
+            width: auto;
+        }
+    }
+
     div[id="buscador-candidatos"] {
         display: flex;
         align-items: center;
@@ -13,21 +26,119 @@
         }
     }
 
-    .recibo-candidato {
-        display: flex;
-        flex-direction: column;
+    /* Las columnas se definen en la lista y las tarjetas las heredan (subgrid),
+       así importes y botones quedan alineados en vertical entre tarjetas. */
+    .lista-candidatos {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        row-gap: var(--espaciado-xs);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    /* Dos filas por tarjeta, cada celda es hija directa de la tarjeta:
+         ☐ | identificación (elástica, se recorta) | importe (derecha) | acción principal
+           | tipo · detalle (se recorta)           | fecha (derecha)   | Ver */
+    .tarjeta-candidato {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        grid-template-rows: auto auto;
+        align-items: center;
+        column-gap: var(--espaciado-s);
+        row-gap: var(--espaciado-xxs);
+        padding: var(--espaciado-xs) var(--espaciado-s);
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-xs);
 
         small {
             color: var(--color-texto-secundario);
         }
     }
 
-    .acciones-candidato {
-        display: flex;
-        justify-content: flex-end;
-        gap: var(--espaciado-xs);
+    .tarjeta-candidato-casilla {
+        grid-row: span 2;
     }
 
+    .tarjeta-candidato-codigo,
+    .tarjeta-candidato-detalle {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tarjeta-candidato-codigo {
+        font-weight: var(--grosor-letra-5);
+
+        small {
+            margin-left: var(--espaciado-xs);
+            font-weight: normal;
+        }
+    }
+
+    .tarjeta-candidato-tipo {
+        font-weight: var(--grosor-letra-5);
+    }
+
+    .tarjeta-candidato-importe,
+    .tarjeta-candidato-fecha {
+        justify-self: end;
+        white-space: nowrap;
+    }
+
+    .tarjeta-candidato-accion {
+        display: flex;
+    }
+
+    .seleccion-candidatos {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+        padding: var(--espaciado-s);
+        border: var(--tamaño-borde-s) solid var(--color-primario);
+        border-radius: var(--redondeo-borde-xs);
+        background: var(--color-superficie-sunken);
+
+        .tarjeta-candidato {
+            background: var(--color-superficie);
+        }
+    }
+
+    .seleccion-candidatos-totales {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--espaciado-m);
+        margin: 0;
+
+        > div {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        dt {
+            font-size: var(--tamaño-letra-xs);
+            color: var(--color-texto-secundario);
+        }
+
+        dd {
+            margin: 0;
+            font-weight: var(--grosor-letra-5);
+            white-space: nowrap;
+        }
+
+        .cuadra dd {
+            color: var(--color-exito-oscuro);
+        }
+
+        .descuadra dd {
+            color: var(--color-error-texto);
+        }
+    }
+
+    h4,
     .sin-candidatos {
         margin: 0;
     }
@@ -35,5 +146,6 @@
     .botones {
         display: flex;
         justify-content: flex-end;
+        gap: var(--espaciado-xs);
     }
 }

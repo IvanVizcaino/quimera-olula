@@ -19,6 +19,7 @@ export const usuarioVacio: Usuario = {
     nombre: "",
     email: "",
     grupo_id: "",
+    empresas: [],
 };
 
 export const metaUsuario: MetaModelo<Usuario> = {
@@ -27,12 +28,14 @@ export const metaUsuario: MetaModelo<Usuario> = {
         nombre: { requerido: true, validacion: (m: Usuario) => stringNoVacio(m.nombre || "") },
         email: { requerido: true, validacion: (m: Usuario) => stringNoVacio(m.email || "") },
         grupo_id: { requerido: false },
+        empresas: { requerido: false },
     },
 };
 
 export const nuevoUsuarioVacio: Partial<Usuario> = {
     nombre: "",
     grupo_id: "",
+    empresas: [],
 };
 
 export const metaNuevoUsuario: MetaModelo<Partial<Usuario>> = {
@@ -41,6 +44,7 @@ export const metaNuevoUsuario: MetaModelo<Partial<Usuario>> = {
         email: { requerido: true, validacion: (m) => stringNoVacio(m.email || "") },
         id: { requerido: true, validacion: (m) => stringNoVacio(m.id || "") },
         grupo_id: { requerido: false },
+        empresas: { requerido: false },
     },
 };
 

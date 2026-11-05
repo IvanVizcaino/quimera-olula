@@ -14,6 +14,7 @@ export interface LineaAlbaranar extends Modelo {
     idLinea: string;
     sku: string;
     descripcion: string;
+    pvpTotal: number;
     cantidad: number;
     servida: number;
     pendiente: number;

@@ -75,6 +75,24 @@ export const LineasOrden = ({
                     modoVoz={modoVoz}
                 />
             )}
+            {lineas.activo && estado === "LEYENDO_GUION_PICK_LINEA" && (
+                <LeerLineaOrden
+                    orden={orden}
+                    linea={lineas.activo}
+                    publicar={publicar}
+                    modoVoz={modoVoz}
+                    fase="PICK"
+                />
+            )}
+            {lineas.activo && estado === "LEYENDO_GUION_DROP_LINEA" && (
+                <LeerLineaOrden
+                    orden={orden}
+                    linea={lineas.activo}
+                    publicar={publicar}
+                    modoVoz={modoVoz}
+                    fase="DROP"
+                />
+            )}
         </>
     );
 };

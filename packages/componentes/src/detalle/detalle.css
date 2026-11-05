@@ -3,11 +3,43 @@
         display: flex;
         justify-content: space-between;
         /* align-items: center; */
-        margin-bottom: 15px;
-        border-bottom: 1px solid #ccc;
+        margin-bottom: var(--espaciado-m);
+        border-bottom: var(--tamaño-borde-s) solid var(--color-borde-sutil);
 
         h2 {
             margin: 0;
+        }
+    }
+
+    .detalle-cabecera-titulo {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s);
+        min-width: 0;
+    }
+
+    .detalle-volver {
+        display: none;
+    }
+
+    .detalle-datos-clave {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s) var(--espaciado-2xl);
+        margin: 0 var(--padding-horizontal) var(--espaciado-m);
+        padding: var(--espaciado-s) var(--espaciado-m);
+        background: var(--color-superficie-sunken);
+        border-radius: var(--redondeo-borde-s);
+
+        dt {
+            font-size: var(--tamaño-letra-xs);
+            color: var(--color-texto-secundario);
+        }
+
+        dd {
+            font-weight: var(--grosor-letra-5);
+            font-variant-numeric: tabular-nums;
         }
     }
 
@@ -25,5 +57,275 @@
 
     .MaestroEntidades {
         display: block !important;
+    }
+}
+/* ===== Móvil: el detalle ocupa la pantalla (ver boceto "Detalle en móvil") ===== */
+@media (max-width: 768px) {
+    .detalle {
+        /* Las acciones del documento se colocan respecto al detalle */
+        position: relative;
+        padding-bottom: var(--espaciado-l);
+
+        .detalle-volver {
+            position: sticky;
+            top: 0;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: var(--espaciado-xxs);
+            width: 100%;
+            min-height: 2.5rem;
+            padding: 0 var(--padding-horizontal);
+            border: 0;
+            border-bottom: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+            background: var(--color-superficie);
+            color: var(--color-primario-texto);
+            font: inherit;
+            font-weight: var(--grosor-letra-6);
+            text-align: left;
+            cursor: pointer;
+
+            quimera-icono {
+                fill: currentColor;
+            }
+        }
+
+        .detalle-cabecera {
+            border-bottom: 0;
+            padding: var(--espaciado-s) var(--padding-horizontal) 0;
+            margin-bottom: var(--espaciado-s);
+
+            .detalle-cerrar {
+                display: none;
+            }
+        }
+
+        /* Código y estado en una línea; el nombre debajo, grande */
+        .detalle-cabecera-titulo {
+            gap: var(--espaciado-xs) var(--espaciado-s);
+
+            h2 {
+                display: contents;
+            }
+
+            .detalle-titulo-codigo {
+                order: 1;
+                /* Del alto de los botones de acción, que van en esta línea */
+                min-height: 2.25rem;
+                display: inline-flex;
+                align-items: center;
+                font-size: var(--tamaño-letra-s);
+                font-weight: var(--grosor-letra-4);
+                color: var(--color-texto-secundario);
+            }
+
+            .detalle-titulo-separador {
+                display: none;
+            }
+
+            > :not(h2) {
+                order: 2;
+            }
+
+            .detalle-titulo-nombre {
+                order: 3;
+                flex-basis: 100%;
+                min-width: 0;
+                font-size: var(--tamaño-letra-l);
+                font-weight: var(--grosor-letra-7);
+                line-height: var(--altura-linea-compacta);
+                /* Una sola línea: el nombre completo queda en el title */
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        /* Datos clave en una tarjeta de dos columnas */
+        .detalle-datos-clave {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--espaciado-m);
+            padding: var(--espaciado-m);
+            background: var(--color-superficie);
+            border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+            border-radius: var(--redondeo-borde-m);
+
+            dd {
+                font-weight: var(--grosor-letra-6);
+            }
+        }
+
+        /* Título sin código (p. ej. un cliente): hueco a la derecha para las acciones */
+        &:has(:is(.fila-acciones-documento, .maestro-botones):not(.tab-content *, .Listado *) > quimera-acciones.vertical)
+            .detalle-cabecera-titulo:not(:has(.detalle-titulo-codigo)) {
+            min-height: 2.25rem;
+            /* Acción + "⋯"; con una sola acción (abajo) basta menos */
+            padding-right: 9rem;
+
+            h2 {
+                display: block;
+                flex: 1;
+                font-size: var(--tamaño-letra-l);
+                font-weight: var(--grosor-letra-7);
+                min-width: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        &:has(:is(.fila-acciones-documento, .maestro-botones):not(.tab-content *, .Listado *) > quimera-acciones.vertical > quimera-boton)
+            .detalle-cabecera-titulo:not(:has(.detalle-titulo-codigo)) {
+            padding-right: 6.5rem;
+        }
+
+        /* Acciones del documento (no las de dentro de una pestaña o un listado):
+           arriba a la derecha, en la línea del código y el estado; principal como píldora y "⋯" redondo, del alto de las
+           pestañas (36px), como las acciones de las líneas. */
+        :is(.fila-acciones-documento, .maestro-botones):not(.tab-content *, .Listado *):has(> quimera-acciones.vertical) {
+            position: absolute;
+            top: calc(2.5rem + var(--espaciado-s));
+            right: var(--padding-horizontal);
+            z-index: 16;
+            display: flex;
+            align-items: center;
+            gap: var(--espaciado-s);
+            margin: 0;
+            padding: 0;
+            background: none;
+            border: 0;
+
+            quimera-acciones.vertical {
+                margin: 0;
+                align-items: center;
+            }
+
+            quimera-acciones.vertical .actions,
+            quimera-acciones.vertical .header {
+                display: flex;
+                align-items: center;
+                gap: var(--espaciado-s);
+            }
+
+            quimera-acciones.vertical .header > quimera-boton,
+            quimera-acciones.vertical > quimera-boton {
+                :is(button, a) {
+                    height: 2.25rem;
+                    min-width: 2.25rem;
+                    padding: 0 var(--espaciado-m);
+                    border-radius: 999px;
+                    white-space: nowrap;
+                }
+            }
+
+            /* "⋯": círculo */
+            quimera-acciones.vertical .header > quimera-boton:last-child:not(:first-child) :is(button, a) {
+                width: 2.25rem;
+                padding: 0;
+            }
+
+            /* El menú "⋯" se abre hacia abajo, alineado a la derecha */
+            quimera-acciones.vertical .acciones {
+                top: calc(100% + var(--espaciado-xs));
+                bottom: auto;
+                right: 0;
+                box-shadow: var(--sombra-l);
+            }
+        }
+    }
+}
+
+/* Móvil: las pestañas sin listado (datos, observaciones…) van en una tarjeta,
+   alineadas con la de datos clave; las de listado ya pintan sus tarjetas. */
+@media (max-width: 768px) {
+    .detalle .tab-content > div:not(:has(.Listado)) {
+        background: var(--color-superficie);
+        border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+        border-radius: var(--redondeo-borde-m);
+        padding: var(--espaciado-m);
+        overflow-x: auto;
+
+        > :last-child > quimera-formulario:last-child {
+            padding-bottom: 0;
+        }
+    }
+}
+
+/* Móvil: en las tarjetas de los listados del detalle (líneas, direcciones…) el
+   nombre va más pequeño, ~14px en un móvil normal, y crece o encoge con el ancho. */
+@media (max-width: 768px) {
+    .detalle .Listado .qtarjeta-generica-grid-arriba {
+        &,
+        .qtarjeta-metatabla-valor {
+            font-size: clamp(0.8125rem, 3.6vw, 0.9375rem);
+            line-height: 1.3;
+        }
+    }
+}
+
+/* Móvil: espaciado más ajustado en el detalle. Sin dobles márgenes: la pestaña ya
+   tiene su margen lateral, así que el listado de dentro no añade otro. */
+@media (max-width: 768px) {
+    .detalle {
+        .detalle-datos-clave {
+            gap: var(--espaciado-s) var(--espaciado-m);
+            padding: var(--espaciado-s) var(--espaciado-m);
+            margin-bottom: var(--espaciado-s);
+        }
+
+        [class*="detalleTabs"] {
+            margin-top: var(--espaciado-s);
+
+            > div:first-of-type {
+                margin-bottom: var(--espaciado-s);
+            }
+        }
+
+        /* Acciones de las líneas: a la izquierda, bajo la primera pestaña, y
+           redondas y del mismo alto que las pestañas para que casen. En el detalle
+           móvil siempre son tarjetas: sobra el selector de modo. */
+        .Listado .listado-cabecera {
+            padding-inline: 0;
+
+            .listado-cabecera-izquierda:empty,
+            .selector-modo {
+                display: none;
+            }
+
+            .listado-cabecera-derecha {
+                flex: 1;
+                margin-left: 0;
+                justify-content: flex-start;
+            }
+
+            quimera-acciones .acciones {
+                margin: 0;
+                gap: var(--espaciado-s);
+
+                quimera-boton {
+                    margin: 0;
+                }
+
+                quimera-boton[destructivo]:not(:first-child) {
+                    margin-left: var(--espaciado-s);
+                }
+            }
+
+            quimera-boton:has(.qboton-icono) :is(button, a) {
+                width: 2.25rem;
+                height: 2.25rem;
+                border-radius: 999px;
+            }
+        }
+
+        quimera-tarjetas {
+            max-height: none;
+            background: transparent;
+
+            .lista-contenedor-scroll {
+                padding: 0;
+            }
+        }
     }
 }

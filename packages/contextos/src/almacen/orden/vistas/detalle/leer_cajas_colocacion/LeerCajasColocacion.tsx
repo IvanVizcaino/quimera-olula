@@ -5,7 +5,7 @@ import {
 } from "#/almacen/comun/componentes/CajaUbicacion.tsx";
 import { CajaCompletaResuelta } from "#/almacen/comun/voz_resolvers.ts";
 import { LineaOrdenAlmacen, OrdenAlmacen } from "#/almacen/orden/diseño.ts";
-import { registrarLecturaOrden } from "#/almacen/orden/infraestructura.ts";
+import { registrarLecturaCajaOrden, registrarLecturasOrden } from "#/almacen/orden/infraestructura.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
@@ -13,19 +13,28 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useCallback, useContext, useEffect, useState } from "react";
 
-type CajaMemoizada = { caja: CajaCompletaResuelta; linea: LineaOrdenAlmacen };
+type CajaMemoizada =
+    | { tipo: "caja"; caja: CajaCompletaResuelta; lineas: LineaOrdenAlmacen[] }
+    | { tipo: "palet"; caja: CajaCompletaResuelta };
 
-const encontrarLineaParaCajaColo = (
+const encontrarLineasParaCajaColo = (
     caja: CajaCompletaResuelta,
     lineas: LineaOrdenAlmacen[],
-): LineaOrdenAlmacen | null =>
-    lineas.find((linea) => {
+): LineaOrdenAlmacen[] => {
+    const lineasDirectas = lineas.filter((linea) => {
         if (linea.idCajaOrigen === caja.id) return true;
         if (linea.idCajaOrigen !== null) return false;
         if (linea.sku && caja.sku !== linea.sku) return false;
         if (linea.loteId && caja.idLote !== linea.loteId) return false;
         return true;
-    }) ?? null;
+    });
+
+    if (lineasDirectas.length > 0) return lineasDirectas;
+
+    return lineas.filter((linea) =>
+        linea.lecturas.some((lectura) => lectura.idCajaDestino === caja.id)
+    );
+};
 
 export const LeerCajasColocacion = ({
     orden,
@@ -61,8 +70,15 @@ export const LeerCajasColocacion = ({
                     resetear();
                     return;
                 }
-                const linea = encontrarLineaParaCajaColo(caja, orden.lineas);
-                if (!linea) {
+                if (!caja.sku) {
+                    // PALET: se registrará vía lectura_caja al leer la ubicación
+                    setCajasLeidas((prev) => [...prev, { tipo: "palet", caja }]);
+                    setResultado({ exito: true, mensaje: `Palé ${caja.lpn} pendiente de ubicación` });
+                    resetear();
+                    return;
+                }
+                const lineasEncontradas = encontrarLineasParaCajaColo(caja, orden.lineas);
+                if (lineasEncontradas.length === 0) {
                     pitidoError();
                     setResultado({
                         exito: false,
@@ -71,10 +87,14 @@ export const LeerCajasColocacion = ({
                     resetear();
                     return;
                 }
-                setCajasLeidas((prev) => [...prev, { caja, linea }]);
+                setCajasLeidas((prev) => [...prev, { tipo: "caja", caja, lineas: lineasEncontradas }]);
+                const primera = lineasEncontradas[0];
                 setResultado({
                     exito: true,
-                    mensaje: `Caja ${caja.lpn} registrada (${linea.sku} - ${linea.articulo})`,
+                    mensaje:
+                        lineasEncontradas.length === 1
+                            ? `Caja ${caja.lpn} registrada (${primera.sku} - ${primera.articulo})`
+                            : `Caja ${caja.lpn} registrada (${lineasEncontradas.length} líneas)`,
                 });
                 resetear();
                 return;
@@ -91,18 +111,32 @@ export const LeerCajasColocacion = ({
 
             let registrado = false;
             await intentar(async () => {
-                for (const { caja, linea } of cajasLeidas) {
-                    await registrarLecturaOrden(orden.id, {
-                        sku: caja.sku ?? linea.sku,
-                        articulo: linea.articulo,
-                        idLote: caja.idLote !== undefined ? caja.idLote : linea.loteId,
-                        idLinea: linea.id,
+                const todasLasLecturas = cajasLeidas
+                    .filter((e): e is Extract<CajaMemoizada, { tipo: "caja" }> => e.tipo === "caja")
+                    .flatMap(({ caja, lineas }) =>
+                        lineas.map((linea) => ({
+                            sku: caja.sku ?? linea.sku,
+                            articulo: linea.articulo,
+                            idLote: linea.loteId ? linea.loteId : caja.idLote,
+                            idLinea: linea.id,
+                            cajaCompleta: true,
+                            cantidad: caja.capacidad ?? linea.cantidadPrevista,
+                            idCajaOrigen: caja.id,
+                            idUbicacionOrigen: null,
+                            idCajaDestino: null,
+                            idUbicacionDestino: ubicacion.id,
+                            fase: 'DROP' as const,
+                        }))
+                    );
+                if (todasLasLecturas.length > 0) {
+                    await registrarLecturasOrden(orden.id, todasLasLecturas);
+                }
+                for (const entrada of cajasLeidas.filter((e) => e.tipo === "palet")) {
+                    await registrarLecturaCajaOrden(orden.id, {
+                        cajaId: entrada.caja.id,
                         cajaCompleta: true,
-                        cantidad: caja.capacidad ?? linea.cantidadPrevista,
-                        idCajaOrigen: caja.id,
-                        idUbicacionOrigen: null,
-                        idCajaDestino: null,
                         idUbicacionDestino: ubicacion.id,
+                        idCajaDestino: null,
                     });
                 }
                 registrado = true;
@@ -151,9 +185,14 @@ export const LeerCajasColocacion = ({
                 )}
                 {cajasLeidas.length > 0 && (
                     <ul className="LeerCajasColocacion__lista">
-                        {cajasLeidas.map(({ caja, linea }) => (
-                            <li key={caja.id}>
-                                {caja.lpn} — {linea.sku} {linea.articulo}
+                        {cajasLeidas.map((entrada) => (
+                            <li key={entrada.caja.id}>
+                                {entrada.caja.lpn}
+                                {entrada.tipo === "caja"
+                                    ? entrada.lineas.length === 1
+                                        ? ` — ${entrada.lineas[0].sku} ${entrada.lineas[0].articulo}`
+                                        : ` — ${entrada.lineas.length} líneas`
+                                    : " (palé)"}
                             </li>
                         ))}
                     </ul>

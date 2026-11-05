@@ -1,0 +1,73 @@
+/*
+ * Totales del asiento bajo la tabla de partidas. Misma estética que los totales
+ * de los documentos de venta (ventas/venta/vistas/TotalesVenta.css); se duplica
+ * aquí en vez de importar un CSS de otro contexto.
+ */
+.totales-asiento {
+    margin-top: 1rem;
+    margin-inline: var(--padding-horizontal);
+    padding: 1rem;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: var(--color-superficie-elevada);
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: baseline;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.totales-asiento-item {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.totales-asiento-item label {
+    font-weight: bold;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+}
+
+.totales-asiento-item span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* Un asiento descuadrado es un error contable: que se vea. */
+.totales-asiento-item--descuadre {
+    color: var(--color-error, #b3261e);
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .totales-asiento {
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.4rem;
+        padding: 0.6rem;
+    }
+
+    .totales-asiento-item {
+        flex: 1 1 0;
+        justify-content: center;
+        min-width: 0;
+        font-size: clamp(0.9rem, 2.8vw, 0.95rem);
+        white-space: nowrap;
+    }
+
+    .totales-asiento-item label {
+        margin-right: 0.25rem;
+        font-size: inherit;
+    }
+
+    .totales-asiento-item span {
+        font-size: inherit;
+        white-space: nowrap;
+        overflow-wrap: normal;
+    }
+}

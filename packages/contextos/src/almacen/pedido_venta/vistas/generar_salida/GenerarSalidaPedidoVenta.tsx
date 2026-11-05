@@ -1,11 +1,11 @@
-import { Ubicacion } from "#/almacen/comun/componentes/Ubicacion.tsx";
+import { Zona } from "#/almacen/comun/componentes/Zona.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback } from "react";
-import { generarSalidaDesdePedidos } from "../../infraestructura.ts";
+import { generarSalidaVentaDesdePedidos } from "../../infraestructura.ts";
 import { generarSalidaVacia, metaGenerarSalida } from "./generar_salida.ts";
 
 export const GenerarSalidaPedidoVenta = ({
@@ -19,10 +19,10 @@ export const GenerarSalidaPedidoVenta = ({
 
     const generar_ = useCallback(async () => {
         const ids = pedidoIds.map((id) => parseInt(id, 10));
-        const ubicacionId = parseInt(modelo.ubicacionDestinoId as string, 10);
-        await generarSalidaDesdePedidos(ids, ubicacionId);
-        publicar("salida_generada");
-    }, [modelo.ubicacionDestinoId, pedidoIds, publicar]);
+        const zonaId = parseInt(modelo.zonaId as string, 10);
+        const idOrden = await generarSalidaVentaDesdePedidos(ids, [zonaId]);
+        publicar("salida_generada", idOrden);
+    }, [modelo.zonaId, pedidoIds, publicar]);
 
     const cancelar_ = useCallback(() => publicar("salida_cancelada"), [publicar]);
 
@@ -36,7 +36,7 @@ export const GenerarSalidaPedidoVenta = ({
             onCerrar={cancelar}
         >
             <quimera-formulario>
-                <Ubicacion label="Ubicación de preparación" {...uiProps("ubicacionDestinoId")} />
+                <Zona label="Zona de preparación" {...uiProps("zonaId")} />
             </quimera-formulario>
 
             <div className="botones maestro-botones">

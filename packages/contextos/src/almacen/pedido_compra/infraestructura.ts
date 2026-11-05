@@ -71,8 +71,11 @@ export const postEntradaDesdePedido: PostEntradaDesdePedido = async (nueva: Nuev
         linea_pedido_id: linea.linea_pedido_id,
         cantidad: linea.cantidad,
         lote_id: linea.lote_id,
+        caducidad: linea.caducidad ?? null,
         tipo_caja_id: linea.tipo_caja_id,
         num_cajas: linea.num_cajas,
+        subcaja_compra_id: linea.subcaja_compra_id ?? null,
+        palet_num: linea.palet_num ?? null,
     });
 
     const respuesta = await RestAPI.post(
@@ -104,8 +107,11 @@ const lineaNuevaEntradaDesdeApi = (api: LineaNuevaEntradaDesdePedidoApi): LineaN
     linea_pedido_id: api.id,
     cantidad: api.cantidad,
     lote_id: api.lotes?.[0]?.id ?? null,
+    caducidad: api.lotes?.[0]?.caducidad ?? null,
     tipo_caja_id: null,
     num_cajas: null,
+    subcaja_compra_id: null,
+    palet_num: null,
 });
 
 export const getInfoLineasPedidoCompra: GetInfoLineasPedidoCompra = async (pedidoCompraId, foto) => {

@@ -39,4 +39,14 @@ quimera-tarjeta-resumen {
     .comparacion[data-positivo="false"] {
         color: var(--rojo-7);
     }
+
+    .pie {
+        font-size: var(--tamaño-letra-xs);
+        color: var(--color-texto-secundario);
+    }
+
+    &[data-cargando] .valor {
+        opacity: 0.4;
+        transition: opacity var(--transicion-normal);
+    }
 }

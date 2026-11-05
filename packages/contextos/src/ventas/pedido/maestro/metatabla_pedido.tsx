@@ -1,50 +1,27 @@
-import { ColumnaEstadoTabla } from "#/comun/componentes/ColumnaEstadoTabla.tsx";
-import { MetaTabla, QIcono } from "@olula/componentes/index.js";
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { MetaTabla } from "@olula/componentes/index.js";
 import { Pedido } from "../diseño.ts";
-import { estadoServidoPedido } from "./maestro.ts";
+import { etiquetaEstadoPedido } from "./maestro.ts";
 
 export const getMetaTablaPedido = () => metaTablaPedido;
 
 const metaTablaPedido: MetaTabla<Pedido> = [
   {
     id: "estado",
-    cabecera: "",
+    cabecera: "Estado",
     render: (pedido: Pedido) => (
-      <ColumnaEstadoTabla
-        estados={{
-          cerrado: (
-            <QIcono
-              nombre={"circulo_relleno"}
-              tamaño="sm"
-              color="var(--color-deshabilitado-oscuro)"
-            />
-          ),
-          parcial: (
-            <QIcono
-              nombre={"circulo_relleno"}
-              tamaño="sm"
-              color="var(--color-advertencia-oscuro)"
-            />
-          ),
-          pendiente: (
-            <QIcono
-              nombre={"circulo_relleno"}
-              tamaño="sm"
-              color="var(--color-exito-oscuro)"
-            />
-          ),
-        }}
-        estadoActual={estadoServidoPedido(pedido)}
-      />
+      <EtiquetaEstado {...etiquetaEstadoPedido(pedido)} />
     ),
   },
   {
     id: "codigo",
+    estilo: "secundario",
     cabecera: "Código",
     prioridad: "alta",
   },
   {
     id: "nombre_cliente",
+    estilo: "destacado",
     cabecera: "Cliente",
     prioridad: "alta",
     render: (p) => p.cliente.nombre_cliente,
@@ -57,6 +34,7 @@ const metaTablaPedido: MetaTabla<Pedido> = [
   },
   {
     id: "total",
+    estilo: "destacado",
     cabecera: "Total",
     tipo: "moneda",
     prioridad: "alta",

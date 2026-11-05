@@ -16,12 +16,14 @@ export interface ModeloAltaFacturaNoRegistrada extends ModeloClienteVentaNoRegis
 export const metaModeloAltaFacturaRegistrada: MetaModelo<ModeloAltaFacturaRegistrada> = {
     campos: {
         ...metaModeloClienteVentaRegistrado.campos,
+        idEmpresa: { requerido: true },
     }
 };
 
 export const metaModeloAltaFacturaNoRegistrada: MetaModelo<ModeloAltaFacturaNoRegistrada> = {
     campos: {
         ...metaModeloClienteVentaNoRegistrado.campos,
+        idEmpresa: { requerido: true },
     }
 };
 

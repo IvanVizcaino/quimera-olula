@@ -7,6 +7,7 @@
     min-height: min(50vh, 22rem);
 
     .listado-cabecera {
+        position: relative;
         flex-shrink: 0;
         display: flex;
         justify-content: space-between;
@@ -47,23 +48,6 @@
         gap: var(--espaciado-s);
     }
 
-    /* Filtros abiertos: la cabecera se dedica entera al panel de filtros.
-       Cuelga de .listado-cabecera para no afectar a listados anidados en el Detalle.
-       Aplica a Listado y a ListadoSemiControlado: comparten este CSS. */
-    .listado-cabecera:has(.MaestroFiltrosControlado[data-abierto]) {
-        align-items: flex-start;
-
-        .listado-cabecera-izquierda {
-            flex-basis: 100%;
-            align-items: flex-start;
-        }
-
-        .listado-cabecera-derecha,
-        .listado-descarga {
-            display: none;
-        }
-    }
-
     .cambio-modo {
         display: inline-flex;
         align-self: center;
@@ -75,5 +59,163 @@
         align-items: center;
         line-height: 0.1;
         fill: var(--color-primario);
+    }
+
+    /* Modo de vista: control segmentado Tarjetas | Tabla */
+    .selector-modo {
+        display: inline-flex;
+        padding: 3px;
+        border-radius: var(--redondeo-borde-s);
+        background: var(--color-superficie-sunken);
+        box-shadow: inset 0 0 0 1px var(--color-borde-sutil);
+
+        button {
+            font: inherit;
+            font-size: var(--tamaño-letra-s);
+            padding: var(--espaciado-xs) var(--espaciado-m);
+            border: 0;
+            border-radius: calc(var(--redondeo-borde-s) - 2px);
+            background: transparent;
+            color: var(--color-texto-secundario);
+            cursor: pointer;
+
+            &:hover {
+                color: var(--color-texto-primario);
+            }
+
+            &[aria-pressed="true"] {
+                background: var(--color-superficie);
+                color: var(--color-texto-primario);
+                font-weight: var(--grosor-letra-6);
+                box-shadow: var(--sombra-xs);
+                cursor: default;
+            }
+
+            &:focus-visible {
+                outline: 2px solid var(--color-primario);
+                outline-offset: 1px;
+            }
+        }
+    }
+
+    /* Densidad: botón cuadrado con borde, activo cuando está en compacta */
+    .cambio-densidad {
+        display: inline-grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-s);
+        background: var(--color-superficie);
+        color: var(--color-texto-secundario);
+        cursor: pointer;
+
+        &:hover {
+            color: var(--color-texto-primario);
+            border-color: var(--color-borde-fuerte);
+        }
+
+        &[aria-pressed="true"] {
+            background: var(--color-superficie-sunken);
+            color: var(--color-texto-primario);
+            border-color: var(--color-borde-fuerte);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--color-primario);
+            outline-offset: 2px;
+        }
+    }
+}
+
+/* Maestro contraído junto al detalle: la cabecera baja a dos líneas si no cabe */
+.Maestro.contraido .Listado .listado-cabecera {
+    flex-wrap: wrap;
+
+    .listado-cabecera-izquierda {
+        flex: 1 0 auto;
+    }
+
+    .listado-cabecera-derecha {
+        margin-left: auto;
+    }
+}
+
+.Listado .listado-cabecera quimera-boton :is(button, a) {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    /* Acciones + modo + densidad no caben en una línea: bajan a otra */
+    .Listado .listado-cabecera,
+    .Listado .listado-cabecera-derecha {
+        flex-wrap: wrap;
+    }
+
+    .Listado .listado-cabecera-derecha {
+        margin-left: auto;
+        justify-content: flex-end;
+    }
+
+    .Listado .selector-modo button {
+        padding: var(--espaciado-xs) var(--espaciado-s);
+    }
+}
+
+/* Densidad compacta: menos aire en tarjetas y filas (preferencia del usuario) */
+.Listado[data-densidad="compacta"] {
+    --espaciado-tarjeta: var(--espaciado-xs) var(--espaciado-m);
+    --hueco-tarjetas: var(--espaciado-xs);
+    --alto-fila-tabla: 2rem;
+
+    quimera-tabla td {
+        padding-block: var(--espaciado-xxs);
+    }
+
+    .qtarjeta-generica-grid {
+        gap: var(--espaciado-xxs);
+    }
+
+    .qtarjeta-generica-principal .q-avatar {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: var(--tamaño-letra-s);
+    }
+}
+/* Móvil: Nuevo, Editar y Borrar de la cabecera se quedan en un icono cuadrado; el
+   texto sigue ahí para lectores de pantalla. */
+@media (max-width: 768px) {
+    .Listado .listado-cabecera quimera-boton:has(.qboton-icono) :is(button, a) {
+        display: inline-grid;
+        place-items: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        padding: 0;
+
+        .qboton-icono {
+            display: inline-flex;
+        }
+
+        .qboton-icono quimera-icono {
+            fill: currentColor;
+            color: currentColor;
+        }
+
+        /* Solo "Nuevo" va relleno; Editar y Borrar, con borde fino */
+        &:not(:has(.qboton-icono[data-icono="crear"])) {
+            background: var(--color-superficie);
+            color: var(--color-boton);
+            border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        }
+
+        .qboton-texto {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
     }
 }

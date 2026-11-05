@@ -8,6 +8,8 @@ export type NuevaLineaOrden = {
     idCajaOrigen: string | null;
     idUbicacionDestino: string | null;
     idCajaDestino: string | null;
+    pasosPick: string | null;
+    pasosDrop: string | null;
 };
 
 const requiereOrigen = (tipo: TipoOrden) => tipo === "SALIDA" || tipo === "TRASPASO";
@@ -72,6 +74,8 @@ export const getMetaNuevaLineaOrden = (tipo: TipoOrden): MetaModelo<NuevaLineaOr
             },
         },
         idCajaDestino: {},
+        pasosPick: {},
+        pasosDrop: {},
     },
     onChange: onNuevaLineaCambiada
 });

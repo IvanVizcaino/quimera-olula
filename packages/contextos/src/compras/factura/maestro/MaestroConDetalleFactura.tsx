@@ -1,7 +1,10 @@
+import { widgetsDocumentoCompra } from "#/compras/comun/dominio.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
+import { getMetaFiltroDefecto } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.tsx";
+import { camelASnake } from "@olula/componentes/maestro/maestroFiltros/dominio.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.ts";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.ts";
@@ -14,6 +17,15 @@ import "./MaestroConDetalleFactura.css";
 import { getMaquina } from "./maquina.ts";
 import { metaTablaFactura } from "./metatabla_factura.tsx";
 import { TarjetaFactura } from "./TarjetaFactura.tsx";
+
+const widgetsFacturaCompra = widgetsDocumentoCompra("compras.factura", {
+    plural: "Facturas de compra",
+    total: "Total facturado",
+    medio: "Factura media",
+});
+
+// Filtros con el nombre de campo de la API (snake_case): el modelo va en camelCase.
+const metaFiltroFactura = getMetaFiltroDefecto(metaTablaFactura, { campoApi: camelASnake });
 
 const criteriaFacturas = {
     ...criteriaDefecto,
@@ -41,13 +53,15 @@ export const MaestroConDetalleFactura = () => {
     }, []);
 
     return (
-        <div className="Factura">
+        <div className="ComprasFactura">
             <MaestroDetalle<Factura>
                 Maestro={
                     <>
                         <h2>Facturas de compra</h2>
                         <Listado<Factura>
                             metaTabla={metaTablaFactura}
+                            metaFiltro={metaFiltroFactura}
+                            widgets={widgetsFacturaCompra}
                             criteria={facturas.criteria}
                             tarjeta={TarjetaFactura}
                             entidades={facturas.lista}

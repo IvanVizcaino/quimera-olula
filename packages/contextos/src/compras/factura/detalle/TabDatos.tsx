@@ -52,7 +52,6 @@ export const TabDatos = ({
                     nombre="grupoIvaNegocioId"
                 />
                 <QInput label="Rectifica a" {...uiProps("codigoRectificativa")} />
-                <QInput label="Asiento" {...uiProps("asientoId")} />
                 <QCheckbox label="De abono" {...uiProps("deAbono")} />
                 <QCheckbox label="Servicios" {...uiProps("servicios")} />
                 <QCheckbox label="No generar asiento" {...uiProps("noGenerarAsiento")} />

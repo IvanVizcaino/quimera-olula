@@ -1,3 +1,4 @@
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
@@ -15,15 +16,17 @@ import { CambiarDescuento } from "../../comun/componentes/moleculas/CambiarDescu
 import { CambiarDivisa } from "../../comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import "../../comun/estilos/campos.css";
 import "../../comun/estilos/detalle_documento.css";
-import { tituloDocumentoVenta } from "../../venta/dominio.ts";
+import {
+  datosClaveDocumentoVenta,
+  tituloDocumentoVenta,
+} from "../../venta/dominio.ts";
 import { TotalesVenta } from "../../venta/vistas/TotalesVenta.tsx";
 import { AprobarPresupuesto } from "../aprobar/AprobarPresupuesto.tsx";
 import { PedidoGenerado } from "../aprobar/PedidoGenerado.tsx";
 import { BorrarPresupuesto } from "../borrar/BorrarPresupuesto.tsx";
 import { Presupuesto } from "../diseño.ts";
-import { aprobado } from "../dominio.ts";
+import { aprobado, etiquetaEstadoPresupuesto } from "../dominio.ts";
 import { getReportPresupuesto, getTrazaPresupuesto } from "../infraestructura.ts";
-import { EstadoPresupuesto } from "../vistas/EstadoPresupuesto.tsx";
 import { metaPresupuesto, presupuestoVacio } from "./detalle.ts";
 import "./DetallePresupuesto.css";
 import { Lineas } from "./lineas/Lineas.tsx";
@@ -76,12 +79,8 @@ export const DetallePresupuesto = ({
 
   const { estado, lineaActiva, pedidoCreado } = ctx;
 
-  const titulo = (presupuesto: Presupuesto) => (
-    <span className="titulo-documento">
-      <EstadoPresupuesto aprobado={aprobado(presupuesto)} />
-      {tituloDocumentoVenta(presupuesto, "Nuevo Presupuesto")}
-    </span>
-  );
+  const titulo = (presupuesto: Presupuesto) =>
+    tituloDocumentoVenta(presupuesto, "Nuevo Presupuesto");
 
   const imprimir = useCallback(async () => {
     const blob = await getReportPresupuesto(ctx.presupuesto.id);
@@ -122,6 +121,10 @@ export const DetallePresupuesto = ({
     <Detalle
       id={ctx.presupuesto.id}
       obtenerTitulo={titulo}
+      obtenerEstado={(presupuesto: Presupuesto) => (
+        <EtiquetaEstado {...etiquetaEstadoPresupuesto(presupuesto)} />
+      )}
+      obtenerDatosClave={datosClaveDocumentoVenta}
       setEntidad={() => {}}
       entidad={ctx.presupuesto}
       cerrarDetalle={() => emitir("presupuesto_deseleccionado", null)}
@@ -136,6 +139,15 @@ export const DetallePresupuesto = ({
       </div>
 
       <Tabs>
+        <Tab label="Líneas">
+          <Lineas
+            presupuesto={ctx.presupuesto}
+            lineaActiva={lineaActiva}
+            publicar={emitir}
+            estadoPresupuesto={estado}
+          />
+        </Tab>
+
         <Tab label="Cliente">
           <TabCliente
             presupuesto={presupuesto}
@@ -179,13 +191,6 @@ export const DetallePresupuesto = ({
           porComision={ctx.presupuesto.por_comision}
         />
       )}
-
-      <Lineas
-        presupuesto={ctx.presupuesto}
-        lineaActiva={lineaActiva}
-        publicar={emitir}
-        estadoPresupuesto={estado}
-      />
 
       {estado === "BORRANDO_PRESUPUESTO" && (
         <BorrarPresupuesto presupuesto={ctx.presupuesto} publicar={emitir} />

@@ -28,10 +28,10 @@ export const ResumenSincronizacionMovimientoBancario = ({
                     modificados, {resumen.eliminados} eliminados.
                 </p>
                 <p>
-                    Conciliación automática: {resumen.conciliados} conciliados y {resumen.sugeridos} con
-                    recibo sugerido para revisar
-                    {resumen.conciliadosIa + resumen.sugeridosIa > 0 &&
-                        ` (la IA ha conciliado ${resumen.conciliadosIa} y sugerido ${resumen.sugeridosIa})`}.
+                    Conciliación automática: {resumen.conciliados} casados y {resumen.conCandidatos} con
+                    candidatos para revisar
+                    {resumen.conciliadosIa + resumen.conCandidatosIa > 0 &&
+                        ` (la IA ha casado ${resumen.conciliadosIa} y propuesto candidatos en ${resumen.conCandidatosIa})`}.
                 </p>
 
                 {resumen.erroresConciliacion.length > 0 && (
@@ -56,9 +56,14 @@ export const ResumenSincronizacionMovimientoBancario = ({
                                     {error.error}
                                     {error.requiereReautenticacion && (
                                         <>
-                                            {" "}
-                                            — hay que volver a conectar el banco en{" "}
-                                            <em>Conexiones bancarias</em>.
+                                            {" "}— hay que volver a autenticar la conexión.{" "}
+                                            <QBoton
+                                                tamaño="pequeño"
+                                                variante="borde"
+                                                enlace={`/tesoreria/conexion_bancaria?id=${encodeURIComponent(error.conexionId)}`}
+                                            >
+                                                Ir a la conexión
+                                            </QBoton>
                                         </>
                                     )}
                                 </li>

@@ -58,6 +58,8 @@ interface OrdenAlmacenApi {
     ubicacion_destino_id: string | null;
     ubicacion_destino: string | null;
     caja_destino_id: string | null;
+    pasos_pick: string | null;
+    pasos_drop: string | null;
     lineas: LineaOrdenAlmacenApi[];
     lecturas_caja: LecturaCajaOrdenApi[];
 }
@@ -96,6 +98,9 @@ export interface LineaOrdenAlmacenApi {
     caja_destino_id: string | null;
     caja_destino: string | null;
     linea_pick_id: string | null;
+    pasos_pick: string | null;
+    pasos_drop: string | null;
+    cantidad_pick?: number;
     lecturas: LecturaLineaOrdenApi[];
 }
 
@@ -107,6 +112,8 @@ interface NuevaLineaOrdenAlmacenApi {
     caja_origen_id: string | null;
     ubicacion_destino_id: string | null;
     caja_destino_id: string | null;
+    pasos_pick?: string | null;
+    pasos_drop?: string | null;
 }
 
 export interface ItemOrdenApi {
@@ -154,6 +161,8 @@ export const ordenDesdeApi = (api: OrdenAlmacenApi): OrdenAlmacen => ({
     idUbicacionDestino: api.ubicacion_destino_id,
     ubicacionDestino: api.ubicacion_destino,
     idCajaDestino: api.caja_destino_id,
+    pasosPick: api.pasos_pick,
+    pasosDrop: api.pasos_drop,
     lineas: api.lineas.map(lineaOrdenDesdeApi),
     lecturasCaja: (api.lecturas_caja ?? []).map(lecturaCajaOrdenDesdeApi),
 });
@@ -192,6 +201,9 @@ export const lineaOrdenDesdeApi = (api: LineaOrdenAlmacenApi): LineaOrdenAlmacen
     idCajaDestino: api.caja_destino_id,
     cajaDestino: api.caja_destino,
     idLineaPick: api.linea_pick_id,
+    pasosPick: api.pasos_pick,
+    pasosDrop: api.pasos_drop,
+    cantidadPick: api.cantidad_pick,
     lecturas: api.lecturas.map(lecturaLineaOrdenDesdeApi),
 });
 
@@ -237,6 +249,8 @@ const nuevaLineaOrdenAApi = (linea: NuevaLineaOrdenAlmacen): NuevaLineaOrdenAlma
     caja_origen_id: linea.idCajaOrigen,
     ubicacion_destino_id: linea.idUbicacionDestino,
     caja_destino_id: linea.idCajaDestino,
+    pasos_pick: linea.pasosPick,
+    pasos_drop: linea.pasosDrop,
 });
 
 export const itemOrdenDesdeApi = (api: ItemOrdenApi): ItemOrdenAlmacen => ({
@@ -258,6 +272,8 @@ const nuevaOrdenAApi = (orden: NuevaOrdenAlmacen) => ({
     tipo_orden: orden.tipoOrden,
     almacen_id: orden.almacenId,
     abierta: orden.abierta,
+    pasos_pick: orden.pasosPick ?? null,
+    pasos_drop: orden.pasosDrop ?? null,
 });
 
 const cambiosOrdenAApi = (cambios: CambiosOrdenAlmacen) => {
@@ -279,6 +295,8 @@ const cambiosLineaOrdenAApi = (cambios: CambiosLineaOrdenAlmacen) => {
     if (cambios.idCajaOrigen !== undefined) payload.caja_origen_id = cambios.idCajaOrigen;
     if (cambios.idUbicacionDestino !== undefined) payload.ubicacion_destino_id = cambios.idUbicacionDestino;
     if (cambios.idCajaDestino !== undefined) payload.caja_destino_id = cambios.idCajaDestino;
+    if (cambios.pasosPick !== undefined) payload.pasos_pick = cambios.pasosPick;
+    if (cambios.pasosDrop !== undefined) payload.pasos_drop = cambios.pasosDrop;
     return payload;
 };
 
@@ -348,25 +366,27 @@ export const getSkuLote = async (codigo: string) => {
     };
 };
 
-export const registrarLecturaOrden = async (
+export const registrarLecturasOrden = async (
     id: string,
-    lectura: NuevaLecturaOrden
+    lecturas: NuevaLecturaOrden[]
 ): Promise<void> => {
-
     await RestAPI.post(
-        `${baseUrl}/${id}/lectura`,
+        `${baseUrl}/${id}/lecturas`,
         {
-            sku: lectura.sku,
-            lote_id: lectura.idLote,
-            linea_id: lectura.idLinea,
-            cantidad: lectura.cantidad,
-            ubicacion_origen_id: lectura.idUbicacionOrigen,
-            caja_origen_id: lectura.idCajaOrigen,
-            caja_completa: lectura.cajaCompleta,
-            ubicacion_destino_id: lectura.idUbicacionDestino,
-            caja_destino_id: lectura.idCajaDestino,
+            lecturas: lecturas.map(lectura => ({
+                sku: lectura.sku,
+                lote_id: lectura.idLote,
+                linea_id: lectura.idLinea,
+                cantidad: lectura.cantidad,
+                ubicacion_origen_id: lectura.idUbicacionOrigen,
+                caja_origen_id: lectura.idCajaOrigen,
+                caja_completa: lectura.cajaCompleta,
+                ubicacion_destino_id: lectura.idUbicacionDestino,
+                caja_destino_id: lectura.idCajaDestino,
+                fase: lectura.fase ?? null,
+            })),
         },
-        "Error al registrar lectura de la orden"
+        "Error al registrar lecturas de la orden"
     );
 };
 
@@ -425,4 +445,96 @@ export const getReportEtiquetasOrden: GetReportEtiquetasOrden = async (id) =>
 export const postColocacion: PostColocacion = async (id) => {
     const respuesta = await RestAPI.post(`${baseUrl}/${id}/colocacion`, {}, "Error al crear la orden de colocación");
     return respuesta.id as string;
+};
+
+export const crearLineaSubcajaPalet = async (
+    ordenId: string,
+    datos: { sku: string; cantidad: number; idCajaOrigen: string; idUbicacionDestino: string },
+): Promise<void> => {
+    await RestAPI.post(
+        `${baseUrl}/${ordenId}/linea_subcaja_palet`,
+        {
+            sku: datos.sku,
+            cantidad: datos.cantidad,
+            caja_origen_id: datos.idCajaOrigen,
+            ubicacion_destino_id: datos.idUbicacionDestino,
+        },
+        "Error al crear línea de subcaja de palé"
+    );
+};
+
+
+export const crearCajasOrden = async (ordenId: string): Promise<void> => {
+    await RestAPI.post(`${baseUrl}/${ordenId}/cajas`, {}, "Error al crear cajas de la orden");
+};
+
+
+export interface ItemStockDesgloseCaja {
+    cajaId: string | null;
+    lpn: string | null;
+    loteId: string | null;
+    cantidad: number;
+}
+
+interface ItemStockDesgloseCajaApi {
+    caja_id: string | null;
+    lpn: string | null;
+    lote_id: string | null;
+    cantidad: number;
+}
+
+interface ItemStockUbicacionApi {
+    id: string;
+}
+
+const desgloseDesdeApi = (api: ItemStockDesgloseCajaApi): ItemStockDesgloseCaja => ({
+    cajaId: api.caja_id,
+    lpn: api.lpn,
+    loteId: api.lote_id,
+    cantidad: api.cantidad,
+});
+
+/**
+ * Obtiene el desglose de stock (suelto vs en cajas) para un SKU en una ubicación.
+ * Resuelve primero el stock_ubicacion_id a partir de ubicacion_id y sku (articulo_id).
+ * Retorna null si no hay stock de ese SKU en esa ubicación.
+ */
+export const getStockDesgloseCaja = async (
+    ubicacionId: string,
+    articuloId: string,
+    loteId?: string,
+): Promise<ItemStockDesgloseCaja[] | null> => {
+    const q = criteriaQuery(
+        [['ubicacion_id', '=', ubicacionId], ['articulo_id', '=', articuloId]],
+        undefined,
+        undefined,
+    );
+    const lista = await RestAPI.get<{ datos: ItemStockUbicacionApi[] }>(
+        `/almacen/stock_ubicacion${q}`
+    );
+    if (!lista.datos.length) return null;
+
+    const stockUbicacionId = lista.datos[0].id;
+    const params = loteId ? `?lote_id=${loteId}` : '';
+    const desglose = await RestAPI.get<{ datos: ItemStockDesgloseCajaApi[] }>(
+        `/almacen/stock_ubicacion/${stockUbicacionId}/desglose_caja${params}`
+    );
+    return desglose.datos.map(desgloseDesdeApi);
+};
+
+/**
+ * Obtiene los lotes distintos de un artículo que hay dentro de una caja concreta.
+ * Útil cuando la caja no tiene lote_id propio (caja multiproducto o multilote).
+ * Retorna array vacío si el artículo no está en esa caja.
+ */
+export const getLotesDeArticuloEnCaja = async (
+    ubicacionId: string,
+    articuloId: string,
+    cajaId: string,
+): Promise<string[]> => {
+    const desglose = await getStockDesgloseCaja(ubicacionId, articuloId);
+    if (!desglose) return [];
+    return desglose
+        .filter((item) => item.cajaId === cajaId && item.loteId !== null && item.cantidad > 0)
+        .map((item) => item.loteId as string);
 };

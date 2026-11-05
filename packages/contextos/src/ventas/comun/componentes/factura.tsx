@@ -25,6 +25,7 @@ interface FacturaProps {
   valor: string;
   nombre?: string;
   label?: string;
+  placeholder?: string;
   deshabilitado?: boolean;
   autoFocus?: boolean;
   autoSeleccion?: boolean;
@@ -34,13 +35,34 @@ interface FacturaProps {
   onChange?: (opcion: OpcionFactura | null) => void;
 }
 
-const filtroFacturas = (texto: string, clienteId?: string): Filtro =>
-  clienteId === undefined
-    ? { or: [["nombre_cliente", "~", texto], ["codigo", "~", texto]] }
-    : ([
-        ["codigo", "~", texto],
-        ["codcliente", "~", clienteId],
-      ] as ClausulaFiltro[]);
+/** Convierte "dd/mm/aaaa" (como se muestra) al formato de la API "aaaa-mm-dd". */
+const fechaApiDesdeTexto = (texto: string): string | null => {
+  const partes = texto.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!partes) return null;
+
+  const [, dia, mes, anyo] = partes;
+  const fecha = new Date(Number(anyo), Number(mes) - 1, Number(dia));
+  if (fecha.getDate() !== Number(dia) || fecha.getMonth() !== Number(mes) - 1) {
+    return null;
+  }
+
+  return `${anyo}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+};
+
+const filtroFacturas = (texto: string, clienteId?: string): Filtro => {
+  const fecha = fechaApiDesdeTexto(texto);
+  const clausulaTexto: ClausulaFiltro = fecha
+    ? ["fecha", "<>", `${fecha}_${fecha}`]
+    : ["codigo", "~", texto];
+
+  if (clienteId !== undefined) {
+    return [clausulaTexto, ["codcliente", "~", clienteId]];
+  }
+
+  return fecha
+    ? clausulaTexto
+    : { or: [["nombre_cliente", "~", texto], clausulaTexto] };
+};
 
 export const Factura = ({
   clienteId,
@@ -48,6 +70,7 @@ export const Factura = ({
   valor,
   nombre = "factura_id",
   label = "Factura",
+  placeholder,
   deshabilitado = false,
   renderOpcion,
   onChange,
@@ -107,6 +130,12 @@ export const Factura = ({
       valor={valor}
       obtenerOpciones={obtenerOpciones}
       descripcion={descripcion}
+      placeholder={
+        placeholder ??
+        (clienteId === undefined
+          ? "Código, cliente o fecha (dd/mm/aaaa)"
+          : "Código o fecha (dd/mm/aaaa)")
+      }
       deshabilitado={deshabilitado}
       erroneo={intentoBusquedaSinCliente}
       textoValidacion={

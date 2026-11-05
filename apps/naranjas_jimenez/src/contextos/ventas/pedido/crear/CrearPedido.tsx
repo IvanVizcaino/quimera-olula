@@ -48,6 +48,7 @@ export const CrearPedidoNrj = ({
         />
         <DirCliente
           clienteId={nuevoPedido.modelo.cliente_id}
+          valorDefecto="facturacion"
           label="Direccion envio"
           {...nuevoPedido.uiProps("direccion_id")}
           // nombre="alta_pedido_direccion_id"

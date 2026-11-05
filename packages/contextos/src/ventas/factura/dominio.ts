@@ -1,10 +1,12 @@
+import { EstadoEtiqueta } from "#/comun/diseño.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { plugin } from "@olula/lib/dominio.ts";
 import {
     cambioClienteVentaVacio,
     clienteVentaVacio,
     nuevaVentaVacia,
-    ventaVacia
+    ventaVacia,
+    widgetsDocumentoVenta
 } from "../venta/dominio.ts";
 import {
     CambioClienteFactura,
@@ -74,11 +76,13 @@ export const emisionEsReintento = (factura: Factura): boolean =>
 export const metaTablaFactura: MetaTabla<Factura> = [
     {
         id: "codigo",
+        estilo: "secundario",
         cabecera: "Código",
         prioridad: "alta",
     },
     {
         id: "nombre_cliente",
+        estilo: "destacado",
         cabecera: "Cliente",
         prioridad: "alta",
         render: (f) => f.cliente.nombre_cliente,
@@ -91,6 +95,7 @@ export const metaTablaFactura: MetaTabla<Factura> = [
     },
     {
         id: "total",
+        estilo: "destacado",
         cabecera: "Total",
         tipo: "moneda",
         prioridad: "alta",
@@ -121,3 +126,23 @@ export const nuevaFacturaVacia: NuevaFactura = nuevaVentaVacia;
 
 export const cambioClienteFacturaVacio: CambioClienteFactura = cambioClienteVentaVacio;
 
+/**
+ * Borrador en gris, error de firma en rojo. Una emitida que aún se puede tocar
+ * (con el plugin de expedición, a la espera de firma) está pendiente; la que ya
+ * no admite cambios está completada.
+ */
+export const etiquetaEstadoFactura = (factura: Factura): EstadoEtiqueta => {
+    const texto = descripcionEstadoExpedicion[factura.estadoExpedicion];
+    const { estadoExpedicion } = factura;
+
+    if (estadoExpedicion === "ERROR_FIRMA") return { texto, tono: "error" };
+    if (estadoExpedicion === "BORRADOR" || estadoExpedicion === "") return { texto, tono: "borrador" };
+    return { texto, tono: facturaEditable(factura) ? "pendiente" : "completado" };
+};
+
+/** Widgets por defecto del maestro de facturas (totales según el filtro activo). */
+export const widgetsFactura = widgetsDocumentoVenta("ventas.factura", {
+    plural: "Facturas",
+    total: "Total facturado",
+    medio: "Ticket medio",
+});

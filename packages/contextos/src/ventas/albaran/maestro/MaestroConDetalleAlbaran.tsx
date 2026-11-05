@@ -1,3 +1,4 @@
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
 import { TarjetaDocumentoVenta } from "#/ventas/comun/componentes/TarjetaDocumentoVenta.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -24,8 +25,11 @@ import {
 import { CrearAlbaran } from "../crear/CrearAlbaran.tsx";
 import { DetalleAlbaran } from "../detalle/DetalleAlbaran.tsx";
 import { Albaran } from "../diseño.ts";
-import { metaTablaAlbaran as metaTablaBase } from "../dominio.ts";
-import { EstadoAlbaran } from "../vistas/EstadoAlbaran.tsx";
+import {
+  etiquetaEstadoAlbaran,
+  metaTablaAlbaran as metaTablaBase,
+  widgetsAlbaran,
+} from "../dominio.ts";
 import "./MaestroConDetalleAlbaran.css";
 import { getMaquina } from "./maquina.ts";
 
@@ -73,9 +77,9 @@ export const MaestroConDetalleAlbaran = () => {
   const metaTablaAlbaran = [
     {
       id: "estado",
-      cabecera: "",
+      cabecera: "Estado",
       render: (albaran: Albaran) => (
-        <EstadoAlbaran facturado={albaran.facturado} />
+        <EtiquetaEstado {...etiquetaEstadoAlbaran(albaran)} />
       ),
     },
     ...metaTablaBase,
@@ -105,6 +109,7 @@ export const MaestroConDetalleAlbaran = () => {
             <Listado<Albaran>
               metaTabla={metaTablaAlbaran}
               metaFiltro={metaFiltroAlbaran}
+              widgets={widgetsAlbaran}
               tarjeta={(albaran) => (
                 <TarjetaDocumentoVenta
                   codigo={albaran.codigo}
@@ -115,6 +120,7 @@ export const MaestroConDetalleAlbaran = () => {
                   tasaConversion={albaran.tasa_conversion}
                   totalDivisaEmpresa={albaran.total_divisa_empresa}
                   estado={albaran.facturado ? "cerrado" : "pendiente"}
+                  etiquetaEstado={etiquetaEstadoAlbaran(albaran)}
                   etiqueta={
                     albaran.de_abono ? (
                       <QEtiqueta variante="advertencia">Abono</QEtiqueta>

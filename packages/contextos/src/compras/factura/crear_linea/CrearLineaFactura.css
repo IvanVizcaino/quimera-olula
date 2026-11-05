@@ -9,25 +9,101 @@
     }
 
     quimera-input[nombre="cantidad"] {
-        grid-column: 1 / span 6;
+        grid-column: 1 / span 3;
     }
 
     quimera-input[nombre="pvpUnitario"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="pvpTotal"] {
+        grid-column: span 5;
+    }
+
+    .mostrar-mas-fila {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    .mostrar-mas-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--color-primario);
+        font-size: var(--tamaño-letra-s);
+        padding: 0;
+        font-family: inherit;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    .seccion-separador {
+        grid-column: 1 / -1;
+        font-size: var(--tamaño-letra-s);
+        font-weight: 600;
+        color: var(--color-texto-secundario, #666);
+        margin-top: var(--espaciado-xs);
+        padding-bottom: var(--espaciado-xxs);
+        border-bottom: 1px solid var(--color-borde-fuerte);
+    }
+
+    quimera-input[nombre="dtoPorcentual"] {
+        grid-column: 1 / span 6;
+    }
+
+    quimera-input[nombre="dtoLineal"] {
         grid-column: span 6;
     }
 
+    quimera-select[nombre="grupoIvaProductoId"] {
+        grid-column: 1 / span 4;
+    }
+
+    quimera-input[nombre="tipoIva"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="tipoRecargo"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="tipoIrpf"] {
+        grid-column: 1 / span 6;
+    }
+
     @media (max-width: 768px) {
-        .ArticuloLinea-campo,
-        quimera-input[nombre="descripcion"] {
-            grid-column: 1 / -1 !important;
-        }
+        quimera-formulario {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
 
-        quimera-input[nombre="cantidad"] {
-            grid-column: 1 / span 1 !important;
-        }
+            .ArticuloLinea-campo,
+            quimera-input[nombre="descripcion"],
+            .mostrar-mas-fila,
+            .seccion-separador {
+                grid-column: 1 / -1 !important;
+            }
 
-        quimera-input[nombre="pvpUnitario"] {
-            grid-column: 2 / span 1 !important;
+            quimera-input[nombre="cantidad"] {
+                grid-column: 1 / span 1 !important;
+            }
+
+            quimera-input[nombre="pvpUnitario"] {
+                grid-column: 2 / span 1 !important;
+            }
+
+            quimera-input[nombre="pvpTotal"] {
+                grid-column: 1 / -1 !important;
+            }
+
+            quimera-input[nombre="dtoPorcentual"] {
+                grid-column: 1 / span 1 !important;
+            }
+
+            quimera-input[nombre="dtoLineal"] {
+                grid-column: 2 / span 1 !important;
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+import { EmpresasUsuario } from "#/auth/comun/componentes/empresas_usuario.tsx";
 import { Grupo } from "#/auth/comun/componentes/grupo.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -120,6 +121,7 @@ export const DetalleUsuario = ({
             <QInput label="Nombre" {...uiProps("nombre")} />
             <QInput label="Email" {...uiProps("email")} />
             <Grupo {...uiProps("grupo_id")} />
+            <EmpresasUsuario {...uiProps("empresas")} />
           </quimera-formulario>
 
           {modificado && (

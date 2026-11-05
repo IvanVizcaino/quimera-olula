@@ -53,6 +53,7 @@ qhistorias-historia {
             --color-primario: light-dark(var(--gris-3), var(--gris-9));
             --color-primario-claro: light-dark(var(--gris-4), var(--gris-7));
             --color-primario-oscuro: var(--color-texto-primario);
+            --color-boton: var(--color-primario);
             --redondeo-borde-xs: 0px;
             --blanco: var(--color-texto-primario);
 

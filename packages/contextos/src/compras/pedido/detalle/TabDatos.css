@@ -1,4 +1,4 @@
-.Pedido .TabDatos {
+.ComprasPedido .TabDatos {
     quimera-input[nombre="codigo"],
     quimera-input[nombre="recibido"] {
         grid-column: span 6;

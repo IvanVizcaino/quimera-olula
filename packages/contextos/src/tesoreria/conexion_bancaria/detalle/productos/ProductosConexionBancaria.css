@@ -1,0 +1,17 @@
+.ProductosConexionBancaria {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+
+    p {
+        margin: 0;
+    }
+
+    .q-aviso {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-m);
+        margin: 0;
+    }
+}

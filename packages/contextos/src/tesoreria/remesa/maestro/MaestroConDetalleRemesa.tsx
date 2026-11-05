@@ -1,5 +1,5 @@
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
-import { MetaTabla } from "@olula/componentes/index.js";
+import { MetaTabla, QEtiqueta } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { criteriaDefecto, formatearMoneda } from "@olula/lib/dominio.js";
@@ -8,6 +8,7 @@ import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect, useMemo } from "react";
 import { DetalleRemesa } from "../detalle/DetalleRemesa.js";
 import { Remesa } from "../diseño.js";
+import { varianteEstadoRemesa } from "../dominio.js";
 import "./MaestroConDetalleRemesa.css";
 import { getMaquina } from "./maquina.js";
 
@@ -16,7 +17,16 @@ const metaTablaRemesa: MetaTabla<Remesa> = [
     { id: 'fecha', cabecera: 'Fecha', tipo: 'fecha' },
     { id: 'fechaCargo', cabecera: 'F. Cargo', tipo: 'fecha' },
     { id: 'cuentaId', cabecera: 'Cuenta' },
-    { id: 'estado', cabecera: 'Estado' },
+    { id: 'descripcionCuenta', cabecera: 'Descripción cuenta' },
+    {
+        id: 'estado',
+        cabecera: 'Estado',
+        render: (remesa: Remesa) => (
+            <QEtiqueta variante={varianteEstadoRemesa(remesa.estado)}>
+                {remesa.estado}
+            </QEtiqueta>
+        ),
+    },
     {
         id: 'total',
         cabecera: 'Total',
@@ -77,13 +87,15 @@ export const MaestroConDetalleRemesa = () => {
 const TarjetaRemesa = (remesa: Remesa) => {
     return (
         <div className="tarjeta-remesa" key={remesa.id}>
-            <div className="tarjeta-remesa-cuenta">{remesa.cuentaId}</div>
+            <div className="tarjeta-remesa-cuenta">
+                {remesa.descripcionCuenta || remesa.cuentaId}
+            </div>
             <div className="tarjeta-remesa-total">
                 {formatearMoneda(remesa.total, remesa.divisaId)}
             </div>
-            <div className={`tarjeta-remesa-estado estado-${remesa.estado}`}>
+            <QEtiqueta variante={varianteEstadoRemesa(remesa.estado)}>
                 {remesa.estado}
-            </div>
+            </QEtiqueta>
         </div>
     );
 };

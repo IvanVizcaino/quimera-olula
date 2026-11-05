@@ -1,6 +1,6 @@
 import { Criteria, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { accionesListaActivaEntidades, ProcesarListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
-import { ItemPedidoVenta } from "../../diseño.ts";
+import { DisponibilidadPedido, ItemPedidoVenta } from "../../diseño.ts";
 import { getPedidosVenta } from "../../infraestructura.ts";
 import { ContextoMaestroPedidoVenta, EstadoMaestroPedidoVenta } from "./diseño.ts";
 
@@ -32,4 +32,18 @@ export const ampliarPedidos: ProcesarMaestro = async (contexto, payload) => {
         criteria.paginacion
     );
     return Pedidos.ampliar(contexto, resultado);
+};
+
+export const actualizarDisponibilidades: ProcesarMaestro = async (ctx, payload) => {
+    const resultados = payload as { pedido_id: number; estado: DisponibilidadPedido }[];
+    const mapa = new Map(resultados.map(r => [String(r.pedido_id), r.estado]));
+    const nuevaLista = ctx.pedidos.lista.map(p => ({
+        ...p,
+        disponibilidad: mapa.has(p.id) ? mapa.get(p.id)! : p.disponibilidad,
+    }));
+    return {
+        ...ctx,
+        estado: 'INICIAL' as EstadoMaestroPedidoVenta,
+        pedidos: { ...ctx.pedidos, lista: nuevaLista },
+    };
 };

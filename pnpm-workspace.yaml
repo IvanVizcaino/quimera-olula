@@ -1,5 +1,6 @@
 packages:
   - packages/*
+  - packages/contextos/*
   - apps/*
   - '!apps/legacy_app'
   - legacy/apps/*

@@ -1,4 +1,7 @@
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { datosClaveDocumentoCompra } from "#/compras/comun/dominio.ts";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
+import { AsientoDeDocumento } from "#/contabilidad/asiento/vistas/detalle/AsientoDeDocumento.tsx";
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import { CambioProveedor } from "#/compras/comun/componentes/moleculas/CambioProveedor/CambioProveedor.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -6,14 +9,16 @@ import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { puede } from "@olula/lib/dominio.ts";
 import { imprimir_blob } from "@olula/lib/impresion.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useEffect } from "react";
 import { BorrarFactura } from "../borrar/BorrarFactura.tsx";
 import { CambiarRectificativa } from "../cambiar_rectificativa/CambiarRectificativa.tsx";
 import { Factura } from "../diseño.ts";
-import { facturaEditable } from "../dominio.ts";
+import { etiquetaEstadoFactura, facturaEditable, facturaRegistrable } from "../dominio.ts";
 import { getReportFactura, getTrazaFactura } from "../infraestructura.ts";
+import { RegistrarFactura } from "../registrar/RegistrarFactura.tsx";
 import {
     contextoDetalleFacturaInicial,
     guardarFactura,
@@ -69,9 +74,12 @@ export const DetalleFactura = ({
     const accionesFactura = [
         { texto: "Imprimir", onClick: imprimir },
         { texto: "Documentos relacionados", onClick: () => emitir("traza_solicitada") },
-        editable
-            ? { texto: "Cerrar factura", onClick: () => emitir("cierre_solicitado") }
-            : { texto: "Reabrir factura", onClick: () => emitir("reapertura_solicitada") },
+        {
+            texto: "Registrar factura",
+            onClick: () => emitir("registro_solicitado"),
+            deshabilitado: !facturaRegistrable(factura),
+            principal: true,
+        },
         {
             texto: "Rectificativa",
             onClick: () => emitir("cambio_rectificativa_solicitado"),
@@ -90,6 +98,8 @@ export const DetalleFactura = ({
         <Detalle
             id={id}
             obtenerTitulo={titulo}
+            obtenerEstado={(F: Factura) => <EtiquetaEstado {...etiquetaEstadoFactura(F)} />}
+            obtenerDatosClave={datosClaveDocumentoCompra}
             setEntidad={() => {}}
             entidad={factura}
             cerrarDetalle={() => emitir("factura_deseleccionada", null, true)}
@@ -100,6 +110,18 @@ export const DetalleFactura = ({
                 </div>
                 <Tabs
                     children={[
+                        <Tab
+                            key="tab-lineas"
+                            label="Líneas"
+                            children={
+                                <LineasFactura
+                                    factura={factura}
+                                    lineas={lineas}
+                                    estado={estado}
+                                    publicar={emitir}
+                                />
+                            }
+                        />,
                         <Tab
                             key="tab-proveedor"
                             label="Proveedor"
@@ -120,15 +142,16 @@ export const DetalleFactura = ({
                             label="Recibos"
                             children={<TabRecibos facturaId={factura.id} />}
                         />,
+                        puede("contabilidad.asiento") && (
+                            <Tab
+                                key="tab-contabilidad"
+                                label="Contabilidad"
+                                children={<AsientoDeDocumento asientoId={factura.asientoId} />}
+                            />
+                        ),
                     ]}
                 />
                 <TotalesDocumento form={formModelo} />
-                <LineasFactura
-                    factura={factura}
-                    lineas={lineas}
-                    estado={estado}
-                    publicar={emitir}
-                />
             </div>
 
             {estado === "CAMBIANDO_DIVISA" && (
@@ -149,6 +172,10 @@ export const DetalleFactura = ({
 
             {estado === "BORRANDO" && (
                 <BorrarFactura factura={factura} publicar={emitir} />
+            )}
+
+            {estado === "REGISTRANDO" && (
+                <RegistrarFactura factura={factura} publicar={emitir} />
             )}
 
             {estado === "CAMBIANDO_RECTIFICATIVA" && (

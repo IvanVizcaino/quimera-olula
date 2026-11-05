@@ -1,6 +1,8 @@
 import { CamposDireccionVenta } from "#/ventas/comun/componentes/CamposDireccionVenta.tsx";
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
 import { DirCliente } from "#/ventas/comun/componentes/dirCliente.tsx";
+import { EmpresaActual } from "#/comun/componentes/empresaActual.tsx";
+import { conEmpresaActual } from "#/valores/empresaActual.ts";
 import {
   metaNuevaVentaClienteNoRegistrado,
   nuevaVentaClienteNoRegistradaVacia,
@@ -22,17 +24,23 @@ export const CrearPedido = ({
   publicar?: EmitirEvento;
 }) => {
   const [modoNoRegistrado, setModoNoRegistrado] = useState(false);
-  const pedidoRegistrado = useModelo(metaNuevoPedido, nuevoPedidoVacio);
+  /* Lazy initializer: referencia estable para useModelo y empresa ya puesta en el
+     primer render, sin depender del efecto de EmpresaActual. */
+  const [inicialRegistrado] = useState(() => conEmpresaActual(nuevoPedidoVacio));
+  const [inicialNoRegistrado] = useState(() =>
+    conEmpresaActual(nuevaVentaClienteNoRegistradaVacia)
+  );
+  const pedidoRegistrado = useModelo(metaNuevoPedido, inicialRegistrado);
   const pedidoNoRegistrado = useModelo(
     metaNuevaVentaClienteNoRegistrado,
-    nuevaVentaClienteNoRegistradaVacia
+    inicialNoRegistrado
   );
   const focus = useFocus();
 
   /* El maestro monta el modal siempre, así que el modo no se reinicia solo. */
   const reiniciar = useCallback(() => {
-    pedidoRegistrado.init(nuevoPedidoVacio);
-    pedidoNoRegistrado.init(nuevaVentaClienteNoRegistradaVacia);
+    pedidoRegistrado.init(conEmpresaActual(nuevoPedidoVacio));
+    pedidoNoRegistrado.init(conEmpresaActual(nuevaVentaClienteNoRegistradaVacia));
     setModoNoRegistrado(false);
   }, [pedidoRegistrado, pedidoNoRegistrado]);
 
@@ -63,8 +71,8 @@ export const CrearPedido = ({
 
   const toggleModoCliente = () => {
     setModoNoRegistrado(!modoNoRegistrado);
-    pedidoRegistrado.init(nuevoPedidoVacio);
-    pedidoNoRegistrado.init(nuevaVentaClienteNoRegistradaVacia);
+    pedidoRegistrado.init(conEmpresaActual(nuevoPedidoVacio));
+    pedidoNoRegistrado.init(conEmpresaActual(nuevaVentaClienteNoRegistradaVacia));
   };
 
   return (
@@ -78,6 +86,9 @@ export const CrearPedido = ({
         <quimera-formulario>
           {modoNoRegistrado ? (
             <>
+              <EmpresaActual
+                onChange={(id) => pedidoNoRegistrado.uiProps("empresa_id").onChange(id)}
+              />
               <QInput
                 label="Nombre del Cliente"
                 {...pedidoNoRegistrado.uiProps("nombre_cliente")}
@@ -91,6 +102,9 @@ export const CrearPedido = ({
             </>
           ) : (
             <>
+              <EmpresaActual
+                onChange={(id) => pedidoRegistrado.uiProps("empresa_id").onChange(id)}
+              />
               <Cliente
                 {...pedidoRegistrado.uiProps("cliente_id", "nombre")}
                 nombre="ClientePedido"

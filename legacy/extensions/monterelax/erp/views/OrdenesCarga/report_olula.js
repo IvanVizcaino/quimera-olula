@@ -1,7 +1,16 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 
-export const getReportOrdenCarga = idOrden =>
+const baseUrl = "/produccion/orden_carga";
+
+export const getReportAlbaranesOrdenCarga = idOrden =>
   RestAPI.blob(
-    `/produccion/orden_carga/${idOrden}/report`,
-    "Error al obtener el informe de la orden de carga"
+    `${baseUrl}/${idOrden}/albaranes/report`,
+    "Error al obtener los albaranes de la orden de carga"
+  );
+
+export const terminarOrdenCarga = idOrden =>
+  RestAPI.patch(
+    `${baseUrl}/${idOrden}/terminar`,
+    {},
+    "Error al marcar la orden de carga como terminada"
   );

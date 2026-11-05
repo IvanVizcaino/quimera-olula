@@ -27,8 +27,11 @@ export const getMaquina: () => Maquina<EstadoDetallePedidoCompra, ContextoDetall
                     linea_pedido_id: l.id,
                     cantidad: 0,
                     lote_id: null,
+                    caducidad: null,
                     tipo_caja_id: null,
                     num_cajas: null,
+                    subcaja_compra_id: null,
+                    palet_num: null,
                 })),
             }),
 

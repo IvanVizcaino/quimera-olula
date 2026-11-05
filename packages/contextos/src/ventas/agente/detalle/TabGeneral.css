@@ -1,0 +1,22 @@
+.Agente .TabGeneral {
+
+    quimera-input[nombre="nombre_pila"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="apellidos"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre="id_fiscal"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="por_comision"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="usuario_id"] {
+        grid-column: span 5;
+    }
+}

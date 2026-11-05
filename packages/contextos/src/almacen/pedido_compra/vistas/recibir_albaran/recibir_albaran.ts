@@ -11,6 +11,8 @@ export interface LineaEditableEntrada extends Modelo {
     linea_pedido_id: string;
     cantidad: number;
     lote_id: string;
+    caducidad: string | null;
+    lote_registrado: boolean; // true si el lote existe en BD (cargado desde API)
 }
 
 export const metaLineaEditableEntrada: MetaModelo<LineaEditableEntrada> = {
@@ -21,7 +23,6 @@ export const metaLineaEditableEntrada: MetaModelo<LineaEditableEntrada> = {
             positivo: true,
             validacion: (m) => (m.cantidad > 0 ? true : "La cantidad debe ser mayor que 0"),
         },
-        lote_id: {},
     },
 };
 
@@ -32,6 +33,8 @@ export const lineaEditableDesdeDetectada = (
     linea_pedido_id: l.linea_pedido_id,
     cantidad: l.cantidad,
     lote_id: l.lote_id ?? "",
+    caducidad: l.caducidad ?? null,
+    lote_registrado: false,
 });
 
 export const crearLineaEditableVacia = (linea_pedido_id: string): LineaEditableEntrada => ({
@@ -39,6 +42,8 @@ export const crearLineaEditableVacia = (linea_pedido_id: string): LineaEditableE
     linea_pedido_id,
     cantidad: 0,
     lote_id: "",
+    caducidad: null,
+    lote_registrado: false,
 });
 
 // ---------------------------------------------------------------------------
@@ -50,6 +55,9 @@ export interface LineaCajaEntrada extends Modelo {
     tipo_caja_id: string;    // "" → null en API (Sin Caja)
     cantidad_caja: number | null;
     num_cajas: number | null;
+    // Modo palet
+    palet_num: number | null;
+    subcaja_compra_id: string | null;
 }
 
 export const metaLineaCajaEntrada: MetaModelo<LineaCajaEntrada> = {
@@ -77,6 +85,8 @@ export const inicializarLineaCaja = (linea: LineaEditableEntrada): LineaCajaEntr
     tipo_caja_id: "",
     cantidad_caja: null,
     num_cajas: null,
+    palet_num: null,
+    subcaja_compra_id: null,
 });
 
 /**
@@ -94,7 +104,28 @@ export const expandirLineaEnCajas = (
         linea_pedido_id: linea.linea_pedido_id,
         cantidad: linea.cantidad,
         lote_id,
+        caducidad: linea.caducidad,
         tipo_caja_id,
         num_cajas: caja.num_cajas,
+        subcaja_compra_id: caja.subcaja_compra_id ?? null,
+        palet_num: caja.palet_num ?? null,
     }];
 };
+
+// ---------------------------------------------------------------------------
+// Paso 2 — configuración de palets por SKU
+// ---------------------------------------------------------------------------
+
+export interface ConfigPaletSku {
+    linea_pedido_id: string;
+    es_palet: boolean;
+    num_palets: number;
+    subcaja_compra_id: string | null;
+}
+
+export const configPaletSkuVacia = (linea_pedido_id: string): ConfigPaletSku => ({
+    linea_pedido_id,
+    es_palet: false,
+    num_palets: 1,
+    subcaja_compra_id: null,
+});

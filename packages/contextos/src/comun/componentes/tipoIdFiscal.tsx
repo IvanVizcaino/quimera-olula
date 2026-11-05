@@ -15,13 +15,18 @@ export const TipoIdFiscal = ({
   opciones = opcionesTipoIdFiscal,
   ...props
 }: TipoIdFiscalProps) => {
+  const opcionesConValor =
+    valor && !opciones.some((opcion) => opcion.valor === valor)
+      ? [...opciones, { valor, descripcion: valor }]
+      : opciones;
+
   return (
     <QSelect
       {...props}
       label={label}
       nombre={nombre}
       valor={valor}
-      opciones={opciones}
+      opciones={opcionesConValor}
     />
   );
 };

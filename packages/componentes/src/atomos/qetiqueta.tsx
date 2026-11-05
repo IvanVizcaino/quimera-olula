@@ -1,6 +1,12 @@
 import "./qetiqueta.css";
 
-type EtiquetaVariante = "exito" | "error" | "advertencia" | "primario";
+type EtiquetaVariante =
+  | "exito"
+  | "error"
+  | "advertencia"
+  | "primario"
+  | "neutro"
+  | "gris";
 
 interface QEtiquetaProps {
   variante?: EtiquetaVariante;

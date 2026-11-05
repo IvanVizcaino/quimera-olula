@@ -53,9 +53,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 2rem;
-    width: 2rem;
-    margin-right: 0.5rem;
+    /* Mismo hueco entre iconos que asistente ↔ usuario */
+    height: 1.5rem;
+    width: 1.5rem;
     padding: 0;
     border: none;
     border-radius: 9999px;
@@ -112,4 +112,86 @@
 #boton-menu-lateral,
 #etiqueta-menu-abierto {
     order: 0;
+}
+/* Búsqueda rápida (Ctrl K) */
+#boton-busqueda-rapida {
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-s);
+    flex: 0 1 22rem;
+    min-width: 0;
+    /* Un poco de aire arriba y abajo dentro de la cabecera (35px) */
+    height: 1.625rem;
+    margin-left: var(--espaciado-l);
+    padding: 0 var(--espaciado-s);
+    border: 0;
+    border-radius: var(--redondeo-borde-s);
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.78);
+    font: inherit;
+    font-size: var(--tamaño-letra-s);
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.18);
+        color: var(--blanco);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--blanco);
+        outline-offset: 2px;
+    }
+
+    quimera-icono {
+        fill: currentColor;
+        color: currentColor;
+    }
+
+    .boton-busqueda-texto {
+        flex: 1;
+        min-width: 0;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .boton-busqueda-texto-movil {
+        display: none;
+    }
+
+    kbd {
+        font-family: inherit;
+        font-size: var(--tamaño-letra-xs);
+        padding: 0 0.375rem;
+        border-radius: var(--redondeo-borde-xs);
+        border: var(--tamaño-borde-s) solid rgba(255, 255, 255, 0.3);
+    }
+}
+
+@media (max-width: 768px) {
+    /* Un campo visible que ocupa el hueco libre entre el logo y los iconos; si
+       no hay sitio, se queda en la lupa. */
+    #boton-busqueda-rapida {
+        flex: 1 1 auto;
+        min-width: 2rem;
+        max-width: 14rem;
+        margin: 0 var(--espaciado-s);
+        padding: 0 var(--espaciado-s);
+        gap: var(--espaciado-xs);
+        overflow: hidden;
+
+        .boton-busqueda-texto,
+        kbd {
+            display: none;
+        }
+
+        .boton-busqueda-texto-movil {
+            display: block;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 }

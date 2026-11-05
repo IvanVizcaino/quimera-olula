@@ -3,6 +3,7 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { useFocus } from "@olula/lib/useFocus.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { metaNuevoCrmContacto, nuevoCrmContactoVacio } from "./dominio.ts";
+import "./CrmContactos.css";
 
 interface CrearCrmContactosProps {
   emitir: (evento: string, payload?: unknown) => void;
@@ -24,6 +25,7 @@ export const CrearCrmContactos = ({ emitir }: CrearCrmContactosProps) => {
       <quimera-formulario>
         <QInput label="Nombre" {...uiProps("nombre")} ref={focus} />
         <QInput label="Email" {...uiProps("email")} />
+        <QInput label="Teléfono" {...uiProps("telefono1")} />
       </quimera-formulario>
       <div className="botones">
         <QBoton onClick={guardar} deshabilitado={!valido}>

@@ -1,0 +1,161 @@
+/* Panel lateral: el diálogo se acopla a la derecha a toda altura */
+quimera-modal[nombre="personalizar-widgets"] dialog {
+    margin: 0 0 0 auto;
+    width: min(28rem, 100vw);
+    min-width: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+}
+
+.personalizar-widgets {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xl);
+
+    h3 {
+        margin: 0 0 var(--espaciado-s);
+        font-size: var(--tamaño-letra-s);
+        font-weight: var(--grosor-letra-6);
+        color: var(--color-texto-secundario);
+    }
+}
+
+.personalizar-widgets-ayuda,
+.personalizar-widgets-vacio {
+    margin: 0;
+    font-size: var(--tamaño-letra-xs);
+    color: var(--color-texto-secundario);
+}
+
+.personalizar-widgets-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-xs);
+        padding: var(--espaciado-s) var(--espaciado-m);
+        border: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+        border-radius: var(--redondeo-borde-s);
+    }
+
+    button {
+        display: grid;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        border: 0;
+        border-radius: var(--redondeo-borde-xs);
+        background: transparent;
+        color: var(--color-texto-secundario);
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            background: var(--color-superficie-sunken);
+            color: var(--color-texto-primario);
+        }
+
+        &:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--color-primario);
+            outline-offset: 1px;
+        }
+    }
+}
+
+.personalizar-widgets-texto {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+
+    .titulo {
+        font-weight: var(--grosor-letra-6);
+    }
+
+    .descripcion {
+        font-size: var(--tamaño-letra-xs);
+        color: var(--color-texto-secundario);
+    }
+}
+
+.personalizar-widgets-defecto {
+    font-size: var(--tamaño-letra-xs);
+    color: var(--color-texto-secundario);
+    background: var(--color-superficie-sunken);
+    padding: 0.125rem var(--espaciado-s);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.personalizar-widgets-nuevo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+    padding: var(--espaciado-l);
+    background: var(--color-superficie-sunken);
+    border-radius: var(--redondeo-borde-m);
+
+    >quimera-boton {
+        align-self: flex-start;
+    }
+}
+
+.personalizar-widgets-previa {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+    font-size: var(--tamaño-letra-xs);
+    font-weight: var(--grosor-letra-5);
+
+    quimera-tarjeta-resumen {
+        max-width: 16rem;
+        background: var(--color-superficie);
+        border-color: var(--color-borde-tabla);
+        padding: var(--espaciado-m) var(--espaciado-l);
+        gap: var(--espaciado-xxs);
+
+        .titulo {
+            font-size: var(--tamaño-letra-xs);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .valor {
+            font-size: var(--tamaño-letra-xl);
+            font-weight: var(--grosor-letra-7);
+            font-variant-numeric: tabular-nums;
+        }
+    }
+}
+
+.personalizar-widgets-error {
+    margin: 0;
+    color: var(--color-error-oscuro);
+    font-size: var(--tamaño-letra-s);
+}
+
+.personalizar-widgets-pie {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--espaciado-s);
+    padding-top: var(--espaciado-m);
+    border-top: var(--tamaño-borde-s) solid var(--color-borde-tabla);
+
+    >div {
+        display: flex;
+        gap: var(--espaciado-s);
+    }
+}

@@ -1,6 +1,13 @@
 import { Criteria, Entidad, Modelo, RespuestaLista } from "@olula/lib/diseño.ts";
 import { TipoArticuloLinea } from "../comun/diseño.ts";
 
+/**
+ * Estado de expedición que devuelve el servidor. El borrador todavía no tiene
+ * número de serie: su código es `#A/3f2b1c9d` en vez de `20260A000001`. La
+ * cadena vacía es la factura todavía no cargada.
+ */
+export type EstadoExpedicion = '' | 'BORRADOR' | 'REGISTRADA';
+
 export interface Factura extends Entidad {
     id: string;
     codigo: string;
@@ -36,6 +43,7 @@ export interface Factura extends Entidad {
     noGenerarAsiento: boolean;
     asientoId: string | null;
     observaciones: string | null;
+    estadoExpedicion: EstadoExpedicion;
 }
 
 export interface LineaFactura extends Entidad {
@@ -85,6 +93,14 @@ export interface NuevaLineaFactura extends Modelo {
     descripcionArticulo: string | null;
     cantidad: number;
     pvpUnitario: number | null;
+    dtoPorcentual: number;
+    dtoLineal: number;
+    pvpTotal: number;
+    grupoIvaProductoId: string | null;
+    ivaIncluido: boolean;
+    tipoIva: number;
+    tipoRecargo: number;
+    tipoIrpf: number;
 }
 
 export interface ModeloLineaFactura extends LineaFactura {
@@ -108,6 +124,11 @@ export type PostFactura = (
 export type FacturarAlbaranes = (albaranIds: string[]) => Promise<FacturaCreada>;
 export type PatchFactura = (id: string, cambios: CambiosFactura) => Promise<void>;
 export type PatchRectificativa = (id: string, rectificativaId: string | null) => Promise<void>;
+/**
+ * Saca la factura de borrador y le asigna el código definitivo. La respuesta
+ * solo confirma, así que hay que recargar la factura para ver el código nuevo.
+ */
+export type PatchRegistrarFactura = (id: string) => Promise<void>;
 export type DeleteFactura = (id: string) => Promise<void>;
 export type GetReportFactura = (id: string) => Promise<Blob>;
 
@@ -117,6 +138,14 @@ export type PostLineasFactura = (
     id: string,
     lineas: NuevaLineaFactura[]
 ) => Promise<string[]>;
+/**
+ * Dry-run del alta de línea: el servidor calcula el coste del proveedor y los
+ * impuestos sin grabar nada, para poder enseñarlos en el modal.
+ */
+export type QueryNuevaLineaFactura = (
+    id: string,
+    linea: NuevaLineaFactura
+) => Promise<NuevaLineaFactura>;
 export type PatchLineaFactura = (
     id: string,
     lineaId: string,
