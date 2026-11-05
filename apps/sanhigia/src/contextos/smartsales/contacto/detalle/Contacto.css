@@ -57,7 +57,7 @@
 
 .Contacto .tarjeta.tareas > header,
 .Contacto .tarjeta.tareas > .vacio {
-    padding-inline: 1rem;
+    padding-inline: 0;
 }
 
 .Contacto .dato {

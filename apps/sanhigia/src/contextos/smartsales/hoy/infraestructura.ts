@@ -13,7 +13,7 @@ import {
 export const bloqueKpiDesdeAPI = (bloque: BloqueKpiAPI | undefined): BloqueKpi => ({
     lineas: (bloque?.detalle ?? []).map((linea, indice) => ({
         clave: String(linea.id ?? `${linea.codfamilia ?? ""}-${linea.codsubfamilia ?? ""}-${indice}`),
-        etiqueta: linea.etiqueta ?? linea.nombre ?? "",
+        etiqueta: (linea.etiqueta ?? linea.nombre ?? "").replace(/\s*\(\d+ \/ \d+\)$/, ""),
         objetivo: Number(linea.objetivo) || 0,
         alcanzada: Number(linea.alcanzada) || 0,
     })),

@@ -4,7 +4,18 @@
 }
 
 .FichaCliente .cabecera-ficha {
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+}
+
+.FichaCliente .cabecera-ficha .subtitulo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
 }
 
 .FichaCliente .acciones-contacto {
@@ -102,11 +113,11 @@
 }
 
 .FichaCliente .tarjeta.tareas > .vacio {
-    padding-inline: 1rem;
+    padding-inline: 0;
 }
 
 .FichaCliente .lista.tarjeta {
-    padding: 0 1rem;
+    padding: 0;
 }
 
 .FichaCliente .lista.tarjeta > li:last-child > a,

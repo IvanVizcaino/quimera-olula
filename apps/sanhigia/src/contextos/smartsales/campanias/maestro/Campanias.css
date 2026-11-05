@@ -71,7 +71,7 @@
 
 .Campanias .tarjeta.lista-clientes {
     gap: 0;
-    padding: 0.25rem 1rem;
+    padding: 0.25rem 0;
 }
 
 .Campanias .cliente-campania {

@@ -141,7 +141,7 @@ Los cambios de modelo de datos y las acciones nuevas o ampliadas de backend est�
   - en Objetivo de nuevos clientes (pantalla 11): **solo trimestres**, uno o varios.
 
   Es el mismo funcionamiento que el bloque "Progreso" actual.
-- **UI:** componente reutilizable con modo "solo trimestres".
+- **UI:** componente reutilizable con pestañas, como en la maqueta: **Trimestre** (año y T1–T4, uno o varios), **Año** (los cuatro trimestres del año) e **Histórico** (fechas desde y hasta). En el modo "solo trimestres" no aparece Histórico.
 
 ### COM-04 · Tarjeta de tarea
 - **Qué:** hora, **cliente y contacto** (los dos si el trato tiene ambos), descripción y **dos etiquetas** en posiciones fijas: **tipo** (Visita, Llamada, Email, Whatsapp) y **estado** (Atrasada, En curso). Se reutiliza en Hoy, Agenda y la ficha de cliente.

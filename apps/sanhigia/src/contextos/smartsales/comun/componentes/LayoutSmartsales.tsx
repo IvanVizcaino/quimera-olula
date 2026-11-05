@@ -1,6 +1,6 @@
 import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { PropsWithChildren, useState } from "react";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { rutasSmartsales } from "../rutas.ts";
 import "./LayoutSmartsales.css";
 
@@ -27,6 +27,17 @@ const accionesRapidas: Destino[] = [
     { texto: "Nueva campaña", icono: "estrella", ruta: rutasSmartsales.nuevaCampania },
 ];
 
+const principales: string[] = [
+    rutasSmartsales.hoy,
+    rutasSmartsales.agenda,
+    rutasSmartsales.clientes,
+    rutasSmartsales.campanias,
+    rutasSmartsales.tratos,
+    rutasSmartsales.rendimiento,
+    rutasSmartsales.objetivos,
+    rutasSmartsales.mapa,
+];
+
 const EnlaceBarra = ({ texto, icono, ruta }: Destino) => (
     <NavLink to={ruta} className="destino">
         <QIcono nombre={icono} />
@@ -36,10 +47,23 @@ const EnlaceBarra = ({ texto, icono, ruta }: Destino) => (
 
 export const LayoutSmartsales = ({ children }: PropsWithChildren) => {
     const [menuAbierto, setMenuAbierto] = useState(false);
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const conVolver = !principales.includes(pathname.replace(/\/$/, ""));
+
+    const volver = () => (window.history.state?.idx > 0 ? navigate(-1) : navigate(rutasSmartsales.hoy));
 
     return (
         <div className="LayoutSmartsales">
-            <main className="contenido">{children}</main>
+            <main className="contenido">
+                {conVolver && (
+                    <button type="button" className="volver" onClick={volver}>
+                        <QIcono nombre="atras" />
+                        <span>Volver</span>
+                    </button>
+                )}
+                {children}
+            </main>
             {menuAbierto && (
                 <div className="fondo-acciones" onClick={() => setMenuAbierto(false)}>
                     <ul className="acciones-rapidas" aria-label="Acciones rápidas">
@@ -65,7 +89,7 @@ export const LayoutSmartsales = ({ children }: PropsWithChildren) => {
                     aria-expanded={menuAbierto}
                     onClick={() => setMenuAbierto(!menuAbierto)}
                 >
-                    <QIcono nombre={menuAbierto ? "cerrar" : "añadir"} tamaño="lg" />
+                    <QIcono nombre={menuAbierto ? "cerrar" : "crear"} tamaño="lg" />
                 </button>
                 {derecha.map((destino) => (
                     <EnlaceBarra key={destino.ruta} {...destino} />

@@ -158,7 +158,7 @@
     background: color-mix(in srgb, var(--color-primario-oscuro) 30%, transparent);
 }
 
-.GraficoMensual .objetivo {
+.GraficoMensual .zona .objetivo {
     position: absolute;
     left: -0.125rem;
     right: -0.125rem;

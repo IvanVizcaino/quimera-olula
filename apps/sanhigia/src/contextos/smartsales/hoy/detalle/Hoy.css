@@ -53,7 +53,7 @@
 .Hoy .tarjeta.tareas > h2,
 .Hoy .tarjeta.tareas > h3,
 .Hoy .tarjeta.tareas > .vacio {
-    padding-inline: 1rem;
+    padding-inline: 0;
 }
 
 .Hoy .cabecera-tarjeta,

@@ -148,7 +148,7 @@
 .Agenda .tarjeta.tareas h3,
 .Agenda .tarjeta.tareas .vacio,
 .Agenda .tarjeta.tareas > quimera-boton {
-    padding-inline: 1rem;
+    padding-inline: 0;
 }
 
 .Agenda .tarjeta.tareas > h2:first-child,

@@ -122,15 +122,15 @@ export const FichaCliente = () => {
         <LayoutSmartsales>
             <div className="FichaCliente">
                 <header className="cabecera-ficha">
-                    <div>
-                        <h1>{resumen.nombre}</h1>
+                    <h1>{resumen.nombre}</h1>
+                    <div className="subtitulo">
                         <span className="secundario">
                             {[resumen.direccion?.ciudad, resumen.clienteDesde && `Cliente desde ${new Date(resumen.clienteDesde).getFullYear()}`]
                                 .filter(Boolean)
                                 .join(" · ")}
                         </span>
+                        <QEtiqueta variante={resumen.activo ? "exito" : "gris"}>{resumen.activo ? "Activo" : "Inactivo"}</QEtiqueta>
                     </div>
-                    <QEtiqueta variante={resumen.activo ? "exito" : "gris"}>{resumen.activo ? "Cliente activo" : "Inactivo"}</QEtiqueta>
                 </header>
 
                 <nav className="acciones-contacto" aria-label="Contactar">

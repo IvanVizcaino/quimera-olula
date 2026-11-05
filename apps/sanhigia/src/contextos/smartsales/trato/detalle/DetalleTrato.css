@@ -45,7 +45,7 @@
 
 .DetalleTrato .tarjeta.tareas > header,
 .DetalleTrato .tarjeta.tareas > .vacio {
-    padding-inline: 1rem;
+    padding-inline: 0;
 }
 
 .DetalleTrato .dato {
