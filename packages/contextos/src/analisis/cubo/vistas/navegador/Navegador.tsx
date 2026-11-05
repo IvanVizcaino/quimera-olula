@@ -143,11 +143,11 @@ export const Navegador = () => {
                         deshabilitado={!historial || historial.posicion === historial.peticiones.length - 1}
                         onClick={() => consultar("historial_adelante")}
                     />
-                    <BotonAccion
+                    {/* <BotonAccion
                         icono={verGrafico ? "tabla" : "grafico_barras"}
                         texto={verGrafico ? "Ver tabla" : "Ver gráfico"}
                         onClick={() => presentar({ verGrafico: !verGrafico })}
-                    />
+                    /> */}
                     <BotonAccion icono="descargar" texto="Exportar a Excel" onClick={() => emitir("exportacion_solicitada")} />
                 </div>
             </header>

@@ -1,3 +1,4 @@
+import { RouterFactoryAnalisisOlula } from '#/analisis/router_factory.ts';
 import { RouterFactoryAuthOlula } from '#/auth/router_factory.ts';
 import { RouterFactoryCrmOlula } from '#/crm/router_factory.ts';
 import { Home } from '@olula/componentes/index.ts';
@@ -6,6 +7,7 @@ import { RouteObject } from 'react-router';
 
 export class RouterFactoryDtsOabe {
     Inicio = { router: { "": Home } };
+    Analisis = RouterFactoryAnalisisOlula;
     Auth = RouterFactoryAuthOlula;
     Crm = RouterFactoryCrmOlula;
 }

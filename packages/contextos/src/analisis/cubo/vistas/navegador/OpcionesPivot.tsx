@@ -43,12 +43,6 @@ export const OpcionesPivot = ({
                         onChange={() => onCambio(alternarMedida(peticion, medida.id, cubo.medidas))}
                     />
                 ))}
-                <QCheckbox
-                    nombre="medidas-en-columnas"
-                    label="Medidas en columnas"
-                    valor={medidasEnColumnas}
-                    onChange={onAlternarMedidasEnColumnas}
-                />
             </section>
             <section>
                 <h3>Orden y límite</h3>
@@ -96,6 +90,12 @@ export const OpcionesPivot = ({
                     label="Excluir ceros"
                     valor={peticion.excluirCeros}
                     onChange={() => onCambio({ ...peticion, excluirCeros: !peticion.excluirCeros })}
+                />
+                <QCheckbox
+                    nombre="medidas-en-columnas"
+                    label="Medidas en columnas"
+                    valor={medidasEnColumnas}
+                    onChange={onAlternarMedidasEnColumnas}
                 />
             </section>
         </div>

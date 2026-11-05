@@ -67,6 +67,10 @@ quimera-tabla-multinivel {
         font-variant-numeric: tabular-nums;
     }
 
+    td[data-destacada="true"] {
+        font-weight: var(--grosor-letra-6);
+    }
+
     tbody tr[data-destacada="true"] td {
         background: var(--color-superficie-sunken);
         font-weight: var(--grosor-letra-6);

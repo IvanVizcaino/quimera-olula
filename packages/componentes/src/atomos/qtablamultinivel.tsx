@@ -10,6 +10,7 @@ export type ColumnaMultinivel = ColumnaAgrupada & {
   tipo?: "texto" | "numero" | "moneda";
   decimales?: number;
   divisa?: string;
+  destacada?: boolean;
 };
 
 export type FilaMultinivel = {
@@ -20,6 +21,8 @@ export type FilaMultinivel = {
   expandible?: boolean;
   expandida?: boolean;
   destacada?: boolean;
+  tipo?: ColumnaMultinivel["tipo"];
+  decimales?: number;
 };
 
 export type QTablaMultinivelProps = {
@@ -32,7 +35,12 @@ export type QTablaMultinivelProps = {
   onAlternar?: (fila: FilaMultinivel) => void;
 };
 
-const formatear = (valor: unknown, columna: ColumnaMultinivel): string => {
+type Formato = Pick<ColumnaMultinivel, "tipo" | "decimales" | "divisa">;
+
+const formatoCelda = (columna: ColumnaMultinivel, fila: FilaMultinivel): Formato =>
+  columna.tipo ? columna : { tipo: fila.tipo, decimales: fila.decimales };
+
+const formatear = (valor: unknown, columna: Formato): string => {
   if (valor === null || valor === undefined) return "";
   if (typeof valor !== "number") return String(valor);
   if (columna.tipo === "moneda") {
@@ -116,11 +124,14 @@ export const QTablaMultinivel = ({
                   )}
                   {fila.etiqueta}
                 </td>
-                {columnas.map((columna) => (
-                  <td key={columna.id} className={columna.tipo ?? ""}>
-                    {formatear(fila.valores[columna.id], columna)}
-                  </td>
-                ))}
+                {columnas.map((columna) => {
+                  const formato = formatoCelda(columna, fila);
+                  return (
+                    <td key={columna.id} className={formato.tipo ?? ""} data-destacada={columna.destacada ?? false}>
+                      {formatear(fila.valores[columna.id], formato)}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>

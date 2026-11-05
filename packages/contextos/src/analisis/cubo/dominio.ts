@@ -136,6 +136,7 @@ export const columnasTabla = (
         const porMiembro = {
             cabecera: hoja && columna.length > 0 ? etiquetas[etiquetas.length - 1] : TOTAL,
             grupo: hoja && columna.length > 0 ? etiquetas.slice(0, -1) : etiquetas,
+            destacada: !hoja,
         };
         if (!medidasEnColumnas) return [{ id: claveRuta(columna), ...porMiembro }];
         if (medidas.length === 1) {
@@ -152,6 +153,7 @@ export const columnasTabla = (
             id: `${claveRuta(columna)}|${medida.id}`,
             cabecera: medida.descripcion,
             grupo,
+            destacada: !hoja,
             ...tipoColumna(medida.formato),
         }));
     });
@@ -181,6 +183,7 @@ const filasDeValores = (
                 etiqueta: medida.descripcion,
                 nivel: base.nivel + 1,
                 valores: valoresDeMedida(valores, medida),
+                ...tipoColumna(medida.formato),
             })),
         ];
 
