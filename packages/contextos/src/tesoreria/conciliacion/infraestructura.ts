@@ -3,22 +3,31 @@ import { fechaDesdeApi } from "../comun/infraestructura.js";
 import ApiUrls from "../comun/urls.js";
 import {
     CandidatoConciliacion,
-    Casacion,
+    Conciliacion,
+    CuadreBancario,
+    CuadreCuenta,
+    EncajeCandidato,
     EstadoMovimientoBancario,
     GetCandidatosConciliacion,
-    GetCasacionesMovimientoBancario,
+    GetConciliacionesMovimientoBancario,
+    GetCuadreBancario,
+    GetPartidasHuerfanas,
     GetMovimientoBancario,
+    GetRemesasConciliacion,
     GetMovimientosBancarios,
+    ItemConciliacion,
     MovimientoBancario,
+    PartidaHuerfana,
     OrigenConciliacionMovimiento,
-    PatchCasarMovimientoBancario,
+    PatchConciliarMovimientoBancario,
     PatchDesconciliarMovimientoBancario,
     PatchIgnorarMovimientoBancario,
     PatchReactivarMovimientoBancario,
     PostSincronizarMovimientoBancario,
     PostConciliarAutomaticamente,
+    RemesaCandidata,
     ResumenSincronizacionMovimientoBancario,
-    TipoCasacion,
+    TipoConciliacion,
     TipoReciboMovimiento,
 } from "./diseño.js";
 
@@ -40,12 +49,9 @@ export interface MovimientoBancarioApi {
     referencia: string | null;
     pendiente: boolean;
     estado: EstadoMovimientoBancario;
-    num_casaciones: number;
+    num_conciliaciones: number;
     probabilidad_maxima: number | null;
-    tipo_casacion: TipoCasacion | null;
-    recibo_id: string | null;
-    codigo_recibo: string | null;
-    nombre_tercero: string | null;
+    num_items_conciliacion: number;
     probabilidad: number | null;
     origen_conciliacion: OrigenConciliacionMovimiento | null;
     justificacion: string | null;
@@ -53,11 +59,14 @@ export interface MovimientoBancarioApi {
     conciliado_en: string | null;
     eliminado_en_banco: boolean;
     requiere_revision: boolean;
+    subcuenta_banco_id: string | null;
+    saldo_tras: number | null;
 }
 
 export interface CandidatoConciliacionApi {
     tipo_recibo: TipoReciboMovimiento;
-    tipo_casacion: TipoCasacion;
+    tipo_conciliacion: TipoConciliacion;
+    encaje: EncajeCandidato;
     recibo_id: string;
     codigo: string;
     factura_codigo: string | null;
@@ -69,16 +78,18 @@ export interface CandidatoConciliacionApi {
     dias_diferencia: number;
 }
 
-interface ReciboCasacionApi {
+interface ReciboConciliacionApi {
     id: string;
     codigo: string;
     tercero: string | null;
     importe: number;
     fecha_vencimiento: string;
     estado: string;
+    fecha_emision: string | null;
+    fecha_cobro: string | null;
 }
 
-interface CuotaCasacionApi {
+interface CuotaConciliacionApi {
     contrato: string | null;
     fecha: string;
     capital: number;
@@ -86,21 +97,51 @@ interface CuotaCasacionApi {
     total: number;
 }
 
-export interface CasacionApi {
+interface RemesaConciliacionApi {
     id: string;
-    tipo: TipoCasacion;
+    fecha_cargo: string;
+    total: number;
+    estado: string;
+    num_recibos: number;
+    tipo_remesa?: string | null;
+}
+
+interface ItemConciliacionApi {
+    tipo: TipoConciliacion;
     params: Record<string, unknown>;
+    recibo: ReciboConciliacionApi | null;
+    cuota?: CuotaConciliacionApi | null;
+    remesa?: RemesaConciliacionApi | null;
+    asiento_id?: number | null;
+    asiento?: { id: number; numero: string | null; fecha: string; importe: number; concepto?: string | null } | null;
+}
+
+export interface RemesaCandidataApi {
+    remesa_id: string;
+    tipo_conciliacion: TipoConciliacion;
+    tipo_remesa?: string | null;
+    fecha: string;
+    fecha_cargo: string;
+    total: number;
+    importe_pendiente: number;
+    dias_diferencia: number;
+    recibos: Array<{ recibo_id: string; codigo: string; tercero: string | null; importe: number }>;
+    recibo_ids_propuestos: string[];
+    propuesta_ambigua: boolean;
+}
+
+export interface ConciliacionApi {
+    id: string;
+    items: ItemConciliacionApi[];
     probabilidad: number;
     origen: OrigenConciliacionMovimiento;
     justificacion: string | null;
-    recibo: ReciboCasacionApi | null;
-    cuota?: CuotaCasacionApi | null;
 }
 
-interface CasarMovimientoBancarioApi {
-    casacion_id?: string;
-    tipo_casacion?: TipoCasacion;
-    params?: Record<string, unknown>;
+interface ConciliarMovimientoBancarioApi {
+    conciliacion_id?: string;
+    extra_params?: Record<string, unknown>;
+    items?: Array<{ tipo: TipoConciliacion; params: Record<string, unknown> }>;
 }
 
 interface IgnorarMovimientoBancarioApi {
@@ -161,12 +202,9 @@ export const movimientoBancarioDesdeApi = (api: MovimientoBancarioApi): Movimien
     referencia: api.referencia,
     pendiente: api.pendiente,
     estado: api.estado,
-    numCasaciones: api.num_casaciones ?? 0,
+    numConciliaciones: api.num_conciliaciones ?? 0,
     probabilidadMaxima: api.probabilidad_maxima,
-    tipoCasacion: api.tipo_casacion,
-    reciboId: api.recibo_id,
-    codigoRecibo: api.codigo_recibo,
-    nombreTercero: api.nombre_tercero,
+    numItemsConciliacion: api.num_items_conciliacion ?? 0,
     probabilidad: api.probabilidad,
     origenConciliacion: api.origen_conciliacion,
     justificacion: api.justificacion,
@@ -174,12 +212,15 @@ export const movimientoBancarioDesdeApi = (api: MovimientoBancarioApi): Movimien
     conciliadoEn: fechaDesdeApi(api.conciliado_en),
     eliminadoEnBanco: api.eliminado_en_banco,
     requiereRevision: api.requiere_revision,
+    subcuentaBancoId: api.subcuenta_banco_id ?? null,
+    saldo: api.saldo_tras ?? null,
 });
 
 export const candidatoConciliacionDesdeApi = (api: CandidatoConciliacionApi): CandidatoConciliacion => ({
     id: `${api.tipo_recibo}_${api.recibo_id}`,
     tipoRecibo: api.tipo_recibo,
-    tipoCasacion: api.tipo_casacion,
+    tipoConciliacion: api.tipo_conciliacion,
+    encaje: api.encaje,
     reciboId: api.recibo_id,
     codigo: api.codigo,
     facturaCodigo: api.factura_codigo,
@@ -191,13 +232,28 @@ export const candidatoConciliacionDesdeApi = (api: CandidatoConciliacionApi): Ca
     diasDiferencia: api.dias_diferencia,
 });
 
-export const casacionDesdeApi = (api: CasacionApi): Casacion => ({
-    id: api.id,
+export const remesaCandidataDesdeApi = (api: RemesaCandidataApi): RemesaCandidata => ({
+    id: api.remesa_id,
+    tipoConciliacion: api.tipo_conciliacion,
+    tipoRemesa: api.tipo_remesa ?? null,
+    fecha: new Date(Date.parse(api.fecha)),
+    fechaCargo: new Date(Date.parse(api.fecha_cargo)),
+    total: api.total,
+    importePendiente: api.importe_pendiente,
+    diasDiferencia: api.dias_diferencia,
+    recibos: api.recibos.map((recibo) => ({
+        reciboId: recibo.recibo_id,
+        codigo: recibo.codigo,
+        tercero: recibo.tercero,
+        importe: recibo.importe,
+    })),
+    reciboIdsPropuestos: api.recibo_ids_propuestos,
+    propuestaAmbigua: api.propuesta_ambigua,
+});
+
+const itemConciliacionDesdeApi = (api: ItemConciliacionApi): ItemConciliacion => ({
     tipo: api.tipo,
     params: api.params ?? {},
-    probabilidad: api.probabilidad,
-    origen: api.origen,
-    justificacion: api.justificacion,
     recibo: api.recibo
         ? {
             id: api.recibo.id,
@@ -206,6 +262,8 @@ export const casacionDesdeApi = (api: CasacionApi): Casacion => ({
             importe: api.recibo.importe,
             fechaVencimiento: new Date(Date.parse(api.recibo.fecha_vencimiento)),
             estado: api.recibo.estado,
+            fechaEmision: api.recibo.fecha_emision ? new Date(Date.parse(api.recibo.fecha_emision)) : null,
+            fechaCobro: api.recibo.fecha_cobro ? new Date(Date.parse(api.recibo.fecha_cobro)) : null,
         }
         : null,
     cuota: api.cuota
@@ -217,6 +275,34 @@ export const casacionDesdeApi = (api: CasacionApi): Casacion => ({
             total: api.cuota.total,
         }
         : null,
+    remesa: api.remesa
+        ? {
+            id: api.remesa.id,
+            fechaCargo: new Date(Date.parse(api.remesa.fecha_cargo)),
+            total: api.remesa.total,
+            estado: api.remesa.estado,
+            numRecibos: api.remesa.num_recibos,
+            tipoRemesa: api.remesa.tipo_remesa ?? null,
+        }
+        : null,
+    asientoId: api.asiento_id ? String(api.asiento_id) : null,
+    asiento: api.asiento
+        ? {
+            id: String(api.asiento.id),
+            numero: api.asiento.numero,
+            fecha: new Date(Date.parse(api.asiento.fecha)),
+            importe: api.asiento.importe,
+            concepto: api.asiento.concepto ?? null,
+        }
+        : null,
+});
+
+export const conciliacionDesdeApi = (api: ConciliacionApi): Conciliacion => ({
+    id: api.id,
+    items: (api.items ?? []).map(itemConciliacionDesdeApi),
+    probabilidad: api.probabilidad,
+    origen: api.origen,
+    justificacion: api.justificacion,
 });
 
 const resumenSincronizacionDesdeApi = (
@@ -257,24 +343,25 @@ export const getMovimientosBancarios: GetMovimientosBancarios = async (criteria)
 };
 
 /**
- * Lanza `/transactions/sync` para todas las conexiones activas. Sin cuerpo;
- * puede tardar varios segundos. Devuelve un resumen aunque alguna conexión
+ * Lanza `/transactions/sync` para las conexiones de la cuenta bancaria (con sus otras
+ * cuentas, porque el cursor es de la conexión) y concilia automáticamente los movimientos
+ * de esa cuenta. Puede tardar varios segundos. Devuelve un resumen aunque alguna conexión
  * individual haya fallado (ver `errores`).
  */
-export const postSincronizarMovimientoBancario: PostSincronizarMovimientoBancario = async () => {
-    const respuesta = await RestAPI.query<undefined, ResumenSincronizacionMovimientoBancarioApi>(
+export const postSincronizarMovimientoBancario: PostSincronizarMovimientoBancario = async (cuentaBancoId) => {
+    const respuesta = await RestAPI.query<{ cuenta_banco_id: string }, ResumenSincronizacionMovimientoBancarioApi>(
         `${baseUrl}/sincronizar`,
-        undefined,
+        { cuenta_banco_id: cuentaBancoId },
         "Error al sincronizar los movimientos bancarios"
     );
     return resumenSincronizacionDesdeApi(respuesta);
 };
 
-/** Aplica las reglas automáticas a todos los movimientos conciliables (lo mismo que al sincronizar). */
-export const postConciliarAutomaticamente: PostConciliarAutomaticamente = async () => {
-    const api = await RestAPI.query<undefined, ResumenConciliacionAutomaticaApi>(
+/** Aplica las reglas automáticas a los movimientos conciliables de la cuenta bancaria (lo mismo que al sincronizar). */
+export const postConciliarAutomaticamente: PostConciliarAutomaticamente = async (cuentaBancoId) => {
+    const api = await RestAPI.query<{ cuenta_banco_id: string }, ResumenConciliacionAutomaticaApi>(
         `${baseUrl}/conciliar_automaticamente`,
-        undefined,
+        { cuenta_banco_id: cuentaBancoId },
         "Error al conciliar automáticamente los movimientos bancarios"
     );
     return {
@@ -302,25 +389,49 @@ export const getCandidatosConciliacion: GetCandidatosConciliacion = async (id, t
     );
 };
 
-/** Casaciones candidatas del movimiento, de más a menos probable. */
-export const getCasacionesMovimientoBancario: GetCasacionesMovimientoBancario = async (id) => {
-    return await RestAPI.getLista<Casacion, CasacionApi>(
-        `${baseUrl}/${id}/casaciones`,
-        casacionDesdeApi,
-        "Error al obtener las casaciones del movimiento"
+/** Remesas de cobro que puede pagar el movimiento, con los recibos propuestos para un pago parcial. */
+export const getRemesasConciliacion: GetRemesasConciliacion = async (id) => {
+    return await RestAPI.getLista<RemesaCandidata, RemesaCandidataApi>(
+        `${baseUrl}/${id}/remesas`,
+        remesaCandidataDesdeApi,
+        "Error al obtener las remesas del movimiento"
     );
+};
+
+/** Conciliaciones candidatas del movimiento, de más a menos probable. */
+export const getConciliacionesMovimientoBancario: GetConciliacionesMovimientoBancario = async (id) => {
+    return await RestAPI.getLista<Conciliacion, ConciliacionApi>(
+        `${baseUrl}/${id}/conciliaciones`,
+        conciliacionDesdeApi,
+        "Error al obtener las conciliaciones del movimiento"
+    );
+};
+
+/** Conciliación aplicada de un movimiento conciliado (datos actuales del recibo/cuota). */
+export const getConciliacionAplicadaMovimientoBancario = async (id: string): Promise<Conciliacion | null> => {
+    const resp = await RestAPI.getItem<ConciliacionApi | null, ConciliacionApi | null>(
+        `${baseUrl}/${id}/conciliacion_aplicada`,
+        (api) => api,
+        "Error al obtener la conciliación aplicada del movimiento"
+    );
+    return resp ? conciliacionDesdeApi(resp) : null;
 };
 
 /**
  * Resuelve la casación en el servidor (paga el recibo, lo divide, genera el
  * asiento...) con la fecha del movimiento y lo deja conciliado.
  */
-export const patchCasarMovimientoBancario: PatchCasarMovimientoBancario = async (id, casacion) => {
-    const cuerpo: CasarMovimientoBancarioApi = "casacionId" in casacion
-        ? { casacion_id: casacion.casacionId, params: casacion.params ?? {} }
-        : { tipo_casacion: casacion.tipo, params: casacion.params };
-    await RestAPI.patch<CasarMovimientoBancarioApi>(
-        `${baseUrl}/${id}/casar`,
+export const patchConciliarMovimientoBancario: PatchConciliarMovimientoBancario = async (id, conciliacion) => {
+    const cuerpo: ConciliarMovimientoBancarioApi = "conciliacionId" in conciliacion
+        ? {
+            conciliacion_id: conciliacion.conciliacionId,
+            ...(conciliacion.extraParams && { extra_params: conciliacion.extraParams }),
+        }
+        : {
+            items: conciliacion.items.map(({ tipo, params }) => ({ tipo, params })),
+        };
+    await RestAPI.patch<ConciliarMovimientoBancarioApi>(
+        `${baseUrl}/${id}/conciliar`,
         cuerpo,
         "Error al conciliar el movimiento"
     );
@@ -341,4 +452,85 @@ export const patchIgnorarMovimientoBancario: PatchIgnorarMovimientoBancario = as
 
 export const patchReactivarMovimientoBancario: PatchReactivarMovimientoBancario = async (id) => {
     await RestAPI.patch(`${baseUrl}/${id}/reactivar`, {}, "Error al reactivar el movimiento");
+};
+
+interface CuadreCuentaApi {
+    cuenta_id: string;
+    cuenta_banco_id: string;
+    nombre_cuenta: string;
+    institucion: string | null;
+    ultima_sincronizacion: string | null;
+    saldo_banco: number | null;
+    saldo_contable: number | null;
+    diferencia: number | null;
+    bancario_sin_conciliar: number;
+    importe_sin_conciliar: number;
+    bancario_ignorado: number;
+    importe_ignorado: number;
+    requiere_revision: number;
+    banco_elimino_conciliado: number;
+    asiento_descuadrado: number;
+    partida_huerfana: number;
+    total_alertas: number;
+}
+
+interface CuadreBancarioApi {
+    cuentas: CuadreCuentaApi[];
+}
+
+const cuadreCuentaDesdeApi = (api: CuadreCuentaApi): CuadreCuenta => ({
+    cuentaId: api.cuenta_id,
+    cuentaBancoId: api.cuenta_banco_id,
+    nombreCuenta: api.nombre_cuenta,
+    institucion: api.institucion,
+    ultimaSincronizacion: fechaDesdeApi(api.ultima_sincronizacion),
+    saldoBanco: api.saldo_banco,
+    saldoContable: api.saldo_contable,
+    diferencia: api.diferencia,
+    bancarioSinConciliar: api.bancario_sin_conciliar,
+    importeSinConciliar: api.importe_sin_conciliar,
+    bancarioIgnorado: api.bancario_ignorado,
+    importeIgnorado: api.importe_ignorado,
+    requiereRevision: api.requiere_revision,
+    bancoEliminoConciliado: api.banco_elimino_conciliado,
+    asientoDescuadrado: api.asiento_descuadrado,
+    partidaHuerfana: api.partida_huerfana,
+    totalAlertas: api.total_alertas,
+});
+
+const cuadreBancarioUrl = new ApiUrls().CUADRE_BANCARIO;
+
+export const getCuadreBancario: GetCuadreBancario = async () => {
+    const api = await RestAPI.getItem<CuadreBancarioApi, CuadreBancarioApi>(
+        cuadreBancarioUrl,
+        (a) => a,
+        "Error al obtener el cuadre bancario"
+    );
+    return {
+        cuentas: (api.cuentas ?? []).map(cuadreCuentaDesdeApi),
+    } satisfies CuadreBancario;
+};
+
+interface PartidaHuerfanaApi {
+    idasiento: number;
+    fecha: string;
+    importe: number;
+    descripcion: string | null;
+    numero_asiento: string | null;
+}
+
+const partidaHuerfanaDesdeApi = (api: PartidaHuerfanaApi): PartidaHuerfana => ({
+    idasiento: api.idasiento,
+    fecha: new Date(Date.parse(api.fecha)),
+    importe: api.importe,
+    descripcion: api.descripcion,
+    numeroAsiento: api.numero_asiento,
+});
+
+export const getPartidasHuerfanas: GetPartidasHuerfanas = async (cuentaConexionId) => {
+    return await RestAPI.getLista<PartidaHuerfana, PartidaHuerfanaApi>(
+        `${cuadreBancarioUrl}/${cuentaConexionId}/partidas_huerfanas`,
+        partidaHuerfanaDesdeApi,
+        "Error al obtener las partidas huérfanas"
+    );
 };

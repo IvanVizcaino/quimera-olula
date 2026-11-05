@@ -1,7 +1,11 @@
+import { plugin } from "./dominio.ts";
+
 export interface ElementoMenuBase {
     nombre: string;
     icono?: string;
     regla?: string | string[];
+    /** Plugins que deben estar activos para mostrar la entrada (todos). */
+    plugin?: string | string[];
     color?: string;
     variant?: string;
     posicion?: number;
@@ -39,3 +43,6 @@ export const crearMenu = (factory: Record<string, MenuContextFactory>) => {
 
     return itemsAgrupados as ElementoMenu[];
 };
+/** Los plugins que pide la entrada están activos en esta instalación (whoami). */
+export const pluginsActivos = (e: ElementoMenuBase): boolean =>
+    !e.plugin || [e.plugin].flat().every((nombre) => plugin(nombre) === "activo");

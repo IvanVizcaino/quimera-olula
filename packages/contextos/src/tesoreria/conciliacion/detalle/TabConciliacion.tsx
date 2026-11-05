@@ -1,124 +1,57 @@
-import { QAviso } from "@olula/componentes/atomos/qaviso.tsx";
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
-import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { FormModelo } from "@olula/lib/dominio.js";
-import { CandidatoConciliacion, Casacion, MovimientoBancario } from "../diseño.js";
 import {
-    bloqueoConciliarMovimientoBancario,
-    etiquetaEstadoMovimientoBancario,
-    etiquetaOrigenConciliacion,
-    etiquetaTipoCasacion,
-    reciboAsociadoMovimientoBancario,
-    urlReciboMovimientoBancario,
-    varianteEstadoMovimientoBancario,
-} from "../dominio.js";
+    CandidatoConciliacion, CandidatoListaConciliacion, Conciliacion, MovimientoBancario, PartidaHuerfana,
+    RemesaCandidata,
+} from "../diseño.js";
+import { bloqueoConciliarMovimientoBancario } from "../dominio.js";
 import { CandidatosConciliacion } from "./candidatos/CandidatosConciliacion.js";
-import { CasacionesMovimiento } from "./casaciones/CasacionesMovimiento.js";
+import { ConciliacionesMovimiento } from "./conciliaciones/ConciliacionesMovimiento.js";
 import "./TabConciliacion.css";
 
 interface TabConciliacionProps {
-    form: FormModelo;
     movimiento: MovimientoBancario;
-    casaciones: Casacion[];
+    conciliaciones: Conciliacion[];
     candidatos: CandidatoConciliacion[];
     candidatosTexto: string;
+    remesas: RemesaCandidata[];
+    partidas: PartidaHuerfana[];
+    seleccion: CandidatoListaConciliacion[];
     publicar: EmitirEvento;
 }
 
 /**
- * Casaciones propuestas + búsqueda de recibos + asiento manual / Ignorar
- * cuando el movimiento está pendiente o con candidatos; casación aplicada +
- * Desconciliar cuando está casado; motivo + Reactivar cuando está ignorado.
- * Los modales (casar/, casar_asiento/, desconciliar/, ignorar/, reactivar/)
- * los monta DetalleConciliacion.tsx según `estado`.
+ * Búsqueda de candidatos para conciliar un movimiento pendiente o con
+ * candidatos. Muestra las conciliaciones propuestas y la lista única de
+ * recibos, remesas y partidas contables con su buscador. Solo se monta cuando el movimiento puede conciliarse (estado
+ * pendiente o candidatos).
  */
 export const TabConciliacion = ({
-    form, movimiento, casaciones, candidatos, candidatosTexto, publicar,
+    movimiento, conciliaciones, candidatos, candidatosTexto, remesas, partidas, seleccion, publicar,
 }: TabConciliacionProps) => {
 
-    const { uiProps } = form;
     const bloqueo = bloqueoConciliarMovimientoBancario(movimiento);
 
     return (
         <div className="TabConciliacion">
-            {movimiento.requiereRevision && (
-                <QAviso variante="advertencia">
-                    Este movimiento requiere revisión manual.
-                </QAviso>
-            )}
-
-            <div id="estado-conciliacion">
-                <QEtiqueta variante={varianteEstadoMovimientoBancario(movimiento.estado)}>
-                    {etiquetaEstadoMovimientoBancario(movimiento.estado)}
-                </QEtiqueta>
-            </div>
-
-            {movimiento.estado === "candidatos" && casaciones.length > 0 && (
-                <CasacionesMovimiento
+            {movimiento.estado === "candidatos" && conciliaciones.length > 0 && (
+                <ConciliacionesMovimiento
                     movimiento={movimiento}
-                    casaciones={casaciones}
+                    conciliaciones={conciliaciones}
                     bloqueo={bloqueo}
                     publicar={publicar}
                 />
             )}
 
-            {(movimiento.estado === "pendiente" || movimiento.estado === "candidatos") && (
-                <CandidatosConciliacion
-                    movimiento={movimiento}
-                    candidatos={candidatos}
-                    texto={candidatosTexto}
-                    bloqueo={bloqueo}
-                    publicar={publicar}
-                />
-            )}
-
-            {movimiento.estado === "conciliado" && (
-                <div className="recibo-conciliado">
-                    <div id="recibo-asociado">
-                        <div>
-                            <span className="etiqueta-recibo">
-                                {movimiento.tipoCasacion ? etiquetaTipoCasacion(movimiento.tipoCasacion) : "Casación"}
-                                {movimiento.probabilidad !== null && ` · ${movimiento.probabilidad} %`}
-                            </span>
-                            <span className="valor-recibo">{reciboAsociadoMovimientoBancario(movimiento)}</span>
-                        </div>
-                        {urlReciboMovimientoBancario(movimiento) && (
-                            <QBoton tamaño="pequeño" variante="borde"
-                                enlace={urlReciboMovimientoBancario(movimiento) ?? undefined}>
-                                Ver recibo
-                            </QBoton>
-                        )}
-                    </div>
-                    <quimera-formulario>
-                        <QInput label="Origen" nombre="origenConciliacion" soloLectura
-                            valor={etiquetaOrigenConciliacion(movimiento.origenConciliacion)} />
-                        <QInput label="Conciliado por" {...uiProps("conciliadoPor")} />
-                        <QInput label="Conciliado el" {...uiProps("conciliadoEn")} />
-                        {movimiento.justificacion && (
-                            <QInput label="Justificación" {...uiProps("justificacion")} />
-                        )}
-                    </quimera-formulario>
-                    <div className="botones">
-                        <QBoton variante="borde" onClick={() => publicar("desconciliar_solicitado")}>
-                            Desconciliar
-                        </QBoton>
-                    </div>
-                </div>
-            )}
-
-            {movimiento.estado === "ignorado" && (
-                <div className="movimiento-ignorado">
-                    <quimera-formulario>
-                        {/* El motivo indicado al ignorar se guarda en el mismo campo que la justificación de conciliar. */}
-                        <QInput label="Motivo" {...uiProps("justificacion")} />
-                    </quimera-formulario>
-                    <div className="botones">
-                        <QBoton variante="borde" onClick={() => publicar("reactivar_solicitado")}>Reactivar</QBoton>
-                    </div>
-                </div>
-            )}
+            <CandidatosConciliacion
+                movimiento={movimiento}
+                candidatos={candidatos}
+                remesas={remesas}
+                partidas={partidas}
+                texto={candidatosTexto}
+                seleccion={seleccion}
+                bloqueo={bloqueo}
+                publicar={publicar}
+            />
         </div>
     );
 };

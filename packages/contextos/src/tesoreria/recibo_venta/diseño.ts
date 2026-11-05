@@ -21,6 +21,9 @@ export interface ReciboVenta extends Entidad {
     clienteId: string;
     nombreCliente: string;
     idFiscal: string;
+    divisaId: string;
+    /** Divisa de la empresa: si es otra, cobrar o devolver pide la tasa de cambio. */
+    divisaEmpresaId: string | null;
     pagos: MovimientoRecibo[];
     recibosAgrupados: ReciboVenta[];
 }
@@ -32,6 +35,7 @@ export type GetRecibosVenta = (criteria: Criteria) => RespuestaLista<ReciboVenta
 export type PagoReciboVenta = {
     cuentaPagoId: string;
     fecha: string;
+    tasaConversion?: number;
 };
 
 export type PatchPagarReciboVenta = (id: string, pago: PagoReciboVenta) => Promise<void>;
@@ -43,6 +47,7 @@ export type DesagruparReciboVenta = (id: string) => Promise<string>;
 export type DevolucionReciboVenta = {
     cuentaPagoId: string;
     fecha: string;
+    tasaConversion?: number;
 };
 
 export type PatchDevolverReciboVenta = (id: string, devolucion: DevolucionReciboVenta) => Promise<void>;

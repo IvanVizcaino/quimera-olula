@@ -2,6 +2,7 @@ import { CamposDireccionVenta } from "#/ventas/comun/componentes/CamposDireccion
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
 import { DirCliente } from "#/ventas/comun/componentes/dirCliente.tsx";
 import { EmpresaActual } from "#/comun/componentes/empresaActual.tsx";
+import { conEmpresaActual } from "#/valores/empresaActual.ts";
 import {
   metaNuevaVentaClienteNoRegistrado,
   nuevaVentaClienteNoRegistradaVacia,
@@ -23,17 +24,23 @@ export const CrearPedido = ({
   publicar?: EmitirEvento;
 }) => {
   const [modoNoRegistrado, setModoNoRegistrado] = useState(false);
-  const pedidoRegistrado = useModelo(metaNuevoPedido, nuevoPedidoVacio);
+  /* Lazy initializer: referencia estable para useModelo y empresa ya puesta en el
+     primer render, sin depender del efecto de EmpresaActual. */
+  const [inicialRegistrado] = useState(() => conEmpresaActual(nuevoPedidoVacio));
+  const [inicialNoRegistrado] = useState(() =>
+    conEmpresaActual(nuevaVentaClienteNoRegistradaVacia)
+  );
+  const pedidoRegistrado = useModelo(metaNuevoPedido, inicialRegistrado);
   const pedidoNoRegistrado = useModelo(
     metaNuevaVentaClienteNoRegistrado,
-    nuevaVentaClienteNoRegistradaVacia
+    inicialNoRegistrado
   );
   const focus = useFocus();
 
   /* El maestro monta el modal siempre, así que el modo no se reinicia solo. */
   const reiniciar = useCallback(() => {
-    pedidoRegistrado.init(nuevoPedidoVacio);
-    pedidoNoRegistrado.init(nuevaVentaClienteNoRegistradaVacia);
+    pedidoRegistrado.init(conEmpresaActual(nuevoPedidoVacio));
+    pedidoNoRegistrado.init(conEmpresaActual(nuevaVentaClienteNoRegistradaVacia));
     setModoNoRegistrado(false);
   }, [pedidoRegistrado, pedidoNoRegistrado]);
 
@@ -64,8 +71,8 @@ export const CrearPedido = ({
 
   const toggleModoCliente = () => {
     setModoNoRegistrado(!modoNoRegistrado);
-    pedidoRegistrado.init(nuevoPedidoVacio);
-    pedidoNoRegistrado.init(nuevaVentaClienteNoRegistradaVacia);
+    pedidoRegistrado.init(conEmpresaActual(nuevoPedidoVacio));
+    pedidoNoRegistrado.init(conEmpresaActual(nuevaVentaClienteNoRegistradaVacia));
   };
 
   return (

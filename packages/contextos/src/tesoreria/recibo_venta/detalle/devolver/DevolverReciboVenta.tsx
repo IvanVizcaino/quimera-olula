@@ -1,10 +1,11 @@
-import { CuentaBancariaSelect } from "#/empresa/comun/componentes/cuenta_bancaria_select.tsx";
+import { CuentaBancariaSelect } from "#/tesoreria/comun/componentes/cuenta_bancaria_select.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QDate, QModal } from "@olula/componentes/index.js";
+import { QDate, QInput, QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useMemo } from "react";
 import { ReciboVenta } from "../../diseño.js";
+import { enDivisaExtranjera } from "../../dominio.js";
 import { DevolucionRecibo } from "./diseño.js";
 import { devolucionReciboVacia, metaDevolucionRecibo } from "./dominio.js";
 
@@ -21,10 +22,10 @@ export const DevolverReciboVenta = ({
     [recibo]
   );
 
-  const { modelo, uiProps, valido } = useModelo(
-    metaDevolucionRecibo,
-    devolucionInicial
-  );
+  const enDivisa = enDivisaExtranjera(recibo);
+  const meta = useMemo(() => metaDevolucionRecibo(enDivisa), [enDivisa]);
+
+  const { modelo, uiProps, valido } = useModelo(meta, devolucionInicial);
 
   const devolver = async () => {
     const devolucion: DevolucionRecibo = { ...modelo };
@@ -48,6 +49,12 @@ export const DevolverReciboVenta = ({
             deshabilitado
           />
           <QDate label="Fecha" {...uiProps("fecha")} />
+          {enDivisa && (
+            <QInput
+              label={`Tasa de cambio ${recibo.divisaId} → ${recibo.divisaEmpresaId}`}
+              {...uiProps("tasa_conversion")}
+            />
+          )}
         </quimera-formulario>
         <div className="botones maestro-botones">
           <QBoton onClick={devolver} deshabilitado={!valido}>
