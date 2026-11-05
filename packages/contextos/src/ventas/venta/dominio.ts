@@ -47,7 +47,10 @@ export const ventaVacia: Venta = {
     netoSinDto: 0,
 }
 
-/** La empresa la resuelve la infraestructura al enviar, con `empresaActual()`. */
+/**
+ * Modelo vacío: los formularios de alta lo siembran con `conEmpresaActual()`, porque
+ * `empresa_id` es requerido y sin él el botón Guardar nace deshabilitado.
+ */
 export const nuevaVentaVacia: NuevaVenta = {
     cliente_id: "",
     direccion_id: "",

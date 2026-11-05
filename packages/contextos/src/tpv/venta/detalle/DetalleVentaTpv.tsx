@@ -3,6 +3,7 @@ import { TotalesVenta } from "#/ventas/venta/vistas/TotalesVenta.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Detalle, QBoton, Tab, Tabs } from "@olula/componentes/index.js";
 import { EmitirEvento, Entidad } from "@olula/lib/diseño.js";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import { abrirCajon } from "@olula/lib/impresion.ts";
 import { listaEntidadesInicial } from "@olula/lib/ListaEntidades.js";
 import { useModelo } from "@olula/lib/useModelo.js";
@@ -40,6 +41,8 @@ export const DetalleVentaTpv = ({
 
     const { ctx, emitir } = useMaquina(getMaquina, contextoInicial, publicar);
 
+    const valesAntesQueTique = (FactoryObj.app.TPV?.venta_imprimirValesAntesQueTique as boolean | undefined) ?? false;
+
     const autoGuardar = useCallback(
         async (venta: VentaTpv) => {
             await guardarVenta(ctx, venta);
@@ -58,7 +61,7 @@ export const DetalleVentaTpv = ({
     useEffect(() => {
         const estadosPago = ["PAGANDO_EN_EFECTIVO", "PAGANDO_CON_TARJETA", "PAGANDO_CON_VALE"];
         if (ctx.estado === 'EMITIDA' && estadosPago.includes(estadoAnterior.current) && ctx.venta.pendiente === 0) {
-            imprimirTicketOFactura(ctx.venta, ctx.pagos.lista);
+            imprimirTicketOFactura(ctx.venta, ctx.pagos.lista, valesAntesQueTique);
         }
         estadoAnterior.current = ctx.estado;
     }, [ctx.estado, ctx.venta]);

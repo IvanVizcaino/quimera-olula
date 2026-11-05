@@ -10,10 +10,15 @@ export default mergeConfig(config, {
             '#': '@olula/ctx',
         }
     },
-    // server: {
-    //     host: '0.0.0.0',  // Escucha en todas las interfaces de red
-    //     port: 5173        // Opcional, se coje por defecto
-    // },
+    server: {
+        allowedHosts: true,
+        proxy: {
+            '/public': {
+                target: 'http://localhost:5000',
+                changeOrigin: true,
+            },
+        },
+    },
     test: {
         setupFiles: ["../../setupTests.ts"]
     }

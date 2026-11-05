@@ -8,7 +8,7 @@ import { useFocus } from "@olula/lib/useFocus.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { HookModelo, useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useState } from "react";
-import { empresaActual } from "#/valores/empresaActual.ts";
+import { conEmpresaActual } from "#/valores/empresaActual.ts";
 import { Cliente } from "../../comun/componentes/cliente.tsx";
 import { DirCliente } from "../../comun/componentes/dirCliente.tsx";
 import {
@@ -33,11 +33,9 @@ export const CrearPresupuesto = ({
   onCancelar?: () => void;
   modeloVacio?: NuevoPresupuesto;
 }) => {
-  const modeloConEmpresa = () => ({ ...modeloVacio, empresa_id: empresaActual() });
-  const modeloNoRegistradoConEmpresa = () => ({
-    ...nuevoPresupuestoClienteNoRegistradoVacio,
-    empresa_id: empresaActual(),
-  });
+  const modeloConEmpresa = () => conEmpresaActual(modeloVacio);
+  const modeloNoRegistradoConEmpresa = () =>
+    conEmpresaActual(nuevoPresupuestoClienteNoRegistradoVacio);
 
   const [modoNoRegistrado, setModoNoRegistrado] = useState(false);
   // Lazy initializer: se evalúa solo en el montaje, garantiza referencia estable para useModelo
@@ -99,11 +97,9 @@ const FormAltaPresupuesto = ({
   onToggleModoCliente: () => void;
 }) => {
   const focus = useFocus();
-  const modeloConEmpresa = () => ({ ...modeloVacio, empresa_id: empresaActual() });
-  const modeloNoRegistradoConEmpresa = () => ({
-    ...nuevoPresupuestoClienteNoRegistradoVacio,
-    empresa_id: empresaActual(),
-  });
+  const modeloConEmpresa = () => conEmpresaActual(modeloVacio);
+  const modeloNoRegistradoConEmpresa = () =>
+    conEmpresaActual(nuevoPresupuestoClienteNoRegistradoVacio);
 
   const crear_ = useCallback(async () => {
     let modelo;
