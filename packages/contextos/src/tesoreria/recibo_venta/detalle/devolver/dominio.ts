@@ -10,12 +10,20 @@ export const devolucionReciboVacia = (recibo: ReciboVenta): DevolucionRecibo => 
         cuenta_pago_id: cuenta?.id ?? "",
         nombre_cuenta_pago: cuenta?.nombre ?? "",
         fecha: new Date(),
+        tasa_conversion: 0,
     };
 };
 
-export const metaDevolucionRecibo: MetaModelo<DevolucionRecibo> = {
+/** En divisa extranjera la tasa de cambio es obligatoria. */
+export const metaDevolucionRecibo = (enDivisa: boolean): MetaModelo<DevolucionRecibo> => ({
     campos: {
         cuenta_pago_id: { requerido: true },
         fecha: { tipo: "fecha", requerido: true },
+        tasa_conversion: {
+            tipo: "numero",
+            requerido: enDivisa,
+            validacion: (m) => !enDivisa || m.tasa_conversion > 0
+                ? true : "La tasa de cambio debe ser mayor que 0",
+        },
     },
-};
+});

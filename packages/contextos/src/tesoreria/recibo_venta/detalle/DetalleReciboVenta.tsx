@@ -113,7 +113,7 @@ export const DetalleReciboVenta = ({
 
         <PagosReciboVenta pagos={ctx.recibo.pagos} />
 
-        {ctx.estado === "PAGANDO" && <PagarReciboVenta publicar={emitir} />}
+        {ctx.estado === "PAGANDO" && <PagarReciboVenta recibo={ctx.recibo} publicar={emitir} />}
 
         {ctx.estado === "ENLACE_COBRO" && (
           <GenerarEnlaceCobroReciboVenta recibo={ctx.recibo} publicar={emitir} />
