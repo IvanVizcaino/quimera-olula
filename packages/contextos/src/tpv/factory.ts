@@ -8,5 +8,6 @@ export class FactoryTpvOlula {
     // static api_payloadPatchPedido = payloadPatchPedido
     // static metaPedido = metaPedido
     static venta_CrearVenta = CrearVentaTpv
+    static venta_imprimirValesAntesQueTique = false
     static menu = menuTPV
 }
