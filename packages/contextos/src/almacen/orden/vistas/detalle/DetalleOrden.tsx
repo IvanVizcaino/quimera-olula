@@ -1,4 +1,5 @@
 import { CrearCaja } from "#/almacen/caja/crear/CrearCaja.tsx";
+import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { Caja } from "#/almacen/comun/componentes/Caja.tsx";
 import { Ubicacion } from "#/almacen/comun/componentes/Ubicacion.tsx";
@@ -15,11 +16,12 @@ import { useModelo } from "@olula/lib/useModelo.ts";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
 import { desbloquearTTS, useSintesisVoz } from "@olula/lib/voz/useSintesisVoz.ts";
 import { useCallback, useContext, useEffect } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import { TipoOrden } from "../../../comun/componentes/TipoOrden.tsx";
 import { LineaOrdenAlmacen, OrdenAlmacen } from "../../diseño.ts";
-import { metaOrden, ordenVacia } from "../../dominio.ts";
+import { etiquetaEstadoOrden, metaOrden, ordenAlbaranable, ordenVacia, pedidoUnicoDeOrden } from "../../dominio.ts";
 import { crearCajasOrden, getReportEtiquetasOrden } from "../../infraestructura.ts";
+import { AlbaranarOrden } from "../albaranar/AlbaranarOrden.tsx";
 import { BorrarOrden } from "../borrar/BorrarOrden.tsx";
 import { ColocacionOrden } from "../colocar/ColocacionOrden.tsx";
 import { TerminarOrden } from "../terminar/TerminarOrden.tsx";
@@ -29,9 +31,9 @@ import "./DetalleOrden.css";
 import { LecturaOrden } from "./lectura/LecturaLineaOrden.tsx";
 import { LecturasCajaOrden } from "./lecturas_caja/LecturasCajaOrden.tsx";
 import { LecturaCajaOrden } from "./leer_caja/LecturaCajaOrden.tsx";
-import { iniciarAudioLectura } from "./leer_cajas_entrada/LeerCajasEntrada.tsx";
-import { LeerDropOrden } from "./leer_drop_orden/LeerDropOrden.tsx";
-import { LeerPickOrden } from "./leer_pick_orden/LeerPickOrden.tsx";
+import { iniciarAudioLectura } from "#/almacen/comun/audio.ts";
+import { definicionDeLinea, tieneFaseDrop } from "../../pasos/catalogo.ts";
+import { LeerPasosOrden } from "./leer_pasos/LeerPasosOrden.tsx";
 import { LecturaUbicacionOrden } from "./leer_ubicacion/LecturaUbicacionOrden.tsx";
 import { LineasOrden } from "./lineas/LineasOrden.tsx";
 import { ContextoOrdenAlmacen, getMaquina } from "./maquina.ts";
@@ -85,6 +87,8 @@ export const DetalleOrden = ({
 
     const sgaActivo = plugin("sga") === "activo";
     const ocultarTemporalDemos = false;
+    // Cajas y ubicaciones de cabecera y lecturas de caja: de momento no se usan.
+    const usarCajasCabecera = false;
     const mostrarOrigen = ["SALIDA", "TRASPASO"].includes(modelo.tipo);
     const mostrarDestino = ["ENTRADA", "TRASPASO"].includes(modelo.tipo);
 
@@ -99,23 +103,37 @@ export const DetalleOrden = ({
               emitirPickSolicitado: () => emitir("lectura_pick_solicitada"),
               emitirDropSolicitado: () => { iniciarAudioLectura(); emitir("lectura_drop_solicitada"); },
               emitirColocacionSolicitada: () => emitir("colocacion_solicitada"),
+              emitirAlbaranadoSolicitado: () => emitir("albaranado_solicitado"),
+              emitirDevolucionSobrante: (linea) => emitir("devolucion_sobrante_solicitada", linea),
           })
         : null;
 
     if (!ctx.orden.id) return null;
 
+    const pedidoUnico = modelo.tipo === "SALIDA" ? pedidoUnicoDeOrden(modelo) : null;
+
     return (
         <Detalle
             id={ordenId}
             obtenerTitulo={titulo}
+            obtenerEstado={(o: OrdenAlmacen) => <EtiquetaEstado {...etiquetaEstadoOrden(o)} />}
             setEntidad={() => {}}
             entidad={ctx.orden}
             cerrarDetalle={() => publicar("cancelar_seleccion")}
         >
             <div className="maestro-botones">
                 <QBoton variante="borde" onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
-                {modelo.estado !== "TERMINADA" && (
+                {modelo.estado !== "TERMINADA" && modelo.estado !== "PREPARADA" && (
                     <QBoton variante="borde" onClick={() => emitir("terminado_solicitado")}>Terminar</QBoton>
+                )}
+                {modelo.tipo === "SALIDA" && modelo.estado !== "TERMINADA" && (
+                    <QBoton
+                        variante="borde"
+                        deshabilitado={!ordenAlbaranable(modelo)}
+                        onClick={() => emitir("albaranado_solicitado")}
+                    >
+                        Albaranar
+                    </QBoton>
                 )}
                 {modelo.tipo === "ENTRADA" && (
                     <QBoton
@@ -145,32 +163,46 @@ export const DetalleOrden = ({
                     <TipoOrden {...orden.uiProps("tipo")} soloLectura />
                     <Almacen {...orden.uiProps("almacenId")} soloLectura />
                     <QInput label="Fecha" {...orden.uiProps("fecha")} soloLectura />
-                    <QInput label="Abierta" {...orden.uiProps("abierta")} soloLectura />
-                    {sgaActivo && mostrarOrigen && (
+                    {pedidoUnico && (
+                        <div className="DetalleOrden__albaranes">
+                            <span>Pedido</span>
+                            <Link to={`/ventas/pedido?id=${pedidoUnico.id}`}>{pedidoUnico.codigo}</Link>
+                            {pedidoUnico.cliente && <span>{pedidoUnico.cliente}</span>}
+                        </div>
+                    )}
+                    {modelo.albaranes.length > 0 && (
+                        <div className="DetalleOrden__albaranes">
+                            <span>{modelo.albaranes.length === 1 ? "Albarán" : "Albaranes"}</span>
+                            {modelo.albaranes.map(({ id, codigo }) => (
+                                <Link key={id} to={`/ventas/albaran?id=${id}`}>{codigo}</Link>
+                            ))}
+                        </div>
+                    )}
+                    {usarCajasCabecera && sgaActivo && mostrarOrigen && (
                         <Caja
                             {...orden.uiProps("idCajaOrigen")}
                             label="Caja origen"
                             nombre="idCajaOrigen"
                         />
                     )}
-                    {sgaActivo && mostrarOrigen && (
+                    {usarCajasCabecera && sgaActivo && mostrarOrigen && (
                         <Ubicacion
                             {...orden.uiProps("idUbicacionOrigen")}
                             label="Ubicación origen"
                             nombre="idUbicacionOrigen"
                         />
                     )}
-                    {sgaActivo && mostrarDestino && (
+                    {usarCajasCabecera && sgaActivo && mostrarDestino && (
                         <Caja
                             {...orden.uiProps("idCajaDestino")}
                             label="Caja destino"
                             nombre="idCajaDestino"
                         />
                     )}
-                    {sgaActivo && mostrarDestino && (
+                    {usarCajasCabecera && sgaActivo && mostrarDestino && (
                         <QBoton variante="borde" texto='Nueva caja' onClick={() => emitir("creacion_de_caja_solicitada")} />
                     )}
-                    {sgaActivo && mostrarDestino && (
+                    {usarCajasCabecera && sgaActivo && mostrarDestino && (
                         <Ubicacion
                             {...orden.uiProps("idUbicacionDestino", "ubicacionDestino")}
                             label="Ubicación destino"
@@ -190,10 +222,10 @@ export const DetalleOrden = ({
                 {ocultarTemporalDemos && sgaActivo && ["TRASPASO", "SALIDA"].includes(modelo.tipo) && (
                     <QBoton variante="borde" onClick={() => emitir("lectura_ubicacion_solicitada")}>Lectura bandeja</QBoton>
                 )}
-                {sgaActivo && modelo.pasosPick && (
+                {sgaActivo && modelo.lineas.some((l) => !!definicionDeLinea(l, modelo, "PICK")) && (
                     <QBoton variante="borde" onClick={() => emitir("lectura_pick_solicitada")}>Leer pick</QBoton>
                 )}
-                {sgaActivo && (modelo.pasosDrop || modelo.tipo === "ENTRADA") && (
+                {sgaActivo && modelo.lineas.some((l) => tieneFaseDrop(l, modelo)) && (
                     <QBoton variante="borde" onClick={() => { iniciarAudioLectura(); emitir("lectura_drop_solicitada"); }}>Leer drop</QBoton>
                 )}
                 {sgaActivo && (
@@ -209,7 +241,7 @@ export const DetalleOrden = ({
                     <p className="q-texto-error">No hay voces TTS instaladas. Instala espeak-ng en el sistema.</p>
                 )}
             </div>
-            {sgaActivo && <LecturasCajaOrden orden={ctx.orden} />}
+            {usarCajasCabecera && sgaActivo && <LecturasCajaOrden orden={ctx.orden} />}
             <h3>LÍNEAS</h3>
             <LineasOrden
                 orden={ctx.orden}
@@ -244,13 +276,16 @@ export const DetalleOrden = ({
                 <CrearCaja publicar={emitir} idUbicacion={modelo.idUbicacionDestino} />
             )}
             {ctx.estado === "LEYENDO_PICK" && (
-                <LeerPickOrden publicar={emitir} orden={ctx.orden} />
+                <LeerPasosOrden publicar={emitir} orden={ctx.orden} fase="PICK" modoVoz={modoVoz} />
             )}
             {ctx.estado === "LEYENDO_DROP" && (
-                <LeerDropOrden publicar={emitir} orden={ctx.orden} />
+                <LeerPasosOrden publicar={emitir} orden={ctx.orden} fase="DROP" modoVoz={modoVoz} />
             )}
             {ctx.estado === "COLOCANDO" && (
                 <ColocacionOrden publicar={emitir} orden={ctx.orden} />
+            )}
+            {ctx.estado === "ALBARANANDO" && (
+                <AlbaranarOrden publicar={emitir} orden={ctx.orden} />
             )}
         </Detalle>
     );

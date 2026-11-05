@@ -48,4 +48,14 @@ export type DeleteUbicacion = (id: string) => Promise<void>;
 export type GetStocksUbicacion = (ubicacionId: string) => Promise<StockUbicacionItem[]>;
 export type GetStockUbicacion = (stockUbicacionId: string) => Promise<StockUbicacion>;
 
+/** Saldo de stock en la ubicación por caja y lote (solo movimientos HECHO, saldo != 0). */
+export interface DesgloseCajaStockUbicacion {
+    idCaja: string | null;
+    caja: string | null;
+    idLote: string | null;
+    cantidad: number;
+}
+
+export type GetDesgloseCajaStockUbicacion = (stockUbicacionId: string) => Promise<DesgloseCajaStockUbicacion[]>;
+
 

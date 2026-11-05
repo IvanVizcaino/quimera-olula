@@ -3,6 +3,8 @@ import { Entidad, Filtro, Orden } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import {
     DeleteUbicacion,
+    DesgloseCajaStockUbicacion,
+    GetDesgloseCajaStockUbicacion,
     GetStocksUbicacion,
     GetStockUbicacion,
     GetUbicacion,
@@ -156,3 +158,24 @@ export const getStockUbicacion: GetStockUbicacion = async (stockUbicacionId) => 
     return stockUbicacionFromApi(respuesta.datos);
 
 }
+
+interface DesgloseCajaStockUbicacionApi {
+    caja_id: string | null;
+    lpn: string | null;
+    lote_id: string | null;
+    cantidad: number;
+}
+
+const desgloseCajaFromApi = (api: DesgloseCajaStockUbicacionApi): DesgloseCajaStockUbicacion => ({
+    idCaja: api.caja_id,
+    caja: api.lpn,
+    idLote: api.lote_id,
+    cantidad: api.cantidad,
+});
+
+export const getDesgloseCajaStockUbicacion: GetDesgloseCajaStockUbicacion = async (stockUbicacionId) => {
+    const respuesta = await RestAPI.get<{ datos: DesgloseCajaStockUbicacionApi[] }>(
+        `${baseUrlStockUbicacion}/${stockUbicacionId}/desglose_caja`
+    );
+    return respuesta.datos.map(desgloseCajaFromApi);
+};

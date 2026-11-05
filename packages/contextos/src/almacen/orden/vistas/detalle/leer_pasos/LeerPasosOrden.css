@@ -1,4 +1,4 @@
-.LeerLineaOrden {
+.LeerPasosOrden {
     .resumen-leer-linea {
         width: 100%;
         border-collapse: collapse;
@@ -34,5 +34,15 @@
             color: var(--color-texto-secundario);
             white-space: nowrap;
         }
+    }
+
+    .paso-guion__instruccion {
+        font-weight: var(--grosor-letra-5);
+        margin-bottom: var(--espaciado-s);
+    }
+
+    .LeerPasosOrden__serie {
+        margin: var(--espaciado-s) 0;
+        padding-left: var(--espaciado-l);
     }
 }

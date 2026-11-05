@@ -85,7 +85,12 @@ export const MaestroConDetallePedidoCompra = () => {
 const TarjetaPedidoCompra = (pedido: ItemPedidoCompra) => {
     return (
         <div className="tarjeta-pedido-compra" key={pedido.id}>
-            <div className="tarjeta-pedido-compra-codigo">{pedido.codigo}</div>
+            <div className="tarjeta-pedido-compra-cabecera">
+                <div className="tarjeta-pedido-compra-codigo">{pedido.codigo}</div>
+                <div className="tarjeta-pedido-compra-fecha">
+                    {pedido.fecha.toLocaleDateString("es-ES")}
+                </div>
+            </div>
             <div className="tarjeta-pedido-compra-proveedor">{pedido.proveedor}</div>
         </div>
     );
