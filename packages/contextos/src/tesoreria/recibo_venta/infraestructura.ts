@@ -25,6 +25,8 @@ export interface ReciboVentaApi {
     cliente_id: string;
     nombre_cliente: string;
     id_fiscal: string;
+    divisa_id?: string;
+    divisa_empresa_id?: string | null;
     pagos?: MovimientoReciboApi[];
     recibos_agrupados?: ReciboVentaApi[];
 }
@@ -52,6 +54,8 @@ export const reciboVentaDesdeApi = (api: ReciboVentaApi): ReciboVenta => ({
     clienteId: api.cliente_id,
     nombreCliente: api.nombre_cliente,
     idFiscal: api.id_fiscal,
+    divisaId: api.divisa_id ?? "",
+    divisaEmpresaId: api.divisa_empresa_id ?? null,
     pagos: (api.pagos ?? []).map(movimientoReciboDesdeApi),
     recibosAgrupados: (api.recibos_agrupados ?? []).map(reciboVentaDesdeApi),
 });
@@ -99,6 +103,7 @@ export const patchPagarReciboVenta: PatchPagarReciboVenta = async (id, pago) => 
         {
             cuenta_pago_id: pago.cuentaPagoId,
             fecha: pago.fecha,
+            ...(pago.tasaConversion !== undefined && { tasa_conversion: String(pago.tasaConversion) }),
         },
         "Error al pagar el recibo de cobro"
     );
@@ -110,6 +115,9 @@ export const patchDevolverReciboVenta: PatchDevolverReciboVenta = async (id, dev
         {
             cuenta_pago_id: devolucion.cuentaPagoId,
             fecha: devolucion.fecha,
+            ...(devolucion.tasaConversion !== undefined && {
+                tasa_conversion: String(devolucion.tasaConversion),
+            }),
         },
         "Error al devolver el recibo de cobro"
     );

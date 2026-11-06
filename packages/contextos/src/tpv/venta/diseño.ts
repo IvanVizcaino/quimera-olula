@@ -80,6 +80,7 @@ type PagoTpv = {
     formaPago: string;
     idVale?: string;
     idTipoTarjeta?: string | null;
+    entregado?: number;
 }
 
 // export const metaNuevoPagoEfectivo: MetaModelo<NuevoPagoEfectivo> = {

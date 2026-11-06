@@ -2,6 +2,7 @@ import { CamposDireccionVenta } from "#/ventas/comun/componentes/CamposDireccion
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
 import { DirCliente } from "#/ventas/comun/componentes/dirCliente.tsx";
 import { EmpresaActual } from "#/comun/componentes/empresaActual.tsx";
+import { conEmpresaActual } from "#/valores/empresaActual.ts";
 import {
   metaNuevaVentaClienteNoRegistrado,
   nuevaVentaClienteNoRegistradaVacia,
@@ -23,17 +24,23 @@ export const CrearAlbaran = ({
   publicar?: EmitirEvento;
 }) => {
   const [modoNoRegistrado, setModoNoRegistrado] = useState(false);
-  const albaranRegistrado = useModelo(metaNuevoAlbaran, nuevoAlbaranVacio);
+  /* Lazy initializer: referencia estable para useModelo y empresa ya puesta en el
+     primer render, sin depender del efecto de EmpresaActual. */
+  const [inicialRegistrado] = useState(() => conEmpresaActual(nuevoAlbaranVacio));
+  const [inicialNoRegistrado] = useState(() =>
+    conEmpresaActual(nuevaVentaClienteNoRegistradaVacia)
+  );
+  const albaranRegistrado = useModelo(metaNuevoAlbaran, inicialRegistrado);
   const albaranNoRegistrado = useModelo(
     metaNuevaVentaClienteNoRegistrado,
-    nuevaVentaClienteNoRegistradaVacia
+    inicialNoRegistrado
   );
   const focus = useFocus();
 
   /* El maestro monta el modal siempre, así que el modo no se reinicia solo. */
   const reiniciar = useCallback(() => {
-    albaranRegistrado.init(nuevoAlbaranVacio);
-    albaranNoRegistrado.init(nuevaVentaClienteNoRegistradaVacia);
+    albaranRegistrado.init(conEmpresaActual(nuevoAlbaranVacio));
+    albaranNoRegistrado.init(conEmpresaActual(nuevaVentaClienteNoRegistradaVacia));
     setModoNoRegistrado(false);
   }, [albaranRegistrado, albaranNoRegistrado]);
 
@@ -64,8 +71,8 @@ export const CrearAlbaran = ({
 
   const toggleModoCliente = () => {
     setModoNoRegistrado(!modoNoRegistrado);
-    albaranRegistrado.init(nuevoAlbaranVacio);
-    albaranNoRegistrado.init(nuevaVentaClienteNoRegistradaVacia);
+    albaranRegistrado.init(conEmpresaActual(nuevoAlbaranVacio));
+    albaranNoRegistrado.init(conEmpresaActual(nuevaVentaClienteNoRegistradaVacia));
   };
 
   return (
