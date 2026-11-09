@@ -2,7 +2,8 @@
  * DetalleOrden.css — posicionado de campos del formulario principal.
  *
  * Grid de 12 columnas (quimera-formulario):
- *   Fila 1: tipoOrden (4) + almacenId (4) + fecha (2) + abierta (2) = 12
+ *   Fila 1: tipoOrden (4) + almacenId (4) + fecha (4) = 12
+ *   Albaranes de la orden de salida (si los hay): fila completa
  */
 
 .accion-principal {
@@ -35,11 +36,19 @@
     }
 
     quimera-input[nombre="fecha"] {
-        grid-column: span 2;
+        grid-column: span 4;
     }
 
-    quimera-input[nombre="abierta"] {
-        grid-column: span 2;
+    .DetalleOrden__albaranes {
+        grid-column: span 12;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--espaciado-m);
+
+        span {
+            color: var(--color-texto-secundario);
+        }
     }
 
     quimera-autocompletar[nombre="idCajaOrigen"] {
