@@ -35,7 +35,10 @@ export const ampliarPedidos: ProcesarMaestro = async (contexto, payload) => {
 };
 
 export const actualizarDisponibilidades: ProcesarMaestro = async (ctx, payload) => {
-    const resultados = payload as { pedido_id: number; estado: DisponibilidadPedido }[];
+    const { zonas, resultados } = payload as {
+        zonas: number[];
+        resultados: { pedido_id: number; estado: DisponibilidadPedido }[];
+    };
     const mapa = new Map(resultados.map(r => [String(r.pedido_id), r.estado]));
     const nuevaLista = ctx.pedidos.lista.map(p => ({
         ...p,
@@ -44,6 +47,7 @@ export const actualizarDisponibilidades: ProcesarMaestro = async (ctx, payload) 
     return {
         ...ctx,
         estado: 'INICIAL' as EstadoMaestroPedidoVenta,
+        zonas,
         pedidos: { ...ctx.pedidos, lista: nuevaLista },
     };
 };
