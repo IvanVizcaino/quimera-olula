@@ -1,5 +1,9 @@
-/// <reference path="./speech-recognition.d.ts" />
 import { useCallback, useEffect, useRef, useState } from "react";
+import type {
+    SpeechRecognitionErrorEvent,
+    SpeechRecognitionEvent,
+    SpeechRecognitionInstance,
+} from "./speech-recognition.d.ts";
 
 const getSpeechRecognition = (): (new () => SpeechRecognitionInstance) | null => {
     if (typeof window === "undefined") return null;
