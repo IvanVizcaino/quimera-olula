@@ -20,6 +20,8 @@ export interface HitlTarea extends Entidad {
     resuelto_en: string | null;
     usuario_id: string;
     resuelto_por: string | null;
+    /** Nombre del fichero original adjunto (p.ej. el PDF de la factura), o null. */
+    fichero_nombre: string | null;
 }
 
 /** Props que recibe cualquier componente de resolución HITL */
@@ -31,4 +33,5 @@ export interface ResolvedorHitlTareaProps {
 export type GetHitlTareas = (estado?: string) => Promise<{ datos: HitlTarea[]; total: number }>;
 export type GetHitlTarea = (id: string) => Promise<HitlTarea>;
 export type PostResolverHitlTarea = (id: string, datos_resolucion: Record<string, unknown>) => Promise<void>;
+export type GetFicheroHitlTarea = (id: string) => Promise<Blob>;
 export type PostRechazarHitlTarea = (id: string, motivo?: string) => Promise<void>;

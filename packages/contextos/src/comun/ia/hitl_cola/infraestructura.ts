@@ -1,6 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
-import { GetHitlTarea, GetHitlTareas, HitlTarea, PostRechazarHitlTarea, PostResolverHitlTarea } from "./diseño.js";
+import { GetFicheroHitlTarea, GetHitlTarea, GetHitlTareas, HitlTarea, PostRechazarHitlTarea, PostResolverHitlTarea } from "./diseño.js";
 
 const BASE_URL = '/comun/hitl-cola';
 
@@ -16,6 +16,7 @@ interface HitlTareaApi {
     resuelto_en: string | null;
     usuario_id: string;
     resuelto_por: string | null;
+    fichero_nombre?: string | null;
 }
 
 const hitlTareaDesdeApi = (api: HitlTareaApi): HitlTarea => ({
@@ -30,6 +31,7 @@ const hitlTareaDesdeApi = (api: HitlTareaApi): HitlTarea => ({
     resuelto_en: api.resuelto_en,
     usuario_id: api.usuario_id,
     resuelto_por: api.resuelto_por,
+    fichero_nombre: api.fichero_nombre ?? null,
 });
 
 export const getHitlTareas: GetHitlTareas = async (estado) => {
@@ -69,3 +71,6 @@ export const rechazarHitlTarea: PostRechazarHitlTarea = async (id, motivo) => {
         'Error al rechazar la tarea HITL',
     );
 };
+
+export const getFicheroHitlTarea: GetFicheroHitlTarea = async (id) =>
+    RestAPI.blob(`${BASE_URL}/${id}/fichero`, 'Error al obtener el fichero de la tarea');
