@@ -34,6 +34,7 @@ const CAMPOS = [
     "descripcion",
     "anioDesde",
     "anioHasta",
+    "intervaloId",
     "fechaDesde",
     "fechaHasta",
     "clienteId",

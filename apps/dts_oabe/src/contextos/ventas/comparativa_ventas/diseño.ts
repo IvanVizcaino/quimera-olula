@@ -8,6 +8,7 @@ export interface ComparativaVentas extends Entidad {
     descripcion: string;
     anioDesde: number;
     anioHasta: number;
+    intervaloId: string;
     fechaDesde: string;
     fechaHasta: string;
     clienteId: string;
@@ -16,6 +17,7 @@ export interface ComparativaVentas extends Entidad {
     nombreAgente: string;
     busquedaAgente: string;
     provinciaId: string;
+    nombreProvincia: string;
     mostrarObjetivo: boolean;
 }
 
@@ -23,6 +25,7 @@ export interface NuevaComparativaVentas extends Modelo {
     descripcion: string;
     anioDesde: number;
     anioHasta: number;
+    intervaloId: string;
     fechaDesde: string;
     fechaHasta: string;
     clienteId: string;
@@ -31,6 +34,7 @@ export interface NuevaComparativaVentas extends Modelo {
     nombreAgente: string;
     busquedaAgente: string;
     provinciaId: string;
+    nombreProvincia: string;
     mostrarObjetivo: boolean;
 }
 
@@ -40,6 +44,7 @@ export type CambiosComparativaVentas = Partial<
         | "descripcion"
         | "anioDesde"
         | "anioHasta"
+        | "intervaloId"
         | "fechaDesde"
         | "fechaHasta"
         | "clienteId"

@@ -1,3 +1,4 @@
+import { filtroAgente, filtroProvincia } from "#/ventas/comun/filtros.tsx";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.tsx";
 import { Criteria } from "@olula/lib/diseño.ts";
@@ -14,10 +15,12 @@ export type ContextoMaestroComparativaVentas = {
 
 export const metaTablaComparativaVentas: MetaTabla<ComparativaVentas> = [
     { id: "descripcion", cabecera: "Descripción" },
-    { id: "anioDesde", cabecera: "Año desde", tipo: "numero" },
-    { id: "anioHasta", cabecera: "Año hasta", tipo: "numero" },
-    { id: "clienteId", cabecera: "Cliente" },
-    { id: "agenteId", cabecera: "Agente" },
+    { id: "fecha_desde", cabecera: "Fecha desde", tipo: "fecha", render: (c) => c.fechaDesde },
+    { id: "fecha_hasta", cabecera: "Fecha hasta", tipo: "fecha", render: (c) => c.fechaHasta },
+    { id: "nombre_cliente", cabecera: "Cliente", render: (c) => c.nombreCliente },
+    { id: "nombre_agente", cabecera: "Agente", render: (c) => c.nombreAgente },
+    { id: "busqueda_agente", cabecera: "Selección agente", render: (c) => c.busquedaAgente },
+    { id: "nombre_provincia", cabecera: "Provincia", render: (c) => c.nombreProvincia },
 ];
 
 export const metaFiltroComparativaVentas: MetaFiltro = {
@@ -35,9 +38,11 @@ export const metaFiltroComparativaVentas: MetaFiltro = {
         filtro: (valor) =>
             !valor || valor === "" ? null : ["anio_desde", "eq", valor as string],
     },
+    agente_id: filtroAgente,
+    provincia_id: filtroProvincia,
 };
 
 export const criteriaComparativaVentasDefecto = (): Criteria => ({
     ...criteriaDefecto,
-    orden: ["id", "DESC"],
+    orden: ["descripcion", "ASC"],
 });

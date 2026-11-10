@@ -11,15 +11,28 @@ export const opcionesBusquedaAgente = [
     { valor: AGENTE_CLIENTE, descripcion: AGENTE_CLIENTE },
 ];
 
+export const opcionesIntervalo = [
+    { valor: "", descripcion: "Sin intervalo" },
+    { valor: "000001", descripcion: "Hoy" },
+    { valor: "000002", descripcion: "Ayer" },
+    { valor: "000003", descripcion: "Esta semana" },
+    { valor: "000004", descripcion: "Semana pasada" },
+    { valor: "000005", descripcion: "Este mes" },
+    { valor: "000006", descripcion: "Mes pasado" },
+    { valor: "000007", descripcion: "Este año" },
+    { valor: "000008", descripcion: "Año pasado" },
+    { valor: "000009", descripcion: "Todo" },
+    { valor: "000010", descripcion: "Hasta hoy" },
+];
+
 export const etiquetaComparativaVentas = (
     comparativa: Pick<ComparativaVentas, "descripcion" | "anioDesde" | "anioHasta">
 ): string =>
     `${comparativa.descripcion} — ${comparativa.anioDesde}-${comparativa.anioHasta}`;
 
-const camposComunes = (anioHasta: number) => ({
+const camposComunes = () => ({
     descripcion: "",
-    anioDesde: anioHasta - 2,
-    anioHasta,
+    intervaloId: "",
     fechaDesde: "",
     fechaHasta: "",
     clienteId: "",
@@ -28,32 +41,82 @@ const camposComunes = (anioHasta: number) => ({
     nombreAgente: "",
     busquedaAgente: AGENTE_FACTURA,
     provinciaId: "",
+    nombreProvincia: "",
     mostrarObjetivo: false,
+});
+
+const aniosPorDefecto = () => ({
+    anioDesde: new Date().getFullYear() - 2,
+    anioHasta: new Date().getFullYear(),
 });
 
 export const comparativaVentasVacia = (): ComparativaVentas => ({
     id: "",
-    ...camposComunes(new Date().getFullYear()),
+    ...aniosPorDefecto(),
+    ...camposComunes(),
 });
 
-export const nuevaComparativaVentasInicial = (): NuevaComparativaVentas =>
-    camposComunes(new Date().getFullYear());
+export const nuevaComparativaVentasInicial = (): NuevaComparativaVentas => ({
+    ...aniosPorDefecto(),
+    ...camposComunes(),
+});
 
 export const admiteFechas = (
-    comparativa: Pick<ComparativaVentas, "mostrarObjetivo">
-): boolean => !comparativa.mostrarObjetivo;
+    comparativa: Pick<ComparativaVentas, "mostrarObjetivo" | "intervaloId">
+): boolean => !comparativa.mostrarObjetivo && !comparativa.intervaloId;
 
 const esAnio = (valor: unknown): boolean => /^\d{4}$/.test(String(valor ?? ""));
 
+export const aniosInformados = (
+    comparativa: Pick<NuevaComparativaVentas, "anioDesde" | "anioHasta">
+): boolean => esAnio(comparativa.anioDesde) && esAnio(comparativa.anioHasta);
+
+const fechaIso = (fecha: Date): string =>
+    `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`;
+
+const dia = (anio: number, mes: number, diaMes: number): string =>
+    fechaIso(new Date(anio, mes, diaMes));
+
+export const fechasIntervalo = (
+    intervaloId: string,
+    hoy: Date,
+    anioDesde: number
+): [string, string] | null => {
+    const [a, m, d] = [hoy.getFullYear(), hoy.getMonth(), hoy.getDate()];
+    const lunes = d - ((hoy.getDay() + 6) % 7);
+    const intervalos: Record<string, [string, string]> = {
+        "000001": [dia(a, m, d), dia(a, m, d)],
+        "000002": [dia(a, m, d - 1), dia(a, m, d - 1)],
+        "000003": [dia(a, m, lunes), dia(a, m, lunes + 6)],
+        "000004": [dia(a, m, lunes - 7), dia(a, m, lunes - 1)],
+        "000005": [dia(a, m, 1), dia(a, m + 1, 0)],
+        "000006": [dia(a, m - 1, 1), dia(a, m, 0)],
+        "000007": [dia(a, 0, 1), dia(a, 11, 31)],
+        "000008": [dia(a - 1, 0, 1), dia(a - 1, 11, 31)],
+        "000009": ["", ""],
+        "000010": [dia(anioDesde, 0, 1), dia(a, m, d)],
+    };
+    return intervalos[intervaloId] ?? null;
+};
+
 export const enlazarAnios = <T extends NuevaComparativaVentas>(
-    modelo: T,
+    entrada: T,
     campo: string
 ): T => {
+    const modelo = {
+        ...entrada,
+        mostrarObjetivo: String(entrada.mostrarObjetivo) === "true",
+        intervaloId: entrada.intervaloId ?? "",
+    };
     if (campo === "anioDesde" && esAnio(modelo.anioDesde)) {
         return { ...modelo, anioDesde: Number(modelo.anioDesde), anioHasta: Number(modelo.anioDesde) + 2 };
     }
     if (campo === "anioHasta" && esAnio(modelo.anioHasta)) {
         return { ...modelo, anioHasta: Number(modelo.anioHasta), anioDesde: Number(modelo.anioHasta) - 2 };
+    }
+    if (campo === "intervaloId") {
+        const fechas = fechasIntervalo(modelo.intervaloId, new Date(), Number(modelo.anioDesde));
+        return fechas ? { ...modelo, fechaDesde: fechas[0], fechaHasta: fechas[1] } : modelo;
     }
     if (campo === "mostrarObjetivo" && modelo.mostrarObjetivo) {
         return { ...modelo, fechaDesde: "", fechaHasta: "" };

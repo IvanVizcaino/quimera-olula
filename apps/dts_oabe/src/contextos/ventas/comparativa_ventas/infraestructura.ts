@@ -21,12 +21,16 @@ export interface ComparativaVentasApi {
     descripcion: string;
     anio_desde: number;
     anio_hasta: number;
+    intervalo_id: string | null;
     fecha_desde: string | null;
     fecha_hasta: string | null;
     cliente_id: string | null;
+    nombre_cliente: string | null;
     agente_id: string | null;
+    nombre_agente: string | null;
     busqueda_agente: string;
     provincia_id: number | null;
+    nombre_provincia: string | null;
     mostrar_objetivo: boolean;
 }
 
@@ -54,14 +58,16 @@ export const comparativaVentasDesdeApi = (
     descripcion: api.descripcion,
     anioDesde: api.anio_desde,
     anioHasta: api.anio_hasta,
+    intervaloId: api.intervalo_id ?? "",
     fechaDesde: api.fecha_desde ?? "",
     fechaHasta: api.fecha_hasta ?? "",
     clienteId: api.cliente_id ?? "",
-    nombreCliente: "",
+    nombreCliente: api.nombre_cliente ?? "",
     agenteId: api.agente_id ?? "",
-    nombreAgente: "",
+    nombreAgente: api.nombre_agente ?? "",
     busquedaAgente: api.busqueda_agente || AGENTE_FACTURA,
     provinciaId: api.provincia_id ? String(api.provincia_id) : "",
+    nombreProvincia: api.nombre_provincia ?? "",
     mostrarObjetivo: api.mostrar_objetivo,
 });
 
@@ -97,6 +103,7 @@ export const nuevaComparativaVentasAApi = (nueva: NuevaComparativaVentas) => ({
     descripcion: nueva.descripcion,
     anio_desde: Number(nueva.anioDesde),
     anio_hasta: Number(nueva.anioHasta),
+    intervalo_id: textoONulo(nueva.intervaloId),
     fecha_desde: textoONulo(nueva.fechaDesde),
     fecha_hasta: textoONulo(nueva.fechaHasta),
     cliente_id: textoONulo(nueva.clienteId),
@@ -113,6 +120,7 @@ export const cambiosComparativaVentasAApi = (
     if (cambios.descripcion !== undefined) api.descripcion = cambios.descripcion;
     if (cambios.anioDesde !== undefined) api.anio_desde = Number(cambios.anioDesde);
     if (cambios.anioHasta !== undefined) api.anio_hasta = Number(cambios.anioHasta);
+    if (cambios.intervaloId !== undefined) api.intervalo_id = textoONulo(cambios.intervaloId);
     if (cambios.fechaDesde !== undefined) api.fecha_desde = textoONulo(cambios.fechaDesde);
     if (cambios.fechaHasta !== undefined) api.fecha_hasta = textoONulo(cambios.fechaHasta);
     if (cambios.clienteId !== undefined) api.cliente_id = textoONulo(cambios.clienteId);

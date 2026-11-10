@@ -1,3 +1,4 @@
+import { ProvinciaSelector } from "#/comun/componentes/provincia/provincia.tsx";
 import { Agente } from "#/ventas/comun/componentes/agente.tsx";
 import { Cliente } from "#/ventas/comun/componentes/cliente.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
@@ -6,7 +7,13 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { FormModelo } from "@olula/lib/dominio.js";
 import { NuevaComparativaVentas } from "../diseño.ts";
-import { admiteFechas, opcionesBusquedaAgente } from "../dominio.ts";
+import {
+    admiteFechas,
+    aniosInformados,
+    opcionesBusquedaAgente,
+    opcionesIntervalo,
+} from "../dominio.ts";
+import "./CamposCriterios.css";
 
 export const CamposCriterios = ({
     form,
@@ -19,10 +26,19 @@ export const CamposCriterios = ({
     const conFechas = admiteFechas(comparativa);
 
     return (
-        <>
+        <div className="CamposCriterios">
             <quimera-formulario>
-                <QInput label="Año desde" {...uiProps("anioDesde")} />
-                <QInput label="Año hasta" {...uiProps("anioHasta")} />
+                <QInput label="Año desde" {...uiProps("anioDesde")} autoSeleccion />
+                <QInput label="Año hasta" {...uiProps("anioHasta")} autoSeleccion />
+                <QCheckbox label="Mostrar objetivo" {...uiProps("mostrarObjetivo")} />
+                <QSelect
+                    label="Intervalo"
+                    {...uiProps("intervaloId")}
+                    opciones={opcionesIntervalo}
+                    placeholder="Sin intervalo"
+                    deshabilitado={comparativa.mostrarObjetivo || !aniosInformados(comparativa)}
+                    opcional
+                />
                 <QDate
                     label="Desde fecha"
                     {...uiProps("fechaDesde")}
@@ -35,7 +51,6 @@ export const CamposCriterios = ({
                     deshabilitado={!conFechas}
                     opcional
                 />
-                <QCheckbox label="Mostrar objetivo" {...uiProps("mostrarObjetivo")} />
             </quimera-formulario>
 
             <quimera-formulario>
@@ -46,8 +61,8 @@ export const CamposCriterios = ({
                     {...uiProps("busquedaAgente")}
                     opciones={opcionesBusquedaAgente}
                 />
-                <QInput label="Provincia (id)" {...uiProps("provinciaId")} opcional />
+                <ProvinciaSelector {...uiProps("provinciaId", "nombreProvincia")} opcional />
             </quimera-formulario>
-        </>
+        </div>
     );
 };
