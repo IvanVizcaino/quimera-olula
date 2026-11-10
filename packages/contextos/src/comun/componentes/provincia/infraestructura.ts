@@ -2,9 +2,9 @@ import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import ApiUrls from "@olula/lib/api/urls.ts";
 import { RespuestaLista2 } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
-import { GetProvincias, Provincia } from "./diseño.ts";
+import { GetProvincias } from "./diseño.ts";
 
-type ProvinciaApi = Omit<Provincia, "id"> & { id: number };
+type ProvinciaApi = { id: number; nombre: string };
 
 export const getProvincias: GetProvincias = async (filtro, orden, paginacion) => {
     const q = criteriaQuery(filtro, orden, paginacion);
