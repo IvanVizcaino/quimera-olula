@@ -27,7 +27,9 @@ jobs:
       - name: Instalar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          # Fijado a 24: desde Node 25 el localStorage nativo de Node tapa el de
+          # jsdom y los tests que lo usan fallan.
+          node-version: '24'
           registry-url: https://registry.npmjs.org
           cache: pnpm
 

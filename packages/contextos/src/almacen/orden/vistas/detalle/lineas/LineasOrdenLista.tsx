@@ -1,13 +1,19 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
+import { QTarjetaGenerica } from "@olula/componentes/moleculas/qtarjeta_generica.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { criteriaDefecto, plugin } from "@olula/lib/dominio.js";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { useContext } from "react";
+import { Link } from "react-router";
 import { LecturaLineaOrden, LineaOrdenAlmacen, OrdenAlmacen } from "../../../diseño.ts";
 import { deleteLecturaOrden } from "../../../infraestructura.ts";
+import { pedidoUnicoDeOrden, sobranteLinea, textoCambioPedido } from "../../../dominio.ts";
+import { definicionDeLinea, tieneFaseDrop, tieneFasePick } from "../../../pasos/catalogo.ts";
+import { cantidadHecha, cantidadPendiente } from "../../../pasos/lector.ts";
+import "./LineasOrdenLista.css";
 
 const formatearFechaHoraLectura = (fechaHora: Date | string): string => {
     const d = fechaHora instanceof Date ? fechaHora : new Date(fechaHora);
@@ -66,6 +72,169 @@ const ExpansionLecturas = (orden: OrdenAlmacen, publicar: EmitirEvento) => {
     return Componente;
 };
 
+type PropsLinea = { orden: OrdenAlmacen; linea: LineaOrdenAlmacen };
+type TamañoBoton = "pequeño" | "mediano";
+
+const VARIANTE_CAMBIO_PEDIDO = {
+    ANADIDA: "primario",
+    CAMBIADA: "advertencia",
+    BORRADA: "error",
+} as const;
+
+/** Marca de las líneas añadidas, cambiadas o borradas en el pedido tras generar la salida. */
+const MarcaCambioPedido = ({ linea }: { linea: LineaOrdenAlmacen }) => {
+    const texto = textoCambioPedido(linea);
+    if (!texto || !linea.cambioPedido) return null;
+    return <QEtiqueta variante={VARIANTE_CAMBIO_PEDIDO[linea.cambioPedido]}>{texto}</QEtiqueta>;
+};
+
+/** Enlace al pedido de venta del que procede la línea. */
+const PedidoLinea = ({ linea }: { linea: LineaOrdenAlmacen }) => {
+    if (!linea.pedidoVentaId) return null;
+    return (
+        <Link
+            to={`/ventas/pedido?id=${linea.pedidoVentaId}`}
+            onClick={(e) => e.stopPropagation()}
+            title={linea.cliente ?? undefined}
+        >
+            {linea.pedidoVenta ?? linea.pedidoVentaId}
+        </Link>
+    );
+};
+
+const varianteProgreso = (hecho: number, prevista: number) =>
+    hecho === 0 ? "error" : hecho < prevista ? "advertencia" : "exito";
+
+const CantidadLinea = ({ orden, linea }: PropsLinea) => {
+    const prevista = linea.cantidadPrevista;
+    const conPick = !!definicionDeLinea(linea, orden, "PICK");
+    const conDrop = tieneFaseDrop(linea, orden);
+    if (conPick && conDrop) {
+        const pick = cantidadHecha(linea, orden, "PICK");
+        const drop = cantidadHecha(linea, orden, "DROP");
+        return (
+            <span style={{ display: "flex", gap: "4px" }}>
+                <QEtiqueta variante={varianteProgreso(pick, prevista)}>P {pick}/{prevista}</QEtiqueta>
+                <QEtiqueta variante={varianteProgreso(drop, prevista)}>D {drop}/{prevista}</QEtiqueta>
+            </span>
+        );
+    }
+    const hecho = cantidadHecha(linea, orden, conPick ? "PICK" : "DROP");
+    return <QEtiqueta variante={varianteProgreso(hecho, prevista)}>{hecho} / {prevista}</QEtiqueta>;
+};
+
+const BotonPick = ({ orden, linea, publicar, tamaño }: PropsLinea & { publicar: EmitirEvento; tamaño?: TamañoBoton }) => {
+    if (!definicionDeLinea(linea, orden, "PICK")) return null;
+    return (
+        <QBoton
+            tamaño={tamaño}
+            deshabilitado={cantidadPendiente(linea, orden, "PICK") <= 0}
+            onClick={(e) => {
+                e?.stopPropagation();
+                publicar("lectura_guion_pick_linea_solicitada", linea);
+            }}
+        >
+            Leer pick
+        </QBoton>
+    );
+};
+
+const BotonDrop = ({ orden, linea, publicar, tamaño }: PropsLinea & { publicar: EmitirEvento; tamaño?: TamañoBoton }) => {
+    if (!tieneFaseDrop(linea, orden)) return null;
+    // Con fase de pick, solo se puede dejar lo que ya se ha recogido.
+    const hayRecogido = !tieneFasePick(linea, orden) || (linea.cantidadPick ?? 0) > 0;
+    return (
+        <QBoton
+            tamaño={tamaño}
+            deshabilitado={!hayRecogido || cantidadPendiente(linea, orden, "DROP") <= 0}
+            onClick={(e) => {
+                e?.stopPropagation();
+                publicar("lectura_guion_drop_linea_solicitada", linea);
+            }}
+        >
+            Leer drop
+        </QBoton>
+    );
+};
+
+/** Material recogido de más porque el pedido se redujo o se quitó la línea en ventas. */
+const AvisoSobrante = ({ linea, publicar, tamaño }: { linea: LineaOrdenAlmacen; publicar: EmitirEvento; tamaño?: TamañoBoton }) => {
+    const sobrante = sobranteLinea(linea);
+    if (sobrante <= 0) return null;
+    return (
+        <>
+            <QEtiqueta variante="advertencia">
+                Sobrante {sobrante}
+            </QEtiqueta>
+            <QBoton
+                tamaño={tamaño}
+                onClick={(e) => {
+                    e?.stopPropagation();
+                    publicar("devolucion_sobrante_solicitada", linea);
+                }}
+            >
+                Devolver
+            </QBoton>
+        </>
+    );
+};
+
+const tarjetaLineaOrden = (orden: OrdenAlmacen, publicar: EmitirEvento) => {
+    const Lecturas = ExpansionLecturas(orden, publicar);
+    // Con un solo pedido, el pedido va en la cabecera de la orden y la línea solo lleva la marca.
+    const variosPedidos = orden.tipo === "SALIDA" && !pedidoUnicoDeOrden(orden);
+    const TarjetaLineaOrden = (linea: LineaOrdenAlmacen) => {
+        const sgaActivo = plugin("sga") === "activo";
+        const ubicaciones = [
+            sgaActivo && orden.tipo !== "ENTRADA" && linea.ubicacionOrigen ? `De ${linea.ubicacionOrigen}` : null,
+            sgaActivo && orden.tipo !== "SALIDA" && linea.ubicacionDestino ? `A ${linea.ubicacionDestino}` : null,
+        ].filter(Boolean).join(" · ");
+        const mostrarPedido = variosPedidos && !!linea.pedidoVentaId;
+        const mostrarMarca = orden.tipo === "SALIDA" && !!linea.cambioPedido;
+        const detalles = [ubicaciones, linea.loteId ? `Lote ${linea.loteId}` : null].filter(Boolean).join(" · ");
+        return (
+            <QTarjetaGenerica
+                key={linea.id}
+                arribaIzquierda={
+                    <div className="TarjetaLineaOrden__articulo">
+                        <strong>{linea.sku} · {linea.articulo}</strong>
+                        {(detalles || mostrarPedido || mostrarMarca) && (
+                            <span className="TarjetaLineaOrden__info">
+                                {mostrarPedido && (
+                                    <span>
+                                        Pedido <PedidoLinea linea={linea} />
+                                        {linea.cliente ? ` · ${linea.cliente}` : ""}
+                                    </span>
+                                )}
+                                {mostrarMarca && <MarcaCambioPedido linea={linea} />}
+                                {detalles && <span>{detalles}</span>}
+                            </span>
+                        )}
+                    </div>
+                }
+                arribaDerecha={
+                    <div className="TarjetaLineaOrden__derecha">
+                        <CantidadLinea orden={orden} linea={linea} />
+                        {/* Arriba, lejos del "Ver más" del pie, para no pulsar uno por otro. */}
+                        <AvisoSobrante linea={linea} publicar={publicar} tamaño="pequeño" />
+                        <BotonPick orden={orden} linea={linea} publicar={publicar} tamaño="pequeño" />
+                        <BotonDrop orden={orden} linea={linea} publicar={publicar} tamaño="pequeño" />
+                    </div>
+                }
+                expansion={<Lecturas entidad={linea} />}
+            />
+        );
+    };
+    return TarjetaLineaOrden;
+};
+
+/** En salidas, la columna Pedido solo aporta si hay líneas de distintos pedidos o alguna con aviso. */
+const conColumnaPedido = (orden: OrdenAlmacen): boolean => {
+    if (orden.tipo !== "SALIDA") return false;
+    const pedidos = new Set(orden.lineas.map((l) => l.pedidoVentaId).filter(Boolean));
+    return pedidos.size > 1 || orden.lineas.some((l) => !!textoCambioPedido(l));
+};
+
 const metaTablaLineasOrden = (orden: OrdenAlmacen, publicar: EmitirEvento): MetaTabla<LineaOrdenAlmacen> => {
     const sgaActivo = plugin("sga") === "activo";
     return {
@@ -73,82 +242,44 @@ const metaTablaLineasOrden = (orden: OrdenAlmacen, publicar: EmitirEvento): Meta
             { id: "sku", cabecera: "SKU" },
             { id: "articulo", cabecera: "Descripción", tipo: "texto" },
             { id: "loteId", cabecera: "Lote" },
+            ...(conColumnaPedido(orden)
+                ? [
+                    {
+                        id: "pedidoVenta" as const,
+                        cabecera: "Pedido",
+                        render: (linea: LineaOrdenAlmacen) => (
+                            <span style={{ display: "flex", gap: "4px", alignItems: "center", flexWrap: "wrap" }}>
+                                <PedidoLinea linea={linea} />
+                                <MarcaCambioPedido linea={linea} />
+                            </span>
+                        ),
+                    },
+                ]
+                : []),
             {
                 id: "cantidadPrevista" as const,
                 cabecera: "Cantidad",
                 tipo: 'numero' as const,
-                render: (linea: LineaOrdenAlmacen) => {
-                    const prevista = linea.cantidadPrevista;
-                    if (orden.tipo === "TRASPASO") {
-                        const pick = (linea.cantidadPick ?? 0) + (linea.cantidadReal ?? 0);
-                        const drop = linea.cantidadReal ?? 0;
-                        const variantePick = pick === 0 ? "error" : pick < prevista ? "advertencia" : "exito";
-                        const varianteDrop = drop === 0 ? "error" : drop < prevista ? "advertencia" : "exito";
-                        return (
-                            <span style={{ display: "flex", gap: "4px" }}>
-                                {orden.pasosPick && <QEtiqueta variante={variantePick}>P {pick}/{prevista}</QEtiqueta>}
-                                {orden.pasosDrop && <QEtiqueta variante={varianteDrop}>D {drop}/{prevista}</QEtiqueta>}
-                            </span>
-                        );
-                    }
-                    // Para órdenes con pasosPick (SALIDA pick-only), mostrar cantidadPick
-                    const tienePick = !!(linea.pasosPick ?? orden.pasosPick);
-                    if (tienePick) {
-                        const pick = linea.cantidadPick ?? 0;
-                        const variante = pick === 0 ? "error" : pick < prevista ? "advertencia" : "exito";
-                        return (
-                            <QEtiqueta variante={variante}>{pick} / {prevista}</QEtiqueta>
-                        );
-                    }
-                    const real = linea.cantidadReal ?? 0;
-                    const variante = real === 0 ? "error" : real < prevista ? "advertencia" : "exito";
-                    return (
-                        <QEtiqueta variante={variante}>{real} / {prevista}</QEtiqueta>
-                    );
-                },
+                render: (linea: LineaOrdenAlmacen) => <CantidadLinea orden={orden} linea={linea} />,
             },
             ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{ id: "ubicacionOrigen" as const, cabecera: "Ubi.Origen" }] : []),
             ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{ id: "cajaOrigen" as const, cabecera: "LPN Origen" }] : []),
             ...(sgaActivo && orden.tipo !== "SALIDA" ? [{ id: "ubicacionDestino" as const, cabecera: "Ubi.Destino" }] : []),
             ...(sgaActivo && orden.tipo !== "SALIDA" ? [{ id: "cajaDestino" as const, cabecera: "LPN Destino" }] : []),
             {
+                id: "acciones_sobrante",
+                cabecera: "",
+                render: (linea: LineaOrdenAlmacen) => <AvisoSobrante linea={linea} publicar={publicar} />,
+            },
+            {
                 id: "acciones_pick",
                 cabecera: "",
-                render: (linea: LineaOrdenAlmacen) => {
-                    const tienePick = !!(linea.pasosPick ?? orden.pasosPick);
-                    if (!tienePick) return null;
-                    const pickPendiente = (linea.cantidadPick ?? 0) < linea.cantidadPrevista;
-                    return (
-                        <QBoton
-                            deshabilitado={!pickPendiente}
-                            onClick={(e) => {
-                                e?.stopPropagation();
-                                publicar("lectura_guion_pick_linea_solicitada", linea);
-                            }}
-                        >
-                            Leer pick
-                        </QBoton>
-                    );
-                },
+                render: (linea: LineaOrdenAlmacen) => <BotonPick orden={orden} linea={linea} publicar={publicar} />,
             },
             {
                 id: "acciones_drop",
                 cabecera: "",
-                render: (linea: LineaOrdenAlmacen) => {
-                    const tienePick = !!(linea.pasosPick ?? orden.pasosPick);
-                    const pickCompleto = !tienePick || (linea.cantidadPick ?? 0) >= linea.cantidadPrevista;
-                    return (
-                        <QBoton
-                            deshabilitado={!pickCompleto}
-                            onClick={(e) => {
-                                e?.stopPropagation();
-                                publicar("lectura_guion_drop_linea_solicitada", linea);
-                            }}
-                        >
-                            Leer drop
-                        </QBoton>
-                    );
-                },
+                render: (linea: LineaOrdenAlmacen) => <BotonDrop orden={orden} linea={linea} publicar={publicar} />,
             },
         ],
         expansion: ExpansionLecturas(orden, publicar),
@@ -180,7 +311,7 @@ export const LineasOrdenLista = ({
             onSeleccion={setSeleccionada}
             criteriaInicial={criteriaDefecto}
             onCriteriaChanged={() => null}
-            modo="tabla"
+            tarjeta={tarjetaLineaOrden(orden, publicar)}
         />
     );
 };
