@@ -1,0 +1,42 @@
+.TarjetaLineaOrden__articulo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+/* Datos secundarios en una sola línea que parte si no cabe. */
+.TarjetaLineaOrden__info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--espaciado-xs);
+    row-gap: 2px;
+    color: var(--color-texto-secundario, inherit);
+    font-size: var(--tamaño-letra-s);
+    font-weight: normal;
+}
+
+/* Cantidad y botones en fila; solo bajan de línea si no caben. */
+.TarjetaLineaOrden__derecha {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+/* La columna derecha de QTarjetaGenerica recorta en una línea; aquí lleva botones. */
+.qtarjeta-generica-grid-arriba > div:has(> .TarjetaLineaOrden__derecha) {
+    overflow: visible;
+    white-space: normal;
+}
+
+/* Tarjeta de línea más compacta: menos aire entre el cuerpo y el "Ver más". */
+.qtarjeta-generica:has(.TarjetaLineaOrden__articulo) {
+    gap: var(--espaciado-xxs);
+}
+
+.qtarjeta-generica:has(.TarjetaLineaOrden__articulo) .qtarjeta-generica-footer {
+    padding-top: 0;
+}

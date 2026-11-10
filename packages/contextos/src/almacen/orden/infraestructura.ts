@@ -1,7 +1,10 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import {
+    AdquirirOrden,
+    AlbaranarOrden,
     CambiosLineaOrdenAlmacen,
+    CambioPedido,
     CambiosOrdenAlmacen,
     DeleteLineasOrden,
     DeleteOrden,
@@ -62,6 +65,7 @@ interface OrdenAlmacenApi {
     pasos_drop: string | null;
     lineas: LineaOrdenAlmacenApi[];
     lecturas_caja: LecturaCajaOrdenApi[];
+    albaranes?: { id: string | number; codigo: string }[];
 }
 
 interface LecturaLineaOrdenApi {
@@ -101,6 +105,11 @@ export interface LineaOrdenAlmacenApi {
     pasos_pick: string | null;
     pasos_drop: string | null;
     cantidad_pick?: number;
+    pedido_venta_id: string | null;
+    pedido_venta: string | null;
+    cliente: string | null;
+    cambio_pedido: CambioPedido | null;
+    cantidad_pedido_anterior: number | null;
     lecturas: LecturaLineaOrdenApi[];
 }
 
@@ -165,6 +174,7 @@ export const ordenDesdeApi = (api: OrdenAlmacenApi): OrdenAlmacen => ({
     pasosDrop: api.pasos_drop,
     lineas: api.lineas.map(lineaOrdenDesdeApi),
     lecturasCaja: (api.lecturas_caja ?? []).map(lecturaCajaOrdenDesdeApi),
+    albaranes: (api.albaranes ?? []).map((a) => ({ id: String(a.id), codigo: a.codigo })),
 });
 
 export const lecturaLineaOrdenDesdeApi = (api: LecturaLineaOrdenApi): LecturaLineaOrden => ({
@@ -204,6 +214,11 @@ export const lineaOrdenDesdeApi = (api: LineaOrdenAlmacenApi): LineaOrdenAlmacen
     pasosPick: api.pasos_pick,
     pasosDrop: api.pasos_drop,
     cantidadPick: api.cantidad_pick,
+    pedidoVentaId: api.pedido_venta_id != null ? String(api.pedido_venta_id) : null,
+    pedidoVenta: api.pedido_venta ?? null,
+    cliente: api.cliente ?? null,
+    cambioPedido: api.cambio_pedido ?? null,
+    cantidadPedidoAnterior: api.cantidad_pedido_anterior ?? null,
     lecturas: api.lecturas.map(lecturaLineaOrdenDesdeApi),
 });
 
@@ -435,8 +450,42 @@ export const postEntradaDesdePedido: PostEntradaDesdePedido = async (nueva: Nuev
     return respuesta.id as string;
 };
 
+export const adquirirOrden: AdquirirOrden = async (id) => {
+    await RestAPI.patch(`${baseUrl}/${id}/adquirir`, {}, "Error al adquirir la orden");
+};
+
+export interface DevolucionSobrante {
+    lineaId: string;
+    cantidad: number;
+    loteId: string | null;
+    idUbicacionDestino: string | null;
+    idCajaDestino: string | null;
+}
+
+/** Devuelve a una ubicación o caja el material recogido de más en una línea de salida. */
+export const devolverSobrante = async (id: string, devolucion: DevolucionSobrante): Promise<void> => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}/devolver_sobrante`,
+        {
+            linea_id: devolucion.lineaId,
+            cantidad: devolucion.cantidad,
+            lote_id: devolucion.loteId,
+            ubicacion_destino_id: devolucion.idUbicacionDestino,
+            caja_destino_id: devolucion.idCajaDestino,
+        },
+        "Error al devolver el sobrante"
+    );
+};
+
 export const terminarOrden: TerminarOrden = async (id) => {
     await RestAPI.patch(`${baseUrl}/${id}/terminar`, {}, "Error al terminar la orden");
+};
+
+export const albaranarOrden: AlbaranarOrden = async (id) => {
+    const respuesta = await RestAPI.patch(
+        `${baseUrl}/${id}/albaranar`, {}, "Error al albaranar la orden",
+    ) as unknown as { albaranes?: { id: string | number; codigo: string }[] } | undefined;
+    return (respuesta?.albaranes ?? []).map((a) => ({ id: String(a.id), codigo: a.codigo }));
 };
 
 export const getReportEtiquetasOrden: GetReportEtiquetasOrden = async (id) =>
