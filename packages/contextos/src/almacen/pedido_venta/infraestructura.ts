@@ -1,6 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
-import { ComprobarReservas, DisponibilidadPedido, GenerarSalidaDesdePedidos, GenerarSalidaVentaDesdePedidos, GetPedidoVenta, GetPedidosVenta, ItemPedidoVenta, LineaPedidoVenta, PedidoVenta } from "./diseño.ts";
+import { CompetidorLinea, ComprobarReservas, ComprobarReservasLineas, DisponibilidadLinea, DisponibilidadPedido, EstadoLinea, GenerarSalidaDesdePedidos, GenerarSalidaVentaDesdePedidos, GetPedidoVenta, GetPedidosVenta, ItemPedidoVenta, LineaPedidoVenta, PedidoVenta } from "./diseño.ts";
 
 
 interface ItemPedidoVentaApi {
@@ -104,11 +104,59 @@ export const generarSalidaVentaDesdePedidos: GenerarSalidaVentaDesdePedidos = as
     return respuesta.id;
 };
 
-export const comprobarReservas: ComprobarReservas = async (zonas, limite) => {
-    const respuesta = await RestAPI.query<{ zonas: number[]; limite: number }, { pedido_id: number; estado: DisponibilidadPedido }[]>(
+export const comprobarReservas: ComprobarReservas = async (zonas) => {
+    const respuesta = await RestAPI.query<{ zonas: number[] }, { pedido_id: number; estado: DisponibilidadPedido }[]>(
         `${baseUrl}/comprobar_reservas`,
-        { zonas, limite },
+        { zonas },
         'Error al comprobar reservas de pedidos'
     );
     return respuesta;
+};
+
+interface CompetidorLineaApi {
+    pedido_id: number;
+    codigo: string;
+    fecha: string;
+    cliente: string;
+    linea_id: number;
+    pendiente: number;
+    asignado: number;
+    posicion: CompetidorLinea['posicion'];
+}
+
+export interface EstadoLineaApi {
+    linea_id: number;
+    sku: string;
+    pendiente: number;
+    asignado: number;
+    estado: DisponibilidadLinea;
+    competidores: CompetidorLineaApi[];
+}
+
+const competidorLineaDesdeApi = (api: CompetidorLineaApi): CompetidorLinea => ({
+    pedidoId: String(api.pedido_id),
+    codigo: api.codigo,
+    fecha: new Date(Date.parse(api.fecha)),
+    cliente: api.cliente,
+    lineaId: String(api.linea_id),
+    pendiente: api.pendiente,
+    asignado: api.asignado,
+    posicion: api.posicion,
+});
+
+export const estadoLineaDesdeApi = (api: EstadoLineaApi): EstadoLinea => ({
+    lineaId: String(api.linea_id),
+    pendiente: api.pendiente,
+    asignado: api.asignado,
+    estado: api.estado,
+    competidores: api.competidores.map(competidorLineaDesdeApi),
+});
+
+export const comprobarReservasLineas: ComprobarReservasLineas = async (pedidoId, zonas) => {
+    const respuesta = await RestAPI.query<{ zonas: number[] }, EstadoLineaApi[]>(
+        `${baseUrl}/${pedidoId}/comprobar_reservas_lineas`,
+        { zonas },
+        'Error al comprobar la disponibilidad de las líneas'
+    );
+    return respuesta.map(estadoLineaDesdeApi);
 };

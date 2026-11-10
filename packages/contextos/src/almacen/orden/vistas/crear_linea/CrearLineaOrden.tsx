@@ -10,8 +10,15 @@ import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useMemo, useState } from "react";
 import { OrdenAlmacen } from "../../diseño.ts";
 import { crearLineaSubcajaPalet, postLineasOrden } from "../../infraestructura.ts";
+import { CampoFlujo, camposPendientes, Flujo, flujoPorDefecto } from "../../pasos/flujos.ts";
+import { SelectorFlujo } from "../selector_flujo/SelectorFlujo.tsx";
 import { nuevaLineaOrdenDesdeOrden } from "./crear_linea.ts";
 import { getMetaNuevaLineaOrden } from "./diseño.ts";
+
+const meta = getMetaNuevaLineaOrden();
+
+const etiqueta = (flujo: Flujo | null, campo: CampoFlujo, texto: string) =>
+    flujo?.campos[campo] === "opcional" ? `${texto} (opcional)` : texto;
 
 export const CrearLineaOrden = ({
     publicar,
@@ -20,29 +27,22 @@ export const CrearLineaOrden = ({
     publicar: EmitirEvento;
     orden: OrdenAlmacen;
 }) => {
-    const [pasos, setPasos] = useState<string | null>(null);
-
-    const meta = getMetaNuevaLineaOrden(orden.tipo);
+    const [flujo, setFlujo] = useState<Flujo | null>(() => flujoPorDefecto(orden));
 
     const lineaInicial = useMemo(
         () => nuevaLineaOrdenDesdeOrden(orden),
-        [orden.idUbicacionOrigen, orden.idCajaOrigen, orden.idUbicacionDestino, orden.idCajaDestino]
+        [orden.idUbicacionOrigen, orden.idCajaOrigen, orden.idUbicacionDestino, orden.idCajaDestino] // eslint-disable-line react-hooks/exhaustive-deps
     );
 
-    const { modelo, uiProps, valido } = useModelo(
-        meta,
-        lineaInicial
-    );
+    const { modelo, uiProps, valido } = useModelo(meta, lineaInicial);
 
-    const mostrarOrigen = orden.tipo === "SALIDA" || orden.tipo === "TRASPASO";
-    const mostrarDestino = orden.tipo === "ENTRADA" || orden.tipo === "TRASPASO";
-
-    const esSubcajaPalet = pasos === "SUBCAJA_PALET";
-    const validoSubcaja = !esSubcajaPalet || (!!modelo.idCajaOrigen && !!modelo.idUbicacionDestino);
-    const puedeGuardar = valido && validoSubcaja;
+    const usa = (campo: CampoFlujo) => !!flujo?.campos[campo];
+    const pendientes = flujo ? camposPendientes(flujo, modelo) : [];
+    const puedeGuardar = valido && !!flujo && pendientes.length === 0;
 
     const crear_ = useCallback(async () => {
-        if (esSubcajaPalet) {
+        if (!flujo) return;
+        if (flujo.palet) {
             await crearLineaSubcajaPalet(orden.id, {
                 sku: modelo.sku,
                 cantidad: modelo.cantidadPrevista,
@@ -55,17 +55,17 @@ export const CrearLineaOrden = ({
                     sku: modelo.sku,
                     cantidadPrevista: modelo.cantidadPrevista,
                     loteId: null,
-                    idUbicacionOrigen: modelo.idUbicacionOrigen,
-                    idCajaOrigen: modelo.idCajaOrigen,
-                    idUbicacionDestino: modelo.idUbicacionDestino,
-                    idCajaDestino: modelo.idCajaDestino,
-                    pasosPick: modelo.pasosPick,
-                    pasosDrop: modelo.pasosDrop,
+                    idUbicacionOrigen: usa("ubicacionOrigen") || usa("cajaOrigen") ? modelo.idUbicacionOrigen : null,
+                    idCajaOrigen: usa("cajaOrigen") ? modelo.idCajaOrigen : null,
+                    idUbicacionDestino: usa("ubicacionDestino") ? modelo.idUbicacionDestino : null,
+                    idCajaDestino: usa("cajaDestino") ? modelo.idCajaDestino : null,
+                    pasosPick: flujo.pasosPick,
+                    pasosDrop: flujo.pasosDrop,
                 },
             ]);
         }
         publicar("linea_creada");
-    }, [modelo, esSubcajaPalet, publicar, orden.id]);
+    }, [modelo, flujo, publicar, orden.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const cancelar_ = useCallback(() => {
         publicar("alta_de_linea_cancelada");
@@ -82,73 +82,44 @@ export const CrearLineaOrden = ({
         >
             <div className="CrearLineaOrden">
                 <quimera-formulario>
-                    <select
-                        value={pasos ?? ""}
-                        onChange={(e) => setPasos(e.target.value || null)}
-                    >
-                        <option value="">Estándar</option>
-                        <option value="SUBCAJA_PALET">Subcaja de palé</option>
-                    </select>
+                    <SelectorFlujo tipo={orden.tipo} valor={flujo?.codigo ?? null} onChange={setFlujo} />
                     <Sku {...uiProps("sku")} />
                     <QInput label="Cantidad prevista" {...uiProps("cantidadPrevista")} />
-                    {!esSubcajaPalet && mostrarOrigen && (
+                    {usa("paletOrigen") && (
+                        <Caja {...uiProps("idCajaOrigen")} label="Palé origen" nombre="idCajaOrigen" />
+                    )}
+                    {usa("ubicacionOrigen") && (
                         <Ubicacion
                             {...uiProps("idUbicacionOrigen")}
-                            label="Ubicación origen"
+                            label={etiqueta(flujo, "ubicacionOrigen", "Ubicación origen")}
                             nombre="idUbicacionOrigen"
                         />
                     )}
-                    {(esSubcajaPalet || mostrarOrigen) && (
+                    {usa("cajaOrigen") && (
                         <Caja
                             {...uiProps("idCajaOrigen")}
-                            label={esSubcajaPalet ? "Palé origen" : "Caja origen"}
+                            label={etiqueta(flujo, "cajaOrigen", "Caja origen")}
                             nombre="idCajaOrigen"
                         />
                     )}
-                    {(esSubcajaPalet || mostrarDestino) && (
+                    {usa("ubicacionDestino") && (
                         <Ubicacion
                             {...uiProps("idUbicacionDestino")}
-                            label="Ubicación destino"
+                            label={etiqueta(flujo, "ubicacionDestino", "Ubicación destino")}
                             nombre="idUbicacionDestino"
                         />
                     )}
-                    {!esSubcajaPalet && mostrarDestino && (
+                    {usa("cajaDestino") && (
                         <Caja
                             {...uiProps("idCajaDestino")}
-                            label="Caja destino"
+                            label={etiqueta(flujo, "cajaDestino", "Caja destino")}
                             nombre="idCajaDestino"
                         />
                     )}
-                    {!esSubcajaPalet && mostrarOrigen && (
-                        <>
-                            <label>Pasos pick</label>
-                            <select
-                                value={modelo.pasosPick ?? ""}
-                                onChange={(e) => uiProps("pasosPick").onChange(e.target.value || null)}
-                            >
-                                <option value="">Sin pasos</option>
-                                <option value="LOTE-CAJAS">Lote → Caja etiqueta</option>
-                                <option value="CAJA-CAJAS">Caja origen → Caja etiqueta</option>
-                            </select>
-                        </>
-                    )}
-                    {!esSubcajaPalet && mostrarDestino && (
-                        <>
-                            <label>Pasos drop</label>
-                            <select
-                                value={modelo.pasosDrop ?? ""}
-                                onChange={(e) => uiProps("pasosDrop").onChange(e.target.value || null)}
-                            >
-                                <option value="">Sin pasos</option>
-                                <option value="CAJAS-UBICACION">Caja → Ubicación</option>
-                                <option value="SKU-CANTIDAD">SKU → Cantidad</option>
-                                <option value="LOTE-CANTIDAD">Lote → Cantidad</option>
-                                <option value="CAJAS">Leer cajas</option>
-                                <option value="PALET">Leer palés</option>
-                            </select>
-                        </>
-                    )}
                 </quimera-formulario>
+                {pendientes.length > 0 && (
+                    <p className="q-texto-secundario">Falta: {pendientes.join(", ")}</p>
+                )}
                 <div className="botones maestro-botones">
                     <QBoton onClick={crear} deshabilitado={!puedeGuardar}>
                         Guardar
