@@ -14,6 +14,7 @@ import { LineaFactura, PagoVentaTpv, VentaTpv } from "../diseño.ts";
 import { ventaTpvVacia } from "../dominio.ts";
 import { EmitirVentaTpv } from "../emitir/EmitirVentaTpv.tsx";
 import { PagarTarjetaVentaTpv } from "../pagar_con_tarjeta/PagarTarjetaVentaTpv.tsx";
+import { PagarQrVentaTpv } from "../pagar_con_qr/PagarQrVentaTpv.tsx";
 import { PagoValeVentaTpv } from "../pagar_con_vale/PagoValeVentaTpv.tsx";
 import { PagarEfectivoVentaTpv } from "../pagar_en_efectivo/PagarEfectivoVentaTpv.tsx";
 import { TiqueRegaloVentaTpv } from "../tique_regalo/TiqueRegaloVentaTpv.tsx";
@@ -56,7 +57,7 @@ export const DetalleVentaTpv = ({
 
     const estadoAnterior = useRef(ctx.estado); // Referencia para saber cuándo imprimir el tique
     useEffect(() => {
-        const estadosPago = ["PAGANDO_EN_EFECTIVO", "PAGANDO_CON_TARJETA", "PAGANDO_CON_VALE"];
+        const estadosPago = ["PAGANDO_EN_EFECTIVO", "PAGANDO_CON_TARJETA", "PAGANDO_CON_VALE", "PAGANDO_CON_QR"];
         if (ctx.estado === 'EMITIDA' && estadosPago.includes(estadoAnterior.current) && ctx.venta.pendiente === 0) {
             imprimirTicketOFactura(ctx.venta, ctx.pagos.lista);
         }
@@ -172,6 +173,9 @@ export const DetalleVentaTpv = ({
             )}
             {estado === "PAGANDO_CON_TARJETA" && (
                 <PagarTarjetaVentaTpv publicar={emitir} venta={venta} />
+            )}
+            {estado === "PAGANDO_CON_QR" && (
+                <PagarQrVentaTpv publicar={emitir} venta={venta} />
             )}
             {estado === "PAGANDO_CON_VALE" && (
                 <PagoValeVentaTpv publicar={emitir} venta={venta} />
