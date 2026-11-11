@@ -6,6 +6,7 @@ import {
     postCancelarCobroQr,
     postCobroQr,
 } from "#/tesoreria/cobro_online/infraestructura.ts";
+import { publicarEnVisor } from "#/tpv/visor/canal.ts";
 import { QAviso } from "@olula/componentes/atomos/qaviso.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QModal } from "@olula/componentes/index.js";
@@ -21,7 +22,8 @@ export const INTERVALO_CONSULTA_MS = 2000;
 
 /**
  * Cobro con QR: el cliente escanea con su móvil y paga el pendiente de la venta
- * en Stripe. El QR se ve en este modal. El pago de la venta lo
+ * en Stripe. El QR se ve aquí y en el visor de cliente
+ * (el "pago recibido" del visor lo publica el detalle, igual para todos los métodos). El pago de la venta lo
  * crea el servidor al recibir el aviso de Stripe; este modal solo espera.
  */
 export const PagarQrVentaTpv = ({
@@ -44,6 +46,9 @@ export const PagarQrVentaTpv = ({
             return;
         }
         setCobro(nuevo);
+        if (nuevo.url) {
+            publicarEnVisor({ tipo: "qr", url: nuevo.url, modo: nuevo.modo });
+        }
     }, [intentar, publicar, venta.id]);
 
     useEffect(() => {
