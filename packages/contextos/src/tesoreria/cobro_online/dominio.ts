@@ -3,10 +3,10 @@ import { CobroOnline, EstadoCobroOnline, ReembolsoPasarela } from "./diseño.ts"
 
 const SIN_PASARELA = ["", "inactivo", "noconfigurado"];
 
-/** Si la instalación tiene una pasarela de pago (whoami `plugins.pasarela_pago`).
+/** Si la instalación tiene una pasarela de pago (whoami `plugins.stripe`).
  * Que la empresa haya conectado su cuenta lo dice el backend al generar el enlace. */
 export const pasarelaPagoActiva = (): boolean =>
-    !SIN_PASARELA.includes(plugin("pasarela_pago").toLowerCase());
+    !SIN_PASARELA.includes(plugin("stripe").toLowerCase());
 
 export const TEXTO_ESTADO: Record<EstadoCobroOnline, string> = {
     pendiente: "Pendiente de pago",

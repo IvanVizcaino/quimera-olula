@@ -1,4 +1,4 @@
-/** Cobros con tarjeta por la pasarela de pago (plugin `pasarela_pago`, Stripe).
+/** Cobros con tarjeta por la pasarela de pago (plugin `stripe`).
  * Ver comandos/tesoreria/cobro_online en el servidor. */
 
 export type EstadoCobroOnline = "pendiente" | "pagado" | "cancelado" | "caducado" | "reembolsado";

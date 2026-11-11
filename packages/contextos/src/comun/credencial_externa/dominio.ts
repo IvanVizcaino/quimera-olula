@@ -172,7 +172,7 @@ export const PROVEEDORES_CONOCIDOS: ProveedorConocido[] = [
         ],
     },
     {
-        // Cobros con tarjeta (plugin pasarela_pago): enlaces de pago de recibos y
+        // Cobros con tarjeta (plugin stripe): enlaces de pago de recibos y
         // facturas y QR del TPV. Al guardar, el backend da de alta el webhook en
         // Stripe y guarda su secreto junto a las claves (ver comandos/comun/
         // credencial_externa/stripe_conector.py); el usuario no configura nada en
