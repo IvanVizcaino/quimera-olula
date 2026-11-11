@@ -27,6 +27,7 @@ import { Pedido } from "../diseño.ts";
 import { getReportPedido, getTrazaPedido } from "../infraestructura.ts";
 import { editable, metaPedido, pedidoVacio } from "./detalle.ts";
 import "./DetallePedido.css";
+import { AvisoPreparacionAlmacen } from "./aviso_almacen/AvisoPreparacionAlmacen.tsx";
 import { Lineas } from "./lineas/Lineas.tsx";
 import { getMaquina } from "./maquina.ts";
 import { TabCliente } from "./TabCliente/TabCliente.tsx";
@@ -144,6 +145,8 @@ export const DetallePedidoBase = ({
         />
         <QuimeraAcciones acciones={acciones} vertical />
       </div>
+
+      <AvisoPreparacionAlmacen pedido={ctx.pedido} />
 
       <Tabs>
         <Tab label="Líneas">

@@ -25,3 +25,11 @@ En la ubicación, el usuario puede leer un SKU, un código de lote o una caja
 		+ Si el artículo está contenido en la caja (primer nivel) y solo hay un lote para el artículo, se crea la lectura
 		+ Si el artículo está contenido en la caja (primer nivel) y solo hay más de un lote para el artículo, se pide al usuario que elija el lote de una lista de lotes
 		+ Si el artículo y lote no está contenido en la caja > Error
+
+## Fin de la salida: albaranar
+
++ Cuando todas las líneas están leídas la orden de SALIDA queda **PREPARADA** (no TERMINADA). El lector de pick se cierra igual que al terminar.
++ En una SALIDA PREPARADA la acción principal es **Albaranar** (`ordenAlbaranable`). También hay un botón Albaranar en el detalle, deshabilitado mientras la salida no está PREPARADA y oculto cuando ya está TERMINADA. El botón Terminar se oculta en PREPARADA.
++ Albaranar (`PATCH /almacen/orden/<id>/albaranar`) genera un albarán por pedido y deja la orden TERMINADA. El modal enlaza los albaranes generados.
++ Al borrar uno de esos albaranes la orden vuelve a PREPARADA y se puede albaranar de nuevo.
++ El maestro muestra por defecto las órdenes PENDIENTE, EN_CURSO y PREPARADA.

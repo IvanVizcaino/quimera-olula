@@ -27,6 +27,8 @@ export interface CajaCompletaResuelta {
     lpn: string;
     sku: string | null;
     idLote: string | null;
+    idUbicacion: string | null;
+    cantidad: number | null;
     capacidad: number | null;
 }
 
@@ -92,6 +94,8 @@ export const buscarCajaCompletaPorTexto = async (texto: string): Promise<CajaCom
         lpn: elegida.lpn,
         sku: elegida.sku ?? null,
         idLote: elegida.lote_id ?? null,
+        idUbicacion: elegida.ubicacion_id ?? null,
+        cantidad: elegida.cantidad ?? null,
         capacidad: elegida.capacidad ?? null,
     };
 };

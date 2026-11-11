@@ -8,4 +8,5 @@ export const menuComun = {
     // Las credenciales las usan el asistente, los conectores (Stripe…) y otras
     // integraciones: van con usuarios y grupos (la sección la define auth).
     "Administración/Credenciales": { url: "/comun/credencial-externa", regla: "comun.credencial_externa" },
+    "Asistente IA/Bandeja de tareas": { url: "/comun/hitl-cola", regla: "comun.hitl_cola" },
 };
