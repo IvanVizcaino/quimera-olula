@@ -3,6 +3,13 @@ import { empresaActual } from "#/valores/empresaActual.ts";
 import { MetaModelo } from "@olula/lib/dominio.ts";
 import { NuevoProveedor } from "../diseño.ts";
 
+const metaDireccion: MetaModelo<NonNullable<NuevoProveedor["direccion"]>> = {
+    campos: {
+        nombreVia: { requerido: true },
+        ciudad: { requerido: true },
+    },
+};
+
 export const metaNuevoProveedor: MetaModelo<NuevoProveedor> = {
     campos: {
         nombre: { requerido: true },
@@ -15,6 +22,9 @@ export const metaNuevoProveedor: MetaModelo<NuevoProveedor> = {
             requerido: true,
             validacion: (modelo) => idFiscalCompraValido(modelo.tipoIdFiscal)(modelo.idFiscal),
         },
+        direccion: {
+            meta: metaDireccion,
+        },
     },
 };
 
@@ -23,4 +33,5 @@ export const nuevoProveedorInicial = (): NuevoProveedor => ({
     idFiscal: "",
     tipoIdFiscal: "NIF",
     empresaId: empresaActual(),
+    direccion: undefined,
 });

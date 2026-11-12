@@ -8,12 +8,22 @@ export const nuevoClienteVacio: NuevoCliente = {
     empresa_id: '',
     tipo_id_fiscal: '',
     agente_id: '',
-}
+};
+
+const metaDireccion: MetaModelo<NonNullable<NuevoCliente["direccion"]>> = {
+    campos: {
+        nombre_via: { requerido: true },
+        ciudad: { requerido: true },
+    },
+};
 
 export const metaNuevoCliente: MetaModelo<NuevoCliente> = {
     campos: {
         nombre: { requerido: true },
         empresa_id: { requerido: true },
+        direccion: {
+            meta: metaDireccion,
+        },
         ...camposIdFiscal<NuevoCliente>(),
     }
 };
