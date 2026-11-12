@@ -13,6 +13,7 @@ export const nuevoClienteVacio: NuevoCliente = {
 export const metaNuevoCliente: MetaModelo<NuevoCliente> = {
     campos: {
         nombre: { requerido: true },
+        empresa_id: { requerido: true },
         ...camposIdFiscal<NuevoCliente>(),
     }
 };

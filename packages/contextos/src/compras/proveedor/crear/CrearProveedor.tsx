@@ -1,5 +1,6 @@
 import { opcionesTipoIdFiscalCompras } from "#/compras/comun/valores.ts";
 import { TipoIdFiscal } from "#/comun/componentes/tipoIdFiscal.tsx";
+import { QAviso } from "@olula/componentes/atomos/qaviso.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
@@ -46,6 +47,11 @@ export const CrearProveedor = ({ publicar }: { publicar: EmitirEvento }) => {
                     />
                     <QInput label="Id Fiscal" {...uiProps("idFiscal")} />
                 </quimera-formulario>
+                {!proveedor.empresaId && (
+                    <QAviso>
+                        Sin empresa activa. Selecciónala en la cabecera para poder guardar.
+                    </QAviso>
+                )}
                 <div className="botones maestro-botones">
                     <QBoton onClick={crear} deshabilitado={!valido}>
                         Crear
