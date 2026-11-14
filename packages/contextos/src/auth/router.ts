@@ -1,3 +1,4 @@
+import { MaestroApiKeys } from './apikey/maestro/MaestroApiKeys.tsx';
 import { MaestroConDetalleGruposReglas } from '@olula/ctx/auth/grupos/maestro/MaestroConDetalleGruposReglas.tsx';
 import { Login } from './login/vistas/Login.tsx';
 import { ResetPassword } from './login/vistas/ResetPassword.tsx';
@@ -9,6 +10,7 @@ import Perfil from './usuario/perfil/Perfil.tsx';
 export const routerAuth = {
     "auth/usuario": MaestroConDetalleUsuario,
     "auth/grupo": MaestroConDetalleGruposReglas,
+    "auth/apikey": MaestroApiKeys,
     "login": Login,
     "logout": Logout,
     "usuario/perfil": Perfil,
