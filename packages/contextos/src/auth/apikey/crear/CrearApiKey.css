@@ -1,0 +1,9 @@
+.CrearApiKey quimera-formulario {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+}
+
+.CrearApiKey .botones {
+    margin-top: 16px;
+}
