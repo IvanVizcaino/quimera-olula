@@ -17,6 +17,7 @@ import { TabCuentasBanco } from "./cuentas_banco/TabCuentasBanco.tsx";
 import "./DetalleCliente.css";
 import { documentos, TabDocumentos } from "./documentos/TabDocumentos.tsx";
 import { TabDirecciones } from "./direcciones/TabDirecciones.tsx";
+import { TabAdicionalCliente } from "./diseño.ts";
 import { clienteVacio, metaCliente } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
 import { TabComercial } from "./TabComercial.tsx";
@@ -25,9 +26,11 @@ import { TabGeneral } from "./TabGeneral.tsx";
 export const DetalleCliente = ({
   id,
   publicar = async () => {},
+  tabsAdicionales = [],
 }: {
   id?: string;
   publicar?: EmitirEvento;
+  tabsAdicionales?: TabAdicionalCliente[];
 }) => {
   const params = useParams();
   const clienteId = id ?? params.id;
@@ -156,6 +159,13 @@ export const DetalleCliente = ({
                       />,
                     ]
                   : []),
+                ...tabsAdicionales.map((tab) => (
+                  <Tab
+                    key={tab.id}
+                    label={tab.label}
+                    children={tab.contenido(ctx.cliente)}
+                  />
+                )),
               ]}
             />
             {estado === "CAMBIANDO_ID_FISCAL" && (

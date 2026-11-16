@@ -7,13 +7,23 @@ import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect } from "react";
 import { CrearCliente } from "../crear/CrearCliente.tsx";
 import { DetalleCliente } from "../detalle/DetalleCliente.tsx";
+import { TabAdicionalCliente } from "../detalle/diseño.ts";
 import { Cliente } from "../diseño.ts";
 import { metaFiltroCliente, metaTablaCliente } from "./diseño.ts";
 import { TarjetaCliente } from "./TarjetaCliente.tsx";
 import "./MaestroConDetalleCliente.css";
 import { getMaquina } from "./maquina.ts";
 
-export const MaestroConDetalleCliente = () => {
+/**
+ * `tabsAdicionales`: pestañas propias de una app en el detalle de cliente (ver
+ * `TabAdicionalCliente`). La app registra en su router un componente que monta
+ * este maestro con ellas.
+ */
+export const MaestroConDetalleCliente = ({
+  tabsAdicionales,
+}: {
+  tabsAdicionales?: TabAdicionalCliente[];
+} = {}) => {
   const { id, criteria } = getUrlParams();
 
   const { ctx, emitir } = useMaquina(getMaquina, {
@@ -60,7 +70,13 @@ export const MaestroConDetalleCliente = () => {
             />
           </>
         }
-        Detalle={<DetalleCliente id={ctx.clientes.activo} publicar={emitir} />}
+        Detalle={
+          <DetalleCliente
+            id={ctx.clientes.activo}
+            publicar={emitir}
+            tabsAdicionales={tabsAdicionales}
+          />
+        }
         seleccionada={ctx.clientes.activo}
         modoDisposicion="maestro-50"
       />
