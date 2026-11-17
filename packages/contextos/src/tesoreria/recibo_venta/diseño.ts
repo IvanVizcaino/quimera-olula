@@ -16,6 +16,9 @@ export interface MovimientoRecibo extends Entidad {
 }
 
 export interface ReciboVenta extends Entidad {
+    /** Cuenta bancaria del titular en la que se domicilia (TES-06). */
+    cuentaDomiciliacionId: string | null;
+    nombreCuentaDomiciliacion: string;
     id: string;
     facturaId: string;
     grupoId: string;

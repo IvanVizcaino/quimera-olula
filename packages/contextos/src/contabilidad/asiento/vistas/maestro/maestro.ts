@@ -38,6 +38,22 @@ export const incluirAsientoCreadoPorId: ProcesarMaestro = async (contexto, paylo
     };
 };
 
+/** Asiento de una cadena de plantillas concatenadas: se incluye en la lista
+ * sin cerrar el alta, que sigue con el siguiente asiento. */
+export const incluirAsientoEncadenado: ProcesarMaestro = async (contexto, payload) => {
+    const id = payload as string;
+    const asiento = await getAsiento(id);
+    return {
+        ...contexto,
+        asientos: {
+            ...contexto.asientos,
+            lista: [asiento, ...contexto.asientos.lista],
+            total: contexto.asientos.total + 1,
+            activo: asiento.id,
+        },
+    };
+};
+
 export const recargarTrasRenumeracion: ProcesarMaestro = async (contexto) => {
     const resultado = await getAsientos(contexto.asientos.criteria);
     // Asientos.recargar es async: sin el await se extendería la promesa, que no

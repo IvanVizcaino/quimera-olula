@@ -1,7 +1,5 @@
+import { CamposLibroIva } from "#/contabilidad/comun/componentes/CamposLibroIva.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
-import { QDate } from "@olula/componentes/atomos/qdate.tsx";
-import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
@@ -58,60 +56,12 @@ export const CrearLibroFacturasRecibidas = ({
         >
             <div className="CrearLibroFacturasRecibidas">
                 <quimera-formulario>
-                    <QInput
-                        label="Descripción"
-                        {...uiProps("descripcion")}
-                        ref={focus}
-                    />
-                    <QInput label="Ejercicio" {...uiProps("ejercicioId")} />
-                    <QDate
-                        label="Desde fecha"
-                        {...uiProps("fechaDesde")}
-                        opcional
-                    />
-                    <QDate
-                        label="Hasta fecha"
-                        {...uiProps("fechaHasta")}
-                        opcional
-                    />
-                    <QCheckbox
-                        label="Todos los tipos de I.V.A."
-                        {...uiProps("todos")}
-                    />
-                    <QInput
-                        label="% de I.V.A."
-                        {...uiProps("porcentaje")}
-                        soloLectura={!admitePorcentaje(informe)}
-                        opcional
-                    />
-                    <QCheckbox label="Solo con I.V.A." {...uiProps("conIva")} />
-                    <QInput
-                        label="Serie"
-                        {...uiProps("codigoSerie")}
-                        opcional
-                    />
-                    <QCheckbox
-                        label="Mostrar total factura"
-                        {...uiProps("mostrarTotalFactura")}
-                    />
-                    <QCheckbox label="Mostrar NIF" {...uiProps("mostrarNif")} />
-                    <QCheckbox
-                        label="Mostrar documento"
-                        {...uiProps("mostrarDocumento")}
-                    />
-                    <QCheckbox
-                        label="Mostrar asiento"
-                        {...uiProps("mostrarAsiento")}
-                    />
-                    <QCheckbox
-                        label="Numeración automática"
-                        {...uiProps("numeracionAutomatica")}
-                    />
-                    <QInput
-                        label="Numerar desde"
-                        {...uiProps("numeroDesde")}
-                        soloLectura={!admiteNumeroDesde(informe)}
-                        opcional
+                    <CamposLibroIva
+                        uiProps={uiProps}
+                        porcentajeEditable={admitePorcentaje(informe)}
+                        numeroDesdeEditable={admiteNumeroDesde(informe)}
+                        conSerie
+                        refDescripcion={focus}
                     />
                 </quimera-formulario>
 

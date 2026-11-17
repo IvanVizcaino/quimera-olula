@@ -1,5 +1,5 @@
 import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
-import { datosClaveDocumentoCompra } from "#/compras/comun/dominio.ts";
+import { useDatosClaveDocumentoCompra } from "#/compras/comun/vistas/useDatosClaveDocumentoCompra.ts";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import { CambioProveedor } from "#/compras/comun/componentes/moleculas/CambioProveedor/CambioProveedor.tsx";
@@ -47,6 +47,7 @@ export const DetallePedido = ({
     );
 
     const formModelo = useModelo(metaPedido, ctx.pedido, autoGuardar);
+    const datosClave = useDatosClaveDocumentoCompra();
 
     const { estado, pedido, lineas } = ctx;
 
@@ -91,7 +92,7 @@ export const DetallePedido = ({
             id={id}
             obtenerTitulo={titulo}
             obtenerEstado={(P: Pedido) => <EtiquetaEstado {...etiquetaEstadoPedido(P)} />}
-            obtenerDatosClave={datosClaveDocumentoCompra}
+            obtenerDatosClave={datosClave}
             setEntidad={() => {}}
             entidad={pedido}
             cerrarDetalle={() => emitir("pedido_deseleccionado", null, true)}

@@ -9,6 +9,7 @@ import { useEffect, useMemo } from "react";
 import { ItemAsiento } from "../../diseño.ts";
 import { ejercicioActual, ejercicioIdParaRenumerar } from "../../dominio.ts";
 import { CrearAsientoManual } from "../crear/CrearAsientoManual.tsx";
+import { CrearAsientoDesdePlantilla } from "../desde_plantilla/CrearAsientoDesdePlantilla.tsx";
 import { DetalleAsiento } from "../detalle/DetalleAsiento.tsx";
 import { RenumerarAsientos } from "../renumerar/RenumerarAsientos.tsx";
 import { metaTablaAsiento } from "./diseño.ts";
@@ -68,6 +69,12 @@ export const MaestroConDetalleAsiento = () => {
                                     <QBoton onClick={() => emitir("crear_asiento_solicitado")}>
                                         Nuevo asiento manual
                                     </QBoton>
+                                    <QBoton
+                                        variante="borde"
+                                        onClick={() => emitir("crear_asiento_desde_plantilla_solicitado")}
+                                    >
+                                        Desde plantilla
+                                    </QBoton>
                                     {renumerable && (
                                         <QBoton
                                             variante="borde"
@@ -87,6 +94,9 @@ export const MaestroConDetalleAsiento = () => {
                 Detalle={<DetalleAsiento id={ctx.asientos.activo} publicar={emitir} />}
             />
             {ctx.estado === "CREANDO" && <CrearAsientoManual publicar={emitir} ejercicioId={ejercicioActual()} />}
+            {ctx.estado === "CREANDO_DESDE_PLANTILLA" && (
+                <CrearAsientoDesdePlantilla publicar={emitir} ejercicioId={ejercicioActual()} />
+            )}
             {ctx.estado === "RENUMERANDO" && (
                 <RenumerarAsientos ejercicioId={ejercicioRenumerar} publicar={emitir} />
             )}

@@ -38,7 +38,7 @@ export const MaestroConDetalleCliente = () => {
               metaTabla={metaTablaCliente}
               metaFiltro={metaFiltroCliente}
               tarjeta={TarjetaCliente}
-              modoInicial="tarjetas"
+              modoInicial="tabla"
               criteria={ctx.clientes.criteria}
               entidades={ctx.clientes.lista}
               totalEntidades={ctx.clientes.total}
@@ -62,7 +62,6 @@ export const MaestroConDetalleCliente = () => {
         }
         Detalle={<DetalleCliente id={ctx.clientes.activo} publicar={emitir} />}
         seleccionada={ctx.clientes.activo}
-        modoDisposicion="maestro-50"
       />
 
       {ctx.estado === "CREANDO_CLIENTE" && (

@@ -23,6 +23,12 @@ export const getMaquina: () => Maquina<EstadoDetalleRemesa, ContextoDetalleRemes
             pago_solicitado: 'PAGANDO',
 
             deshacer_pago_solicitado: 'DESHACIENDO_PAGO',
+
+            fichero_solicitado: 'GENERANDO_FICHERO',
+        },
+
+        GENERANDO_FICHERO: {
+            fichero_cerrado: 'ABIERTO',
         },
 
         PAGANDO: {

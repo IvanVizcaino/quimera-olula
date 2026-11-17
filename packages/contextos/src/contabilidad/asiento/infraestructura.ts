@@ -49,6 +49,10 @@ interface PartidaAsientoApi {
     grupo_iva_negocio_id?: string | null;
     contrapartida_id?: number | null;
     casilla303?: string | null;
+    divisa_id?: string | null;
+    tasa_conversion?: number;
+    debe_me?: number;
+    haber_me?: number;
 }
 
 interface AsientoDetalleApi extends ItemAsientoApi {
@@ -74,6 +78,10 @@ export const partidaAsientoDesdeApi = (api: PartidaAsientoApi): PartidaAsiento =
     grupoIvaNegocioId: api.grupo_iva_negocio_id,
     contrapartidaId: api.contrapartida_id,
     casilla303: api.casilla303,
+    divisaId: api.divisa_id ?? null,
+    tasaConversion: api.tasa_conversion ?? 1,
+    debeMe: api.debe_me ?? 0,
+    haberMe: api.haber_me ?? 0,
 });
 
 export const itemAsientoDesdeApi = (api: ItemAsientoApi): ItemAsiento => ({
@@ -108,6 +116,14 @@ const partidaManualAApi = (p: PartidaManualInput) => ({
     ...(p.grupoIvaNegocioId ? { grupo_iva_negocio_id: p.grupoIvaNegocioId } : {}),
     ...(p.contrapartidaId ? { contrapartida_id: p.contrapartidaId } : {}),
     ...(p.casilla303 ? { casilla303: p.casilla303 } : {}),
+    ...(p.divisaId
+        ? {
+              divisa_id: p.divisaId,
+              tasa_conversion: p.tasaConversion ?? 1,
+              debe_me: p.debeMe ?? 0,
+              haber_me: p.haberMe ?? 0,
+          }
+        : {}),
 });
 
 export const getAsiento: GetAsiento = async (id) =>

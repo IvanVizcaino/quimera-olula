@@ -18,7 +18,7 @@ import "../../comun/estilos/detalle_documento.css";
 import { TotalesVenta } from "../../venta/vistas/TotalesVenta.tsx";
 import { BorrarAlbaran } from "../borrar/BorrarAlbaran.tsx";
 import { Albaran } from "../diseño.ts";
-import { datosClaveDocumentoVenta } from "../../venta/dominio.ts";
+import { useDatosClaveDocumentoVenta } from "../../venta/vistas/useDatosClaveDocumentoVenta.ts";
 import {
   albaranVacio,
   editable,
@@ -66,6 +66,7 @@ export const DetalleAlbaran = ({
   );
 
   const albaran = useModelo(metaAlbaran, ctx.albaran, autoGuardar);
+  const datosClave = useDatosClaveDocumentoVenta();
 
   useEffect(() => {
     emitir("albaran_id_cambiado", albaranId, true);
@@ -115,7 +116,7 @@ export const DetalleAlbaran = ({
       obtenerEstado={(albaran: Albaran) => (
         <EtiquetaEstado {...etiquetaEstadoAlbaran(albaran)} />
       )}
-      obtenerDatosClave={datosClaveDocumentoVenta}
+      obtenerDatosClave={datosClave}
       setEntidad={() => {}}
       entidad={ctx.albaran}
       cerrarDetalle={() => emitir("albaran_deseleccionado", null)}

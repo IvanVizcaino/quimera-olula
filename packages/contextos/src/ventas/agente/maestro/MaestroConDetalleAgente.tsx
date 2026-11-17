@@ -53,7 +53,7 @@ export const MaestroConDetalleAgente = () => {
                         <Listado<Agente>
                             metaTabla={metaTablaAgente}
                             criteria={agentes.criteria}
-                            modoInicial="tarjetas"
+                            modoInicial="tabla"
                             tarjeta={TarjetaAgente}
                             entidades={agentes.lista}
                             totalEntidades={agentes.total}

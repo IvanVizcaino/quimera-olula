@@ -83,7 +83,7 @@ export const DetalleLibroFacturasRecibidas = ({
                             children={
                                 <TabCriterios
                                     form={formModelo}
-                                    informe={informe}
+                                    informe={formModelo.modelo}
                                 />
                             }
                         />,

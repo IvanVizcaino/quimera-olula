@@ -6,10 +6,8 @@ import { CambiarDescuento } from "#/ventas/comun/componentes/moleculas/CambiarDe
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import "#/ventas/comun/estilos/campos.css";
 import "#/ventas/comun/estilos/detalle_documento.css";
-import {
-  datosClaveDocumentoVenta,
-  tituloDocumentoVenta,
-} from "#/ventas/venta/dominio.ts";
+import { tituloDocumentoVenta } from "#/ventas/venta/dominio.ts";
+import { useDatosClaveDocumentoVenta } from "#/ventas/venta/vistas/useDatosClaveDocumentoVenta.ts";
 import { etiquetaEstadoPedido } from "../maestro/maestro.ts";
 import { TotalesVenta } from "#/ventas/venta/vistas/TotalesVenta.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -78,6 +76,7 @@ export const DetallePedidoBase = ({
   );
 
   const pedido = useModelo(metaPedido, ctx.pedido, autoGuardar);
+  const datosClave = useDatosClaveDocumentoVenta();
 
   useEffect(() => {
     emitir("pedido_id_cambiado", pedidoId, true);
@@ -133,7 +132,7 @@ export const DetallePedidoBase = ({
       obtenerEstado={(pedido: Pedido) => (
         <EtiquetaEstado {...etiquetaEstadoPedido(pedido)} />
       )}
-      obtenerDatosClave={datosClaveDocumentoVenta}
+      obtenerDatosClave={datosClave}
       setEntidad={() => {}}
       entidad={ctx.pedido}
       cerrarDetalle={() => emitir("pedido_deseleccionado", null)}

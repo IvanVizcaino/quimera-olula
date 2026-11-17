@@ -6,11 +6,14 @@
  * Las fichas se guardan planas en cada módulo, igual que en el formulario del
  * ERP; estos tipos son los del borde con la API, que los recibe anidados.
  */
-import { Entidad } from "@olula/lib/diseño.ts";
+import { Entidad, Modelo } from "@olula/lib/diseño.ts";
+import { MetaModelo } from "@olula/lib/dominio.ts";
+import { aBooleano, conChecks } from "./checks_informe.ts";
 
 export interface FiltroIva {
     todos: boolean;
-    porcentaje: string;
+    /** `i_co__partidas_iva` (double 2,2): número libre, `null` si vacío. */
+    porcentaje: number | null;
     conIva: boolean;
 }
 
@@ -85,8 +88,61 @@ export interface ResultadoLibroIvaApi {
     total: number;
 }
 
+/** Campos `bool` de `co_i_facturasemi`/`co_i_facturasrec` que se editan
+ * como casilla. */
+export const CHECKS_LIBRO_IVA = [
+    "todos",
+    "conIva",
+    "mostrarTotalFactura",
+    "mostrarNif",
+    "mostrarDocumento",
+    "mostrarAsiento",
+    "numeracionAutomatica",
+] as const;
+
+/** Sin «todos los tipos» hay que indicar el porcentaje (el servidor lo
+ * exige igual que el formulario de Eneboo). */
+export const porcentajeRequerido = (modelo: Modelo): boolean =>
+    !aBooleano(modelo.todos);
+
+/** `bufferChanged` de `co_i_facturasemi.qs`/`co_i_facturasrec.qs`: al marcar
+ * «todos los tipos» el % de I.V.A. pasa a 0 y se deshabilita; al desmarcar se
+ * habilita con lo que tenga. */
+export const porcentajeSegunTodos = <T extends Modelo>(
+    modelo: T,
+    campo: string
+): T =>
+    campo === "todos" && aBooleano(modelo.todos) && modelo.porcentaje !== 0
+        ? { ...modelo, porcentaje: 0 }
+        : modelo;
+
+/** Meta común del alta y de la ficha de los dos libros de I.V.A. */
+export const metaFormularioLibroIva = <T extends Modelo>(): MetaModelo<T> =>
+    conChecks<T>(
+        {
+            campos: {
+                descripcion: { requerido: true },
+                ejercicioId: { requerido: true },
+                porcentaje: {
+                    tipo: "decimal",
+                    decimales: 2,
+                    requerido: porcentajeRequerido,
+                },
+            },
+        },
+        CHECKS_LIBRO_IVA,
+        porcentajeSegunTodos
+    );
+
 const numeroATexto = (valor: number | null): string =>
     valor === null || valor === undefined ? "" : String(valor);
+
+/** Tolera el texto que pudiera quedar de una ficha antigua o del input. */
+const porcentajeAApi = (valor: unknown): number | null => {
+    if (valor === null || valor === undefined || valor === "") return null;
+    const numero = Number(valor);
+    return Number.isFinite(numero) ? numero : null;
+};
 
 const textoANumero = (valor: string): number | null => {
     const limpio = (valor ?? "").trim();
@@ -95,7 +151,7 @@ const textoANumero = (valor: string): number | null => {
 
 export const filtroIvaVacio = (): FiltroIva => ({
     todos: true,
-    porcentaje: "",
+    porcentaje: null,
     conIva: false,
 });
 
@@ -110,7 +166,7 @@ export const presentacionIvaVacia = (): PresentacionIva => ({
 
 export const filtroDesdeApi = (api: FiltroIvaApi): FiltroIva => ({
     todos: api.todos,
-    porcentaje: numeroATexto(api.porcentaje),
+    porcentaje: api.porcentaje ?? null,
     conIva: api.con_iva,
 });
 
@@ -125,11 +181,12 @@ export const presentacionDesdeApi = (
     numeroDesde: numeroATexto(api.numero_desde),
 });
 
-/** Con «todos los tipos» marcado el porcentaje no viaja, igual que en el ERP
- * se deshabilita el combo. */
+/** Con «todos los tipos» marcado el porcentaje viaja a 0, que es lo que
+ * deja Eneboo en `i_co__partidas_iva` al marcar el check (el filtro lo
+ * ignora). */
 export const filtroAApi = (filtro: FiltroIva): FiltroIvaApi => ({
     todos: filtro.todos,
-    porcentaje: filtro.todos ? null : textoANumero(filtro.porcentaje),
+    porcentaje: filtro.todos ? 0 : porcentajeAApi(filtro.porcentaje),
     con_iva: filtro.conIva,
 });
 

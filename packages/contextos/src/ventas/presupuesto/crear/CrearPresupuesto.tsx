@@ -165,6 +165,7 @@ const FormAltaPresupuesto = ({
               <Cliente
                 {...presupuestoRegistrado.uiProps("cliente_id", "nombre")}
                 nombre="clientePresupuesto"
+                avisarObservaciones
                 ref={focus}
               />
               <DirCliente

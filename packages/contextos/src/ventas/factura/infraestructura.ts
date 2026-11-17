@@ -45,6 +45,7 @@ interface FacturaAPI {
     rectificativa_id: string | null;
     asiento_id: string | null;
     grupo_iva_negocio_id: string;
+    serie_id: string;
     por_comision?: number;
     por_comision_agente?: number | null;
     observaciones: string;
@@ -56,6 +57,7 @@ export const facturaDesdeAPI = (p: FacturaAPI): Factura => ({
     fecha: new Date(Date.parse(p.fecha)),
     dtoPorcentual: p.por_descuento,
     netoSinDto: p.neto_sin_dto,
+    serie_id: p.serie_id ?? "",
     por_comision: p.por_comision ?? p.por_comision_agente ?? 0,
     estadoExpedicion: p.estado_expedicion,
     cliente: {

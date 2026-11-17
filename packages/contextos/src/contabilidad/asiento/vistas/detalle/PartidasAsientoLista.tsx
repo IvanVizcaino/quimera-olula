@@ -29,13 +29,22 @@ const metaTablaPartida: MetaTabla<PartidaAsiento> = [
 // memoria: no hay consulta que lanzar al servidor.
 const criteriaPartidasDefecto: Criteria = { ...criteriaDefecto };
 
-export const PartidasAsientoLista = ({ partidas }: { partidas: PartidaAsiento[] }) => {
+/** `simple`: sin el título «Partidas», siempre en tabla (sin el cambio
+ * tabla/tarjetas) y sin el recuadro de totales Debe/Haber (pestaña
+ * Contabilidad de las facturas). */
+export const PartidasAsientoLista = ({
+    partidas,
+    simple = false,
+}: {
+    partidas: PartidaAsiento[];
+    simple?: boolean;
+}) => {
     const esMovil = useEsMovil();
     const descuadre = descuadrePartidas(partidas);
 
     return (
         <div className="PartidasAsientoLista">
-            <h3>Partidas</h3>
+            {!simple && <h3>Partidas</h3>}
             <ListadoSemiControlado
                 metaTabla={metaTablaPartida}
                 entidades={partidas}
@@ -43,25 +52,28 @@ export const PartidasAsientoLista = ({ partidas }: { partidas: PartidaAsiento[] 
                 seleccionada={null}
                 onSeleccion={() => {}}
                 criteriaInicial={criteriaPartidasDefecto}
-                modoInicial={esMovil ? "tarjetas" : "tabla"}
+                modoInicial={simple || !esMovil ? "tabla" : "tarjetas"}
+                modosDisponibles={simple ? ["tabla"] : undefined}
                 onCriteriaChanged={(_: Criteria) => null}
             />
-            <div className="totales-asiento">
-                <div className="totales-asiento-item">
-                    <label>Debe:</label>
-                    <span>{formatearMoneda(totalDebe(partidas), "EUR")}</span>
-                </div>
-                <div className="totales-asiento-item">
-                    <label>Haber:</label>
-                    <span>{formatearMoneda(totalHaber(partidas), "EUR")}</span>
-                </div>
-                {Math.abs(descuadre) >= 0.005 && (
-                    <div className="totales-asiento-item totales-asiento-item--descuadre">
-                        <label>Descuadre:</label>
-                        <span>{formatearMoneda(descuadre, "EUR")}</span>
+            {!simple && (
+                <div className="totales-asiento">
+                    <div className="totales-asiento-item">
+                        <label>Debe:</label>
+                        <span>{formatearMoneda(totalDebe(partidas), "EUR")}</span>
                     </div>
-                )}
-            </div>
+                    <div className="totales-asiento-item">
+                        <label>Haber:</label>
+                        <span>{formatearMoneda(totalHaber(partidas), "EUR")}</span>
+                    </div>
+                    {Math.abs(descuadre) >= 0.005 && (
+                        <div className="totales-asiento-item totales-asiento-item--descuadre">
+                            <label>Descuadre:</label>
+                            <span>{formatearMoneda(descuadre, "EUR")}</span>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

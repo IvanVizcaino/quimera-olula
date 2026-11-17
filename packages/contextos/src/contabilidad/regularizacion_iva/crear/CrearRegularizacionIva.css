@@ -1,0 +1,6 @@
+/* Fecha desde y hasta en la misma fila. */
+.CrearRegularizacionIva quimera-formulario {
+    quimera-date[nombre="fechaFin"] {
+        grid-column: span 3;
+    }
+}
