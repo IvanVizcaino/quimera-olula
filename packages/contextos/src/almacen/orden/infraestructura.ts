@@ -12,6 +12,8 @@ import {
     GetDiferenciasPedidoOrden,
     GetOrden,
     GetOrdenes,
+    GetRecorridoOrden,
+    RecorridoOrden,
     ItemOrdenAlmacen,
     LecturaCajaOrden,
     LecturaLineaOrden,
@@ -683,3 +685,46 @@ export const postEnvioAgencia: PostEnvioAgencia = async (ordenId, envio) => {
 
 export const getEtiquetaEnvio: GetEtiquetaEnvio = async (albaranId) =>
     RestAPI.blob(`${urlEnvioAgencia}/${albaranId}/etiqueta`, "Error al obtener la etiqueta del envío");
+
+export interface RecorridoOrdenApi {
+    orden_id: string;
+    modulos_recorridos: number;
+    pasillos_cruzados: number;
+    paradas: {
+        secuencia: number;
+        ubicacion_id: string;
+        ubicacion: string;
+        zona?: string | null;
+        pasillo?: string | null;
+        modulo?: number | null;
+        nivel?: number | null;
+        hueco?: number | null;
+        lineas: { linea_id: string; sku: string; pendiente: number }[];
+    }[];
+}
+
+export const recorridoOrdenDesdeApi = (r: RecorridoOrdenApi): RecorridoOrden => ({
+    ordenId: r.orden_id,
+    modulosRecorridos: r.modulos_recorridos,
+    pasillosCruzados: r.pasillos_cruzados,
+    paradas: r.paradas.map((p) => ({
+        secuencia: p.secuencia,
+        ubicacionId: p.ubicacion_id,
+        ubicacion: p.ubicacion,
+        zona: p.zona ?? null,
+        pasillo: p.pasillo ?? null,
+        modulo: p.modulo ?? null,
+        nivel: p.nivel ?? null,
+        hueco: p.hueco ?? null,
+        lineas: p.lineas.map((l) => ({
+            lineaId: String(l.linea_id),
+            sku: l.sku,
+            pendiente: l.pendiente,
+        })),
+    })),
+});
+
+export const getRecorridoOrden: GetRecorridoOrden = async (id) => {
+    const respuesta = await RestAPI.get<{ datos: RecorridoOrdenApi }>(`${baseUrl}/${id}/recorrido`);
+    return recorridoOrdenDesdeApi(respuesta.datos);
+};
