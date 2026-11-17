@@ -14,6 +14,7 @@ export const menuAlmacen = {
     "Almacén/Stock": { alias: ["existencias", "inventario"], url: "/almacen/stock", regla: "almacen.stock" },
     "Almacén/Ubicaciones": { url: "/almacen/ubicaciones", regla: "almacen.ubicacion", plugin: "sga" },
     "Almacén/Tipos de Caja": { url: "/almacen/tipos_caja", regla: "almacen.tipo_caja", plugin: "sga" },
+    "Almacén/Tipos de Ubicación": { url: "/almacen/tipos_ubicacion", regla: "almacen.tipo_ubicacion", plugin: "sga" },
     "Almacén/Zonas": { url: "/almacen/zonas", regla: "almacen.zona", plugin: "sga" },
     "Almacén/Configuración": { alias: ["IVA por defecto"], url: "/almacen/config", regla: "almacen.config" },
 };

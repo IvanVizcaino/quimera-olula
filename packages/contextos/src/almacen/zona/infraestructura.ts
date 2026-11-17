@@ -3,7 +3,7 @@ import { Criteria, Filtro, Orden, Paginacion } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import { getUbicaciones } from "../ubicacion/infraestructura.ts";
 import { Ubicacion } from "../ubicacion/diseño.ts";
-import { DeleteZona, GetZona, GetZonas, NuevaZona, PatchZona, PostZona, Zona } from "./diseño.ts";
+import { FuncionZona, DeleteZona, GetZona, GetZonas, NuevaZona, PatchZona, PostZona, Zona } from "./diseño.ts";
 
 const baseUrl = `/almacen/zona`;
 
@@ -12,12 +12,14 @@ interface ZonaApi {
     codigo: string;
     almacen_id: string;
     descripcion: string | null;
+    funcion: FuncionZona;
 }
 
 interface NuevaZonaApi {
     codigo: string;
     almacen_id: string;
     descripcion: string | null;
+    funcion: FuncionZona;
 }
 
 type CambiosZonaApi = Partial<ZonaApi>;
@@ -27,12 +29,14 @@ export const zonaDesdeApi = (api: ZonaApi): Zona => ({
     codigo: api.codigo,
     almacenId: api.almacen_id,
     descripcion: api.descripcion,
+    funcion: api.funcion,
 });
 
 const nuevaZonaAApi = (z: NuevaZona): NuevaZonaApi => ({
     codigo: z.codigo,
     almacen_id: z.almacenId,
     descripcion: z.descripcion,
+    funcion: z.funcion,
 });
 
 const cambiosZonaAApi = (z: Partial<Zona>): CambiosZonaApi => {
@@ -40,6 +44,7 @@ const cambiosZonaAApi = (z: Partial<Zona>): CambiosZonaApi => {
     if (z.codigo !== undefined) cambios.codigo = z.codigo;
     if (z.almacenId !== undefined) cambios.almacen_id = z.almacenId;
     if (z.descripcion !== undefined) cambios.descripcion = z.descripcion;
+    if (z.funcion !== undefined) cambios.funcion = z.funcion;
     return cambios;
 };
 

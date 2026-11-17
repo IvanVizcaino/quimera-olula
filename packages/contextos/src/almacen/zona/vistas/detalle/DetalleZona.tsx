@@ -1,3 +1,4 @@
+import { FuncionZona } from "#/almacen/comun/componentes/FuncionZona.tsx";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -13,6 +14,7 @@ import { patchZona } from "../../infraestructura.ts";
 import { BorrarZona } from "../borrar/BorrarZona.js";
 import { contextoDetalleZonaInicial, metaZona } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
+import { PasillosZona } from "./pasillos/PasillosZona.js";
 import { UbicacionesZona } from "./ubicaciones/UbicacionesZona.js";
 
 const titulo = (zona: Zona) => zona.codigo as string;
@@ -63,8 +65,17 @@ export const DetalleZona = ({
                             <quimera-formulario>
                                 <QInput label="Código" {...modelo.uiProps("codigo")} />
                                 <Almacen {...modelo.uiProps("almacenId")} />
+                                <FuncionZona {...modelo.uiProps("funcion")} />
                                 <QInput label="Descripción" {...modelo.uiProps("descripcion")} />
                             </quimera-formulario>
+                        </Tab>,
+                        <Tab key="pasillos" label="Pasillos">
+                            <PasillosZona
+                                zona={ctx.zona}
+                                pasillos={ctx.pasillos}
+                                estado={ctx.estado}
+                                publicar={emitir}
+                            />
                         </Tab>,
                         <Tab key="ubicaciones" label="Ubicaciones">
                             <UbicacionesZona ubicaciones={ctx.ubicaciones} />
