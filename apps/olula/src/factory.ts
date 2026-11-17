@@ -1,4 +1,5 @@
 import { FactoryAlmacenOlula } from '#/almacen/factory.ts';
+import { FactoryAnalisisOlula } from '#/analisis/factory.ts';
 import { FactoryAuthOlula } from '#/auth/factory.ts';
 import { FactoryComprasOlula } from '#/compras/factory.ts';
 import { FactoryContabilidadOlula } from '#/contabilidad/factory.ts';
@@ -36,6 +37,7 @@ export class FactoryOlula {
     Fiscal = FactoryFiscalOlula;
     TPV = FactoryTpvOlula;
     Predicciones = FactoryPrediccionesOlula;
+    Analisis = FactoryAnalisisOlula;
     Auth = FactoryAuthOlula;
     Rrhh = FactoryRrhhOlula;
     Proyectos = FactoryProyectosOlula;

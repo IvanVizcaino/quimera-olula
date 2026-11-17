@@ -27,6 +27,8 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboVenta, ContextoDetalle
 
             enlace_cobro_solicitado: 'ENLACE_COBRO',
 
+            enlace_tarjeta_solicitado: 'ENLACE_TARJETA',
+
             devolucion_solicitada: 'DEVOLVIENDO',
 
             cambio_recibo_solicitado: 'CAMBIANDO',
@@ -44,6 +46,10 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboVenta, ContextoDetalle
 
         ENLACE_COBRO: {
             enlace_cobro_cerrado: 'ABIERTO',
+        },
+
+        ENLACE_TARJETA: {
+            enlace_tarjeta_cerrado: 'ABIERTO',
         },
 
         DEVOLVIENDO: {

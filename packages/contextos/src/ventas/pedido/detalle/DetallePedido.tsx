@@ -22,6 +22,7 @@ import { useCallback, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { BorrarPedido } from "../borrar/BorrarPedido.tsx";
 import { Pedido } from "../diseño.ts";
+import { pedidoPendiente } from "../dominio.ts";
 import { getReportPedido, getTrazaPedido } from "../infraestructura.ts";
 import { editable, metaPedido, pedidoVacio } from "./detalle.ts";
 import "./DetallePedido.css";
@@ -120,7 +121,7 @@ export const DetallePedidoBase = ({
       texto: "Borrar",
       advertencia: true,
       onClick: () => emitir("borrar_solicitado"),
-      deshabilitado: !esEditable,
+      deshabilitado: !pedidoPendiente(ctx.pedido),
     },
   ];
 

@@ -1,4 +1,4 @@
-import { plugin } from "./dominio.ts";
+import { moduloBloqueadoEnUrl, plugin } from "./dominio.ts";
 
 export interface ElementoMenuBase {
     nombre: string;
@@ -66,3 +66,7 @@ export const conReglaEnResumen = (elemento: ElementoMenu): ElementoMenu => {
 /** Los plugins que pide la entrada están activos en esta instalación (whoami). */
 export const pluginsActivos = (e: ElementoMenuBase): boolean =>
     !e.plugin || [e.plugin].flat().every((nombre) => plugin(nombre) === "activo");
+
+/** SaaS: la entrada no es de un módulo que la empresa no tiene contratado. */
+export const disponibleEnSaas = (e: ElementoMenuBase): boolean =>
+    !("url" in e) || typeof e.url !== "string" || !moduloBloqueadoEnUrl(e.url);

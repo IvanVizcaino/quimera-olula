@@ -55,6 +55,11 @@ export const reciboCompraDesdeApi = (api: ReciboCompraApi): ReciboCompra => ({
         estado: pago.estado,
         cuentaPagoId: pago.cuenta_pago_id ?? "",
         nombreCuentaPago: pago.nombre_cuenta_pago ?? "",
+        // Los pagos de proveedor no pasan por pasarela (Stripe).
+        pasarela: null,
+        modoPasarela: null,
+        urlPanel: null,
+        incidenciaPasarela: null,
     })),
 });
 
