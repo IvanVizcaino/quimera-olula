@@ -20,6 +20,7 @@ const metaDireccion: MetaModelo<NonNullable<NuevoCliente["direccion"]>> = {
 export const metaNuevoCliente: MetaModelo<NuevoCliente> = {
     campos: {
         nombre: { requerido: true },
+        empresa_id: { requerido: true },
         direccion: {
             meta: metaDireccion,
         },

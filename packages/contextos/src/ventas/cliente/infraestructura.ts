@@ -1,4 +1,3 @@
-import { empresaActual } from "#/valores/empresaActual.ts";
 import UrlsCrmClass from "@olula/ctx/crm/comun/urls.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
@@ -128,10 +127,8 @@ export const darDeAltaCliente = async (id: string) =>
 export const deleteCliente = async (id: string): Promise<void> =>
   await RestAPI.delete(`${UrlsVentas.CLIENTE}/${id}`, "Error al borrar cliente");
 
-export const postCliente: PostCliente = async (cliente) => {
-  const payload = { ...cliente, empresa_id: empresaActual() };
-  return await RestAPI.post(UrlsVentas.CLIENTE, payload, "Error al guardar el cliente").then((respuesta) => respuesta.id);
-}
+export const postCliente: PostCliente = async (cliente) =>
+  await RestAPI.post(UrlsVentas.CLIENTE, cliente, "Error al guardar el cliente").then((respuesta) => respuesta.id);
 
 export const getDireccion = async (clienteId: string, direccionId: string): Promise<DirCliente> =>
   await RestAPI.get<{ datos: DirClienteAPI }>(`${UrlsVentas.CLIENTE}/${clienteId}/direccion/${direccionId}`).then((respuesta) =>
