@@ -11,5 +11,7 @@ export class FactoryTpvOlula {
     static venta_imprimirValesAntesQueTique = false
     // Enviar el efectivo entregado al cobrar (el servidor lo guarda e imprime con el cambio en el tique)
     static venta_enviarEfectivoEntregado = false
+    // Mostrar el botón "P. QR" (cobro con QR por Stripe) si la pasarela está activa
+    static venta_pagoConQr = true
     static menu = menuTPV
 }

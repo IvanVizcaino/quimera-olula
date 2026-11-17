@@ -1,5 +1,5 @@
 import { FactoryAuthOlula } from '#/auth/factory.ts';
-import { FactoryTpvOlula } from '#/tpv/factory.ts';
+import { FactoryTpvNadia } from './contextos/tpv/factory.ts';
 import { SelectorEmpresaActual } from '#/empresa/empresa/componentes/SelectorEmpresaActual.tsx';
 import { OlulaWordmark } from '@olula/componentes/tema/Olula.jsx';
 import { FactoryAlmacenNad } from './contextos/almacen/factory.ts';
@@ -13,7 +13,7 @@ class FactoryComponentesNadia {
 export class FactoryNadia {
     Componentes = FactoryComponentesNadia;
     Auth = FactoryAuthOlula;
-    TPV = FactoryTpvOlula;
+    TPV = FactoryTpvNadia;
     Almacen = FactoryAlmacenNad;
     Ventas = FactoryVentasNad;
 }
