@@ -25,7 +25,7 @@ jobs:
           cache: 'pnpm'
     
       - name: Make envfile
-        run: echo "VITE_API_URL=https://almafiber-api.yeboyebo.es" > .env && echo "VITE_API_URL=https://almafiber-api.yeboyebo.es" > ./apps/crema_cafe/.env
+        run: echo "VITE_API_URL=https://almafiber-api.yeboyebo.es" > .env && echo "VITE_API_URL=https://almafiber-api.yeboyebo.es" > ./apps/almafiber/.env
 
       - name: Install Dependecies
         run: pnpm install --no-frozen-lockfile
