@@ -1,5 +1,5 @@
 import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
-import { datosClaveDocumentoCompra } from "#/compras/comun/dominio.ts";
+import { useDatosClaveDocumentoCompra } from "#/compras/comun/vistas/useDatosClaveDocumentoCompra.ts";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import { CambioProveedor } from "#/compras/comun/componentes/moleculas/CambioProveedor/CambioProveedor.tsx";
@@ -48,6 +48,7 @@ export const DetalleAlbaran = ({
     );
 
     const formModelo = useModelo(metaAlbaran, ctx.albaran, autoGuardar);
+    const datosClave = useDatosClaveDocumentoCompra();
 
     const { estado, albaran, lineas, facturaCreada } = ctx;
 
@@ -89,7 +90,7 @@ export const DetalleAlbaran = ({
             id={id}
             obtenerTitulo={titulo}
             obtenerEstado={(A: Albaran) => <EtiquetaEstado {...etiquetaEstadoAlbaran(A)} />}
-            obtenerDatosClave={datosClaveDocumentoCompra}
+            obtenerDatosClave={datosClave}
             setEntidad={() => {}}
             entidad={albaran}
             cerrarDetalle={() => emitir("albaran_deseleccionado", null, true)}

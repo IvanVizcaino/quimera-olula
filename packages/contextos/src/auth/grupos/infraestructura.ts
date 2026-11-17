@@ -23,7 +23,7 @@ export const getGrupos = async (
     return await RestAPI.get<{ datos: Grupo[]; total: number }>(baseUrl + '/grupo' + q);
 };
 
-export const postGrupo = async (accion: Partial<Grupo>): Promise<string> => {
+export const postGrupo = async (accion: { id: string; descripcion: string }): Promise<string> => {
     return await RestAPI.post(baseUrl + '/grupo', accion, "Error al guardar grupo").then((respuesta) => respuesta.id);
 };
 

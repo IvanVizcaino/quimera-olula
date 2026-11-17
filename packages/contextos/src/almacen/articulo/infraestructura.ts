@@ -128,7 +128,11 @@ export const getArticulos: GetArticulos = async (
 export const postArticulo: PostArticulo = async (Articulo) => {
     return await RestAPI.post(
         baseUrlArticulo,
-        { descripcion: Articulo.descripcion ?? "" },
+        {
+            id: (Articulo.id ?? "").trim(),
+            descripcion: Articulo.descripcion ?? "",
+            ...(Articulo.grupoIvaProductoId ? { grupo_iva_producto_id: Articulo.grupoIvaProductoId } : {}),
+        },
         "Error al guardar Articulo"
     ).then((respuesta) => respuesta.id);
 };

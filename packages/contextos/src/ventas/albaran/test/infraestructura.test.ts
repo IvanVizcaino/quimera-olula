@@ -15,6 +15,7 @@ const albaranApi: AlbaranAPI = {
     cliente_id: "cli-1",
     nombre_cliente: "Cliente 1",
     id_fiscal: "12345678Z",
+    serie_id: "A",
     direccion_id: "dir-1",
     direccion: direccionVacia(),
     agente_id: "",
@@ -61,5 +62,15 @@ describe("albaranDesdeAPI mapea hora, almacén y abono", () => {
     test("facturado llega como booleano y decide el bloqueo", () => {
         expect(albaran.facturado).toBe(false);
         expect(albaranDesdeAPI({ ...albaranApi, facturado: true }).facturado).toBe(true);
+    });
+});
+
+describe("albaranDesdeAPI trae la serie del documento", () => {
+    test("la serie llega como serie_id", () => {
+        expect(albaranDesdeAPI(albaranApi).serie_id).toBe("A");
+    });
+
+    test("sin serie en la respuesta queda vacía", () => {
+        expect(albaranDesdeAPI({ ...albaranApi, serie_id: undefined as unknown as string }).serie_id).toBe("");
     });
 });

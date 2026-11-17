@@ -72,7 +72,6 @@ export const MaestroConDetalleProveedor = () => {
                 }
                 Detalle={<DetalleProveedor id={proveedores.activo} publicar={emitir} />}
                 seleccionada={proveedores.activo}
-                modoDisposicion="maestro-50"
             />
 
             {estado === "CREANDO" && <CrearProveedor publicar={emitir} />}

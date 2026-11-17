@@ -3,7 +3,16 @@ import { formatearFechaDate } from "@olula/lib/dominio.ts";
 import { Asiento } from "../../diseño.ts";
 import "./CabeceraAsiento.css";
 
-export const CabeceraAsiento = ({ asiento }: { asiento: Asiento }) => (
+/** Cabecera del asiento. `sinDatosDocumento` quita tipo de documento,
+ * documento y concepto: en la pestaña Contabilidad de una factura sobran,
+ * porque el documento es la propia factura. */
+export const CabeceraAsiento = ({
+    asiento,
+    sinDatosDocumento = false,
+}: {
+    asiento: Asiento;
+    sinDatosDocumento?: boolean;
+}) => (
     <div className="CabeceraAsiento">
         <quimera-formulario>
             <QInput label="Ejercicio" nombre="ejercicio" valor={asiento.ejercicioId} soloLectura />
@@ -20,19 +29,23 @@ export const CabeceraAsiento = ({ asiento }: { asiento: Asiento }) => (
                 valor={asiento.manual ? "Manual" : "Automático"}
                 soloLectura
             />
-            <QInput
-                label="Tipo de documento"
-                nombre="tipoDocumento"
-                valor={asiento.tipoDocumento}
-                soloLectura
-            />
-            <QInput
-                label="Documento"
-                nombre="documento"
-                valor={asiento.documento}
-                soloLectura
-            />
-            <QInput label="Concepto" nombre="concepto" valor={asiento.concepto} soloLectura />
+            {!sinDatosDocumento && (
+                <>
+                    <QInput
+                        label="Tipo de documento"
+                        nombre="tipoDocumento"
+                        valor={asiento.tipoDocumento}
+                        soloLectura
+                    />
+                    <QInput
+                        label="Documento"
+                        nombre="documento"
+                        valor={asiento.documento}
+                        soloLectura
+                    />
+                    <QInput label="Concepto" nombre="concepto" valor={asiento.concepto} soloLectura />
+                </>
+            )}
         </quimera-formulario>
     </div>
 );

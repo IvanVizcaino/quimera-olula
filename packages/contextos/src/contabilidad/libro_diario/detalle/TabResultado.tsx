@@ -5,12 +5,67 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useCallback, useContext, useMemo, useState } from "react";
 import {
+    FilaLibroDiario,
     LibroDiario,
     LineaLibroDiario,
     ResultadoLibroDiario,
 } from "../diseño.ts";
-import { nombreFicheroLibroDiario } from "../dominio.ts";
+import {
+    CABECERAS_IVA_LIBRO_DIARIO,
+    CABECERAS_LIBRO_DIARIO,
+    celdasFilaLibroDiario,
+    nombreFicheroLibroDiario,
+} from "../dominio.ts";
 import { getReportLibroDiario } from "../infraestructura.ts";
+import "./TabResultado.css";
+
+/** Resultado agrupado por el servidor: (mes,) asiento y debajo sus partidas. */
+const TablaAgrupada = ({
+    filas,
+    datosIva,
+}: {
+    filas: FilaLibroDiario[];
+    datosIva: boolean;
+}) => {
+    const cabeceras = datosIva
+        ? [...CABECERAS_LIBRO_DIARIO, ...CABECERAS_IVA_LIBRO_DIARIO]
+        : [...CABECERAS_LIBRO_DIARIO];
+
+    return (
+        <table className="tabla-libro-diario">
+            <thead>
+                <tr>
+                    {cabeceras.map((cabecera) => (
+                        <th key={cabecera}>{cabecera}</th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {filas.map((fila, indice) => (
+                    <tr key={indice} className={`fila-${fila.tipo}`}>
+                        {celdasFilaLibroDiario(fila, datosIva).map(
+                            (celda, columna) => (
+                                <td
+                                    key={columna}
+                                    colSpan={
+                                        celda.columnas > 1
+                                            ? celda.columnas
+                                            : undefined
+                                    }
+                                    className={
+                                        celda.numerica ? "importe" : undefined
+                                    }
+                                >
+                                    {celda.texto}
+                                </td>
+                            )
+                        )}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
 
 const COLUMNAS_BASE: MetaTabla<LineaLibroDiario> = [
     { id: "fecha", cabecera: "Fecha", tipo: "fecha" },
@@ -149,7 +204,14 @@ export const TabResultado = ({
                 </div>
             )}
 
-            {resultado && !informe.resumenMensual && (
+            {resultado && !informe.resumenMensual && resultado.filas && (
+                <TablaAgrupada
+                    filas={resultado.filas}
+                    datosIva={informe.datosIva}
+                />
+            )}
+
+            {resultado && !informe.resumenMensual && !resultado.filas && (
                 <>
                     <QTabla
                         metaTabla={metaTabla}

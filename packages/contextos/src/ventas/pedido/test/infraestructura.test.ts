@@ -14,6 +14,7 @@ const pedidoApi: PedidoAPI = {
     cliente_id: "cli-1",
     nombre_cliente: "Cliente 1",
     id_fiscal: "12345678Z",
+    serie_id: "A",
     direccion_id: "dir-1",
     direccion: direccionVacia(),
     agente_id: "",
@@ -81,5 +82,15 @@ describe("payloadPatchPedido manda los campos nuevos", () => {
     test("el almacén viaja por id", () => {
         const pedido = pedidoDesdeAPI(pedidoApi);
         expect(payloadPatchPedido(pedido).cambios.almacen_id).toBe("ALM1");
+    });
+});
+
+describe("pedidoDesdeAPI trae la serie del documento", () => {
+    test("la serie llega como serie_id", () => {
+        expect(pedidoDesdeAPI(pedidoApi).serie_id).toBe("A");
+    });
+
+    test("sin serie en la respuesta queda vacía", () => {
+        expect(pedidoDesdeAPI({ ...pedidoApi, serie_id: undefined as unknown as string }).serie_id).toBe("");
     });
 });

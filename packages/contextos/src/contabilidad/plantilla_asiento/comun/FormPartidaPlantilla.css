@@ -1,0 +1,7 @@
+.FormPartidaPlantilla h4 {
+    margin: var(--espaciado, 0.75rem) 0 0.25rem;
+}
+
+.FormPartidaPlantilla quimera-formulario > * {
+    grid-column: span 4;
+}

@@ -9,6 +9,7 @@
  *       tbody                                 (UNA POR PARTIDA)
  *         tr.EditorPartidasManual-filaPartida
  *         tr.EditorPartidasManual-filaIva     (solo si la partida es de IVA)
+ *         tr.EditorPartidasManual-filaDivisa  (solo si va en otra divisa: Debe/Haber ME)
  *           .EditorPartidasManual-ivaCampos
  *     .EditorPartidasManual-pie               (botón añadir + totales)
  *
@@ -32,15 +33,23 @@
     /* ── Anchos de columna ────────────────────────────────────────────────── */
 
     .col-subcuenta {
-        width: 26%;
+        width: 22%;
     }
 
     .col-importe {
-        width: 14%;
+        width: 12%;
+    }
+
+    .col-divisa {
+        width: 9%;
+    }
+
+    .col-tasa {
+        width: 9%;
     }
 
     .col-concepto {
-        width: 30%;
+        width: 20%;
     }
 
     .col-iva {
@@ -86,7 +95,8 @@
     }
 
     /* Con bloque de IVA desplegado, la fila de la partida se pega a él. */
-    tbody:has(.EditorPartidasManual-filaIva) .EditorPartidasManual-filaPartida > td {
+    tbody:has(.EditorPartidasManual-filaIva) .EditorPartidasManual-filaPartida > td,
+    tbody:has(.EditorPartidasManual-filaDivisa) .EditorPartidasManual-filaPartida > td {
         padding-bottom: var(--espaciado-xs);
     }
 
@@ -96,6 +106,7 @@
        demás no: eso es lo que descuadraba los campos entre sí. */
 
     .EditorPartidasManual-filaPartida quimera-input .etiqueta,
+    .EditorPartidasManual-filaPartida quimera-select .etiqueta,
     .EditorPartidasManual-filaPartida quimera-autocompletar .etiqueta {
         display: none;
     }
@@ -121,7 +132,9 @@
 
     /* ── Bloque de IVA: cuelga de su partida ──────────────────────────────── */
 
-    .EditorPartidasManual-filaIva > td {
+    /* La fila de moneda extranjera se despliega igual que la de IVA. */
+    .EditorPartidasManual-filaIva > td,
+    .EditorPartidasManual-filaDivisa > td {
         padding: 0 var(--espaciado-s) var(--espaciado-m) var(--espaciado-l);
         white-space: normal;
     }
@@ -142,6 +155,16 @@
             flex: 1;
             min-width: 120px;
         }
+    }
+
+    /* Importes (CampoImporte, campo de texto para admitir coma decimal):
+       alineados a la derecha como los numéricos. */
+    :is(quimera-input[nombre^="debe-"], quimera-input[nombre^="haber-"],
+        quimera-input[nombre^="debeme-"], quimera-input[nombre^="haberme-"],
+        quimera-input[nombre^="tasa-"], quimera-input[nombre^="base-"],
+        quimera-input[nombre^="ivapct-"]) input {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
     }
 
     /* ── Pie: añadir partida y totales ────────────────────────────────────── */

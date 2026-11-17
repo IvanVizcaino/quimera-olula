@@ -96,7 +96,43 @@ export interface PeriodoResumenMensual {
     acumuladoHaber: number;
 }
 
+export type TipoFilaLibroDiario =
+    | "mes"
+    | "asiento"
+    | "partida"
+    | "total_mes"
+    | "total";
+
+/**
+ * Fila ya agrupada por el servidor (la misma que pinta el PDF): sin checks,
+ * asiento (fecha y número) y debajo sus partidas; con «Agrupar por meses»,
+ * mes, asiento y partidas, y el total del mes. `titulo` es el mes, el concepto
+ * del asiento, el de la partida o el texto del total. Los datos de I.V.A. solo
+ * vienen en las partidas que los tienen.
+ */
+export interface FilaLibroDiario {
+    tipo: TipoFilaLibroDiario;
+    nivel: number;
+    titulo: string;
+    fecha: Date | null;
+    asientoNumero: number | null;
+    documento: string;
+    codigoSubcuenta: string;
+    descripcionSubcuenta: string;
+    debe: number | null;
+    haber: number | null;
+    descuadre: number | null;
+    codigoSerie: string | null;
+    factura: number | null;
+    baseImponible: number | null;
+    iva: number | null;
+    recargo: number | null;
+}
+
 export interface ResultadoLibroDiario {
+    /** Agrupadas por el servidor; vacía con resumen mensual. Si el servidor no
+     * las manda (versión anterior), la web pinta `datos` sin agrupar. */
+    filas: FilaLibroDiario[] | null;
     datos: LineaLibroDiario[];
     total: number;
     totales: TotalesLibroDiario | null;
@@ -120,6 +156,10 @@ export interface NuevoLibroDiario extends Modelo {
     resumenMensual: boolean;
     orden1: CriterioOrden;
     tipoOrden1: SentidoOrden;
+    orden2: CriterioOrden;
+    tipoOrden2: SentidoOrden;
+    orden3: CriterioOrden;
+    tipoOrden3: SentidoOrden;
 }
 
 /** Los campos de un rango viajan juntos aunque solo cambie uno: la API recibe

@@ -16,10 +16,8 @@ import { CambiarDescuento } from "../../comun/componentes/moleculas/CambiarDescu
 import { CambiarDivisa } from "../../comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
 import "../../comun/estilos/campos.css";
 import "../../comun/estilos/detalle_documento.css";
-import {
-  datosClaveDocumentoVenta,
-  tituloDocumentoVenta,
-} from "../../venta/dominio.ts";
+import { tituloDocumentoVenta } from "../../venta/dominio.ts";
+import { useDatosClaveDocumentoVenta } from "../../venta/vistas/useDatosClaveDocumentoVenta.ts";
 import { TotalesVenta } from "../../venta/vistas/TotalesVenta.tsx";
 import { AprobarPresupuesto } from "../aprobar/AprobarPresupuesto.tsx";
 import { PedidoGenerado } from "../aprobar/PedidoGenerado.tsx";
@@ -71,6 +69,7 @@ export const DetallePresupuesto = ({
   );
 
   const presupuesto = useModelo(metaPresupuesto, ctx.presupuesto, autoGuardar);
+  const datosClave = useDatosClaveDocumentoVenta();
 
   useEffect(() => {
     emitir("presupuesto_id_cambiado", presupuestoId, true);
@@ -124,7 +123,7 @@ export const DetallePresupuesto = ({
       obtenerEstado={(presupuesto: Presupuesto) => (
         <EtiquetaEstado {...etiquetaEstadoPresupuesto(presupuesto)} />
       )}
-      obtenerDatosClave={datosClaveDocumentoVenta}
+      obtenerDatosClave={datosClave}
       setEntidad={() => {}}
       entidad={ctx.presupuesto}
       cerrarDetalle={() => emitir("presupuesto_deseleccionado", null)}

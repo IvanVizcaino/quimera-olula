@@ -1,0 +1,29 @@
+.CrearAsientoDesdePlantilla fieldset {
+    margin: 0.5rem 0;
+    border: 1px solid var(--color-borde, #ddd);
+    border-radius: 4px;
+}
+
+.CrearAsientoDesdePlantilla .resultado table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.75rem;
+}
+
+.CrearAsientoDesdePlantilla .resultado th,
+.CrearAsientoDesdePlantilla .resultado td {
+    padding: 0.25rem 0.5rem;
+    text-align: left;
+}
+
+.CrearAsientoDesdePlantilla .resultado td.importe {
+    text-align: right;
+}
+
+.CrearAsientoDesdePlantilla .resultado tr.omitida {
+    opacity: 0.5;
+}
+
+.CrearAsientoDesdePlantilla .aviso {
+    color: var(--color-advertencia, #b26a00);
+}

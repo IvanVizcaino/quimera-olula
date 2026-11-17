@@ -5,4 +5,5 @@ export default class ApiUrls {
     readonly PEDIDO = `/compras/pedido`;
     readonly ALBARAN = `/compras/albaran`;
     readonly FACTURA = `/compras/factura`;
+    readonly CONFIG = `/compras/config`;
 }

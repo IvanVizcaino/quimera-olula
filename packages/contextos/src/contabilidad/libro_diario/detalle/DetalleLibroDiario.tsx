@@ -5,6 +5,7 @@ import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { puede } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
+import { useRangosEjercicio } from "#/contabilidad/comun/use_rangos_ejercicio.ts";
 import { useCallback, useEffect } from "react";
 import { BorrarLibroDiario } from "../borrar/BorrarLibroDiario.tsx";
 import { LibroDiario } from "../diseño.ts";
@@ -40,6 +41,11 @@ export const DetalleLibroDiario = ({
     );
 
     const formModelo = useModelo(metaLibroDiario, ctx.informe, autoGuardar);
+
+    useRangosEjercicio(formModelo.modelo, formModelo.set, {
+        asientos: true,
+        subcuentas: true,
+    });
 
     const { estado, informe, resultado } = ctx;
 
@@ -79,7 +85,7 @@ export const DetalleLibroDiario = ({
                             children={
                                 <TabCriterios
                                     form={formModelo}
-                                    informe={informe}
+                                    informe={formModelo.modelo}
                                 />
                             }
                         />,

@@ -119,3 +119,41 @@ export const deshacerPagoRemesa: DeshacerPagoRemesa = async (id) => {
         "Error al deshacer el pago de la remesa de cobro"
     );
 };
+
+export type FormatoFicheroRemesa = "csb19" | "sepa";
+
+export type AvisoDomiciliacion = {
+    reciboId: string;
+    codigo: string;
+    clienteId: string;
+    nombreCliente: string;
+    aviso: string;
+};
+
+/** TES-07: recibos de la remesa sin cuenta de domiciliación válida o sin lo que pide el formato. */
+export const getDomiciliacionesRemesa = async (
+    id: string,
+    formato: FormatoFicheroRemesa,
+): Promise<AvisoDomiciliacion[]> => {
+    const respuesta = await RestAPI.get<{
+        datos: { recibo_id: string; codigo: string; cliente_id: string; nombre_cliente: string; aviso: string }[];
+    }>(`${baseUrl}/${id}/domiciliaciones?formato=${formato}`, "Error al comprobar las domiciliaciones");
+    return respuesta.datos.map((a) => ({
+        reciboId: a.recibo_id,
+        codigo: a.codigo,
+        clienteId: a.cliente_id,
+        nombreCliente: a.nombre_cliente,
+        aviso: a.aviso,
+    }));
+};
+
+/** TES-07: fichero bancario de la remesa (CSB19 como el ERP, o SEPA pain.008). */
+export const getFicheroRemesa = async (
+    id: string,
+    opciones: { formato: FormatoFicheroRemesa; agruparPorCliente: boolean; incluirLineas: boolean },
+): Promise<Blob> =>
+    RestAPI.blob(
+        `${baseUrl}/${id}/fichero?formato=${opciones.formato}` +
+        `&agrupar_por_cliente=${opciones.agruparPorCliente}&incluir_lineas=${opciones.incluirLineas}`,
+        "Error al generar el fichero de la remesa"
+    );

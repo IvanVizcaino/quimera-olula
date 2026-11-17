@@ -37,6 +37,7 @@ export const metaPresupuesto: MetaModelo<Presupuesto> = {
         tasa_conversion: { tipo: "numero", requerido: true, bloqueado: true },
         total_divisa_empresa: { tipo: "numero", bloqueado: true },
         codigo: { bloqueado: true },
+        serie_id: { bloqueado: true },
         divisa_id: { requerido: true, bloqueado: true },
         agente_id: { bloqueado: true },
         por_comision: { tipo: "decimal", requerido: false, decimales: 2, positivo: true, maximo: 100, bloqueado: true },

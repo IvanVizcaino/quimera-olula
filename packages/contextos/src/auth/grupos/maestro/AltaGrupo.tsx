@@ -13,7 +13,12 @@ export const AltaGrupo = ({
   const nuevoGrupo = useModelo(metaNuevoGrupo, grupoVacio);
 
   const guardar = async () => {
-    await emitir("alta_de_grupo_confirmada", nuevoGrupo.modelo);
+    try {
+      await emitir("alta_de_grupo_confirmada", nuevoGrupo.modelo);
+    } catch {
+      // El aviso (p. ej. «Ya existe un grupo…») lo muestra la propia llamada; el
+      // formulario sigue abierto para corregir el identificador.
+    }
   };
 
   return (

@@ -45,9 +45,17 @@ export const descripcionEstadoExpedicion: Record<EstadoExpedicion, string> = {
     PRE_VERIFACTU: "Pre Verifactu",
 };
 
-/** Con el plugin de expedición activo la firma es la que cierra la factura, no la emisión. */
+/**
+ * Variante del plugin `estado_expedicion_factura` del servidor en la que la
+ * firma (Veri*Factu) es la que cierra la factura. Las otras son "basico",
+ * "inactivo" y "emision" (firma con la factura emitida protegida: como en
+ * "basico", solo se edita el borrador); "activo" no existe.
+ */
+export const VARIANTE_EXPEDICION_CON_FIRMA = "firma";
+
+/** Con la variante de firma es la firma la que cierra la factura, no la emisión. */
 export const conPluginExpedicion = (): boolean =>
-    plugin("estado_expedicion_factura") === "activo";
+    plugin("estado_expedicion_factura") === VARIANTE_EXPEDICION_CON_FIRMA;
 
 /**
  * Sin plugin solo se edita el borrador. Con plugin una factura emitida (o con
