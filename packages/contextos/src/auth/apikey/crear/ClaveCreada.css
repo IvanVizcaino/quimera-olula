@@ -1,0 +1,40 @@
+.ClaveCreada {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 640px;
+}
+
+.ClaveCreada .valor {
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--color-fondo-secundario, #f4f4f4);
+    font-family: monospace;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    user-select: all;
+}
+
+.ClaveCreada .usar-con-agente {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px solid var(--color-borde, #ddd);
+    padding-top: 12px;
+}
+
+.ClaveCreada .usar-con-agente summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.ClaveCreada .usar-con-agente[open] > * + * {
+    margin-top: 8px;
+}
+
+.ClaveCreada .nota {
+    color: var(--color-texto-secundario, #666);
+    font-size: 0.85rem;
+}

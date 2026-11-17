@@ -1,0 +1,12 @@
+.MaestroApiKeys {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 1rem;
+    max-width: 960px;
+}
+
+.MaestroApiKeys .explicacion,
+.MaestroApiKeys .vacio {
+    color: var(--color-texto-secundario, #666);
+}
