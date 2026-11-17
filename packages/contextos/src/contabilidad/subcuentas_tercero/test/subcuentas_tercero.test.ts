@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "vitest";
 import { SubcuentaTercero } from "../diseño.ts";
-import { mostrarPestanaContabilidad, subcuentaInicial } from "../dominio.ts";
+import { mostrarPestanaContabilidad, opcionesSubcuentas, subcuentaInicial } from "../dominio.ts";
 import {
     partidaSubcuentaDesdeApi,
     subcuentaTerceroDesdeApi,
@@ -104,5 +104,16 @@ describe("subcuentas de tercero: dominio", () => {
     test("la pestaña no se ve si el whoami no trae la config de contabilidad", () => {
         localStorage.setItem("whoami", JSON.stringify({ config: {} }));
         expect(mostrarPestanaContabilidad()).toBe(false);
+    });
+});
+
+describe("combo de subcuentas por ejercicio", () => {
+    test("una opción por subcuenta, del ejercicio más reciente al más antiguo, con subcuenta y saldo", () => {
+        const opciones = opcionesSubcuentas([
+            { ...subcuenta("1", "2026"), codigoSubcuenta: "4300000001", saldo: 1234.5 },
+            { ...subcuenta("2", "2027"), codigoSubcuenta: "4300000001", saldo: 0 },
+        ]);
+        expect(opciones.map((o) => o.valor)).toEqual(["2", "1"]);
+        expect(opciones[1].descripcion).toMatch(/^2026 · 4300000001 · 1\.?234,50/);
     });
 });

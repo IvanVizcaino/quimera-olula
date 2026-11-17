@@ -1,21 +1,20 @@
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { QTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { useCallback, useEffect, useState } from "react";
 import { PartidaSubcuenta, SubcuentaTercero, TipoTercero } from "../diseño.ts";
-import { subcuentaInicial } from "../dominio.ts";
+import { opcionesSubcuentas, subcuentaInicial } from "../dominio.ts";
 import {
     getPartidasSubcuenta,
     getSubcuentasTercero,
 } from "../infraestructura.ts";
-import {
-    metaTablaPartidasSubcuenta,
-    metaTablaSubcuentasTercero,
-} from "./meta.ts";
+import { metaTablaPartidasSubcuenta } from "./meta.ts";
 import "./TabContabilidad.css";
 
 /** Pestaña «Contabilidad» de las fichas de cliente y proveedor (Eneboo
- * clientes.ui / proveedores.ui): subcuenta elegida arriba, subcuentas por
- * ejercicio a la izquierda y sus partidas a la derecha. */
+ * clientes.ui / proveedores.ui): subcuenta elegida arriba y, encima de sus
+ * partidas, un combo con las subcuentas por ejercicio (ejercicio, subcuenta y
+ * saldo) que filtra la tabla. */
 export const TabContabilidad = ({
     tipo,
     terceroId,
@@ -81,32 +80,24 @@ export const TabContabilidad = ({
                     deshabilitado
                 />
             </quimera-formulario>
-            <div className="TabContabilidad-tablas">
-                <div className="TabContabilidad-subcuentas">
-                    <h4>Subcuentas por ejercicio</h4>
-                    <QTabla
-                        metaTabla={metaTablaSubcuentasTercero}
-                        datos={subcuentas}
-                        cargando={cargandoSubcuentas}
-                        seleccionadaId={activa?.id}
-                        onSeleccion={setActiva}
-                        orden={["ejercicioId", "ASC"]}
-                        totalEntidades={subcuentas.length}
-                    />
-                </div>
-                <div className="TabContabilidad-partidas">
-                    <h4>
-                        Partidas
-                        {activa ? ` de ${activa.codigoSubcuenta} (${activa.ejercicioId})` : ""}
-                    </h4>
-                    <QTabla
-                        metaTabla={metaTablaPartidasSubcuenta}
-                        datos={partidas}
-                        cargando={cargandoPartidas}
-                        orden={["fecha", "ASC"]}
-                        totalEntidades={partidas.length}
-                    />
-                </div>
+            <div className="TabContabilidad-partidas">
+                <QSelect
+                    label="Subcuenta por ejercicio"
+                    nombre="subcuenta_ejercicio"
+                    valor={activa?.id ?? ""}
+                    opciones={opcionesSubcuentas(subcuentas)}
+                    deshabilitado={cargandoSubcuentas || subcuentas.length === 0}
+                    onChange={(opcion) =>
+                        setActiva(subcuentas.find((s) => s.id === opcion?.valor) ?? null)
+                    }
+                />
+                <QTabla
+                    metaTabla={metaTablaPartidasSubcuenta}
+                    datos={partidas}
+                    cargando={cargandoPartidas}
+                    orden={["fecha", "ASC"]}
+                    totalEntidades={partidas.length}
+                />
             </div>
         </div>
     );
