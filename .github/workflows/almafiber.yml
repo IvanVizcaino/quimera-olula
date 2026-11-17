@@ -28,7 +28,7 @@ jobs:
         run: echo "VITE_API_URL=https://almafiber-api.yeboyebo.es" > .env && echo "VITE_API_URL=https://almafiber-api.yeboyebo.es" > ./apps/crema_cafe/.env
 
       - name: Install Dependecies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build
         run: pnpm run --filter @olula/almafiber build
