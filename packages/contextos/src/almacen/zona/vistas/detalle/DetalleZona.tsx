@@ -1,6 +1,8 @@
 import { FuncionZona } from "#/almacen/comun/componentes/FuncionZona.tsx";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { ClasesAdmitidasZona } from "#/almacen/comun/componentes/ClasesAdmitidasZona.tsx";
+import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
@@ -67,6 +69,12 @@ export const DetalleZona = ({
                                 <Almacen {...modelo.uiProps("almacenId")} />
                                 <FuncionZona {...modelo.uiProps("funcion")} />
                                 <QInput label="Descripción" {...modelo.uiProps("descripcion")} />
+                            </quimera-formulario>
+                        </Tab>,
+                        <Tab key="clases" label="Clases">
+                            <quimera-formulario>
+                                <QCheckbox label="Admite artículos sin clase" {...modelo.uiProps("admiteSinClase")} />
+                                <ClasesAdmitidasZona {...modelo.uiProps("clasesAdmitidas")} />
                             </quimera-formulario>
                         </Tab>,
                         <Tab key="pasillos" label="Pasillos">

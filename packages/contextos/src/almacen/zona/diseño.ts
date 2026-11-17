@@ -15,6 +15,9 @@ export interface Zona extends Entidad {
     almacenId: string;
     descripcion: string | null;
     funcion: FuncionZona;
+    /** Ids de las clases de almacenamiento que admite la zona. */
+    clasesAdmitidas: string[];
+    admiteSinClase: boolean;
 }
 
 export interface NuevaZona extends Modelo {

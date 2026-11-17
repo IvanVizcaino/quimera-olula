@@ -13,6 +13,8 @@ interface ZonaApi {
     almacen_id: string;
     descripcion: string | null;
     funcion: FuncionZona;
+    clases_admitidas: string[];
+    admite_sin_clase: boolean;
 }
 
 interface NuevaZonaApi {
@@ -22,7 +24,9 @@ interface NuevaZonaApi {
     funcion: FuncionZona;
 }
 
-type CambiosZonaApi = Partial<ZonaApi>;
+type CambiosZonaApi = Partial<Omit<ZonaApi, "id">>;
+
+const aBooleano = (v: unknown): boolean => v === true || v === "true" || v === "1";
 
 export const zonaDesdeApi = (api: ZonaApi): Zona => ({
     id: api.id,
@@ -30,6 +34,8 @@ export const zonaDesdeApi = (api: ZonaApi): Zona => ({
     almacenId: api.almacen_id,
     descripcion: api.descripcion,
     funcion: api.funcion,
+    clasesAdmitidas: api.clases_admitidas ?? [],
+    admiteSinClase: api.admite_sin_clase ?? true,
 });
 
 const nuevaZonaAApi = (z: NuevaZona): NuevaZonaApi => ({
@@ -45,6 +51,8 @@ const cambiosZonaAApi = (z: Partial<Zona>): CambiosZonaApi => {
     if (z.almacenId !== undefined) cambios.almacen_id = z.almacenId;
     if (z.descripcion !== undefined) cambios.descripcion = z.descripcion;
     if (z.funcion !== undefined) cambios.funcion = z.funcion;
+    if (z.clasesAdmitidas !== undefined) cambios.clases_admitidas = z.clasesAdmitidas;
+    if (z.admiteSinClase !== undefined) cambios.admite_sin_clase = aBooleano(z.admiteSinClase);
     return cambios;
 };
 

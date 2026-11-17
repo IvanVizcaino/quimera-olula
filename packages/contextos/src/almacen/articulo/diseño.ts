@@ -17,6 +17,14 @@ export interface ArticuloItem extends Entidad {
     noStock: boolean;
     seCompra: boolean;
     seVende: boolean;
+    /** Id de la clase de almacenamiento ("" si no tiene). */
+    claseAlmacenamientoId: string;
+    /** Código de la clase de almacenamiento ("" si no tiene). */
+    claseAlmacenamiento: string;
+    /** Dimensiones de la unidad de stock, en metros. */
+    largo: number | null;
+    ancho: number | null;
+    alto: number | null;
 };
 
 export interface CajaProveedorArticulo extends Entidad {
@@ -62,6 +70,10 @@ export type CambiosArticulo = Partial<
         | "noStock"
         | "seCompra"
         | "seVende"
+        | "claseAlmacenamientoId"
+        | "largo"
+        | "ancho"
+        | "alto"
     >
 >;
 

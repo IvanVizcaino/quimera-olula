@@ -23,6 +23,8 @@ export const metaZona: MetaModelo<Zona> = {
         almacenId: { requerido: true, validacion: (m: Zona) => stringNoVacio(m.almacenId) },
         descripcion: { requerido: false },
         funcion: { requerido: true, validacion: (m: Zona) => stringNoVacio(m.funcion) },
+        clasesAdmitidas: { requerido: false },
+        admiteSinClase: { tipo: "checkbox" },
     },
 };
 
@@ -32,6 +34,8 @@ export const zonaVaciaDetalle = (): Zona => ({
     almacenId: "",
     descripcion: null,
     funcion: FUNCION_ZONA_POR_DEFECTO,
+    clasesAdmitidas: [],
+    admiteSinClase: true,
 });
 
 export const contextoDetalleZonaInicial: ContextoDetalleZona = {
