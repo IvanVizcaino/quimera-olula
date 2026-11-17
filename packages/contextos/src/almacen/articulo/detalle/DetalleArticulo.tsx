@@ -101,7 +101,7 @@ export const DetalleArticulo = ({
               <Tab
                 key="tab-almacenaje"
                 label="Almacenaje"
-                children={<TabAlmacenaje form={form} />}
+                children={<TabAlmacenaje form={form} articuloId={articulo.id} />}
               />
             ),
             puede("ventas.articulo") && articulo.seVende && (
