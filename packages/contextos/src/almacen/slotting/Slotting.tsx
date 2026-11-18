@@ -1,5 +1,6 @@
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { Articulo } from "#/almacen/comun/componentes/Articulo.tsx";
+import { Ubicacion } from "#/almacen/comun/componentes/Ubicacion.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { MetaTabla, QTabla } from "@olula/componentes/atomos/qtabla.tsx";
@@ -8,11 +9,11 @@ import { QSelect } from "@olula/componentes/index.js";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { Entidad } from "@olula/lib/diseño.ts";
-import { ArticuloAbc, ClaseAbc, FilaPickingFijo, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
+import { AjusteMigracion, ArticuloAbc, ClaseAbc, FilaPickingFijo, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
 import {
     clasesPicking, DIAS_POR_DEFECTO, enteroPositivo, errorValidacionFila, explicacionAbc,
-    filaPickingMarcable, filasPickingACrear, origenesRotacion, textoDestinoRecolocacion,
-    todasPickingMarcadas,
+    filaPickingMarcable, filasPickingACrear, origenesRotacion, puedeUbicarMigracion,
+    resumenMigracion, textoDestinoRecolocacion, todasPickingMarcadas,
 } from "./dominio.ts";
 import "./Slotting.css";
 import { contextoSlottingInicial, getMaquina } from "./maquina.ts";
@@ -162,6 +163,47 @@ export const Slotting = () => {
                                 ? <p>No hay recolocaciones que proponer.</p>
                                 : <TablaRecolocacion recolocaciones={ctx.recolocaciones} />)}
                     </Tab>,
+                    <Tab key="migracion" label="Migración">
+                        <div className="slotting-explicacion">
+                            <strong>Ubicar el stock sin ubicar</strong>
+                            <ul>
+                                <li>Mueve a la ubicación elegida (p. ej. MIGRACION, en una zona de reserva) el stock del almacén que no está en ninguna ubicación, para que reposición y slotting lo vean.</li>
+                                <li>Por cada artículo crea un par de movimientos que suman cero: no cambia el stock ni toca los movimientos anteriores.</li>
+                                <li>Artículos por lotes: por lote, con el saldo de cada lote. Resto: el stock del almacén.</li>
+                                <li>Se puede repetir: ubica lo nuevo y retira de esa ubicación lo vendido sin SGA.</li>
+                            </ul>
+                        </div>
+                        <quimera-formulario>
+                            <Ubicacion
+                                label="Ubicación destino" nombre="ubicacionMigracion"
+                                valor={ctx.ubicacionMigracionId} descripcion={ctx.ubicacionMigracion}
+                                onChange={(opcion) => emitir("ubicacion_migracion_cambiada", opcion)}
+                            />
+                        </quimera-formulario>
+                        <div className="botones maestro-botones">
+                            <QBoton
+                                variante="texto"
+                                deshabilitado={!almacenId || !ctx.ubicacionMigracionId}
+                                onClick={() => emitir("migracion_simulada")}
+                            >
+                                Simular
+                            </QBoton>
+                            <QBoton
+                                deshabilitado={!puedeUbicarMigracion(ctx.resultadoMigracion)}
+                                onClick={() => emitir("migracion_solicitada")}
+                            >
+                                Ubicar
+                            </QBoton>
+                        </div>
+                        {ctx.resultadoMigracion && (
+                            <>
+                                <p className="resumen-picking">{resumenMigracion(ctx.resultadoMigracion)}</p>
+                                {ctx.resultadoMigracion.ajustes.length > 0 && (
+                                    <TablaMigracion ajustes={ctx.resultadoMigracion.ajustes} />
+                                )}
+                            </>
+                        )}
+                    </Tab>,
                 ]}
             />
         </div>
@@ -298,3 +340,19 @@ const TablaPickingFijo = ({ filas, onCambio }: {
         />
     );
 };
+
+const metaTablaMigracion: MetaTabla<Fila<AjusteMigracion>> = [
+    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    { id: "loteId", cabecera: "Lote", render: (a) => a.loteId ?? "" },
+    { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
+    { id: "accion", cabecera: "", render: (a) => (a.cantidad > 0 ? "Ubicar" : "Retirar") },
+];
+
+const TablaMigracion = ({ ajustes }: { ajustes: AjusteMigracion[] }) => (
+    <QTabla<Fila<AjusteMigracion>>
+        metaTabla={metaTablaMigracion}
+        datos={conId(ajustes, (a) => `${a.stockId}-${a.loteId ?? ""}`)}
+        cargando={false}
+        orden={[]}
+    />
+);

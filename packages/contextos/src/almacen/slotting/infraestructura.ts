@@ -1,6 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import {
-    ArticuloAbc, ClaseAbc, GetAbc, GetPropuestaPicking, PropuestaPickingFijo, GetPropuesta, GetRecolocacion, PropuestaUbicacion, Recolocacion, UbicacionPropuesta,
+    ArticuloAbc, ClaseAbc, GetAbc, GetPropuestaPicking, PropuestaPickingFijo, GetPropuesta, GetRecolocacion, PropuestaUbicacion, Recolocacion, UbicacionPropuesta, ResultadoMigracion, UbicarSinUbicar,
 } from "./diseño.ts";
 import { construirQuery } from "./dominio.ts";
 
@@ -132,4 +132,35 @@ export const getPropuestaPicking: GetPropuestaPicking = async (almacenId, dias, 
         `${baseUrl}/propuesta_picking${q}`, "Error al proponer picking fijo"
     );
     return r.datos.map(propuestaPickingDesdeApi);
+};
+
+type ResultadoMigracionApi = {
+    simulado: boolean;
+    lineas_ubicadas: number;
+    unidades_ubicadas: number;
+    lineas_retiradas: number;
+    unidades_retiradas: number;
+    ajustes: { stock_id: string; articulo_id: string; lote_id: string | null; cantidad: number }[];
+};
+
+export const resultadoMigracionDesdeApi = (r: ResultadoMigracionApi): ResultadoMigracion => ({
+    simulado: r.simulado,
+    lineasUbicadas: r.lineas_ubicadas,
+    unidadesUbicadas: r.unidades_ubicadas,
+    lineasRetiradas: r.lineas_retiradas,
+    unidadesRetiradas: r.unidades_retiradas,
+    ajustes: r.ajustes.map((a) => ({
+        stockId: a.stock_id, articuloId: a.articulo_id, loteId: a.lote_id ?? null, cantidad: a.cantidad,
+    })),
+});
+
+export const ubicarSinUbicar: UbicarSinUbicar = async (almacenId, ubicacionId, simular) => {
+    const r = await RestAPI.query<
+        { almacen_id: string; ubicacion_id: string; simular: boolean }, ResultadoMigracionApi
+    >(
+        "/almacen/stock_ubicacion/ubicar_sin_ubicar",
+        { almacen_id: almacenId, ubicacion_id: ubicacionId, simular },
+        simular ? "Error al simular la migración" : "Error al ubicar el stock sin ubicar"
+    );
+    return resultadoMigracionDesdeApi(r);
 };

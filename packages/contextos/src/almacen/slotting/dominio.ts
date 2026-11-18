@@ -1,6 +1,6 @@
 import { validarReposicionPickingFijo } from "#/almacen/picking_fijo/dominio.ts";
 import {
-    ClasesPicking, FilaPickingFijo, OrigenRotacion, PropuestaPickingFijo, PropuestaUbicacion, Recolocacion,
+    ClasesPicking, FilaPickingFijo, OrigenRotacion, PropuestaPickingFijo, PropuestaUbicacion, Recolocacion, ResultadoMigracion,
 } from "./diseño.ts";
 
 export const DIAS_POR_DEFECTO = 90;
@@ -125,3 +125,15 @@ export const explicacionAbc = (origen: OrigenRotacion, dias: number): string[] =
     "Ordenados de más a menos líneas: A son los que suman el primer 80 % de las líneas, B los siguientes hasta el 95 % y C el resto, incluidos los que tienen stock y no han salido.",
     "No entran los artículos sin stock (servicios, portes, gastos). La clasificación no se guarda: se calcula cada vez.",
 ];
+
+/** Resumen del resultado de la migración. */
+export const resumenMigracion = (r: ResultadoMigracion): string => {
+    if (r.ajustes.length === 0) return "No hay nada que ubicar: todo el stock del almacén ya está en ubicaciones.";
+    const partes = [`${r.lineasUbicadas} líneas a ubicar (${r.unidadesUbicadas} unidades)`];
+    if (r.lineasRetiradas) partes.push(`${r.lineasRetiradas} a retirar (${r.unidadesRetiradas} unidades)`);
+    return `${r.simulado ? "Simulación" : "Hecho"}: ${partes.join(", ")}.`;
+};
+
+/** Se puede ubicar tras una simulación con algo que hacer. */
+export const puedeUbicarMigracion = (r: ResultadoMigracion | null): boolean =>
+    !!r && r.simulado && r.ajustes.length > 0;

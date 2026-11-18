@@ -1,13 +1,13 @@
 import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { postPickingFijo } from "#/almacen/picking_fijo/infraestructura.ts";
-import { ArticuloAbc, FilaPickingFijo, ClasesPicking, OrigenRotacion, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
+import { ArticuloAbc, FilaPickingFijo, ClasesPicking, OrigenRotacion, PropuestaUbicacion, Recolocacion, ResultadoMigracion } from "./diseño.ts";
 import {
     CLASES_PICKING_POR_DEFECTO, clasesPickingValidas, COBERTURA_POR_DEFECTO, DIAS_POR_DEFECTO,
     enteroPositivo, filaPickingDesdePropuesta, filasPickingACrear, LIMITE_PROPUESTA_POR_DEFECTO,
     LIMITE_RECOLOCACION_POR_DEFECTO, marcarTodasPicking, mensajeErrorApi, ORIGEN_POR_DEFECTO,
     origenRotacion, propuestaVacia, resumenCreacionPicking,
 } from "./dominio.ts";
-import { getAbc, getPropuesta, getPropuestaPicking, getRecolocacion } from "./infraestructura.ts";
+import { getAbc, getPropuesta, getPropuestaPicking, getRecolocacion, ubicarSinUbicar } from "./infraestructura.ts";
 
 export type EstadoSlotting = "INICIAL";
 
@@ -28,6 +28,9 @@ export type ContextoSlotting = {
     coberturaPicking: string;
     filasPicking: FilaPickingFijo[] | null;
     resumenPicking: string | null;
+    ubicacionMigracionId: string;
+    ubicacionMigracion: string;
+    resultadoMigracion: ResultadoMigracion | null;
 };
 
 export const contextoSlottingInicial: ContextoSlotting = {
@@ -47,6 +50,9 @@ export const contextoSlottingInicial: ContextoSlotting = {
     coberturaPicking: String(COBERTURA_POR_DEFECTO),
     filasPicking: null,
     resumenPicking: null,
+    ubicacionMigracionId: "",
+    ubicacionMigracion: "",
+    resultadoMigracion: null,
 };
 
 type ProcesarSlotting = ProcesarContexto<EstadoSlotting, ContextoSlotting>;
@@ -59,6 +65,7 @@ const cambiarAlmacen: ProcesarSlotting = async (ctx, payload) => ({
     recolocaciones: null,
     filasPicking: null,
     resumenPicking: null,
+    resultadoMigracion: null,
 });
 
 const cambiarOrigen: ProcesarSlotting = async (ctx, payload) => ({
@@ -152,9 +159,27 @@ const calcularRecolocacion: ProcesarSlotting = async (ctx) => {
     return { ...ctx, recolocaciones };
 };
 
+const cambiarUbicacionMigracion: ProcesarSlotting = async (ctx, payload) => {
+    const opcion = payload as { valor: string; descripcion: string } | null;
+    return {
+        ...ctx,
+        ubicacionMigracionId: opcion?.valor ?? "",
+        ubicacionMigracion: opcion?.descripcion ?? "",
+        resultadoMigracion: null,
+    };
+};
+
+const migrar = (simular: boolean): ProcesarSlotting => async (ctx) => ({
+    ...ctx,
+    resultadoMigracion: await ubicarSinUbicar(ctx.almacenId, ctx.ubicacionMigracionId, simular),
+});
+
 export const getMaquina: () => Maquina<EstadoSlotting, ContextoSlotting> = () => ({
     INICIAL: {
         almacen_cambiado: cambiarAlmacen,
+        ubicacion_migracion_cambiada: cambiarUbicacionMigracion,
+        migracion_simulada: migrar(true),
+        migracion_solicitada: migrar(false),
         origen_cambiado: cambiarOrigen,
         dias_abc_cambiados: cambiarCampo("diasAbc"),
         abc_solicitado: calcularAbc,

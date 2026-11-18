@@ -16,8 +16,10 @@ import {
     todasPickingMarcadas,
     filaPickingMarcable,
     explicacionAbc,
+    puedeUbicarMigracion,
+    resumenMigracion,
 } from "../dominio.ts";
-import { propuestaPickingDesdeApi, articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
+import { resultadoMigracionDesdeApi, propuestaPickingDesdeApi, articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
 
 describe("slotting dominio", () => {
     it("construye la query omitiendo vacíos y codificando", () => {
@@ -164,5 +166,36 @@ describe("explicación del ABC", () => {
         expect(explicacionAbc("VENTAS", 365)[0]).toContain("albarán de venta");
         expect(explicacionAbc("VENTAS", 365)[0]).toContain("365 días");
         expect(explicacionAbc("ORDENES", 90)[0]).toContain("órdenes de salida");
+    });
+});
+
+describe("migración", () => {
+    const api = {
+        simulado: true, lineas_ubicadas: 2, unidades_ubicadas: 110, lineas_retiradas: 1, unidades_retiradas: 3,
+        ajustes: [
+            { stock_id: "1", articulo_id: "A", lote_id: null, cantidad: 100 },
+            { stock_id: "2", articulo_id: "B", lote_id: "L1", cantidad: 10 },
+            { stock_id: "3", articulo_id: "C", lote_id: null, cantidad: -3 },
+        ],
+    };
+
+    it("mapea el resultado de la API", () => {
+        const r = resultadoMigracionDesdeApi(api);
+        expect(r.ajustes[1]).toEqual({ stockId: "2", articuloId: "B", loteId: "L1", cantidad: 10 });
+        expect(r.lineasUbicadas).toBe(2);
+    });
+
+    it("resume lo que se va a hacer", () => {
+        expect(resumenMigracion(resultadoMigracionDesdeApi(api)))
+            .toBe("Simulación: 2 líneas a ubicar (110 unidades), 1 a retirar (3 unidades).");
+        expect(resumenMigracion({ ...resultadoMigracionDesdeApi(api), ajustes: [] })).toContain("No hay nada que ubicar");
+    });
+
+    it("solo deja ubicar tras una simulación con ajustes", () => {
+        const simulado = resultadoMigracionDesdeApi(api);
+        expect(puedeUbicarMigracion(simulado)).toBe(true);
+        expect(puedeUbicarMigracion({ ...simulado, simulado: false })).toBe(false);
+        expect(puedeUbicarMigracion({ ...simulado, ajustes: [] })).toBe(false);
+        expect(puedeUbicarMigracion(null)).toBe(false);
     });
 });

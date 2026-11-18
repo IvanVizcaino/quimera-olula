@@ -77,3 +77,24 @@ export interface FilaPickingFijo extends PropuestaPickingFijo {
 export type GetPropuestaPicking = (
     almacenId: string, dias: number, origen: OrigenRotacion, clases: ClasesPicking, cobertura: number
 ) => Promise<PropuestaPickingFijo[]>;
+
+/** Ajuste de la migración: positivo se ubica en la ubicación destino; negativo se retira de ella. */
+export interface AjusteMigracion {
+    stockId: string;
+    articuloId: string;
+    loteId: string | null;
+    cantidad: number;
+}
+
+export interface ResultadoMigracion {
+    simulado: boolean;
+    lineasUbicadas: number;
+    unidadesUbicadas: number;
+    lineasRetiradas: number;
+    unidadesRetiradas: number;
+    ajustes: AjusteMigracion[];
+}
+
+export type UbicarSinUbicar = (
+    almacenId: string, ubicacionId: string, simular: boolean
+) => Promise<ResultadoMigracion>;
