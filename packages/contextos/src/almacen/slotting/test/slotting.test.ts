@@ -5,8 +5,15 @@ import {
     textoDestinoRecolocacion,
     origenRotacion,
     ORIGEN_POR_DEFECTO,
+    clasesPickingValidas,
+    errorValidacionFila,
+    filaPickingDesdePropuesta,
+    filasPickingACrear,
+    mensajeErrorApi,
+    puedeCrearFilaPicking,
+    resumenCreacionPicking,
 } from "../dominio.ts";
-import { articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
+import { propuestaPickingDesdeApi, articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
 
 describe("slotting dominio", () => {
     it("construye la query omitiendo vacíos y codificando", () => {
@@ -68,5 +75,57 @@ describe("origen de la rotación", () => {
     it("viaja en la query string", () => {
         expect(construirQuery({ almacen_id: "ALG", dias: 365, origen: "VENTAS" }))
             .toBe("?almacen_id=ALG&dias=365&origen=VENTAS");
+    });
+});
+
+describe("slotting picking fijo", () => {
+    const api = {
+        articulo_id: "REF1", descripcion: "Disolvente", clase: "A" as const, lineas: 120, unidades: 860,
+        ubicacion_id: "17", ubicacion: "PIC-A-01-1-1", zona: "PIC", accesibilidad: 1,
+        minimo: 24, maximo: 48, unidad_reposicion: 1,
+    };
+    const sinHueco = { ...api, articulo_id: "REF2", ubicacion_id: null, ubicacion: null, zona: null, accesibilidad: null };
+
+    it("mapea la propuesta de la API", () => {
+        expect(propuestaPickingDesdeApi(api)).toMatchObject({
+            articuloId: "REF1", ubicacionId: "17", unidadReposicion: 1, accesibilidad: 1,
+        });
+        expect(propuestaPickingDesdeApi(sinHueco)).toMatchObject({ ubicacionId: null, ubicacion: null, zona: null });
+    });
+
+    it("selecciona por defecto solo las filas con ubicación", () => {
+        expect(filaPickingDesdePropuesta(propuestaPickingDesdeApi(api)).seleccionada).toBe(true);
+        const f = filaPickingDesdePropuesta(propuestaPickingDesdeApi(sinHueco));
+        expect(f.seleccionada).toBe(false);
+        expect(puedeCrearFilaPicking(f)).toBe(false);
+    });
+
+    it("valida las cantidades de la fila", () => {
+        const f = filaPickingDesdePropuesta(propuestaPickingDesdeApi(api));
+        expect(errorValidacionFila(f)).toBeNull();
+        expect(errorValidacionFila({ ...f, maximo: 10, minimo: 10 })).toMatch(/máximo/);
+        expect(errorValidacionFila({ ...f, minimo: NaN })).toMatch(/mínimo/);
+        expect(puedeCrearFilaPicking({ ...f, unidadReposicion: 0 })).toBe(false);
+    });
+
+    it("solo crea filas marcadas, válidas y no creadas", () => {
+        const f = filaPickingDesdePropuesta(propuestaPickingDesdeApi(api));
+        const desmarcada = { ...f, articuloId: "X", seleccionada: false };
+        const creada = { ...f, articuloId: "Y", estado: "CREADO" as const };
+        const invalida = { ...f, articuloId: "Z", maximo: 0 };
+        expect(filasPickingACrear([f, desmarcada, creada, invalida]).map((r) => r.articuloId)).toEqual(["REF1"]);
+        expect(resumenCreacionPicking([f, creada], 2)).toBe("Creados 1 de 2");
+    });
+
+    it("extrae el mensaje de error de la API", () => {
+        expect(mensajeErrorApi({ nombre: "Error", descripcion: '{"detail":"Ya existe"}' })).toBe("Ya existe");
+        expect(mensajeErrorApi({ nombre: "Error al crear", descripcion: "texto plano" })).toBe("texto plano");
+        expect(mensajeErrorApi({ nombre: "Error 500" })).toBe("Error 500");
+        expect(mensajeErrorApi(null)).toBe("Error al crear picking fijo");
+    });
+
+    it("clases válidas con valor por defecto", () => {
+        expect(clasesPickingValidas("A")).toBe("A");
+        expect(clasesPickingValidas("x")).toBe("AB");
     });
 });

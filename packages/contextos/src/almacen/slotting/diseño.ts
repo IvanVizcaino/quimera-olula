@@ -46,3 +46,34 @@ export type GetPropuesta = (
 export type GetRecolocacion = (
     almacenId: string, dias: number, limite: number, origen: OrigenRotacion
 ) => Promise<Recolocacion[]>;
+
+/** Clases de artículo a las que asignar picking fijo: solo A o A y B. */
+export type ClasesPicking = "A" | "AB";
+
+export interface PropuestaPickingFijo {
+    articuloId: string;
+    descripcion: string;
+    clase: ClaseAbc;
+    lineas: number;
+    unidades: number;
+    ubicacionId: string | null;
+    ubicacion: string | null;
+    zona: string | null;
+    accesibilidad: number | null;
+    minimo: number;
+    maximo: number;
+    unidadReposicion: number;
+}
+
+export type EstadoFilaPicking = "PENDIENTE" | "CREADO" | "ERROR";
+
+/** Fila editable de la propuesta de picking fijo. */
+export interface FilaPickingFijo extends PropuestaPickingFijo {
+    seleccionada: boolean;
+    estado: EstadoFilaPicking;
+    errorCreacion: string | null;
+}
+
+export type GetPropuestaPicking = (
+    almacenId: string, dias: number, origen: OrigenRotacion, clases: ClasesPicking, cobertura: number
+) => Promise<PropuestaPickingFijo[]>;

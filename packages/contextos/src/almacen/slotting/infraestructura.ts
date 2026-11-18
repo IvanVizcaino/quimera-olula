@@ -1,6 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import {
-    ArticuloAbc, ClaseAbc, GetAbc, GetPropuesta, GetRecolocacion, PropuestaUbicacion, Recolocacion, UbicacionPropuesta,
+    ArticuloAbc, ClaseAbc, GetAbc, GetPropuestaPicking, PropuestaPickingFijo, GetPropuesta, GetRecolocacion, PropuestaUbicacion, Recolocacion, UbicacionPropuesta,
 } from "./diseño.ts";
 import { construirQuery } from "./dominio.ts";
 
@@ -74,6 +74,36 @@ export const recolocacionDesdeApi = (r: RecolocacionApi): Recolocacion => ({
     beneficio: r.beneficio,
 });
 
+interface PropuestaPickingFijoApi {
+    articulo_id: string;
+    descripcion: string;
+    clase: ClaseAbc;
+    lineas: number;
+    unidades: number;
+    ubicacion_id?: string | null;
+    ubicacion?: string | null;
+    zona?: string | null;
+    accesibilidad?: number | null;
+    minimo: number;
+    maximo: number;
+    unidad_reposicion: number;
+}
+
+export const propuestaPickingDesdeApi = (p: PropuestaPickingFijoApi): PropuestaPickingFijo => ({
+    articuloId: p.articulo_id,
+    descripcion: p.descripcion,
+    clase: p.clase,
+    lineas: p.lineas,
+    unidades: p.unidades,
+    ubicacionId: p.ubicacion_id ?? null,
+    ubicacion: p.ubicacion ?? null,
+    zona: p.zona ?? null,
+    accesibilidad: p.accesibilidad ?? null,
+    minimo: p.minimo,
+    maximo: p.maximo,
+    unidadReposicion: p.unidad_reposicion,
+});
+
 export const getAbc: GetAbc = async (almacenId, dias, origen) => {
     const q = construirQuery({ almacen_id: almacenId, dias, origen });
     const r = await RestAPI.get<{ datos: ArticuloAbcApi[] }>(`${baseUrl}/abc${q}`, "Error al calcular el ABC");
@@ -94,4 +124,12 @@ export const getRecolocacion: GetRecolocacion = async (almacenId, dias, limite, 
         `${baseUrl}/recolocacion${q}`, "Error al calcular la recolocación"
     );
     return r.datos.map(recolocacionDesdeApi);
+};
+
+export const getPropuestaPicking: GetPropuestaPicking = async (almacenId, dias, origen, clases, cobertura) => {
+    const q = construirQuery({ almacen_id: almacenId, dias, origen, clases, cobertura });
+    const r = await RestAPI.get<{ datos: PropuestaPickingFijoApi[] }>(
+        `${baseUrl}/propuesta_picking${q}`, "Error al proponer picking fijo"
+    );
+    return r.datos.map(propuestaPickingDesdeApi);
 };

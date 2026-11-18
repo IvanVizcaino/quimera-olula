@@ -5,8 +5,11 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/index.js";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
-import { ArticuloAbc, ClaseAbc, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
-import { origenesRotacion, textoDestinoRecolocacion } from "./dominio.ts";
+import { ArticuloAbc, ClaseAbc, FilaPickingFijo, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
+import {
+    clasesPicking, errorValidacionFila, filasPickingACrear, origenesRotacion,
+    textoDestinoRecolocacion,
+} from "./dominio.ts";
 import { contextoSlottingInicial, getMaquina } from "./maquina.ts";
 
 const colorClase: Record<ClaseAbc, string> = { A: "#2e7d32", B: "#f9a825", C: "#c62828" };
@@ -62,6 +65,44 @@ export const Slotting = () => {
                             </QBoton>
                         </div>
                         {ctx.abc && (ctx.abc.length === 0 ? <p>No hay movimiento en el periodo.</p> : <TablaAbc abc={ctx.abc} />)}
+                    </Tab>,
+                    <Tab key="picking" label="Asignar picking fijo">
+                        <quimera-formulario>
+                            <QInput
+                                label="Días" nombre="diasPicking" tipo="numero" valor={ctx.diasPicking}
+                                onChange={(v: string) => emitir("dias_picking_cambiados", v)}
+                            />
+                            <QSelect
+                                label="Clases" nombre="clasesPicking" valor={ctx.clasesPicking}
+                                opciones={clasesPicking}
+                                onChange={(opcion) => emitir("clases_picking_cambiadas", opcion?.valor ?? "")}
+                            />
+                            <QInput
+                                label="Cobertura (días)" nombre="coberturaPicking" tipo="numero"
+                                valor={ctx.coberturaPicking}
+                                onChange={(v: string) => emitir("cobertura_picking_cambiada", v)}
+                            />
+                        </quimera-formulario>
+                        <div className="botones maestro-botones">
+                            <QBoton deshabilitado={!almacenId} onClick={() => emitir("picking_solicitado")}>
+                                Proponer
+                            </QBoton>
+                            {ctx.filasPicking && (
+                                <QBoton
+                                    deshabilitado={filasPickingACrear(ctx.filasPicking).length === 0}
+                                    onClick={() => emitir("picking_fijo_creacion_solicitada")}
+                                >
+                                    Crear picking fijo seleccionados
+                                </QBoton>
+                            )}
+                        </div>
+                        {ctx.resumenPicking && <p className="resumen-picking">{ctx.resumenPicking}</p>}
+                        {ctx.filasPicking && (ctx.filasPicking.length === 0
+                            ? <p>No hay artículos sin picking fijo para proponer.</p>
+                            : <TablaPickingFijo
+                                filas={ctx.filasPicking}
+                                onCambio={(articuloId, cambios) => emitir("fila_picking_cambiada", { articuloId, cambios })}
+                            />)}
                     </Tab>,
                     <Tab key="propuesta" label="Propuesta de ubicación">
                         <quimera-formulario>
@@ -178,6 +219,68 @@ const TablaRecolocacion = ({ recolocaciones }: { recolocaciones: Recolocacion[] 
                     <td>{r.beneficio}</td>
                 </tr>
             ))}
+        </tbody>
+    </table>
+);
+
+const estiloNumero = { width: 70 };
+
+const InputNumero = ({ valor, deshabilitado, onCambio }: {
+    valor: number; deshabilitado: boolean; onCambio: (n: number) => void;
+}) => (
+    <input
+        type="number" style={estiloNumero} value={Number.isNaN(valor) ? "" : valor}
+        disabled={deshabilitado}
+        onChange={(e) => onCambio(e.target.value === "" ? NaN : Number(e.target.value))}
+    />
+);
+
+const TablaPickingFijo = ({ filas, onCambio }: {
+    filas: FilaPickingFijo[];
+    onCambio: (articuloId: string, cambios: Partial<FilaPickingFijo>) => void;
+}) => (
+    <table className="tabla-picking-fijo">
+        <thead>
+            <tr>
+                <th></th><th>Artículo</th><th>Descripción</th><th>Clase</th><th>Líneas</th>
+                <th>Ubicación</th><th>Zona</th><th>Mínimo</th><th>Máximo</th><th>Unidad</th><th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {filas.map((f) => {
+                const creado = f.estado === "CREADO";
+                const sinHueco = !f.ubicacionId;
+                const error = creado || sinHueco ? null : errorValidacionFila(f);
+                return (
+                    <tr key={f.articuloId}>
+                        <td>
+                            <input
+                                type="checkbox" checked={f.seleccionada} disabled={creado || sinHueco}
+                                onChange={(e) => onCambio(f.articuloId, { seleccionada: e.target.checked })}
+                            />
+                        </td>
+                        <td>{f.articuloId}</td>
+                        <td>{f.descripcion}</td>
+                        <td><InsigniaClase clase={f.clase} /></td>
+                        <td>{f.lineas}</td>
+                        <td>{sinHueco ? "Sin hueco libre" : f.ubicacion}</td>
+                        <td>{f.zona ?? ""}</td>
+                        {(["minimo", "maximo", "unidadReposicion"] as const).map((campo) => (
+                            <td key={campo}>
+                                <InputNumero
+                                    valor={f[campo]} deshabilitado={creado || sinHueco}
+                                    onCambio={(n) => onCambio(f.articuloId, { [campo]: n, estado: "PENDIENTE", errorCreacion: null })}
+                                />
+                            </td>
+                        ))}
+                        <td>
+                            {creado && "Creado"}
+                            {f.estado === "ERROR" && <span style={{ color: "#c62828" }}>{f.errorCreacion}</span>}
+                            {error && <span style={{ color: "#c62828" }}>{error}</span>}
+                        </td>
+                    </tr>
+                );
+            })}
         </tbody>
     </table>
 );

@@ -1,9 +1,12 @@
 import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
-import { ArticuloAbc, OrigenRotacion, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
+import { postPickingFijo } from "#/almacen/picking_fijo/infraestructura.ts";
+import { ArticuloAbc, FilaPickingFijo, ClasesPicking, OrigenRotacion, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
 import {
+    CLASES_PICKING_POR_DEFECTO, clasesPickingValidas, COBERTURA_POR_DEFECTO, filaPickingDesdePropuesta,
+    filasPickingACrear, mensajeErrorApi, resumenCreacionPicking,
     DIAS_POR_DEFECTO, enteroPositivo, ORIGEN_POR_DEFECTO, origenRotacion, LIMITE_PROPUESTA_POR_DEFECTO, LIMITE_RECOLOCACION_POR_DEFECTO, propuestaVacia,
 } from "./dominio.ts";
-import { getAbc, getPropuesta, getRecolocacion } from "./infraestructura.ts";
+import { getAbc, getPropuesta, getPropuestaPicking, getRecolocacion } from "./infraestructura.ts";
 
 export type EstadoSlotting = "INICIAL";
 
@@ -19,6 +22,11 @@ export type ContextoSlotting = {
     diasRecolocacion: string;
     limiteRecolocacion: string;
     recolocaciones: Recolocacion[] | null;
+    diasPicking: string;
+    clasesPicking: ClasesPicking;
+    coberturaPicking: string;
+    filasPicking: FilaPickingFijo[] | null;
+    resumenPicking: string | null;
 };
 
 export const contextoSlottingInicial: ContextoSlotting = {
@@ -33,6 +41,11 @@ export const contextoSlottingInicial: ContextoSlotting = {
     diasRecolocacion: String(DIAS_POR_DEFECTO),
     limiteRecolocacion: String(LIMITE_RECOLOCACION_POR_DEFECTO),
     recolocaciones: null,
+    diasPicking: String(DIAS_POR_DEFECTO),
+    clasesPicking: CLASES_PICKING_POR_DEFECTO,
+    coberturaPicking: String(COBERTURA_POR_DEFECTO),
+    filasPicking: null,
+    resumenPicking: null,
 };
 
 type ProcesarSlotting = ProcesarContexto<EstadoSlotting, ContextoSlotting>;
@@ -43,6 +56,8 @@ const cambiarAlmacen: ProcesarSlotting = async (ctx, payload) => ({
     abc: null,
     propuesta: null,
     recolocaciones: null,
+    filasPicking: null,
+    resumenPicking: null,
 });
 
 const cambiarOrigen: ProcesarSlotting = async (ctx, payload) => ({
@@ -51,12 +66,67 @@ const cambiarOrigen: ProcesarSlotting = async (ctx, payload) => ({
     abc: null,
     propuesta: null,
     recolocaciones: null,
+    filasPicking: null,
+    resumenPicking: null,
 });
 
 const cambiarCampo = (campo: keyof ContextoSlotting): ProcesarSlotting => async (ctx, payload) => ({
     ...ctx,
     [campo]: (payload as string) ?? "",
 });
+
+const limpiarPicking = (ctx: ContextoSlotting): ContextoSlotting => ({ ...ctx, filasPicking: null, resumenPicking: null });
+
+const cambiarParametroPicking = (campo: keyof ContextoSlotting): ProcesarSlotting => async (ctx, payload) =>
+    limpiarPicking({ ...ctx, [campo]: (payload as string) ?? "" });
+
+const cambiarClasesPicking: ProcesarSlotting = async (ctx, payload) =>
+    limpiarPicking({ ...ctx, clasesPicking: clasesPickingValidas(payload as string) });
+
+const proponerPicking: ProcesarSlotting = async (ctx) => {
+    const propuesta = await getPropuestaPicking(
+        ctx.almacenId,
+        enteroPositivo(ctx.diasPicking, DIAS_POR_DEFECTO),
+        ctx.origen,
+        ctx.clasesPicking,
+        enteroPositivo(ctx.coberturaPicking, COBERTURA_POR_DEFECTO)
+    );
+    return { ...ctx, filasPicking: propuesta.map(filaPickingDesdePropuesta), resumenPicking: null };
+};
+
+const actualizarFila = (
+    ctx: ContextoSlotting, articuloId: string, cambios: Partial<FilaPickingFijo>
+): ContextoSlotting => ({
+    ...ctx,
+    filasPicking: (ctx.filasPicking ?? []).map((f) => (f.articuloId === articuloId ? { ...f, ...cambios } : f)),
+});
+
+const cambiarFilaPicking: ProcesarSlotting = async (ctx, payload) => {
+    const { articuloId, cambios } = payload as { articuloId: string; cambios: Partial<FilaPickingFijo> };
+    return actualizarFila(ctx, articuloId, cambios);
+};
+
+const crearPickingFijos: ProcesarSlotting = async (ctx) => {
+    const filas = ctx.filasPicking ?? [];
+    const aCrear = filasPickingACrear(filas);
+    const resultado = new Map<string, Partial<FilaPickingFijo>>();
+    for (const f of aCrear) {
+        try {
+            await postPickingFijo({
+                articuloId: f.articuloId,
+                ubicacionId: f.ubicacionId as string,
+                minimo: f.minimo,
+                maximo: f.maximo,
+                unidadReposicion: f.unidadReposicion,
+            });
+            resultado.set(f.articuloId, { estado: "CREADO", errorCreacion: null, seleccionada: false });
+        } catch (e) {
+            resultado.set(f.articuloId, { estado: "ERROR", errorCreacion: mensajeErrorApi(e) });
+        }
+    }
+    const nuevas = filas.map((f) => ({ ...f, ...resultado.get(f.articuloId) }));
+    return { ...ctx, filasPicking: nuevas, resumenPicking: resumenCreacionPicking(nuevas, aCrear.length) };
+};
 
 const calcularAbc: ProcesarSlotting = async (ctx) => {
     const abc = await getAbc(ctx.almacenId, enteroPositivo(ctx.diasAbc, DIAS_POR_DEFECTO), ctx.origen);
@@ -93,5 +163,11 @@ export const getMaquina: () => Maquina<EstadoSlotting, ContextoSlotting> = () =>
         dias_recolocacion_cambiados: cambiarCampo("diasRecolocacion"),
         limite_recolocacion_cambiado: cambiarCampo("limiteRecolocacion"),
         recolocacion_solicitada: calcularRecolocacion,
+        dias_picking_cambiados: cambiarParametroPicking("diasPicking"),
+        clases_picking_cambiadas: cambiarClasesPicking,
+        cobertura_picking_cambiada: cambiarParametroPicking("coberturaPicking"),
+        picking_solicitado: proponerPicking,
+        fila_picking_cambiada: cambiarFilaPicking,
+        picking_fijo_creacion_solicitada: crearPickingFijos,
     },
 });
