@@ -1,6 +1,8 @@
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { MetaTabla, QTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
+import { Entidad } from "@olula/lib/diseño.ts";
 import { Link } from "react-router";
 import { NecesidadReposicion } from "./diseño.ts";
 import { puedeGenerarTraspaso, textoOrigenes } from "./dominio.ts";
@@ -37,6 +39,13 @@ export const ReposicionPicking = () => {
                 )}
             </div>
 
+            {estado === "CALCULADO" && reposicion.necesidades.length > 0 && !puedeGenerarTraspaso(reposicion) && (
+                <p className="mensaje">
+                    No se puede generar el traspaso: ninguno de estos artículos tiene stock libre en
+                    ubicaciones activas de zonas de reserva del almacén desde donde reponer.
+                </p>
+            )}
+
             {estado === "GENERADO" && (
                 <div className="mensaje">
                     {reposicion.ordenId ? (
@@ -62,33 +71,32 @@ export const ReposicionPicking = () => {
     );
 };
 
+type FilaNecesidad = Entidad & NecesidadReposicion;
+
+const metaTablaNecesidades: MetaTabla<FilaNecesidad> = [
+    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    { id: "ubicacion", cabecera: "Ubicación de picking" },
+    { id: "fisico", cabecera: "Físico", tipo: "numero" },
+    { id: "entrante", cabecera: "Entrante", tipo: "numero" },
+    { id: "saliente", cabecera: "Saliente", tipo: "numero" },
+    { id: "disponible", cabecera: "Disponible", tipo: "numero", estilo: "destacado" },
+    { id: "minimo", cabecera: "Mínimo", tipo: "numero" },
+    { id: "maximo", cabecera: "Máximo", tipo: "numero" },
+    { id: "cantidad", cabecera: "A reponer", tipo: "numero", estilo: "destacado" },
+    { id: "falta", cabecera: "Falta", tipo: "numero" },
+    {
+        id: "origenes",
+        cabecera: "Orígenes",
+        ancho: "25%",
+        render: (n) => (n.origenes.length ? textoOrigenes(n) : "Sin stock en reserva"),
+    },
+];
+
 const TablaNecesidades = ({ necesidades }: { necesidades: NecesidadReposicion[] }) => (
-    <table className="tabla-necesidades">
-        <thead>
-            <tr>
-                <th>Artículo</th>
-                <th>Ubicación de picking</th>
-                <th>Disponible</th>
-                <th>Mín. / Máx.</th>
-                <th>A reponer</th>
-                <th>Falta</th>
-                <th>Orígenes</th>
-            </tr>
-        </thead>
-        <tbody>
-            {necesidades.map((n) => (
-                <tr key={n.pickingFijoId}>
-                    <td>{n.articuloId}</td>
-                    <td>{n.ubicacion}</td>
-                    <td title={`Físico ${n.fisico} + entrante ${n.entrante} - saliente ${n.saliente}`}>
-                        {n.disponible}
-                    </td>
-                    <td>{n.minimo} / {n.maximo}</td>
-                    <td>{n.cantidad}</td>
-                    <td>{n.falta}</td>
-                    <td>{textoOrigenes(n)}</td>
-                </tr>
-            ))}
-        </tbody>
-    </table>
+    <QTabla<FilaNecesidad>
+        metaTabla={metaTablaNecesidades}
+        datos={necesidades.map((n) => ({ ...n, id: n.pickingFijoId }))}
+        cargando={false}
+        orden={[]}
+    />
 );
