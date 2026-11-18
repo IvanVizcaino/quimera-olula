@@ -8,6 +8,7 @@ import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js"
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect, useMemo } from "react";
 import { Zona } from "../../diseño.ts";
+import { descripcionFuncionZona } from "../../dominio.ts";
 import { CrearZona } from "../crear/CrearZona.js";
 import { DetalleZona } from "../detalle/DetalleZona.js";
 import { getMaquina } from "./maquina.js";
@@ -15,6 +16,7 @@ import { getMaquina } from "./maquina.js";
 const metaTablaZona: MetaTabla<Zona> = [
     { id: "codigo", cabecera: "Código" },
     { id: "almacenId", cabecera: "Almacén" },
+    { id: "funcion", cabecera: "Función", render: (z) => descripcionFuncionZona(z.funcion) },
     { id: "descripcion", cabecera: "Descripción" },
 ];
 

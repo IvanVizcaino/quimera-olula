@@ -1,0 +1,18 @@
+.DetalleTipoUbicacion {
+    quimera-input[nombre="codigo"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 8;
+    }
+
+    quimera-select[nombre="formato"],
+    quimera-input[nombre="capacidadPalets"],
+    quimera-input[nombre="pesoMax"],
+    quimera-input[nombre="alturaMax"],
+    quimera-checkbox[nombre="multiReferencia"],
+    quimera-checkbox[nombre="multiLote"] {
+        grid-column: span 6;
+    }
+}

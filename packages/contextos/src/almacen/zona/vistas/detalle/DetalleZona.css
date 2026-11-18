@@ -1,0 +1,11 @@
+.DetalleZona {
+    quimera-input[nombre="codigo"],
+    quimera-select[nombre="almacenId"],
+    quimera-select[nombre="funcion"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 12;
+    }
+}

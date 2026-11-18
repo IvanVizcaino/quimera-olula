@@ -1,0 +1,9 @@
+.DetalleClaseAlmacenamiento {
+    quimera-input[nombre="codigo"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 8;
+    }
+}

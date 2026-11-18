@@ -1,0 +1,19 @@
+.DetalleUbicacion {
+    quimera-input[nombre="codigo"],
+    quimera-select[nombre="idZona"],
+    quimera-select[nombre="pasilloId"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="modulo"],
+    quimera-input[nombre="cara"],
+    quimera-input[nombre="nivel"],
+    quimera-input[nombre="hueco"] {
+        grid-column: span 3;
+    }
+
+    quimera-select[nombre="tipoUbicacionId"],
+    quimera-select[nombre="estado"] {
+        grid-column: span 6;
+    }
+}

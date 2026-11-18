@@ -1,10 +1,34 @@
 import { Entidad, Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
 
+export type EstadoActividadUbicacion = "ACTIVA" | "BLOQUEADA";
+export type CaraUbicacion = "IZQUIERDA" | "DERECHA";
+
 export interface Ubicacion extends Entidad {
     id: string;
     codigo: string;
     idZona: string;
     zona: string;
+    pasilloId: string | null;
+    pasillo: string | null;
+    modulo: number | null;
+    /** Solo lectura: deducida del módulo (impar izquierda, par derecha). */
+    cara: CaraUbicacion | null;
+    nivel: number | null;
+    hueco: number | null;
+    tipoUbicacionId: string | null;
+    tipoUbicacion: string | null;
+    estado: EstadoActividadUbicacion;
+}
+
+/** Alta: si se indica pasillo, el código puede quedar vacío (lo genera el servidor). */
+export type NuevaUbicacion = {
+    codigo: string;
+    zonaId: string;
+    pasilloId: string | null;
+    modulo: number | null;
+    nivel: number | null;
+    hueco: number | null;
+    tipoUbicacionId: string | null;
 };
 
 
@@ -42,7 +66,7 @@ export type GetUbicaciones = (
     paginacion?: Paginacion
 ) => RespuestaLista<Ubicacion>;
 
-export type PostUbicacion = (ubicacion: Partial<Ubicacion>) => Promise<string>;
+export type PostUbicacion = (ubicacion: NuevaUbicacion) => Promise<string>;
 export type PatchUbicacion = (id: string, ubicacion: Partial<Ubicacion>) => Promise<void>;
 export type DeleteUbicacion = (id: string) => Promise<void>;
 export type GetStocksUbicacion = (ubicacionId: string) => Promise<StockUbicacionItem[]>;
