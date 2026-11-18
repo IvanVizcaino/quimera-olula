@@ -3,6 +3,7 @@ import { postPickingFijo } from "#/almacen/picking_fijo/infraestructura.ts";
 import { ArticuloAbc, FilaPickingFijo, ClasesPicking, OrigenRotacion, PropuestaUbicacion, Recolocacion, ResultadoMigracion } from "./diseño.ts";
 import {
     CLASES_PICKING_POR_DEFECTO, clasesPickingValidas, COBERTURA_POR_DEFECTO, DIAS_POR_DEFECTO,
+    REPOSICION_POR_DEFECTO,
     enteroPositivo, filaPickingDesdePropuesta, filasPickingACrear, LIMITE_PROPUESTA_POR_DEFECTO,
     LIMITE_RECOLOCACION_POR_DEFECTO, marcarTodasPicking, mensajeErrorApi, ORIGEN_POR_DEFECTO,
     origenRotacion, propuestaVacia, resumenCreacionPicking,
@@ -26,6 +27,7 @@ export type ContextoSlotting = {
     diasPicking: string;
     clasesPicking: ClasesPicking;
     coberturaPicking: string;
+    reposicionPicking: string;
     filasPicking: FilaPickingFijo[] | null;
     resumenPicking: string | null;
     ubicacionMigracionId: string;
@@ -48,6 +50,7 @@ export const contextoSlottingInicial: ContextoSlotting = {
     diasPicking: String(DIAS_POR_DEFECTO),
     clasesPicking: CLASES_PICKING_POR_DEFECTO,
     coberturaPicking: String(COBERTURA_POR_DEFECTO),
+    reposicionPicking: String(REPOSICION_POR_DEFECTO),
     filasPicking: null,
     resumenPicking: null,
     ubicacionMigracionId: "",
@@ -97,7 +100,8 @@ const proponerPicking: ProcesarSlotting = async (ctx) => {
         enteroPositivo(ctx.diasPicking, DIAS_POR_DEFECTO),
         ctx.origen,
         ctx.clasesPicking,
-        enteroPositivo(ctx.coberturaPicking, COBERTURA_POR_DEFECTO)
+        enteroPositivo(ctx.coberturaPicking, COBERTURA_POR_DEFECTO),
+        enteroPositivo(ctx.reposicionPicking, REPOSICION_POR_DEFECTO)
     );
     return { ...ctx, filasPicking: propuesta.map(filaPickingDesdePropuesta), resumenPicking: null };
 };
@@ -192,6 +196,7 @@ export const getMaquina: () => Maquina<EstadoSlotting, ContextoSlotting> = () =>
         dias_picking_cambiados: cambiarParametroPicking("diasPicking"),
         clases_picking_cambiadas: cambiarClasesPicking,
         cobertura_picking_cambiada: cambiarParametroPicking("coberturaPicking"),
+        reposicion_picking_cambiada: cambiarParametroPicking("reposicionPicking"),
         picking_solicitado: proponerPicking,
         fila_picking_cambiada: cambiarFilaPicking,
         seleccion_picking_cambiada: async (ctx, payload) => ({

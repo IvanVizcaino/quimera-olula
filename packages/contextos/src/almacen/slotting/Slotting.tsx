@@ -11,9 +11,10 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { Entidad } from "@olula/lib/diseño.ts";
 import { AjusteMigracion, ArticuloAbc, ClaseAbc, FilaPickingFijo, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
 import {
-    clasesPicking, DIAS_POR_DEFECTO, enteroPositivo, errorValidacionFila, explicacionAbc,
-    filaPickingMarcable, filasPickingACrear, origenesRotacion, puedeUbicarMigracion,
-    resumenMigracion, textoDestinoRecolocacion, todasPickingMarcadas,
+    clasesPicking, COBERTURA_POR_DEFECTO, DIAS_POR_DEFECTO, enteroPositivo, errorValidacionFila,
+    explicacionAbc, explicacionCantidadesPicking, filaPickingMarcable, filasPickingACrear,
+    origenesRotacion, puedeUbicarMigracion, REPOSICION_POR_DEFECTO, resumenMigracion,
+    textoDestinoRecolocacion, todasPickingMarcadas,
 } from "./dominio.ts";
 import "#/comun/estilos/pagina_proceso.css";
 import "./Slotting.css";
@@ -74,6 +75,15 @@ export const Slotting = () => {
                         {ctx.abc && (ctx.abc.length === 0 ? <p>No hay movimiento en el periodo.</p> : <TablaAbc abc={ctx.abc} />)}
                     </Tab>,
                     <Tab key="picking" label="Asignar picking fijo">
+                        <div className="slotting-explicacion">
+                            <strong>Cómo se calculan las cantidades</strong>
+                            <ul>
+                                {explicacionCantidadesPicking(
+                                    enteroPositivo(ctx.coberturaPicking, COBERTURA_POR_DEFECTO),
+                                    enteroPositivo(ctx.reposicionPicking, REPOSICION_POR_DEFECTO)
+                                ).map((t) => <li key={t}>{t}</li>)}
+                            </ul>
+                        </div>
                         <quimera-formulario>
                             <QInput
                                 label="Días" nombre="diasPicking" tipo="numero" valor={ctx.diasPicking}
@@ -88,6 +98,11 @@ export const Slotting = () => {
                                 label="Cobertura (días)" nombre="coberturaPicking" tipo="numero"
                                 valor={ctx.coberturaPicking}
                                 onChange={(v: string) => emitir("cobertura_picking_cambiada", v)}
+                            />
+                            <QInput
+                                label="Reposición (días)" nombre="reposicionPicking" tipo="numero"
+                                valor={ctx.reposicionPicking}
+                                onChange={(v: string) => emitir("reposicion_picking_cambiada", v)}
                             />
                         </quimera-formulario>
                         <div className="botones maestro-botones">

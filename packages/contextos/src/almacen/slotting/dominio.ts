@@ -43,6 +43,7 @@ export const textoDestinoRecolocacion = (r: Pick<Recolocacion, "accion" | "conAr
 };
 
 export const COBERTURA_POR_DEFECTO = 5;
+export const REPOSICION_POR_DEFECTO = 1;
 export const CLASES_PICKING_POR_DEFECTO: ClasesPicking = "AB";
 
 export const clasesPicking: { valor: ClasesPicking; descripcion: string }[] = [
@@ -137,3 +138,11 @@ export const resumenMigracion = (r: ResultadoMigracion): string => {
 /** Se puede ubicar tras una simulación con algo que hacer. */
 export const puedeUbicarMigracion = (r: ResultadoMigracion | null): boolean =>
     !!r && r.simulado && r.ajustes.length > 0;
+
+/** Cómo se calculan mínimo, máximo y unidad de la propuesta de picking fijo. */
+export const explicacionCantidadesPicking = (cobertura: number, reposicion: number): string[] => [
+    "Consumo diario: unidades del periodo entre los días laborables (5 de cada 7) del tramo con salidas, del primer al último día con movimiento.",
+    `Mínimo: lo que se consume en ${reposicion} día(s) laborable(s) de reposición, y nunca menos que la línea más grande del periodo, para poder servir cualquier pedido habitual desde el hueco.`,
+    `Máximo: el mínimo más el consumo de ${cobertura} día(s) laborable(s) de cobertura.`,
+    "Unidad: la caja de proveedor por defecto del artículo (la menor si hay varias) o 1; mínimo y máximo van en múltiplos de ella.",
+];

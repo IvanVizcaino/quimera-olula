@@ -11,6 +11,7 @@
     quimera-input[nombre="diasAbc"],
     quimera-input[nombre="diasPicking"],
     quimera-input[nombre="coberturaPicking"],
+    quimera-input[nombre="reposicionPicking"],
     quimera-input[nombre="diasRecolocacion"],
     quimera-input[nombre="limiteRecolocacion"],
     quimera-input[nombre="limitePropuesta"] {
@@ -18,7 +19,7 @@
     }
 
     quimera-select[nombre="clasesPicking"] {
-        grid-column: span 4;
+        grid-column: span 3;
     }
 
     quimera-autocompletar[nombre="referencia"],

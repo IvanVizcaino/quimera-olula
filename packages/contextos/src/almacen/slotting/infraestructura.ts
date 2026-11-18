@@ -126,8 +126,10 @@ export const getRecolocacion: GetRecolocacion = async (almacenId, dias, limite, 
     return r.datos.map(recolocacionDesdeApi);
 };
 
-export const getPropuestaPicking: GetPropuestaPicking = async (almacenId, dias, origen, clases, cobertura) => {
-    const q = construirQuery({ almacen_id: almacenId, dias, origen, clases, cobertura });
+export const getPropuestaPicking: GetPropuestaPicking = async (
+    almacenId, dias, origen, clases, cobertura, reposicion
+) => {
+    const q = construirQuery({ almacen_id: almacenId, dias, origen, clases, cobertura, reposicion });
     const r = await RestAPI.get<{ datos: PropuestaPickingFijoApi[] }>(
         `${baseUrl}/propuesta_picking${q}`, "Error al proponer picking fijo"
     );

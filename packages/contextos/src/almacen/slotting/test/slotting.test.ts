@@ -18,6 +18,7 @@ import {
     explicacionAbc,
     puedeUbicarMigracion,
     resumenMigracion,
+    explicacionCantidadesPicking,
 } from "../dominio.ts";
 import { resultadoMigracionDesdeApi, propuestaPickingDesdeApi, articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
 
@@ -197,5 +198,13 @@ describe("migración", () => {
         expect(puedeUbicarMigracion({ ...simulado, simulado: false })).toBe(false);
         expect(puedeUbicarMigracion({ ...simulado, ajustes: [] })).toBe(false);
         expect(puedeUbicarMigracion(null)).toBe(false);
+    });
+});
+
+describe("explicación de las cantidades de picking", () => {
+    it("incluye los días de reposición y de cobertura elegidos", () => {
+        const texto = explicacionCantidadesPicking(5, 2).join(" ");
+        expect(texto).toContain("2 día(s) laborable(s) de reposición");
+        expect(texto).toContain("5 día(s) laborable(s) de cobertura");
     });
 });
