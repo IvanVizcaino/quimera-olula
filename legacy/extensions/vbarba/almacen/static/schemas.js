@@ -1,7 +1,9 @@
 import { Field, Schema } from "quimera/lib";
+import { schemasPartesCarros } from "./schemasPartesCarros";
 
 export default parent => ({
   ...parent,
+  ...schemasPartesCarros,
   articulos: parent.articulos.fields({
     precioRef: Field.Float("precioRef", "Precio referencia"),
     precioBnp: Field.Float("precioBnp", "Precio BNP"),
