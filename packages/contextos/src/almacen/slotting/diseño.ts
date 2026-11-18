@@ -36,6 +36,13 @@ export interface Recolocacion {
     beneficio: number;
 }
 
-export type GetAbc = (almacenId: string, dias: number) => Promise<ArticuloAbc[]>;
-export type GetPropuesta = (almacenId: string, articuloId: string, limite: number) => Promise<PropuestaUbicacion>;
-export type GetRecolocacion = (almacenId: string, dias: number, limite: number) => Promise<Recolocacion[]>;
+/** De dónde sale la rotación: órdenes de salida del SGA o albaranes de venta. */
+export type OrigenRotacion = "ORDENES" | "VENTAS";
+
+export type GetAbc = (almacenId: string, dias: number, origen: OrigenRotacion) => Promise<ArticuloAbc[]>;
+export type GetPropuesta = (
+    almacenId: string, articuloId: string, limite: number, origen: OrigenRotacion
+) => Promise<PropuestaUbicacion>;
+export type GetRecolocacion = (
+    almacenId: string, dias: number, limite: number, origen: OrigenRotacion
+) => Promise<Recolocacion[]>;

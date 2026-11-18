@@ -1,8 +1,19 @@
-import { PropuestaUbicacion, Recolocacion } from "./diseño.ts";
+import { OrigenRotacion, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
 
 export const DIAS_POR_DEFECTO = 90;
 export const LIMITE_PROPUESTA_POR_DEFECTO = 5;
 export const LIMITE_RECOLOCACION_POR_DEFECTO = 20;
+
+export const ORIGEN_POR_DEFECTO: OrigenRotacion = "ORDENES";
+
+export const origenesRotacion: { valor: OrigenRotacion; descripcion: string }[] = [
+    { valor: "ORDENES", descripcion: "Órdenes de salida" },
+    { valor: "VENTAS", descripcion: "Ventas (albaranes)" },
+];
+
+/** El valor del selector, o el origen por defecto si no es uno conocido. */
+export const origenRotacion = (valor: string | null | undefined): OrigenRotacion =>
+    origenesRotacion.find((o) => o.valor === valor)?.valor ?? ORIGEN_POR_DEFECTO;
 
 export const propuestaVacia: PropuestaUbicacion = { articuloId: "", clase: "C", ubicaciones: [] };
 

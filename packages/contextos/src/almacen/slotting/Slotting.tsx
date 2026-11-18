@@ -2,10 +2,11 @@ import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { Articulo } from "#/almacen/comun/componentes/Articulo.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { QSelect } from "@olula/componentes/index.js";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { ArticuloAbc, ClaseAbc, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
-import { textoDestinoRecolocacion } from "./dominio.ts";
+import { origenesRotacion, textoDestinoRecolocacion } from "./dominio.ts";
 import { contextoSlottingInicial, getMaquina } from "./maquina.ts";
 
 const colorClase: Record<ClaseAbc, string> = { A: "#2e7d32", B: "#f9a825", C: "#c62828" };
@@ -36,6 +37,13 @@ export const Slotting = () => {
                     nombre="almacenId"
                     valor={almacenId}
                     onChange={(opcion) => emitir("almacen_cambiado", opcion?.valor ?? "")}
+                />
+                <QSelect
+                    label="Rotación según"
+                    nombre="origen"
+                    valor={ctx.origen}
+                    opciones={origenesRotacion}
+                    onChange={(opcion) => emitir("origen_cambiado", opcion?.valor ?? "")}
                 />
             </quimera-formulario>
 

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { construirQuery, enteroPositivo, textoDestinoRecolocacion } from "../dominio.ts";
+import {
+    construirQuery,
+    enteroPositivo,
+    textoDestinoRecolocacion,
+    origenRotacion,
+    ORIGEN_POR_DEFECTO,
+} from "../dominio.ts";
 import { articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
 
 describe("slotting dominio", () => {
@@ -48,5 +54,19 @@ describe("slotting mappers", () => {
             conArticuloId: "REF9", conUbicacion: "U2", beneficio: 540,
         });
         expect(recolocacionDesdeApi({ ...base, accion: "MOVER", con_ubicacion: "U3" }).conArticuloId).toBeNull();
+    });
+});
+
+describe("origen de la rotación", () => {
+    it("acepta ORDENES y VENTAS y, si no, usa el de por defecto", () => {
+        expect(origenRotacion("VENTAS")).toBe("VENTAS");
+        expect(origenRotacion("ORDENES")).toBe("ORDENES");
+        expect(origenRotacion("PEDIDOS")).toBe(ORIGEN_POR_DEFECTO);
+        expect(origenRotacion(null)).toBe(ORIGEN_POR_DEFECTO);
+    });
+
+    it("viaja en la query string", () => {
+        expect(construirQuery({ almacen_id: "ALG", dias: 365, origen: "VENTAS" }))
+            .toBe("?almacen_id=ALG&dias=365&origen=VENTAS");
     });
 });

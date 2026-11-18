@@ -74,22 +74,22 @@ export const recolocacionDesdeApi = (r: RecolocacionApi): Recolocacion => ({
     beneficio: r.beneficio,
 });
 
-export const getAbc: GetAbc = async (almacenId, dias) => {
-    const q = construirQuery({ almacen_id: almacenId, dias });
+export const getAbc: GetAbc = async (almacenId, dias, origen) => {
+    const q = construirQuery({ almacen_id: almacenId, dias, origen });
     const r = await RestAPI.get<{ datos: ArticuloAbcApi[] }>(`${baseUrl}/abc${q}`, "Error al calcular el ABC");
     return r.datos.map(articuloAbcDesdeApi);
 };
 
-export const getPropuesta: GetPropuesta = async (almacenId, articuloId, limite) => {
-    const q = construirQuery({ almacen_id: almacenId, articulo_id: articuloId, limite });
+export const getPropuesta: GetPropuesta = async (almacenId, articuloId, limite, origen) => {
+    const q = construirQuery({ almacen_id: almacenId, articulo_id: articuloId, limite, origen });
     const r = await RestAPI.get<{ datos: PropuestaUbicacionApi }>(
         `${baseUrl}/propuesta${q}`, "Error al proponer ubicación"
     );
     return propuestaDesdeApi(r.datos);
 };
 
-export const getRecolocacion: GetRecolocacion = async (almacenId, dias, limite) => {
-    const q = construirQuery({ almacen_id: almacenId, dias, limite });
+export const getRecolocacion: GetRecolocacion = async (almacenId, dias, limite, origen) => {
+    const q = construirQuery({ almacen_id: almacenId, dias, limite, origen });
     const r = await RestAPI.get<{ datos: RecolocacionApi[] }>(
         `${baseUrl}/recolocacion${q}`, "Error al calcular la recolocación"
     );
