@@ -1,18 +1,12 @@
-import {
-    CriterioOrdenInforme,
-    SentidoOrdenInforme,
-} from "#/contabilidad/comun/componentes/OpcionesLibroDiario.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
-import { QDate } from "@olula/componentes/atomos/qdate.tsx";
-import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
+import { useRangosEjercicio } from "#/contabilidad/comun/use_rangos_ejercicio.ts";
 import { useCallback, useMemo } from "react";
-import { admiteOpcionesDeDetalle } from "../dominio.ts";
+import { CamposLibroDiario } from "../detalle/CamposLibroDiario.tsx";
 import { postLibroDiario } from "../infraestructura.ts";
 import { metaNuevoLibroDiario, nuevoLibroDiarioInicial } from "./crear.ts";
 
@@ -34,7 +28,10 @@ export const CrearLibroDiario = ({
         modelo: informe,
         uiProps,
         valido,
+        set,
     } = useModelo(metaNuevoLibroDiario, inicial);
+
+    useRangosEjercicio(informe, set, { asientos: true, subcuentas: true });
 
     const crear_ = useCallback(async () => {
         const id = await postLibroDiario(informe);
@@ -50,8 +47,6 @@ export const CrearLibroDiario = ({
 
     const focus = useFocus();
 
-    const conDetalle = admiteOpcionesDeDetalle(informe);
-
     return (
         <QModal
             abierto={true}
@@ -61,75 +56,10 @@ export const CrearLibroDiario = ({
         >
             <div className="CrearLibroDiario">
                 <quimera-formulario>
-                    <QInput
-                        label="Descripción"
-                        {...uiProps("descripcion")}
-                        ref={focus}
-                    />
-                    <QInput label="Ejercicio" {...uiProps("ejercicioId")} />
-                    <QDate
-                        label="Desde fecha"
-                        {...uiProps("fechaDesde")}
-                        opcional
-                    />
-                    <QDate
-                        label="Hasta fecha"
-                        {...uiProps("fechaHasta")}
-                        opcional
-                    />
-                    <QCheckbox
-                        label="Todos los asientos"
-                        {...uiProps("todosAsientos")}
-                    />
-                    <QInput
-                        label="Desde asiento Nº"
-                        {...uiProps("asientoDesde")}
-                        soloLectura={informe.todosAsientos}
-                        opcional
-                    />
-                    <QInput
-                        label="Hasta asiento Nº"
-                        {...uiProps("asientoHasta")}
-                        soloLectura={informe.todosAsientos}
-                        opcional
-                    />
-                    <QCheckbox
-                        label="Todas las subcuentas"
-                        {...uiProps("todasSubcuentas")}
-                    />
-                    <QInput
-                        label="Desde subcuenta Nº"
-                        {...uiProps("subcuentaDesde")}
-                        soloLectura={informe.todasSubcuentas}
-                        opcional
-                    />
-                    <QInput
-                        label="Hasta subcuenta Nº"
-                        {...uiProps("subcuentaHasta")}
-                        soloLectura={informe.todasSubcuentas}
-                        opcional
-                    />
-                    <QCheckbox
-                        label="Resumen mensual"
-                        {...uiProps("resumenMensual")}
-                    />
-                    <QCheckbox
-                        label="Datos de I.V.A."
-                        {...uiProps("datosIva")}
-                        soloLectura={!conDetalle}
-                    />
-                    <QCheckbox
-                        label="Agrupar por meses"
-                        {...uiProps("agruparMeses")}
-                        soloLectura={!conDetalle}
-                    />
-                    <CriterioOrdenInforme
-                        label="Criterio 1"
-                        {...uiProps("orden1")}
-                    />
-                    <SentidoOrdenInforme
-                        label="Orden 1"
-                        {...uiProps("tipoOrden1")}
+                    <CamposLibroDiario
+                        uiProps={uiProps}
+                        informe={informe}
+                        refDescripcion={focus}
                     />
                 </quimera-formulario>
 

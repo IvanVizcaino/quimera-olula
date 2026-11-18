@@ -1,5 +1,5 @@
 import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
-import { datosClaveDocumentoCompra } from "#/compras/comun/dominio.ts";
+import { useDatosClaveDocumentoCompra } from "#/compras/comun/vistas/useDatosClaveDocumentoCompra.ts";
 import { ModalTraza } from "#/comun/componentes/traza/ModalTraza.tsx";
 import { AsientoDeDocumento } from "#/contabilidad/asiento/vistas/detalle/AsientoDeDocumento.tsx";
 import { CambiarDivisa } from "#/ventas/comun/componentes/moleculas/CambiarDivisa/CambiarDivisa.tsx";
@@ -51,6 +51,7 @@ export const DetalleFactura = ({
     );
 
     const formModelo = useModelo(metaFactura, ctx.factura, autoGuardar);
+    const datosClave = useDatosClaveDocumentoCompra();
 
     const { estado, factura, lineas } = ctx;
 
@@ -99,7 +100,7 @@ export const DetalleFactura = ({
             id={id}
             obtenerTitulo={titulo}
             obtenerEstado={(F: Factura) => <EtiquetaEstado {...etiquetaEstadoFactura(F)} />}
-            obtenerDatosClave={datosClaveDocumentoCompra}
+            obtenerDatosClave={datosClave}
             setEntidad={() => {}}
             entidad={factura}
             cerrarDetalle={() => emitir("factura_deseleccionada", null, true)}
@@ -146,7 +147,7 @@ export const DetalleFactura = ({
                             <Tab
                                 key="tab-contabilidad"
                                 label="Contabilidad"
-                                children={<AsientoDeDocumento asientoId={factura.asientoId} />}
+                                children={<AsientoDeDocumento asientoId={factura.asientoId} sinDatosDocumento />}
                             />
                         ),
                     ]}

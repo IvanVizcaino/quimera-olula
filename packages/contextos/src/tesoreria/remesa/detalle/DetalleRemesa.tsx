@@ -1,6 +1,7 @@
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
+import { QuimeraAcciones } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { configuracion } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
@@ -9,6 +10,7 @@ import { Remesa } from "../diseño.js";
 import { contextoDetalleRemesaInicial, metaRemesa } from "./detalle.js";
 import "./DetalleRemesa.css";
 import { DeshacerPagoRemesa } from "./deshacer_pago/DeshacerPagoRemesa.js";
+import { GenerarFicheroRemesa } from "./fichero/GenerarFicheroRemesa.tsx";
 import { getMaquina } from "./maquina.js";
 import { PagarRemesa } from "./pagar/PagarRemesa.js";
 import { PagosRemesa } from "./pagos/PagosRemesa.js";
@@ -49,6 +51,15 @@ export const DetalleRemesa = ({
             cerrarDetalle={() => emitir("remesa_deseleccionada", null, true)}
         >
             <div className="DetalleRemesa">
+                <QuimeraAcciones
+                    acciones={[{
+                        texto: "Fichero bancario",
+                        onClick: () => emitir("fichero_solicitado"),
+                        deshabilitado: ctx.remesa.recibos.length === 0,
+                    }]}
+                    vertical
+                />
+
                 <Tabs children={[
                     <Tab label="General"
                         key="tab-general"
@@ -67,6 +78,10 @@ export const DetalleRemesa = ({
                 ]} />
 
                 {ctx.estado === "PAGANDO" && <PagarRemesa publicar={emitir} />}
+
+                {ctx.estado === "GENERANDO_FICHERO" && (
+                    <GenerarFicheroRemesa remesa={ctx.remesa} publicar={emitir} />
+                )}
 
                 {ctx.estado === "DESHACIENDO_PAGO" && (
                     <DeshacerPagoRemesa remesa={ctx.remesa} publicar={emitir} />

@@ -29,6 +29,7 @@ type PresupuestoAPI = {
     forma_pago_id: string;
     nombre_forma_pago: string;
     grupo_iva_negocio_id: string;
+    serie_id: string;
     por_comision: number;
     almacen_id: string;
     observaciones: string;
@@ -57,6 +58,7 @@ export const presupuestoFromAPI = (p: PresupuestoAPI): Presupuesto => ({
     fecha_salida: new Date(Date.parse(p.fecha_salida)),
     dtoPorcentual: p.por_descuento,
     netoSinDto: p.neto_sin_dto,
+    serie_id: p.serie_id ?? "",
     cliente: {
         cliente_id: p.cliente_id ?? null,
         nombre_cliente: p.nombre_cliente ?? "",

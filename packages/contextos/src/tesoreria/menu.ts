@@ -8,5 +8,7 @@ export const menuTesoreria = {
     "Tesorería/Recibos de pago": { url: "/tesoreria/recibo_compra", regla: "tesoreria.recibo_compra" },
     "Tesorería/Conexiones bancarias": { url: "/tesoreria/conexion_bancaria", regla: "tesoreria.conexion_bancaria" },
     "Tesorería/Cuentas bancarias": { alias: ["banco", "conciliación", "extracto", "movimientos"], url: "/tesoreria/cuentas_bancarias", regla: "tesoreria.cuentas_bancarias.leer" },
+    "Tesorería/Formas de Pago": { alias: ["plazos", "forma de pago"], url: "/tesoreria/forma_pago", regla: "comun.forma_pago" },
+    "Tesorería/Bancos": { alias: ["entidad bancaria", "sucursales", "BIC"], url: "/tesoreria/banco", regla: "comun.banco" },
     "Tesorería/Configuración": { alias: ["remesas", "pago diferido", "pago indirecto"], url: "/tesoreria/config", regla: "tesoreria.config" },
 };

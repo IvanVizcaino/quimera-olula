@@ -1,6 +1,8 @@
 import { VentaTpv } from "#/tpv/venta/diseño.ts";
 import { ModeloClienteFacturaRegistrado } from "#/ventas/factura/cliente_factura/cliente_factura.ts";
+import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { useContext } from "react";
 import { guardarClienteRegistrado, guardarClienteSimplificada } from "./cambiar_cliente.ts";
 import "./CambiarClienteVentaTpv.css";
 import { ClienteVentaTpv } from "./ClienteVentaTpv.tsx";
@@ -13,6 +15,8 @@ export const CambiarCliente = ({
     publicar?: EmitirEvento;
 }) => {
 
+    const { intentar } = useContext(ContextoError);
+
     const cancelar = () => {
         publicar("cambio_cliente_cancelado");
     };
@@ -21,11 +25,11 @@ export const CambiarCliente = ({
 
         if (cliente) {
             const registrado = cliente as ModeloClienteFacturaRegistrado
-            await guardarClienteRegistrado(venta.id, registrado);
+            await intentar(() => guardarClienteRegistrado(venta.id, registrado));
             publicar("cliente_cambiado", registrado);
 
         } else {
-            await guardarClienteSimplificada(venta.id);
+            await intentar(() => guardarClienteSimplificada(venta.id));
             publicar("cliente_cambiado", null);
         }
     }

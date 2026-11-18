@@ -1,0 +1,7 @@
+/* Título de cada asiento cuando un formulario enseña varios (cierre del ejercicio). */
+.AsientoDeDocumento .titulo-asiento {
+    margin-inline: var(--padding-horizontal);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+}

@@ -1,4 +1,6 @@
 import Tpv_Urls from "#/tpv/comun/urls.ts";
+import { DirCliente } from "#/ventas/cliente/diseño.ts";
+import { getDirecciones } from "#/ventas/cliente/infraestructura.ts";
 import { ModeloClienteFacturaRegistrado } from "#/ventas/factura/cliente_factura/cliente_factura.ts";
 import { ClienteFacturaRegistrado } from "#/ventas/factura/diseño.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.js";
@@ -9,6 +11,19 @@ const baseUrl = new Tpv_Urls().VENTA;
 type PatchVentaClienteRegistrado = (id: string, cliente: ClienteFacturaRegistrado) => Promise<void>;
 
 type PatchVentaClienteSimplificada = (id: string) => Promise<void>;
+
+// DOMINIO
+
+export const avisoClienteSinDireccion =
+    "El cliente seleccionado no tiene dirección de facturación. " +
+    "Créala en Ventas > Cliente > Direcciones antes de asignarlo a la venta.";
+
+/** El servidor solo puede poner en la venta un cliente con dirección de facturación. */
+export const tieneDireccionFacturacion = (direcciones: Pick<DirCliente, "dir_facturacion">[]): boolean =>
+    direcciones.some((d) => d.dir_facturacion);
+
+export const clienteTieneDireccionFacturacion = async (clienteId: string): Promise<boolean> =>
+    tieneDireccionFacturacion(await getDirecciones(clienteId));
 
 // export const guardarClienteNoRegistrado = async (id: string, cliente: ModeloClienteVentaNoRegistrado) => {
 

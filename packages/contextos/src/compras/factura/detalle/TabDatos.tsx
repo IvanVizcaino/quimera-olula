@@ -51,6 +51,8 @@ export const TabDatos = ({
                     {...uiProps("grupoIvaNegocioId")}
                     nombre="grupoIvaNegocioId"
                 />
+                {/* Solo lectura: la serie se fija al crear la factura (ver metaFactura). */}
+                <QInput label="Serie" {...uiProps("serieId")} />
                 <QInput label="Rectifica a" {...uiProps("codigoRectificativa")} />
                 <QCheckbox label="De abono" {...uiProps("deAbono")} />
                 <QCheckbox label="Servicios" {...uiProps("servicios")} />

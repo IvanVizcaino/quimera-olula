@@ -103,5 +103,6 @@ const VARIANTES_ESTADO_RECIBO_VENTA: Record<string, VarianteEstado> = {
     agrupado: "gris",
 };
 
-export const varianteEstadoReciboVenta = (estado: string): VarianteEstado =>
-    VARIANTES_ESTADO_RECIBO_VENTA[estado.trim().toLowerCase()] ?? "neutro";
+// Sin estado en las filas de relleno que pinta el listado mientras carga.
+export const varianteEstadoReciboVenta = (estado: string | undefined): VarianteEstado =>
+    VARIANTES_ESTADO_RECIBO_VENTA[(estado ?? "").trim().toLowerCase()] ?? "neutro";

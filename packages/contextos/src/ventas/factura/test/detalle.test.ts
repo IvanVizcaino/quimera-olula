@@ -19,7 +19,7 @@ const abierta = () => conEstado("BORRADOR");
 const activarPlugin = () =>
     localStorage.setItem(
         "whoami",
-        JSON.stringify({ plugins: { estado_expedicion_factura: "activo" } })
+        JSON.stringify({ plugins: { estado_expedicion_factura: "firma" } })
     );
 
 beforeEach(() => localStorage.clear());
@@ -58,6 +58,27 @@ describe("con el plugin de expedición es la firma la que cierra la factura", ()
 
     test("sin estado sigue sin editarse", () => {
         expect(editable(facturaVacia())).toBe(false);
+    });
+});
+
+describe("solo la variante de firma del servidor reabre la factura emitida", () => {
+    const conVariante = (variante: string) =>
+        localStorage.setItem(
+            "whoami",
+            JSON.stringify({ plugins: { estado_expedicion_factura: variante } })
+        );
+
+    test("con basico, inactivo o un valor desconocido una emitida no se edita", () => {
+        for (const variante of ["basico", "inactivo", "activo"]) {
+            conVariante(variante);
+            expect(editable(conEstado("EMITIDA"))).toBe(false);
+        }
+    });
+
+    test("con firma una emitida se edita hasta que se firma", () => {
+        conVariante("firma");
+        expect(editable(conEstado("EMITIDA"))).toBe(true);
+        expect(editable(conEstado("FIRMADA"))).toBe(false);
     });
 });
 

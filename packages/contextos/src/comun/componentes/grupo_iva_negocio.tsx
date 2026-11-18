@@ -1,13 +1,14 @@
-import { capitalizarDescripcion } from "#/ventas/comun/dominio.ts";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
-import { obtenerDatosSelector } from "@olula/lib/infraestructura.ts";
-import { useEffect, useState } from "react";
+import {
+  OpcionGrupoIvaNegocio,
+  useOpcionesGrupoIvaNegocio,
+} from "./useOpcionesGrupoIvaNegocio.ts";
 
 interface GrupoIvaNegocioProps {
   valor: string;
   label?: string;
   nombre?: string;
-  onChange: (opcion: { valor: string; descripcion: string } | null) => void;
+  onChange: (opcion: OpcionGrupoIvaNegocio | null) => void;
 }
 
 export const GrupoIvaNegocio = ({
@@ -17,23 +18,7 @@ export const GrupoIvaNegocio = ({
   onChange,
   ...props
 }: GrupoIvaNegocioProps) => {
-  const [opciones, setOpciones] = useState<
-    { valor: string; descripcion: string }[]
-  >([]);
-
-  useEffect(() => {
-    const cargarOpciones = async () => {
-      const datos = await obtenerDatosSelector("grupo_iva_negocio")();
-      setOpciones(
-        datos.map((grupo) => ({
-          valor: String(grupo.id ?? ""),
-          descripcion: capitalizarDescripcion(String(grupo.descripcion ?? "")),
-        }))
-      );
-    };
-
-    cargarOpciones();
-  }, []);
+  const opciones = useOpcionesGrupoIvaNegocio();
 
   return (
     <QSelect

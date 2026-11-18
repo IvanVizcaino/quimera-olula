@@ -12,6 +12,7 @@ const facturaApi: FacturaAPI = {
     cliente_id: "000001",
     nombre_cliente: "Cliente 1",
     id_fiscal: "77716433P",
+    serie_id: "A",
     direccion_id: "7",
     direccion: direccionVacia(),
     agente_id: "",
@@ -74,5 +75,15 @@ describe("facturaDesdeAPI mapea la cabecera", () => {
         });
         expect(conDescuento.dtoPorcentual).toBe(10);
         expect(conDescuento.netoSinDto).toBe(197.2);
+    });
+});
+
+describe("facturaDesdeAPI trae la serie del documento", () => {
+    test("la serie llega como serie_id", () => {
+        expect(facturaDesdeAPI(facturaApi).serie_id).toBe("A");
+    });
+
+    test("sin serie en la respuesta queda vacía", () => {
+        expect(facturaDesdeAPI({ ...facturaApi, serie_id: undefined as unknown as string }).serie_id).toBe("");
     });
 });

@@ -1,3 +1,4 @@
+import { useAplicarImpuestoDefecto } from "#/almacen/config/useImpuestoDefecto.ts";
 import { ArticuloLinea, CamposArticuloLinea } from "#/ventas/comun/componentes/articulo_linea/ArticuloLinea.tsx";
 import { GrupoIvaProducto } from "#/ventas/comun/componentes/grupo_iva_producto.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
@@ -47,6 +48,7 @@ export const CrearLineaBase = ({ idPedido, publicar }: CrearLineaProps) => {
     );
 
     const lineaArticulo = useModelo(metaNuevaLinea, nuevaLineaInicial, onModeloListo);
+    useAplicarImpuestoDefecto(lineaArticulo, "idGrupoIvaProducto", "linea");
 
     const linea = lineaArticulo.modelo;
 

@@ -1,7 +1,12 @@
+import { conChecks } from "#/contabilidad/comun/checks_informe.ts";
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
 import { CambiosCuentasAnuales, CuentasAnuales } from "../diseño.ts";
-import { cuentasAnualesVacias, desgloseSegunFormato } from "../dominio.ts";
+import {
+    cuentasAnualesVacias,
+    desgloseSegunFormato,
+    omitirEpigrafesSegunTipo,
+} from "../dominio.ts";
 import {
     getBalanceCuentasAnuales,
     getCuentasAnuales,
@@ -22,15 +27,20 @@ const pipeInforme = ejecutarListaProcesos<
     ContextoDetalleCuentasAnuales
 >;
 
-export const metaCuentasAnuales: MetaModelo<CuentasAnuales> = {
-    campos: {
-        descripcion: { requerido: true },
-        tipo: { requerido: true },
-        formato: { requerido: true },
-        nivelDesglose: { requerido: true },
-        ejercicioId: { requerido: true },
+/** «Omitir epígrafes sin saldo» (`omitirepigsinsaldo`, bool) es casilla. */
+export const metaCuentasAnuales: MetaModelo<CuentasAnuales> = conChecks<CuentasAnuales>(
+    {
+        campos: {
+            descripcion: { requerido: true },
+            tipo: { requerido: true },
+            formato: { requerido: true },
+            nivelDesglose: { requerido: true },
+            ejercicioId: { requerido: true },
+        },
     },
-};
+    ["omitirEpigrafesSinSaldo"],
+    omitirEpigrafesSegunTipo
+);
 
 export const contextoDetalleCuentasAnualesInicial: ContextoDetalleCuentasAnuales =
     {

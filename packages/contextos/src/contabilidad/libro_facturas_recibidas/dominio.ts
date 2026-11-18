@@ -28,8 +28,8 @@ export const libroFacturasRecibidasVacio = (): LibroFacturasRecibidas => ({
     ...presentacionIvaVacia(),
 });
 
-/** El combo de porcentaje solo se habilita al desmarcar «todos los tipos»,
- * como en el formulario de Eneboo. */
+/** El % de I.V.A. (número libre) solo se habilita al desmarcar «todos los
+ * tipos», como en `co_i_facturasrec.qs`. */
 export const admitePorcentaje = (
     informe: Pick<LibroFacturasRecibidas, "todos">
 ): boolean => !informe.todos;

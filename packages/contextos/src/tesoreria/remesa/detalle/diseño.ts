@@ -4,7 +4,8 @@ export type EstadoDetalleRemesa =
     | 'INICIAL'
     | 'ABIERTO'
     | 'PAGANDO'
-    | 'DESHACIENDO_PAGO';
+    | 'DESHACIENDO_PAGO'
+    | 'GENERANDO_FICHERO';
 
 export type ContextoDetalleRemesa = {
     estado: EstadoDetalleRemesa;

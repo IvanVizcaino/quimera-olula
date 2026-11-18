@@ -1,3 +1,4 @@
+import { metaFormularioLibroIva } from "#/contabilidad/comun/librosIva.ts";
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
 import {
@@ -25,12 +26,8 @@ const pipeInforme = ejecutarListaProcesos<
     ContextoDetalleLibroFacturasRecibidas
 >;
 
-export const metaLibroFacturasRecibidas: MetaModelo<LibroFacturasRecibidas> = {
-    campos: {
-        descripcion: { requerido: true },
-        ejercicioId: { requerido: true },
-    },
-};
+export const metaLibroFacturasRecibidas: MetaModelo<LibroFacturasRecibidas> =
+    metaFormularioLibroIva<LibroFacturasRecibidas>();
 
 export const contextoDetalleLibroFacturasRecibidasInicial: ContextoDetalleLibroFacturasRecibidas =
     {

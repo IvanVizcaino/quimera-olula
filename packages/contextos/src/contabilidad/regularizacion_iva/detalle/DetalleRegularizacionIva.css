@@ -1,0 +1,12 @@
+/* Primera fila: ejercicio, periodo, fecha desde y hasta.
+ * Segunda fila: subcuentas H.P., número y fecha del asiento. */
+.DetalleRegularizacionIva quimera-formulario {
+    quimera-input {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="ejercicioId"],
+    quimera-input[nombre="codigoSubcuentaDeudora"] {
+        grid-column: 1 / span 3;
+    }
+}
