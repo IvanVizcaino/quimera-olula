@@ -537,6 +537,9 @@ importers:
       '@quimera-extension/login':
         specifier: workspace:*
         version: link:../../extensions/login
+      '@quimera-extension/vbarba-almacen':
+        specifier: workspace:*
+        version: link:../../extensions/vbarba/almacen
       '@quimera-extension/vbarba-facturacion':
         specifier: workspace:*
         version: link:../../extensions/vbarba/facturacion
@@ -691,6 +694,9 @@ importers:
       '@quimera-extension/login':
         specifier: workspace:*
         version: link:../../extensions/login
+      '@quimera-extension/vbarba-almacen':
+        specifier: workspace:*
+        version: link:../../extensions/vbarba/almacen
       '@quimera-extension/vbarba-facturacion':
         specifier: workspace:*
         version: link:../../extensions/vbarba/facturacion
@@ -2149,6 +2155,9 @@ importers:
       '@quimera-extension/login':
         specifier: workspace:*
         version: link:../../login
+      '@quimera-extension/vbarba-almacen':
+        specifier: workspace:*
+        version: link:../almacen
       '@quimera/comps':
         specifier: workspace:*
         version: link:../../../libs/comps
