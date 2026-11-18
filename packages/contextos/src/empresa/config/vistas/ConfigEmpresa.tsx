@@ -5,8 +5,8 @@ import { Impuesto } from "#/comun/componentes/impuesto.tsx";
 import { PantallaConfig } from "#/comun/componentes/pantalla_config/PantallaConfig.tsx";
 import { useConfig } from "#/comun/componentes/pantalla_config/useConfig.ts";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
-import { puede } from "@olula/lib/dominio.ts";
-import { configEmpresaValida } from "../dominio.ts";
+import { plugin, puede } from "@olula/lib/dominio.ts";
+import { configEmpresaValida, grupoIvaNegocioVisible } from "../dominio.ts";
 import { getConfigEmpresa, patchConfigEmpresa } from "../infraestructura.ts";
 
 const REGLA_CONFIG_ALMACEN = "almacen.config";
@@ -28,7 +28,9 @@ export const ConfigEmpresa = () => {
 
     if (!empresa.config || !iva.config) return null;
 
-    const empresaCambiada = empresa.cambiada && configEmpresaValida(empresa.config);
+    const estadoIvaNav = plugin("iva_nav");
+    const verGrupoIva = grupoIvaNegocioVisible(empresa.config, estadoIvaNav);
+    const empresaCambiada = verGrupoIva && empresa.cambiada && configEmpresaValida(empresa.config, estadoIvaNav);
     const ivaCambiado = verIva && iva.cambiada;
     const aviso = avisoIvaDefecto(iva.config);
 
@@ -45,15 +47,20 @@ export const ConfigEmpresa = () => {
             cambiada={empresaCambiada || ivaCambiado}
             guardando={empresa.guardando || iva.guardando}
         >
-            <section className="grupo-config">
-                <h3>Impuestos</h3>
-                <GrupoIvaNegocio
-                    label="G.IVA Negocio"
-                    nombre="grupo_iva_negocio_id"
-                    valor={empresa.config.grupoIvaNegocioId}
-                    onChange={(opcion) => empresa.cambiar("grupoIvaNegocioId", opcion?.valor ?? "")}
-                />
-            </section>
+            {verGrupoIva && (
+                <section className="grupo-config">
+                    <h3>Impuestos</h3>
+                    <GrupoIvaNegocio
+                        label="G.IVA Negocio"
+                        nombre="grupo_iva_negocio_id"
+                        valor={empresa.config.grupoIvaNegocioId}
+                        onChange={(opcion) => empresa.cambiar("grupoIvaNegocioId", opcion?.valor ?? "")}
+                    />
+                </section>
+            )}
+            {!verGrupoIva && !verIva && (
+                <p className="descripcion-config">No hay datos de empresa que configurar en esta instalación.</p>
+            )}
             {verIva && (
                 <section className="grupo-config">
                     <h3>Valores por defecto</h3>
