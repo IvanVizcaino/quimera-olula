@@ -18,6 +18,7 @@ export const menuAlmacen = {
     "Almacén/Clases de almacenamiento": { url: "/almacen/clases_almacenamiento", regla: "almacen.clase_almacenamiento", plugin: "sga" },
     "Almacén/Picking fijo": { url: "/almacen/picking_fijo", regla: "almacen.picking_fijo", plugin: "sga" },
     "Almacén/Reposición de picking": { url: "/almacen/reposicion", regla: "almacen.picking_fijo", plugin: "sga" },
+    "Almacén/Slotting": { url: "/almacen/slotting", regla: "almacen.picking_fijo", plugin: "sga" },
     "Almacén/Zonas": { url: "/almacen/zonas", regla: "almacen.zona", plugin: "sga" },
     "Almacén/Configuración": { alias: ["IVA por defecto"], url: "/almacen/config", regla: "almacen.config" },
 };
