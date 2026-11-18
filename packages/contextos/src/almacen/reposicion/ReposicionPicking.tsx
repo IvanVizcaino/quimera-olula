@@ -7,6 +7,7 @@ import { Link } from "react-router";
 import { NecesidadReposicion } from "./diseño.ts";
 import { puedeGenerarTraspaso, textoOrigenes } from "./dominio.ts";
 import { contextoReposicionInicial, getMaquina } from "./maquina.ts";
+import "#/comun/estilos/pagina_proceso.css";
 import "./ReposicionPicking.css";
 
 export const ReposicionPicking = () => {
@@ -14,7 +15,7 @@ export const ReposicionPicking = () => {
     const { estado, almacenId, reposicion } = ctx;
 
     return (
-        <div className="ReposicionPicking">
+        <div className="ReposicionPicking PaginaProceso">
             <h2>Reposición de picking</h2>
 
             <quimera-formulario>

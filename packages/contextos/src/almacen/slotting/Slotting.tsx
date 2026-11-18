@@ -15,6 +15,7 @@ import {
     filaPickingMarcable, filasPickingACrear, origenesRotacion, puedeUbicarMigracion,
     resumenMigracion, textoDestinoRecolocacion, todasPickingMarcadas,
 } from "./dominio.ts";
+import "#/comun/estilos/pagina_proceso.css";
 import "./Slotting.css";
 import { contextoSlottingInicial, getMaquina } from "./maquina.ts";
 
@@ -29,7 +30,7 @@ export const Slotting = () => {
     const { almacenId } = ctx;
 
     return (
-        <div className="Slotting">
+        <div className="Slotting PaginaProceso">
             <h2>Slotting</h2>
 
             <quimera-formulario>
