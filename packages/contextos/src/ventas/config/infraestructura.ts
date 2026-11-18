@@ -8,6 +8,7 @@ export interface ConfigVentasApi {
     facturar_albaranes_borrador: SiNoPreguntar;
     crear_facturas_borrador: SiNoPreguntar;
     correo_copias: string | null;
+    no_disponibles?: string[];
 }
 
 const baseUrl = new ApiUrls().CONFIG;
@@ -17,6 +18,7 @@ export const configVentasDesdeApi = (api: ConfigVentasApi): ConfigVentas => ({
     facturarAlbaranesBorrador: api.facturar_albaranes_borrador,
     crearFacturasBorrador: api.crear_facturas_borrador,
     correoCopias: api.correo_copias ?? "",
+    noDisponibles: api.no_disponibles ?? [],
 });
 
 export const configVentasAApi = (config: ConfigVentas): ConfigVentasApi => ({
