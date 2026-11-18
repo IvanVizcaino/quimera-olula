@@ -1,0 +1,6 @@
+.PasillosZona {
+    .botones {
+        flex-wrap: wrap;
+        margin-block: 0 var(--espaciado-m);
+    }
+}

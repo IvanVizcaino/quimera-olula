@@ -8,6 +8,7 @@ import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback } from "react";
 import { metaNuevaClaseAlmacenamiento, nuevaClaseAlmacenamientoVacia } from "../dominio.ts";
 import { postClaseAlmacenamiento } from "../infraestructura.ts";
+import "./CrearClaseAlmacenamiento.css";
 
 export const CrearClaseAlmacenamiento = ({ publicar }: { publicar: EmitirEvento }) => {
     const { modelo, uiProps, valido } = useModelo(metaNuevaClaseAlmacenamiento, nuevaClaseAlmacenamientoVacia);

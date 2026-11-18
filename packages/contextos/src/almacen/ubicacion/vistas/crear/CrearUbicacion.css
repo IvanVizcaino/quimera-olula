@@ -1,0 +1,16 @@
+.CrearUbicacion {
+    quimera-select[nombre="zonaId"],
+    quimera-select[nombre="pasilloId"] {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="modulo"],
+    quimera-input[nombre="nivel"],
+    quimera-input[nombre="hueco"] {
+        grid-column: span 4;
+    }
+
+    quimera-select[nombre="tipoUbicacionId"] {
+        grid-column: span 12;
+    }
+}

@@ -7,6 +7,7 @@ import { Link } from "react-router";
 import { NecesidadReposicion } from "./diseño.ts";
 import { puedeGenerarTraspaso, textoOrigenes } from "./dominio.ts";
 import { contextoReposicionInicial, getMaquina } from "./maquina.ts";
+import "./ReposicionPicking.css";
 
 export const ReposicionPicking = () => {
     const { ctx, emitir } = useMaquina(getMaquina, contextoReposicionInicial);

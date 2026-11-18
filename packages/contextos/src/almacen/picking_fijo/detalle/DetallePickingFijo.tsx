@@ -11,6 +11,7 @@ import { PickingFijo } from "../diseño.ts";
 import { metaPickingFijo } from "../dominio.ts";
 import { patchPickingFijo } from "../infraestructura.ts";
 import { contextoDetallePickingFijoInicial } from "./detalle.ts";
+import "./DetallePickingFijo.css";
 import { getMaquina } from "./maquina.ts";
 
 const titulo = (p: PickingFijo) => `${p.articuloId} en ${p.ubicacion}`;

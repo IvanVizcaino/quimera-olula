@@ -13,6 +13,7 @@ import { formatosUbicacion, metaTipoUbicacion } from "../dominio.ts";
 import { patchTipoUbicacion } from "../infraestructura.ts";
 import { BorrarTipoUbicacion } from "../borrar/BorrarTipoUbicacion.js";
 import { contextoDetalleTipoUbicacionInicial } from "./detalle.ts";
+import "./DetalleTipoUbicacion.css";
 import { getMaquina } from "./maquina.ts";
 
 const titulo = (tipo: TipoUbicacion) => tipo.codigo as string;

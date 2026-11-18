@@ -13,6 +13,7 @@ import {
     parametrosGenerarUbicacionesIniciales,
 } from "../dominio.ts";
 import { generarUbicacionesPasillo } from "../infraestructura.ts";
+import "./GenerarUbicacionesPasillo.css";
 
 /**
  * Modal de generación de ubicaciones de un pasillo. Tras generar, el formulario deja paso a un

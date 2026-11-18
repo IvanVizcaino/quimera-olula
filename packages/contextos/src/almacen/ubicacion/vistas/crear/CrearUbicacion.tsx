@@ -11,6 +11,7 @@ import { useContext } from "react";
 import { NuevaUbicacion } from "../../diseño.ts";
 import { metaNuevaUbicacion, nuevaUbicacionVacia } from "../../dominio.ts";
 import { getUbicacion, postUbicacion } from "../../infraestructura.ts";
+import "./CrearUbicacion.css";
 
 export const CrearUbicacion = ({
   publicar = async () => {},

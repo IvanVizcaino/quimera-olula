@@ -14,6 +14,7 @@ import { useCallback, useContext, useEffect } from "react";
 import { Zona } from "../../diseño.ts";
 import { patchZona } from "../../infraestructura.ts";
 import { BorrarZona } from "../borrar/BorrarZona.js";
+import "./DetalleZona.css";
 import { contextoDetalleZonaInicial, metaZona } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
 import { PasillosZona } from "./pasillos/PasillosZona.js";

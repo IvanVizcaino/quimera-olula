@@ -10,6 +10,7 @@ import { useCallback } from "react";
 import { Zona } from "../../zona/diseño.ts";
 import { accesosPasillo, carasPasillo, metaNuevoPasillo, nuevoPasilloVacio } from "../dominio.ts";
 import { postPasillo } from "../infraestructura.ts";
+import "./CrearPasillo.css";
 
 export const CrearPasillo = ({
     zona,

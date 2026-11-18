@@ -12,6 +12,7 @@ import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { ListaEntidades } from "@olula/lib/ListaEntidades.js";
 import { Zona } from "../../../diseño.ts";
 import { EstadoDetalleZona } from "../diseño.ts";
+import "./PasillosZona.css";
 
 const metaTablaPasillos: MetaTabla<Pasillo> = [
     { id: "orden", cabecera: "Orden" },

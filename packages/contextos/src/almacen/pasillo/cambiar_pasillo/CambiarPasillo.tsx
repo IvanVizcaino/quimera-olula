@@ -9,6 +9,7 @@ import { useCallback } from "react";
 import { Pasillo } from "../diseño.ts";
 import { accesosPasillo, carasPasillo, metaPasillo } from "../dominio.ts";
 import { patchPasillo } from "../infraestructura.ts";
+import "./CambiarPasillo.css";
 
 export const CambiarPasillo = ({
     pasillo,

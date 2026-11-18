@@ -9,6 +9,7 @@ import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback } from "react";
 import { metaNuevoPickingFijo, nuevoPickingFijoVacio } from "../dominio.ts";
 import { postPickingFijo } from "../infraestructura.ts";
+import "./CrearPickingFijo.css";
 
 export const CrearPickingFijo = ({ publicar }: { publicar: EmitirEvento }) => {
     const { modelo, uiProps, valido } = useModelo(metaNuevoPickingFijo, nuevoPickingFijoVacio);

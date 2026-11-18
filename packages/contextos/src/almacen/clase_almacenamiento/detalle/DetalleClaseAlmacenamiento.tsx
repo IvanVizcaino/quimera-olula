@@ -11,6 +11,7 @@ import { ClaseAlmacenamiento } from "../diseño.ts";
 import { metaClaseAlmacenamiento } from "../dominio.ts";
 import { patchClaseAlmacenamiento } from "../infraestructura.ts";
 import { contextoDetalleClaseAlmacenamientoInicial } from "./detalle.ts";
+import "./DetalleClaseAlmacenamiento.css";
 import { getMaquina } from "./maquina.ts";
 
 const titulo = (clase: ClaseAlmacenamiento) => clase.codigo as string;

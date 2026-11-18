@@ -10,6 +10,7 @@ import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback } from "react";
 import { formatosUbicacion, metaNuevoTipoUbicacion, nuevoTipoUbicacionVacio } from "../dominio.ts";
 import { postTipoUbicacion } from "../infraestructura.ts";
+import "./CrearTipoUbicacion.css";
 
 export const CrearTipoUbicacion = ({ publicar }: { publicar: EmitirEvento }) => {
     const { modelo, uiProps, valido } = useModelo(metaNuevoTipoUbicacion, nuevoTipoUbicacionVacio);

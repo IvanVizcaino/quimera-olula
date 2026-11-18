@@ -14,6 +14,7 @@ import { Ubicacion } from "../../diseño.ts";
 import { estadosUbicacion, metaUbicacion, ubicacionVacia, descripcionCaraUbicacion } from "../../dominio.ts";
 import { patchUbicacion } from "../../infraestructura.ts";
 import { BorrarUbicacion } from "./BorrarUbicacion.tsx";
+import "./DetalleUbicacion.css";
 import { getMaquina } from "./maquina.ts";
 import { StocksUbicacion } from "./stocks/StocksUbicacion.tsx";
 
