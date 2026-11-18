@@ -14,16 +14,16 @@ type OpcionClase = { valor: string; descripcion: string };
 /**
  * Selección múltiple de las clases de almacenamiento que admite una zona.
  *
- * No reenvía a QMultiCheckbox todo lo de `uiProps`: su `tipo` ("texto", el de un campo sin tipo)
- * pisaría el "checkbox" de cada casilla y se pintarían como cajas de texto.
+ * Reenvía lo de `uiProps` salvo su `tipo` ("texto", el de un campo sin tipo), que pisaría el
+ * "checkbox" de cada casilla y se pintarían como cajas de texto. `evaluarCambio` sí debe llegar a
+ * las casillas: es lo que guarda la zona al perder el foco.
  */
 export const ClasesAdmitidasZona = ({
     valor,
     nombre = "clasesAdmitidas",
     label = "Clases admitidas",
-    onChange,
-    soloLectura,
-    deshabilitado,
+    tipo: _tipo,
+    ...props
 }: ClasesAdmitidasZonaProps) => {
     const [opciones, setOpciones] = useState<OpcionClase[] | null>(null);
 
@@ -52,10 +52,8 @@ export const ClasesAdmitidasZona = ({
 
     return (
         <QMultiCheckbox
+            {...props}
             label={label}
-            onChange={onChange}
-            soloLectura={soloLectura}
-            deshabilitado={deshabilitado}
             nombre={nombre}
             valor={(Array.isArray(valor) ? valor : []) as unknown as string}
             opciones={opciones}
