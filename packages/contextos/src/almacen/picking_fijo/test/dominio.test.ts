@@ -42,5 +42,6 @@ describe("validarNuevoPickingFijo", () => {
     it("exige artículo y ubicación", () => {
         expect(validarNuevoPickingFijo({ ...nuevo, articuloId: "" })).not.toBe(true);
         expect(validarNuevoPickingFijo({ ...nuevo, ubicacionId: " " })).not.toBe(true);
+        expect(validarNuevoPickingFijo({ ...nuevo, articuloId: null as unknown as string })).not.toBe(true);
     });
 });

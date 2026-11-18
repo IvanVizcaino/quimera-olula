@@ -1,3 +1,4 @@
+import { sinTexto } from "#/almacen/comun/dominio.ts";
 import { MetaModelo } from "@olula/lib/dominio.ts";
 import {
     AccesosPasillo,
@@ -45,7 +46,7 @@ export const caraDeModulo = (modulo: number): "IZQUIERDA" | "DERECHA" =>
 
 /** Devuelve `true` si es válido o el mensaje del primer error. */
 export const validarPasillo = (m: Pick<NuevoPasillo, "codigo" | "orden" | "modulos">): string | true => {
-    if (m.codigo.trim() === "") return "El código es obligatorio";
+    if (sinTexto(m.codigo)) return "El código es obligatorio";
     if (m.codigo.length > 10) return "El código admite como máximo 10 caracteres";
     if (!esEntero(m.orden) || m.orden < 0) return "El orden debe ser un entero mayor o igual que 0";
     if (!esEntero(m.modulos) || m.modulos <= 0) return "Los módulos por cara deben ser un entero mayor que 0";

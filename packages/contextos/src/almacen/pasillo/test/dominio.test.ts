@@ -66,6 +66,7 @@ describe("validarPasillo", () => {
 
     it("rechaza código vacío o de más de 10 caracteres", () => {
         expect(validarPasillo({ ...valido, codigo: " " })).not.toBe(true);
+        expect(validarPasillo({ ...valido, codigo: null as unknown as string })).not.toBe(true);
         expect(validarPasillo({ ...valido, codigo: "12345678901" })).not.toBe(true);
     });
 

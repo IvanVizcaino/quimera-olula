@@ -1,5 +1,6 @@
 import { MetaModelo } from "@olula/lib/dominio.ts";
 import { FormatoUbicacion, NuevoTipoUbicacion, TipoUbicacion } from "./diseño.ts";
+import { sinTexto } from "#/almacen/comun/dominio.ts";
 
 export const formatosUbicacion: { valor: FormatoUbicacion; descripcion: string }[] = [
     { valor: "HUECO_PALET", descripcion: "Hueco de palé" },
@@ -26,10 +27,10 @@ type CamposTipoUbicacion = Pick<
 
 /** Devuelve `true` si es válido o el mensaje del primer error. */
 export const validarTipoUbicacion = (m: CamposTipoUbicacion): string | true => {
-    if (m.codigo.trim() === "") return "El código es obligatorio";
+    if (sinTexto(m.codigo)) return "El código es obligatorio";
     if (m.codigo.length > 10) return "El código admite como máximo 10 caracteres";
-    if (m.descripcion.trim() === "") return "La descripción es obligatoria";
-    if (m.formato.trim() === "") return "El formato es obligatorio";
+    if (sinTexto(m.descripcion)) return "La descripción es obligatoria";
+    if (sinTexto(m.formato)) return "El formato es obligatorio";
     if (!enteroNoNegativoONulo(m.capacidadPalets)) return "La capacidad de palés debe ser un entero mayor o igual que 0";
     if (!numeroNoNegativoONulo(m.pesoMax)) return "El peso máximo debe ser mayor o igual que 0";
     if (!numeroNoNegativoONulo(m.alturaMax)) return "La altura máxima debe ser mayor o igual que 0";

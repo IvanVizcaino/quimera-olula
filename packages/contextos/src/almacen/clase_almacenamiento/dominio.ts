@@ -1,13 +1,14 @@
 import { MetaModelo } from "@olula/lib/dominio.ts";
 import { ClaseAlmacenamiento, NuevaClaseAlmacenamiento } from "./diseño.ts";
+import { sinTexto } from "#/almacen/comun/dominio.ts";
 
 type CamposClaseAlmacenamiento = Pick<NuevaClaseAlmacenamiento, "codigo" | "descripcion">;
 
 /** Devuelve `true` si es válido o el mensaje del primer error. */
 export const validarClaseAlmacenamiento = (m: CamposClaseAlmacenamiento): string | true => {
-    if (m.codigo.trim() === "") return "El código es obligatorio";
+    if (sinTexto(m.codigo)) return "El código es obligatorio";
     if (m.codigo.length > 10) return "El código admite como máximo 10 caracteres";
-    if (m.descripcion.trim() === "") return "La descripción es obligatoria";
+    if (sinTexto(m.descripcion)) return "La descripción es obligatoria";
     return true;
 };
 

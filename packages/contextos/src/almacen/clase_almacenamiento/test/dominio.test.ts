@@ -11,6 +11,8 @@ describe("validarClaseAlmacenamiento", () => {
     it("rechaza código vacío o solo espacios", () => {
         expect(validarClaseAlmacenamiento({ ...valida, codigo: "" })).not.toBe(true);
         expect(validarClaseAlmacenamiento({ ...valida, codigo: "  " })).not.toBe(true);
+        expect(validarClaseAlmacenamiento({ ...valida, codigo: null as unknown as string })).not.toBe(true);
+        expect(validarClaseAlmacenamiento({ ...valida, descripcion: null as unknown as string })).not.toBe(true);
     });
 
     it("rechaza código de más de 10 caracteres", () => {

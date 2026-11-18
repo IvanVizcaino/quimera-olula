@@ -20,6 +20,9 @@ describe("validarTipoUbicacion", () => {
     it("rechaza código o descripción vacíos", () => {
         expect(validarTipoUbicacion({ ...valido, codigo: "" })).not.toBe(true);
         expect(validarTipoUbicacion({ ...valido, descripcion: "" })).not.toBe(true);
+        // useModelo deja en null el campo que se borra
+        expect(validarTipoUbicacion({ ...valido, codigo: null as unknown as string })).not.toBe(true);
+        expect(validarTipoUbicacion({ ...valido, descripcion: null as unknown as string })).not.toBe(true);
     });
 
     it("rechaza código de más de 10 caracteres", () => {

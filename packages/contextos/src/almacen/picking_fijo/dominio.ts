@@ -1,5 +1,6 @@
 import { MetaModelo } from "@olula/lib/dominio.ts";
 import { NuevoPickingFijo, PickingFijo } from "./diseño.ts";
+import { sinTexto } from "#/almacen/comun/dominio.ts";
 
 type CamposReposicion = Pick<NuevoPickingFijo, "minimo" | "maximo" | "unidadReposicion">;
 
@@ -21,8 +22,8 @@ export const validarReposicionPickingFijo = (m: CamposReposicion): string | true
 };
 
 export const validarNuevoPickingFijo = (m: NuevoPickingFijo): string | true => {
-    if (m.articuloId.trim() === "") return "El artículo es obligatorio";
-    if (m.ubicacionId.trim() === "") return "La ubicación es obligatoria";
+    if (sinTexto(m.articuloId)) return "El artículo es obligatorio";
+    if (sinTexto(m.ubicacionId)) return "La ubicación es obligatoria";
     return validarReposicionPickingFijo(m);
 };
 
