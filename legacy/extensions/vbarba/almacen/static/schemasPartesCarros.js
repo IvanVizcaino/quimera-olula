@@ -1,9 +1,8 @@
 import { util } from "quimera";
 import { Field, Schema } from "quimera/lib";
 
-// Esquemas de partes de carros (tabla escarros). Los usan las vistas de
-// vbarba-almacen y AlbaranesVenta de vbarba-firma_albaranes; viven aquí para
-// que una app que solo carga una de las dos extensiones los tenga igualmente.
+// Esquemas de partes de carros (tabla escarros) y de su firma. Los usan las
+// vistas de vbarba-almacen y AlbaranesVenta de vbarba-firma_albaranes.
 export const schemasPartesCarros = {
   partescarros: Schema("escarros", "id")
     .fields({
@@ -84,4 +83,17 @@ export const schemasPartesCarros = {
     })
     .order(() => ({ field: "fecha", direction: "DESC" }))
     .filter(({ parteCarro }) => ["id", "eq", parteCarro.data.idParte]),
+  firmasdecarros: Schema("firmasdecarros", "idescarro").fields({
+    idEscarro: Field.Text("idescarro", "idescarro"),
+    codigoParte: Field.Text("codigoparte", "codigoparte"),
+    codContacto: Field.Text("codcontacto", "codcontacto"),
+    firmadopor: Field.Text("firmadopor", "firmadopor"),
+    cifnif: Field.Text("cifnif", "cifnif"),
+    puesto: Field.Text("puesto", "puesto"),
+    fecha: Field.Text("fecha", "fecha"),
+    hora: Field.Text("hora", "hora"),
+    observacionesfirma: Field.TextArea("observacionesfirma", "observacionesfirma").default(""),
+    estado: Field.Text("estado", "estado"),
+    firma: Field.Text("firma", "firma"),
+  }),
 };

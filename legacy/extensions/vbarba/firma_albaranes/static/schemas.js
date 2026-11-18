@@ -50,19 +50,6 @@ export default parent => {
       firma: Field.Text("firma", "firma"),
     }),
     ...schemasPartesCarros,
-    firmasdecarros: Schema("firmasdecarros", "idescarro").fields({
-      idEscarro: Field.Text("idescarro", "idescarro"),
-      codigoParte: Field.Text("codigoparte", "codigoparte"),
-      codContacto: Field.Text("codcontacto", "codcontacto"),
-      firmadopor: Field.Text("firmadopor", "firmadopor"),
-      cifnif: Field.Text("cifnif", "cifnif"),
-      puesto: Field.Text("puesto", "puesto"),
-      fecha: Field.Text("fecha", "fecha"),
-      hora: Field.Text("hora", "hora"),
-      observacionesfirma: Field.TextArea("observacionesfirma", "observacionesfirma").default(""),
-      estado: Field.Text("estado", "estado"),
-      firma: Field.Text("firma", "firma"),
-    }),
     puestosdefirma: Schema("vb_puestosdefirma", "puesto")
       .fields({
         puesto: Field.Text("puesto", "puesto"),

@@ -567,6 +567,9 @@ importers:
       '@quimera-extension/vbarba-facturacion':
         specifier: workspace:*
         version: link:../../extensions/vbarba/facturacion
+      '@quimera-extension/vbarba-firma_albaranes':
+        specifier: workspace:*
+        version: link:../../extensions/vbarba/firma_albaranes
       quimera:
         specifier: workspace:@quimera/core@*
         version: link:../../libs/core
