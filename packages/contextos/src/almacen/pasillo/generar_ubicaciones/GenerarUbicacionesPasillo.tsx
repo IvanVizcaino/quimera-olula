@@ -1,7 +1,7 @@
 import { TipoUbicacion } from "#/almacen/comun/componentes/TipoUbicacion.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
-import { QModal } from "@olula/componentes/index.js";
+import { QModal, QModalConfirmacion } from "@olula/componentes/index.js";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
@@ -15,8 +15,9 @@ import {
 import { generarUbicacionesPasillo } from "../infraestructura.ts";
 
 /**
- * Modal de generación de ubicaciones de un pasillo. Tras generar muestra cuántas se han
- * creado; al cerrarlo avisa con "ubicaciones_generadas" para que se refresquen las de la zona.
+ * Modal de generación de ubicaciones de un pasillo. Tras generar, el formulario deja paso a un
+ * aviso con cuántas se han creado; al aceptarlo avisa con "ubicaciones_generadas" para que se
+ * cierre y se refresquen las ubicaciones de la zona.
  */
 export const GenerarUbicacionesPasillo = ({
     pasillo,
@@ -37,17 +38,29 @@ export const GenerarUbicacionesPasillo = ({
         setResultado(r);
     }, [intentar, pasillo.id, modelo]);
 
-    const cerrar = useCallback(
-        () => publicar(resultado ? "ubicaciones_generadas" : "generacion_cancelada"),
-        [publicar, resultado]
-    );
+    const cancelar = useCallback(() => publicar("generacion_cancelada"), [publicar]);
+    const terminar = useCallback(() => publicar("ubicaciones_generadas"), [publicar]);
+
+    if (resultado) {
+        return (
+            <QModalConfirmacion
+                nombre="ubicacionesGeneradas"
+                abierto={true}
+                titulo="Ubicaciones generadas"
+                mensaje={mensajeUbicacionesGeneradas(resultado.creadas)}
+                mostrarCancelar={false}
+                onAceptar={terminar}
+                onCerrar={terminar}
+            />
+        );
+    }
 
     return (
         <QModal
             abierto={true}
             nombre="generarUbicacionesPasillo"
             titulo={`Generar ubicaciones del pasillo ${pasillo.codigo}`}
-            onCerrar={cerrar}
+            onCerrar={cancelar}
         >
             <quimera-formulario>
                 <QInput label="Nivel desde" {...uiProps("nivelDesde")} />
@@ -57,16 +70,10 @@ export const GenerarUbicacionesPasillo = ({
                 <QInput label="Módulo desde (opcional)" {...uiProps("moduloDesde")} />
                 <QInput label="Módulo hasta (opcional)" {...uiProps("moduloHasta")} />
             </quimera-formulario>
-            {resultado && (
-                <p className="resultado-generacion">
-                    {mensajeUbicacionesGeneradas(resultado.creadas)}
-                </p>
-            )}
             <div className="botones maestro-botones">
                 <QBoton onClick={generar} deshabilitado={!valido}>
                     Generar
                 </QBoton>
-                {resultado && <QBoton onClick={cerrar}>Cerrar</QBoton>}
             </div>
         </QModal>
     );
