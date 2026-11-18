@@ -26,4 +26,7 @@ export interface Reposicion {
     necesidades: NecesidadReposicion[];
 }
 
-export type GenerarReposicion = (almacenId: string, simular: boolean) => Promise<Reposicion>;
+/** `pickingFijoIds`: solo esas necesidades (por defecto, todas las del almacén). */
+export type GenerarReposicion = (
+    almacenId: string, simular: boolean, pickingFijoIds?: string[]
+) => Promise<Reposicion>;

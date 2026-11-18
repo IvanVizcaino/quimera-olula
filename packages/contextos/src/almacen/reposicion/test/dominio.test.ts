@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { NecesidadReposicion, Reposicion } from "../diseño.ts";
-import { calcularDisponible, puedeGenerarTraspaso, textoOrigenes, totalOrigenes } from "../dominio.ts";
+import {
+    calcularDisponible, marcarNecesidad, puedeGenerarSeleccion, puedeGenerarTraspaso, seleccionInicial,
+    textoOrigenes, todasSeleccionadas, totalOrigenes,
+} from "../dominio.ts";
 
 const necesidad: NecesidadReposicion = {
     pickingFijoId: "1",
@@ -40,5 +43,34 @@ describe("reposición", () => {
         expect(puedeGenerarTraspaso({ ...r, ordenId: "T1" })).toBe(false);
         expect(puedeGenerarTraspaso({ ordenId: null, necesidades: [{ ...necesidad, origenes: [] }] })).toBe(false);
         expect(puedeGenerarTraspaso({ ordenId: null, necesidades: [] })).toBe(false);
+    });
+
+    describe("selección", () => {
+        const sinOrigen = { ...necesidad, pickingFijoId: "2", origenes: [] };
+        const otra = { ...necesidad, pickingFijoId: "3" };
+        const r: Reposicion = { ordenId: null, necesidades: [necesidad, sinOrigen, otra] };
+
+        it("marca de inicio las que tienen origen", () => {
+            expect(seleccionInicial(r)).toEqual(["1", "3"]);
+        });
+
+        it("sabe si están todas marcadas", () => {
+            expect(todasSeleccionadas(r, ["1", "3"])).toBe(true);
+            expect(todasSeleccionadas(r, ["1"])).toBe(false);
+            expect(todasSeleccionadas({ ordenId: null, necesidades: [sinOrigen] }, [])).toBe(false);
+        });
+
+        it("marca y desmarca sin duplicar", () => {
+            expect(marcarNecesidad(["1"], "1", true)).toEqual(["1"]);
+            expect(marcarNecesidad(["1"], "3", true)).toEqual(["1", "3"]);
+            expect(marcarNecesidad(["1", "3"], "1", false)).toEqual(["3"]);
+        });
+
+        it("solo genera con alguna marcada con origen", () => {
+            expect(puedeGenerarSeleccion(r, ["3"])).toBe(true);
+            expect(puedeGenerarSeleccion(r, [])).toBe(false);
+            expect(puedeGenerarSeleccion(r, ["2"])).toBe(false);
+            expect(puedeGenerarSeleccion({ ...r, ordenId: "T1" }, ["1"])).toBe(false);
+        });
     });
 });

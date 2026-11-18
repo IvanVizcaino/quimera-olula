@@ -5,14 +5,16 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { Entidad } from "@olula/lib/diseño.ts";
 import { Link } from "react-router";
 import { NecesidadReposicion } from "./diseño.ts";
-import { puedeGenerarTraspaso, textoOrigenes } from "./dominio.ts";
+import {
+    necesidadSeleccionable, puedeGenerarSeleccion, puedeGenerarTraspaso, textoOrigenes, todasSeleccionadas,
+} from "./dominio.ts";
 import { contextoReposicionInicial, getMaquina } from "./maquina.ts";
 import "#/comun/estilos/pagina_proceso.css";
 import "./ReposicionPicking.css";
 
 export const ReposicionPicking = () => {
     const { ctx, emitir } = useMaquina(getMaquina, contextoReposicionInicial);
-    const { estado, almacenId, reposicion } = ctx;
+    const { estado, almacenId, reposicion, seleccion } = ctx;
 
     return (
         <div className="ReposicionPicking PaginaProceso">
@@ -31,9 +33,17 @@ export const ReposicionPicking = () => {
                 <QBoton deshabilitado={!almacenId} onClick={() => emitir("calculo_solicitado")}>
                     Calcular
                 </QBoton>
+                {estado === "CALCULADO" && puedeGenerarTraspaso(reposicion) && (
+                    <QBoton
+                        variante="texto"
+                        onClick={() => emitir("seleccion_todas_cambiada", !todasSeleccionadas(reposicion, seleccion))}
+                    >
+                        {todasSeleccionadas(reposicion, seleccion) ? "Desmarcar todos" : "Marcar todos"}
+                    </QBoton>
+                )}
                 {estado === "CALCULADO" && (
                     <QBoton
-                        deshabilitado={!puedeGenerarTraspaso(reposicion)}
+                        deshabilitado={!puedeGenerarSeleccion(reposicion, seleccion)}
                         onClick={() => emitir("generacion_solicitada")}
                     >
                         Generar traspaso
@@ -67,7 +77,11 @@ export const ReposicionPicking = () => {
                 (reposicion.necesidades.length === 0 ? (
                     <p>No hay necesidades de reposición.</p>
                 ) : (
-                    <TablaNecesidades necesidades={reposicion.necesidades} />
+                    <TablaNecesidades
+                        necesidades={reposicion.necesidades}
+                        seleccion={estado === "CALCULADO" ? seleccion : null}
+                        onMarcar={(id, marcada) => emitir("necesidad_marcada", { id, marcada })}
+                    />
                 ))}
         </div>
     );
@@ -75,7 +89,7 @@ export const ReposicionPicking = () => {
 
 type FilaNecesidad = Entidad & NecesidadReposicion;
 
-const metaTablaNecesidades: MetaTabla<FilaNecesidad> = [
+const columnasNecesidades: MetaTabla<FilaNecesidad> = [
     { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
     { id: "ubicacion", cabecera: "Ubicación de picking" },
     { id: "fisico", cabecera: "Físico", tipo: "numero" },
@@ -94,11 +108,30 @@ const metaTablaNecesidades: MetaTabla<FilaNecesidad> = [
     },
 ];
 
-const TablaNecesidades = ({ necesidades }: { necesidades: NecesidadReposicion[] }) => (
-    <QTabla<FilaNecesidad>
-        metaTabla={metaTablaNecesidades}
-        datos={necesidades.map((n) => ({ ...n, id: n.pickingFijoId }))}
-        cargando={false}
-        orden={[]}
-    />
-);
+const TablaNecesidades = ({ necesidades, seleccion, onMarcar }: {
+    necesidades: NecesidadReposicion[];
+    /** null: sin casillas (p. ej. tras generar el traspaso). */
+    seleccion: string[] | null;
+    onMarcar: (id: string, marcada: boolean) => void;
+}) => {
+    const casilla: MetaTabla<FilaNecesidad>[number] = {
+        id: "seleccionada", cabecera: "", ancho: "40px",
+        render: (n) => (
+            <input
+                type="checkbox"
+                checked={!!seleccion?.includes(n.pickingFijoId)}
+                disabled={!necesidadSeleccionable(n)}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => onMarcar(n.pickingFijoId, e.target.checked)}
+            />
+        ),
+    };
+    return (
+        <QTabla<FilaNecesidad>
+            metaTabla={seleccion ? [casilla, ...columnasNecesidades] : columnasNecesidades}
+            datos={necesidades.map((n) => ({ ...n, id: n.pickingFijoId }))}
+            cargando={false}
+            orden={[]}
+        />
+    );
+};

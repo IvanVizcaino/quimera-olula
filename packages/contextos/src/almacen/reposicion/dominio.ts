@@ -17,3 +17,25 @@ export const textoOrigenes = (n: Pick<NecesidadReposicion, "origenes">): string 
 /** Se puede generar traspaso si alguna necesidad tiene al menos un origen con cantidad. */
 export const puedeGenerarTraspaso = (r: Reposicion): boolean =>
     r.ordenId === null && r.necesidades.some((n) => totalOrigenes(n) > 0);
+
+/** Una necesidad se puede marcar si tiene algún origen desde donde reponer. */
+export const necesidadSeleccionable = (n: Pick<NecesidadReposicion, "origenes">): boolean =>
+    totalOrigenes(n) > 0;
+
+/** Al calcular, vienen marcadas todas las que se pueden reponer. */
+export const seleccionInicial = (r: Reposicion): string[] =>
+    r.necesidades.filter(necesidadSeleccionable).map((n) => n.pickingFijoId);
+
+/** Si están marcadas todas las que se pueden marcar (y hay alguna). */
+export const todasSeleccionadas = (r: Reposicion, seleccion: string[]): boolean => {
+    const seleccionables = seleccionInicial(r);
+    return seleccionables.length > 0 && seleccionables.every((id) => seleccion.includes(id));
+};
+
+/** Marca o desmarca una necesidad. */
+export const marcarNecesidad = (seleccion: string[], id: string, marcada: boolean): string[] =>
+    marcada ? [...new Set([...seleccion, id])] : seleccion.filter((s) => s !== id);
+
+/** Se puede generar el traspaso si hay alguna necesidad marcada con origen. */
+export const puedeGenerarSeleccion = (r: Reposicion, seleccion: string[]): boolean =>
+    r.ordenId === null && r.necesidades.some((n) => seleccion.includes(n.pickingFijoId) && necesidadSeleccionable(n));

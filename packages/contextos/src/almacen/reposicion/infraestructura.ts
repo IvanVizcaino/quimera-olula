@@ -34,6 +34,7 @@ interface ReposicionApi {
 interface PeticionReposicionApi {
     almacen_id: string;
     simular: boolean;
+    picking_fijo_ids?: string[];
 }
 
 const origenDesdeApi = (o: OrigenReposicionApi): OrigenReposicion => ({
@@ -64,10 +65,10 @@ export const reposicionDesdeApi = (r: ReposicionApi): Reposicion => ({
     necesidades: (r.necesidades ?? []).map(necesidadDesdeApi),
 });
 
-export const generarReposicion: GenerarReposicion = async (almacenId, simular) => {
+export const generarReposicion: GenerarReposicion = async (almacenId, simular, pickingFijoIds) => {
     const respuesta = await RestAPI.query<PeticionReposicionApi, ReposicionApi>(
         baseUrl,
-        { almacen_id: almacenId, simular },
+        { almacen_id: almacenId, simular, ...(pickingFijoIds ? { picking_fijo_ids: pickingFijoIds } : {}) },
         simular ? "Error al calcular la reposición" : "Error al generar el traspaso de reposición"
     );
     return reposicionDesdeApi(respuesta);
