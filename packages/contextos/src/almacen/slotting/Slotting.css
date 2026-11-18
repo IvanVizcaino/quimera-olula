@@ -26,3 +26,17 @@
 .Slotting .resumen-picking {
     font-weight: var(--grosor-letra-5);
 }
+
+.Slotting .slotting-explicacion {
+    margin: var(--espaciado-s) 0;
+    padding: var(--espaciado-s) var(--espaciado-m);
+    border-left: 3px solid var(--color-primario);
+    background: var(--color-superficie-sunken);
+    color: var(--color-texto-secundario);
+    font-size: var(--tamaño-letra-s);
+}
+
+.Slotting .slotting-explicacion ul {
+    margin: var(--espaciado-xs) 0 0;
+    padding-left: var(--espaciado-l);
+}

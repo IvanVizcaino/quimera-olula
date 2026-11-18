@@ -15,6 +15,7 @@ import {
     marcarTodasPicking,
     todasPickingMarcadas,
     filaPickingMarcable,
+    explicacionAbc,
 } from "../dominio.ts";
 import { propuestaPickingDesdeApi, articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
 
@@ -155,5 +156,13 @@ describe("marcar y desmarcar todas las filas de picking", () => {
     it("sabe si están todas las marcables marcadas", () => {
         expect(todasPickingMarcadas(filas)).toBe(false);
         expect(todasPickingMarcadas(marcarTodasPicking(filas, true))).toBe(true);
+    });
+});
+
+describe("explicación del ABC", () => {
+    it("dice de dónde sale la rotación y el periodo", () => {
+        expect(explicacionAbc("VENTAS", 365)[0]).toContain("albarán de venta");
+        expect(explicacionAbc("VENTAS", 365)[0]).toContain("365 días");
+        expect(explicacionAbc("ORDENES", 90)[0]).toContain("órdenes de salida");
     });
 });

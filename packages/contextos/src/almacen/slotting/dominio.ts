@@ -115,3 +115,13 @@ export const todasPickingMarcadas = (filas: FilaPickingFijo[]): boolean => {
 /** Marca todas las que se pueden marcar, o desmarca todas. */
 export const marcarTodasPicking = (filas: FilaPickingFijo[], marcar: boolean): FilaPickingFijo[] =>
     filas.map((f) => ({ ...f, seleccionada: marcar && filaPickingMarcable(f) }));
+
+/** Cómo se obtiene la clasificación ABC, para explicarlo en la pantalla. */
+export const explicacionAbc = (origen: OrigenRotacion, dias: number): string[] => [
+    origen === "VENTAS"
+        ? `Cuenta cuántas líneas de albarán de venta tiene cada artículo en este almacén en los últimos ${dias} días (cada línea es un envío; las devoluciones no cuentan).`
+        : `Cuenta cuántas líneas de órdenes de salida del SGA, con algo recogido, tiene cada artículo en este almacén en los últimos ${dias} días.`,
+    "Se cuentan visitas al hueco (líneas), no unidades: es lo que cuesta tiempo al preparar.",
+    "Ordenados de más a menos líneas: A son los que suman el primer 80 % de las líneas, B los siguientes hasta el 95 % y C el resto, incluidos los que tienen stock y no han salido.",
+    "No entran los artículos sin stock (servicios, portes, gastos). La clasificación no se guarda: se calcula cada vez.",
+];

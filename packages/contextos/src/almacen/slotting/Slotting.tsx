@@ -10,8 +10,9 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { Entidad } from "@olula/lib/diseño.ts";
 import { ArticuloAbc, ClaseAbc, FilaPickingFijo, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
 import {
-    clasesPicking, errorValidacionFila, filaPickingMarcable, filasPickingACrear, origenesRotacion,
-    textoDestinoRecolocacion, todasPickingMarcadas,
+    clasesPicking, DIAS_POR_DEFECTO, enteroPositivo, errorValidacionFila, explicacionAbc,
+    filaPickingMarcable, filasPickingACrear, origenesRotacion, textoDestinoRecolocacion,
+    todasPickingMarcadas,
 } from "./dominio.ts";
 import "./Slotting.css";
 import { contextoSlottingInicial, getMaquina } from "./maquina.ts";
@@ -49,6 +50,14 @@ export const Slotting = () => {
             <Tabs
                 children={[
                     <Tab key="abc" label="ABC">
+                        <div className="slotting-explicacion">
+                            <strong>Cómo se calcula</strong>
+                            <ul>
+                                {explicacionAbc(ctx.origen, enteroPositivo(ctx.diasAbc, DIAS_POR_DEFECTO)).map((t) => (
+                                    <li key={t}>{t}</li>
+                                ))}
+                            </ul>
+                        </div>
                         <quimera-formulario>
                             <QInput
                                 label="Días" nombre="diasAbc" tipo="numero" valor={ctx.diasAbc}
