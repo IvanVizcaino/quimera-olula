@@ -2,7 +2,8 @@ import { Pasillo } from "#/almacen/pasillo/diseño.ts";
 import { getPasillosZona } from "#/almacen/pasillo/infraestructura.ts";
 import { accionesListaEntidades, listaEntidadesInicial, ProcesarListaEntidades } from "@olula/lib/ListaEntidades.js";
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
-import { ejecutarListaProcesos, MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
+import { criteriaDefecto, ejecutarListaProcesos, MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
+import { Criteria } from "@olula/lib/diseño.ts";
 import { Zona } from "../../diseño.ts";
 import { FUNCION_ZONA_POR_DEFECTO } from "../../dominio.ts";
 import { getUbicacionesZona, getZona } from "../../infraestructura.ts";
@@ -38,29 +39,37 @@ export const zonaVaciaDetalle = (): Zona => ({
     admiteSinClase: true,
 });
 
+export const criteriaUbicacionesInicial = (): Criteria => ({ ...criteriaDefecto, orden: ["codigo", "ASC"] });
+
 export const contextoDetalleZonaInicial: ContextoDetalleZona = {
     estado: "INICIAL",
     zona: zonaVaciaDetalle(),
     ubicaciones: [],
+    totalUbicaciones: 0,
+    criteriaUbicaciones: criteriaUbicacionesInicial(),
     pasillos: listaEntidadesInicial<Pasillo>(),
 };
 
 export const refrescarZona: ProcesarDetalle = async (contexto) => {
-    const [zona, ubicaciones] = await Promise.all([
+    const [zona, pagina] = await Promise.all([
         getZona(contexto.zona.id),
-        getUbicacionesZona(contexto.zona.id),
+        getUbicacionesZona(contexto.zona.id, contexto.criteriaUbicaciones),
     ]);
     return [
-        { ...contexto, zona, ubicaciones },
+        { ...contexto, zona, ubicaciones: pagina.datos, totalUbicaciones: pagina.total },
         [["zona_cambiada", zona]],
     ];
 };
 
-/** Recarga las ubicaciones de la zona (p. ej. tras generar ubicaciones de un pasillo). */
+/** Recarga la página de ubicaciones de la zona (p. ej. tras generar ubicaciones de un pasillo). */
 export const refrescarUbicaciones: ProcesarDetalle = async (contexto) => {
-    const ubicaciones = await getUbicacionesZona(contexto.zona.id);
-    return { ...contexto, ubicaciones };
+    const pagina = await getUbicacionesZona(contexto.zona.id, contexto.criteriaUbicaciones);
+    return { ...contexto, ubicaciones: pagina.datos, totalUbicaciones: pagina.total };
 };
+
+/** El listado de ubicaciones cambia de página u orden: se pide esa página al servidor. */
+export const cambiarCriteriaUbicaciones: ProcesarDetalle = async (contexto, payload) =>
+    refrescarUbicaciones({ ...contexto, criteriaUbicaciones: payload as Criteria });
 
 const activarPasilloPorId = (id: string | null): ProcesarDetalle => async (contexto) => ({
     ...contexto,
@@ -88,16 +97,19 @@ export const onPasilloBorrado: ProcesarDetalle = async (contexto) =>
 
 const cargarZona = (idZona: string): ProcesarDetalle =>
     async (contexto) => {
-        const [zona, ubicaciones, lista] = await Promise.all([
+        const criteriaUbicaciones = criteriaUbicacionesInicial();
+        const [zona, pagina, lista] = await Promise.all([
             getZona(idZona),
-            getUbicacionesZona(idZona),
+            getUbicacionesZona(idZona, criteriaUbicaciones),
             getPasillosZona(idZona),
         ]);
         return pipeZona(contexto, [
             async (ctx) => ({
                 ...ctx,
                 zona,
-                ubicaciones,
+                ubicaciones: pagina.datos,
+                totalUbicaciones: pagina.total,
+                criteriaUbicaciones,
                 pasillos: { lista, total: lista.length, activo: lista[0] ?? null },
             }),
             "ABIERTO",
@@ -114,6 +126,8 @@ export const cargarContexto: ProcesarDetalle = async (contexto, payload) => {
         estado: "INICIAL",
         zona: zonaVaciaDetalle(),
         ubicaciones: [],
+        totalUbicaciones: 0,
+        criteriaUbicaciones: criteriaUbicacionesInicial(),
         pasillos: listaEntidadesInicial<Pasillo>(),
     };
 };

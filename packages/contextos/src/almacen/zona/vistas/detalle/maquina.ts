@@ -1,6 +1,7 @@
 import { Maquina } from "@olula/lib/diseño.ts";
 import { publicar } from "@olula/lib/dominio.ts";
 import {
+    cambiarCriteriaUbicaciones,
     cargarContexto,
     onPasilloBorrado,
     onPasilloCambiado,
@@ -25,6 +26,7 @@ export const getMaquina: () => Maquina<EstadoDetalleZona, ContextoDetalleZona> =
         cambio_pasillo_solicitado: "CAMBIANDO_PASILLO",
         baja_pasillo_solicitada: "BORRANDO_PASILLO",
         generar_ubicaciones_solicitado: "GENERANDO_UBICACIONES",
+        criteria_ubicaciones_cambiada: [cambiarCriteriaUbicaciones],
         zona_deseleccionada: [publicar("zona_deseleccionada", null)],
     },
     BORRANDO: {

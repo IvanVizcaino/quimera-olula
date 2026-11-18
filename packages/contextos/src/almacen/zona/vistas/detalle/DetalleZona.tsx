@@ -86,7 +86,12 @@ export const DetalleZona = ({
                             />
                         </Tab>,
                         <Tab key="ubicaciones" label="Ubicaciones">
-                            <UbicacionesZona ubicaciones={ctx.ubicaciones} />
+                            <UbicacionesZona
+                                ubicaciones={ctx.ubicaciones}
+                                total={ctx.totalUbicaciones}
+                                criteria={ctx.criteriaUbicaciones}
+                                publicar={emitir}
+                            />
                         </Tab>,
                     ]}
                 />

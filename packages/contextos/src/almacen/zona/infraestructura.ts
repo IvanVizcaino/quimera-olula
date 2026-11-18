@@ -1,5 +1,5 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
-import { Criteria, Filtro, Orden, Paginacion } from "@olula/lib/diseño.ts";
+import { ClausulaFiltro, Criteria, Filtro, Orden, Paginacion } from "@olula/lib/diseño.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
 import { getUbicaciones } from "../ubicacion/infraestructura.ts";
 import { Ubicacion } from "../ubicacion/diseño.ts";
@@ -89,10 +89,15 @@ export const deleteZona: DeleteZona = async (id) => {
     await RestAPI.delete(`${baseUrl}/${id}`, "Error al eliminar zona");
 };
 
-export const getUbicacionesZona = async (zonaId: string): Promise<Ubicacion[]> => {
-    const resultado = await getUbicaciones(
-        [["zona_id", "==", zonaId]],
-        ["codigo", "ASC"]
+/** Una página de las ubicaciones de la zona, según el criterio (orden y paginación) del listado. */
+export const getUbicacionesZona = async (
+    zonaId: string,
+    criteria: Criteria
+): Promise<{ datos: Ubicacion[]; total: number }> => {
+    const filtroListado = Array.isArray(criteria.filtro) ? (criteria.filtro as ClausulaFiltro[]) : [];
+    return getUbicaciones(
+        [["zona_id", "==", zonaId], ...filtroListado],
+        criteria.orden.length ? criteria.orden : ["codigo", "ASC"],
+        criteria.paginacion
     );
-    return resultado.datos;
 };

@@ -1,6 +1,6 @@
 import { MetaTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
-import { criteriaDefecto } from "@olula/lib/dominio.js";
+import { Criteria, EmitirEvento } from "@olula/lib/diseño.ts";
 import { useState } from "react";
 import { descripcionEstadoUbicacion } from "#/almacen/ubicacion/dominio.ts";
 import { StockUbicacionItem, Ubicacion } from "#/almacen/ubicacion/diseño.ts";
@@ -17,10 +17,18 @@ const metaTablaUbicaciones: MetaTabla<Ubicacion> = [
     { id: "estado", cabecera: "Estado", render: (u) => descripcionEstadoUbicacion(u.estado) },
 ];
 
+/** Ubicaciones de la zona, paginadas en el servidor: cada cambio de página u orden se publica
+ *  como "criteria_ubicaciones_cambiada" para que el detalle pida esa página. */
 export const UbicacionesZona = ({
     ubicaciones,
+    total,
+    criteria,
+    publicar,
 }: {
     ubicaciones: Ubicacion[];
+    total: number;
+    criteria: Criteria;
+    publicar: EmitirEvento;
 }) => {
     const [ubicacionSeleccionada, setUbicacionSeleccionada] = useState<Ubicacion | null>(null);
     const [stocks, setStocks] = useState<StockUbicacionItem[]>([]);
@@ -36,12 +44,12 @@ export const UbicacionesZona = ({
             <ListadoSemiControlado
                 metaTabla={metaTablaUbicaciones}
                 entidades={ubicaciones}
-                totalEntidades={ubicaciones.length}
+                totalEntidades={total}
                 cargando={false}
                 seleccionada={ubicacionSeleccionada}
                 onSeleccion={seleccionarUbicacion}
-                criteriaInicial={criteriaDefecto}
-                onCriteriaChanged={() => null}
+                criteriaInicial={criteria}
+                onCriteriaChanged={(c) => publicar("criteria_ubicaciones_cambiada", c)}
                 modo="tabla"
             />
             {ubicacionSeleccionada && (
