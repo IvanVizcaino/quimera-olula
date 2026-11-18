@@ -1,52 +1,47 @@
 /*
- * DetalleStock.css — posicionado de campos en grid de 12 columnas.
- *
- * Desktop (12 columnas):
- *   ┌─────────────────────────────────────────────┐
- *   │ artículo                          span 12   │
- *   ├───────────────────┬────────┬────────────────┤
- *   │ almacén  span 6   │ fís. 3 │ disp.        3 │
- *   └───────────────────┴────────┴────────────────┘
- *
- * Móvil (2 columnas, < 768px):
- *   ┌───────────────────────────────┐
- *   │ artículo          1 / -1     │
- *   ├───────────────────────────────┤
- *   │ almacén           1 / -1     │
- *   ├────────────────┬──────────────┤
- *   │ fís.  span 1   │ disp. span 1 │
- *   └────────────────┴──────────────┘
+ * DetalleStock.css — campos de la ficha de stock (como el form stocks de Eneboo)
+ * en un grid de 12 columnas:
+ *   artículo (8) | referencia (4)
+ *   almacén (4)  | n. almacén (8)
+ *   física | disponible | reservada | pte. recibir   (3 c/u)
+ *   necesidad | stock mín. | stock máx.               (4 c/u)
+ *   fecha últ. reg. | hora | cantidad                 (4 c/u)
+ * En móvil (< 768px) cada campo ocupa la fila entera salvo las cantidades (mitad).
  */
 
 .DetalleStock {
-
-    quimera-input[nombre="articulo"] {
-        grid-column: span 12;
-    }
-
+    quimera-input[nombre="articulo"],
     quimera-input[nombre="almacen"] {
-        grid-column: span 6;
+        grid-column: span 8;
     }
 
-    quimera-input[nombre="cantidadFisica"] {
-        grid-column: span 3;
+    quimera-input[nombre="articulo_id"],
+    quimera-input[nombre="almacen_id"],
+    quimera-input[nombre="necesidad"],
+    quimera-input[nombre="stockMinimo"],
+    quimera-input[nombre="stockMaximo"],
+    quimera-input[nombre="fechaUltReg"],
+    quimera-input[nombre="horaUltReg"],
+    quimera-input[nombre="cantidadUltReg"] {
+        grid-column: span 4;
     }
 
-    quimera-input[nombre="cantidadDisponible"] {
+    quimera-input[nombre="cantidadFisica"],
+    quimera-input[nombre="cantidadDisponible"],
+    quimera-input[nombre="cantidadReservada"],
+    quimera-input[nombre="cantidadPendiente"] {
         grid-column: span 3;
     }
 }
 
 @media (max-width: 768px) {
     .DetalleStock {
-        /* artículo y almacén ya son 1/-1 por defecto en móvil (qform.css) */
-
-        /* Cantidades: mitad del ancho (1 col en grid de 2 = 50%) */
-        quimera-input[nombre="cantidadFisica"] {
-            grid-column: span 1 !important;
-        }
-
-        quimera-input[nombre="cantidadDisponible"] {
+        quimera-input[nombre="cantidadFisica"],
+        quimera-input[nombre="cantidadDisponible"],
+        quimera-input[nombre="cantidadReservada"],
+        quimera-input[nombre="cantidadPendiente"],
+        quimera-input[nombre="stockMinimo"],
+        quimera-input[nombre="stockMaximo"] {
             grid-column: span 1 !important;
         }
     }
