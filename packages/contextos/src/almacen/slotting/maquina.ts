@@ -2,9 +2,10 @@ import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { postPickingFijo } from "#/almacen/picking_fijo/infraestructura.ts";
 import { ArticuloAbc, FilaPickingFijo, ClasesPicking, OrigenRotacion, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
 import {
-    CLASES_PICKING_POR_DEFECTO, clasesPickingValidas, COBERTURA_POR_DEFECTO, filaPickingDesdePropuesta,
-    filasPickingACrear, mensajeErrorApi, resumenCreacionPicking,
-    DIAS_POR_DEFECTO, enteroPositivo, ORIGEN_POR_DEFECTO, origenRotacion, LIMITE_PROPUESTA_POR_DEFECTO, LIMITE_RECOLOCACION_POR_DEFECTO, propuestaVacia,
+    CLASES_PICKING_POR_DEFECTO, clasesPickingValidas, COBERTURA_POR_DEFECTO, DIAS_POR_DEFECTO,
+    enteroPositivo, filaPickingDesdePropuesta, filasPickingACrear, LIMITE_PROPUESTA_POR_DEFECTO,
+    LIMITE_RECOLOCACION_POR_DEFECTO, marcarTodasPicking, mensajeErrorApi, ORIGEN_POR_DEFECTO,
+    origenRotacion, propuestaVacia, resumenCreacionPicking,
 } from "./dominio.ts";
 import { getAbc, getPropuesta, getPropuestaPicking, getRecolocacion } from "./infraestructura.ts";
 
@@ -168,6 +169,9 @@ export const getMaquina: () => Maquina<EstadoSlotting, ContextoSlotting> = () =>
         cobertura_picking_cambiada: cambiarParametroPicking("coberturaPicking"),
         picking_solicitado: proponerPicking,
         fila_picking_cambiada: cambiarFilaPicking,
+        seleccion_picking_cambiada: async (ctx, payload) => ({
+            ...ctx, filasPicking: marcarTodasPicking(ctx.filasPicking ?? [], Boolean(payload)),
+        }),
         picking_fijo_creacion_solicitada: crearPickingFijos,
     },
 });

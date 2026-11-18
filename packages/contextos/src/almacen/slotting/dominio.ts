@@ -101,3 +101,17 @@ export const mensajeErrorApi = (e: unknown): string => {
     }
     return "Error al crear picking fijo";
 };
+
+/** Las filas que se pueden marcar: con hueco y aún sin crear. */
+export const filaPickingMarcable = (f: Pick<FilaPickingFijo, "ubicacionId" | "estado">): boolean =>
+    !!f.ubicacionId && f.estado !== "CREADO";
+
+/** Si están marcadas todas las que se pueden marcar (y hay alguna). */
+export const todasPickingMarcadas = (filas: FilaPickingFijo[]): boolean => {
+    const marcables = filas.filter(filaPickingMarcable);
+    return marcables.length > 0 && marcables.every((f) => f.seleccionada);
+};
+
+/** Marca todas las que se pueden marcar, o desmarca todas. */
+export const marcarTodasPicking = (filas: FilaPickingFijo[], marcar: boolean): FilaPickingFijo[] =>
+    filas.map((f) => ({ ...f, seleccionada: marcar && filaPickingMarcable(f) }));

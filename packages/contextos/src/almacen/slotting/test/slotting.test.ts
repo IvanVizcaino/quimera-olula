@@ -12,6 +12,9 @@ import {
     mensajeErrorApi,
     puedeCrearFilaPicking,
     resumenCreacionPicking,
+    marcarTodasPicking,
+    todasPickingMarcadas,
+    filaPickingMarcable,
 } from "../dominio.ts";
 import { propuestaPickingDesdeApi, articuloAbcDesdeApi, propuestaDesdeApi, recolocacionDesdeApi } from "../infraestructura.ts";
 
@@ -127,5 +130,30 @@ describe("slotting picking fijo", () => {
     it("clases válidas con valor por defecto", () => {
         expect(clasesPickingValidas("A")).toBe("A");
         expect(clasesPickingValidas("x")).toBe("AB");
+    });
+});
+
+describe("marcar y desmarcar todas las filas de picking", () => {
+    const fila = (articuloId: string, ubicacionId: string | null, estado: "PENDIENTE" | "CREADO" | "ERROR", seleccionada: boolean) =>
+        ({ articuloId, ubicacionId, estado, seleccionada }) as unknown as Parameters<typeof filaPickingMarcable>[0] & { seleccionada: boolean };
+
+    const filas = [
+        fila("CON_HUECO", "1", "PENDIENTE", false),
+        fila("SIN_HUECO", null, "PENDIENTE", false),
+        fila("CREADA", "2", "CREADO", false),
+        fila("CON_ERROR", "3", "ERROR", true),
+    ] as unknown as Parameters<typeof marcarTodasPicking>[0];
+
+    it("marcar todas solo marca las que tienen hueco y no están creadas", () => {
+        expect(marcarTodasPicking(filas, true).map((f) => f.seleccionada)).toEqual([true, false, false, true]);
+    });
+
+    it("desmarcar las desmarca todas", () => {
+        expect(marcarTodasPicking(filas, false).every((f) => !f.seleccionada)).toBe(true);
+    });
+
+    it("sabe si están todas las marcables marcadas", () => {
+        expect(todasPickingMarcadas(filas)).toBe(false);
+        expect(todasPickingMarcadas(marcarTodasPicking(filas, true))).toBe(true);
     });
 });

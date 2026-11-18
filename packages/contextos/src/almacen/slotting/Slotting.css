@@ -1,0 +1,28 @@
+.Slotting .slotting-input-numero {
+    width: 6em;
+    padding: var(--espaciado-xs) var(--espaciado-s);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--redondeo-borde-xs);
+    background: var(--color-superficie);
+    color: var(--color-texto-primario);
+    text-align: right;
+}
+
+.Slotting .slotting-input-numero:disabled {
+    color: var(--color-texto-deshabilitado);
+    background: var(--color-superficie-sunken);
+}
+
+.Slotting .slotting-error {
+    color: var(--color-error);
+    font-size: var(--tamaño-letra-xs);
+}
+
+.Slotting .slotting-sin-hueco {
+    color: var(--color-texto-secundario);
+    font-style: italic;
+}
+
+.Slotting .resumen-picking {
+    font-weight: var(--grosor-letra-5);
+}

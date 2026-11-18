@@ -1,29 +1,25 @@
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { Articulo } from "#/almacen/comun/componentes/Articulo.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
+import { MetaTabla, QTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/index.js";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
+import { Entidad } from "@olula/lib/diseño.ts";
 import { ArticuloAbc, ClaseAbc, FilaPickingFijo, PropuestaUbicacion, Recolocacion } from "./diseño.ts";
 import {
-    clasesPicking, errorValidacionFila, filasPickingACrear, origenesRotacion,
-    textoDestinoRecolocacion,
+    clasesPicking, errorValidacionFila, filaPickingMarcable, filasPickingACrear, origenesRotacion,
+    textoDestinoRecolocacion, todasPickingMarcadas,
 } from "./dominio.ts";
+import "./Slotting.css";
 import { contextoSlottingInicial, getMaquina } from "./maquina.ts";
 
-const colorClase: Record<ClaseAbc, string> = { A: "#2e7d32", B: "#f9a825", C: "#c62828" };
+const varianteClase = { A: "exito", B: "advertencia", C: "error" } as const;
 
 export const InsigniaClase = ({ clase }: { clase: ClaseAbc }) => (
-    <span
-        className={`insignia-clase clase-${clase}`}
-        style={{
-            background: colorClase[clase], color: "#fff", borderRadius: 4,
-            padding: "0 8px", fontWeight: "bold",
-        }}
-    >
-        {clase}
-    </span>
+    <QEtiqueta variante={varianteClase[clase]}>{clase}</QEtiqueta>
 );
 
 export const Slotting = () => {
@@ -87,6 +83,17 @@ export const Slotting = () => {
                             <QBoton deshabilitado={!almacenId} onClick={() => emitir("picking_solicitado")}>
                                 Proponer
                             </QBoton>
+                            {ctx.filasPicking && ctx.filasPicking.some(filaPickingMarcable) && (
+                                <QBoton
+                                    variante="texto"
+                                    onClick={() => emitir(
+                                        "seleccion_picking_cambiada",
+                                        !todasPickingMarcadas(ctx.filasPicking ?? [])
+                                    )}
+                                >
+                                    {todasPickingMarcadas(ctx.filasPicking) ? "Desmarcar todos" : "Marcar todos"}
+                                </QBoton>
+                            )}
                             {ctx.filasPicking && (
                                 <QBoton
                                     deshabilitado={filasPickingACrear(ctx.filasPicking).length === 0}
@@ -152,27 +159,37 @@ export const Slotting = () => {
     );
 };
 
+type Fila<T> = Entidad & T;
+
+const conId = <T,>(filas: T[], id: (f: T, i: number) => string): Fila<T>[] =>
+    filas.map((f, i) => ({ ...f, id: id(f, i) }) as Fila<T>);
+
+const metaTablaAbc: MetaTabla<Fila<ArticuloAbc>> = [
+    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    { id: "descripcion", cabecera: "Descripción", ancho: "40%" },
+    { id: "lineas", cabecera: "Líneas", tipo: "numero" },
+    { id: "unidades", cabecera: "Unidades", tipo: "numero" },
+    { id: "porcentajeAcumulado", cabecera: "% acumulado", tipo: "numero" },
+    { id: "clase", cabecera: "Clase", render: (a) => <InsigniaClase clase={a.clase} /> },
+];
+
 const TablaAbc = ({ abc }: { abc: ArticuloAbc[] }) => (
-    <table className="tabla-abc">
-        <thead>
-            <tr>
-                <th>Artículo</th><th>Descripción</th><th>Líneas</th><th>Unidades</th><th>% acumulado</th><th>Clase</th>
-            </tr>
-        </thead>
-        <tbody>
-            {abc.map((a) => (
-                <tr key={a.articuloId}>
-                    <td>{a.articuloId}</td>
-                    <td>{a.descripcion}</td>
-                    <td>{a.lineas}</td>
-                    <td>{a.unidades}</td>
-                    <td>{a.porcentajeAcumulado}</td>
-                    <td><InsigniaClase clase={a.clase} /></td>
-                </tr>
-            ))}
-        </tbody>
-    </table>
+    <QTabla<Fila<ArticuloAbc>>
+        metaTabla={metaTablaAbc}
+        datos={conId(abc, (a) => a.articuloId)}
+        cargando={false}
+        orden={[]}
+    />
 );
+
+type UbicacionPropuestaFila = PropuestaUbicacion["ubicaciones"][number];
+
+const metaTablaPropuesta: MetaTabla<Fila<UbicacionPropuestaFila>> = [
+    { id: "ubicacion", cabecera: "Ubicación", estilo: "destacado" },
+    { id: "zona", cabecera: "Zona" },
+    { id: "accesibilidad", cabecera: "Accesibilidad", tipo: "numero" },
+    { id: "claseUbicacion", cabecera: "Clase", render: (u) => <InsigniaClase clase={u.claseUbicacion} /> },
+];
 
 const ResultadoPropuesta = ({ propuesta }: { propuesta: PropuestaUbicacion }) => (
     <div className="resultado-propuesta">
@@ -180,107 +197,95 @@ const ResultadoPropuesta = ({ propuesta }: { propuesta: PropuestaUbicacion }) =>
         {propuesta.ubicaciones.length === 0 ? (
             <p>No hay ubicaciones vacías disponibles.</p>
         ) : (
-            <table className="tabla-propuesta">
-                <thead>
-                    <tr><th>Ubicación</th><th>Zona</th><th>Accesibilidad</th><th>Clase</th></tr>
-                </thead>
-                <tbody>
-                    {propuesta.ubicaciones.map((u) => (
-                        <tr key={u.ubicacionId}>
-                            <td>{u.ubicacion}</td>
-                            <td>{u.zona}</td>
-                            <td>{u.accesibilidad}</td>
-                            <td><InsigniaClase clase={u.claseUbicacion} /></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <QTabla<Fila<UbicacionPropuestaFila>>
+                metaTabla={metaTablaPropuesta}
+                datos={conId(propuesta.ubicaciones, (u) => u.ubicacionId)}
+                cargando={false}
+                orden={[]}
+            />
         )}
     </div>
 );
 
-const TablaRecolocacion = ({ recolocaciones }: { recolocaciones: Recolocacion[] }) => (
-    <table className="tabla-recolocacion">
-        <thead>
-            <tr>
-                <th>Artículo</th><th>Clase</th><th>Ubicación actual</th><th>Clase ubicación</th>
-                <th>Acción</th><th>Destino</th><th>Beneficio</th>
-            </tr>
-        </thead>
-        <tbody>
-            {recolocaciones.map((r, i) => (
-                <tr key={`${r.articuloId}-${r.ubicacion}-${i}`}>
-                    <td>{r.articuloId}</td>
-                    <td><InsigniaClase clase={r.clase} /></td>
-                    <td>{r.ubicacion}</td>
-                    <td><InsigniaClase clase={r.claseUbicacion} /></td>
-                    <td>{r.accion}</td>
-                    <td>{textoDestinoRecolocacion(r)}</td>
-                    <td>{r.beneficio}</td>
-                </tr>
-            ))}
-        </tbody>
-    </table>
-);
+const metaTablaRecolocacion: MetaTabla<Fila<Recolocacion>> = [
+    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    { id: "clase", cabecera: "Clase", render: (r) => <InsigniaClase clase={r.clase} /> },
+    { id: "ubicacion", cabecera: "Ubicación actual" },
+    { id: "claseUbicacion", cabecera: "Clase ubicación", render: (r) => <InsigniaClase clase={r.claseUbicacion} /> },
+    { id: "accion", cabecera: "Acción", render: (r) => (r.accion === "INTERCAMBIAR" ? "Intercambiar" : "Mover") },
+    { id: "destino", cabecera: "Destino", render: (r) => textoDestinoRecolocacion(r) },
+    { id: "beneficio", cabecera: "Beneficio", tipo: "numero" },
+];
 
-const estiloNumero = { width: 70 };
+const TablaRecolocacion = ({ recolocaciones }: { recolocaciones: Recolocacion[] }) => (
+    <QTabla<Fila<Recolocacion>>
+        metaTabla={metaTablaRecolocacion}
+        datos={conId(recolocaciones, (r, i) => `${r.articuloId}-${r.ubicacion}-${i}`)}
+        cargando={false}
+        orden={[]}
+    />
+);
 
 const InputNumero = ({ valor, deshabilitado, onCambio }: {
     valor: number; deshabilitado: boolean; onCambio: (n: number) => void;
 }) => (
     <input
-        type="number" style={estiloNumero} value={Number.isNaN(valor) ? "" : valor}
+        type="number" className="slotting-input-numero" value={Number.isNaN(valor) ? "" : valor}
         disabled={deshabilitado}
+        onClick={(e) => e.stopPropagation()}
         onChange={(e) => onCambio(e.target.value === "" ? NaN : Number(e.target.value))}
     />
 );
 
+const estadoFila = (f: FilaPickingFijo) => {
+    if (f.estado === "CREADO") return <QEtiqueta variante="exito">Creado</QEtiqueta>;
+    if (f.estado === "ERROR") return <span className="slotting-error">{f.errorCreacion}</span>;
+    const error = f.ubicacionId ? errorValidacionFila(f) : null;
+    return error ? <span className="slotting-error">{error}</span> : null;
+};
+
 const TablaPickingFijo = ({ filas, onCambio }: {
     filas: FilaPickingFijo[];
     onCambio: (articuloId: string, cambios: Partial<FilaPickingFijo>) => void;
-}) => (
-    <table className="tabla-picking-fijo">
-        <thead>
-            <tr>
-                <th></th><th>Artículo</th><th>Descripción</th><th>Clase</th><th>Líneas</th>
-                <th>Ubicación</th><th>Zona</th><th>Mínimo</th><th>Máximo</th><th>Unidad</th><th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {filas.map((f) => {
-                const creado = f.estado === "CREADO";
-                const sinHueco = !f.ubicacionId;
-                const error = creado || sinHueco ? null : errorValidacionFila(f);
-                return (
-                    <tr key={f.articuloId}>
-                        <td>
-                            <input
-                                type="checkbox" checked={f.seleccionada} disabled={creado || sinHueco}
-                                onChange={(e) => onCambio(f.articuloId, { seleccionada: e.target.checked })}
-                            />
-                        </td>
-                        <td>{f.articuloId}</td>
-                        <td>{f.descripcion}</td>
-                        <td><InsigniaClase clase={f.clase} /></td>
-                        <td>{f.lineas}</td>
-                        <td>{sinHueco ? "Sin hueco libre" : f.ubicacion}</td>
-                        <td>{f.zona ?? ""}</td>
-                        {(["minimo", "maximo", "unidadReposicion"] as const).map((campo) => (
-                            <td key={campo}>
-                                <InputNumero
-                                    valor={f[campo]} deshabilitado={creado || sinHueco}
-                                    onCambio={(n) => onCambio(f.articuloId, { [campo]: n, estado: "PENDIENTE", errorCreacion: null })}
-                                />
-                            </td>
-                        ))}
-                        <td>
-                            {creado && "Creado"}
-                            {f.estado === "ERROR" && <span style={{ color: "#c62828" }}>{f.errorCreacion}</span>}
-                            {error && <span style={{ color: "#c62828" }}>{error}</span>}
-                        </td>
-                    </tr>
-                );
-            })}
-        </tbody>
-    </table>
-);
+}) => {
+    const metaTabla: MetaTabla<Fila<FilaPickingFijo>> = [
+        {
+            id: "seleccionada", cabecera: "", ancho: "40px",
+            render: (f) => (
+                <input
+                    type="checkbox" checked={f.seleccionada} disabled={!filaPickingMarcable(f)}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => onCambio(f.articuloId, { seleccionada: e.target.checked })}
+                />
+            ),
+        },
+        { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+        { id: "descripcion", cabecera: "Descripción", ancho: "25%" },
+        { id: "clase", cabecera: "Clase", render: (f) => <InsigniaClase clase={f.clase} /> },
+        { id: "lineas", cabecera: "Líneas", tipo: "numero" },
+        {
+            id: "ubicacion", cabecera: "Ubicación",
+            render: (f) => f.ubicacion ?? <span className="slotting-sin-hueco">Sin hueco libre</span>,
+        },
+        { id: "zona", cabecera: "Zona", render: (f) => f.zona ?? "" },
+        ...(["minimo", "maximo", "unidadReposicion"] as const).map((campo) => ({
+            id: campo,
+            cabecera: { minimo: "Mínimo", maximo: "Máximo", unidadReposicion: "Unidad" }[campo],
+            render: (f: Fila<FilaPickingFijo>) => (
+                <InputNumero
+                    valor={f[campo]} deshabilitado={!filaPickingMarcable(f)}
+                    onCambio={(n) => onCambio(f.articuloId, { [campo]: n, estado: "PENDIENTE", errorCreacion: null })}
+                />
+            ),
+        })),
+        { id: "estado", cabecera: "Estado", ancho: "20%", render: estadoFila },
+    ];
+    return (
+        <QTabla<Fila<FilaPickingFijo>>
+            metaTabla={metaTabla}
+            datos={conId(filas, (f) => f.articuloId)}
+            cargando={false}
+            orden={[]}
+        />
+    );
+};
