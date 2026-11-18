@@ -41,3 +41,15 @@ export const empresaActual = (): string => {
 export const setEmpresaActual = (id: string): void => {
     localStorage.setItem(EMPRESA_ACTUAL_KEY, id);
 };
+
+/**
+ * Copia del modelo con la empresa activa ya puesta.
+ *
+ * Los formularios de alta la necesitan en el modelo inicial, no solo al enviar: el campo
+ * es requerido y sin él el botón Guardar nace deshabilitado. El nombre del campo es
+ * parametrizable porque el alta de factura lo llama `idEmpresa`.
+ */
+export const conEmpresaActual = <T extends object>(
+    modelo: T,
+    campo: string = "empresa_id"
+): T => ({ ...modelo, [campo]: empresaActual() });

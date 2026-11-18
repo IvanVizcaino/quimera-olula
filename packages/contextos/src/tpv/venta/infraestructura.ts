@@ -217,6 +217,7 @@ export const postPago: PostPago = async (id, pago) => {
         forma_pago: pago.formaPago,
         vale_id: pago.idVale,
         tipo_tarjeta_id: pago.idTipoTarjeta,
+        entregado: pago.entregado,
     }
     return await RestAPI.post(`${baseUrl}/${id}/pago`,
         body,

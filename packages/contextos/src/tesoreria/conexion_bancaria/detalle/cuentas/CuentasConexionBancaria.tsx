@@ -5,7 +5,7 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
 import { useCallback, useContext } from "react";
-import { CuentaBancariaSelect } from "#/empresa/comun/componentes/cuenta_bancaria_select.tsx";
+import { CuentaBancariaSelect } from "#/tesoreria/comun/componentes/cuenta_bancaria_select.tsx";
 import { CuentaConexionBancaria } from "../../diseño.js";
 import { patchCuentaConexionBancaria } from "../../infraestructura.js";
 import "./CuentasConexionBancaria.css";

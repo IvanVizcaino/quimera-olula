@@ -4,6 +4,10 @@ import { ProcesarEvento } from "@olula/lib/useMaquina.js";
 import { useCallback } from "react";
 import { LineaPedido } from "../diseño.ts";
 import { deleteLinea } from "../infraestructura.ts";
+import {
+  TEXTO_CAMBIOS_EN_PREPARACION,
+  useOrdenesAlmacenDePedido,
+} from "../detalle/aviso_almacen/ordenes_almacen.ts";
 
 export const BorrarLinea = ({
   pedidoId,
@@ -25,13 +29,18 @@ export const BorrarLinea = ({
   );
 
   const [borrar, cancelar] = useForm(borrar_, cancelar_);
+  const ordenesAlmacen = useOrdenesAlmacenDePedido(pedidoId);
+  const mensaje = ordenesAlmacen.length > 0
+    ? `El pedido está en preparación en almacén (${ordenesAlmacen.map((o) => o.id).join(", ")}). ` +
+      `${TEXTO_CAMBIOS_EN_PREPARACION} ¿Borrar la línea?`
+    : "¿Está seguro de que desea borrar esta línea?";
 
   return (
     <QModalConfirmacion
       nombre="confirmarBorrarLinea"
       abierto={true}
       titulo="Borrar línea"
-      mensaje="¿Está seguro de que desea borrar esta línea?"
+      mensaje={mensaje}
       onCerrar={cancelar}
       onAceptar={borrar}
     />

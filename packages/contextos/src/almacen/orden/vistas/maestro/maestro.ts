@@ -1,7 +1,7 @@
 import { Criteria, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { accionesListaActivaEntidades, ProcesarListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
 import { ItemOrdenAlmacen } from "../../diseño.ts";
-import { getOrden, getOrdenes } from "../../infraestructura.ts";
+import { adquirirOrden, getOrden, getOrdenes } from "../../infraestructura.ts";
 import { ContextoMaestroOrden, EstadoMaestroOrden } from "./maquina.ts";
 
 type ProcesarMaestro = ProcesarContexto<EstadoMaestroOrden, ContextoMaestroOrden>;
@@ -60,4 +60,15 @@ export const incluirOrdenCreadaPorId: ProcesarMaestro = async (contexto, payload
             activo: item.id,
         },
     };
+};
+
+/**
+ * Adquiere la orden activa para el usuario y recarga la lista: el backend también
+ * le libera de cualquier otra orden abierta, así que cambian varias filas.
+ */
+export const adquirirOrdenActiva: ProcesarMaestro = async (contexto) => {
+    const id = contexto.ordenes.activo;
+    if (!id) return contexto;
+    await adquirirOrden(id);
+    return recargarOrdenes(contexto, contexto.ordenes.criteria);
 };

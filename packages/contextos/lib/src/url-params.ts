@@ -24,7 +24,7 @@ export const setIdUrlParams = (id: string | undefined) => {
     history.replaceState({}, "", formarUrl(params));
 }
 
-const clavesReservadas = ["id", "modo", "orden", "p", "l"];
+const clavesReservadas = ["id", "modo", "orden", "p", "l", "_label"];
 
 export const filtroDefecto: ClausulaFiltro[] = [];
 

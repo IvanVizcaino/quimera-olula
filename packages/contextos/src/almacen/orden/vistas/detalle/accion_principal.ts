@@ -1,4 +1,8 @@
 import { LineaOrdenAlmacen, OrdenAlmacen } from "../../diseño.ts";
+import { definicionDeLinea } from "../../pasos/catalogo.ts";
+import { FaseLectura } from "../../pasos/diseño.ts";
+import { cantidadPendiente } from "../../pasos/lector.ts";
+import { lineasConSobrante, ordenAlbaranable, sobranteLinea } from "../../dominio.ts";
 
 export type AccionPrincipalData = {
     label: string;
@@ -10,31 +14,24 @@ type Handlers = {
     emitirPickSolicitado: () => void;
     emitirDropSolicitado: () => void;
     emitirColocacionSolicitada: () => void;
+    emitirAlbaranadoSolicitado: () => void;
+    emitirDevolucionSobrante?: (linea: LineaOrdenAlmacen) => void;
 };
 
-export const INSTRUCCIONES_DROP: Record<string, string> = {
-    "CAJAS-UBICACION": "lee la caja y la ubicación de destino",
-    "SKU_LOTE-CANTIDAD": "lee el SKU, lote y cantidad",
-    "SKU-UBICACION": "lee el SKU y la ubicación de destino",
-    "CAJA-CAJAS": "lee la caja origen y la nueva caja",
-    "LOTE-CANTIDAD": "lee el lote y la cantidad",
-    "PALET": "lee el palet",
-    "CAJAS": "lee la caja",
-};
+const tienePasos = (linea: LineaOrdenAlmacen, orden: OrdenAlmacen, fase: FaseLectura): boolean =>
+    !!definicionDeLinea(linea, orden, fase);
 
-export const INSTRUCCIONES_PICK: Record<string, string> = {
-    "LOTE-CAJAS": "lee el lote de la subcaja y la nueva caja",
-    "CAJA-CAJAS": "lee la caja origen y la nueva caja",
-    "CAJAS": "lee la caja",
-};
+const isCompleta = (linea: LineaOrdenAlmacen, orden: OrdenAlmacen, fase: FaseLectura): boolean =>
+    !tienePasos(linea, orden, fase) || cantidadPendiente(linea, orden, fase) <= 0;
 
-const isPickCompleta = (linea: LineaOrdenAlmacen, pasosPickCabecera: string | null): boolean => {
-    const pick = pasosPickCabecera ?? linea.pasosPick;
-    return !pick || (linea.cantidadPick ?? 0) >= linea.cantidadPrevista;
+const instruccionDeGrupo = (
+    lineas: LineaOrdenAlmacen[],
+    orden: OrdenAlmacen,
+    fase: FaseLectura,
+): string => {
+    const primera = lineas.find((l) => !isCompleta(l, orden, fase)) ?? lineas[0];
+    return (primera && definicionDeLinea(primera, orden, fase)?.instruccion) ?? "lee las líneas";
 };
-
-const isDropCompleta = (linea: LineaOrdenAlmacen): boolean =>
-    (linea.cantidadReal ?? 0) >= linea.cantidadPrevista;
 
 const agruparPorUbicacion = (
     lineas: LineaOrdenAlmacen[],
@@ -60,14 +57,12 @@ const getAccionPick = (
     lineasOrdenadas: LineaOrdenAlmacen[],
     emitirPickSolicitado: () => void,
 ): AccionPrincipalData | null => {
-    const grupos = agruparPorUbicacion(lineasOrdenadas, (l) => l.idUbicacionOrigen);
-    const grupoActual = grupos.find((g) =>
-        g.lineas.some((l) => !isPickCompleta(l, orden.pasosPick))
-    );
+    const conPick = lineasOrdenadas.filter((l) => tienePasos(l, orden, "PICK"));
+    const grupos = agruparPorUbicacion(conPick, (l) => l.idUbicacionOrigen);
+    const grupoActual = grupos.find((g) => g.lineas.some((l) => !isCompleta(l, orden, "PICK")));
     if (!grupoActual) return null;
 
-    const pasos = orden.pasosPick ?? grupoActual.lineas[0]?.pasosPick ?? null;
-    const instruccionPasos = pasos ? (INSTRUCCIONES_PICK[pasos] ?? pasos) : "lee las líneas";
+    const instruccionPasos = instruccionDeGrupo(grupoActual.lineas, orden, "PICK");
     const algunaLeida = grupoActual.lineas.some((l) => (l.cantidadPick ?? 0) > 0);
     const ubicacion = grupoActual.lineas[0]?.ubicacionOrigen ?? "ubicación desconocida";
 
@@ -83,12 +78,12 @@ const getAccionDrop = (
     lineasOrdenadas: LineaOrdenAlmacen[],
     handlers: Handlers,
 ): AccionPrincipalData | null => {
-    const grupos = agruparPorUbicacion(lineasOrdenadas, (l) => l.idUbicacionDestino);
-    const grupoActual = grupos.find((g) => g.lineas.some((l) => !isDropCompleta(l)));
+    const conDrop = lineasOrdenadas.filter((l) => tienePasos(l, orden, "DROP"));
+    const grupos = agruparPorUbicacion(conDrop, (l) => l.idUbicacionDestino);
+    const grupoActual = grupos.find((g) => g.lineas.some((l) => !isCompleta(l, orden, "DROP")));
     if (!grupoActual) return null;
 
-    const pasos = orden.pasosDrop ?? grupoActual.lineas[0]?.pasosDrop ?? null;
-    const instruccionPasos = pasos ? (INSTRUCCIONES_DROP[pasos] ?? pasos) : "lee las líneas";
+    const instruccionPasos = instruccionDeGrupo(grupoActual.lineas, orden, "DROP");
     const algunaLeida = grupoActual.lineas.some((l) => (l.cantidadReal ?? 0) > 0);
 
     let instruccion: string;
@@ -122,6 +117,28 @@ export function calcularAccionPrincipal(
         };
     }
 
+    // El pedido cambió en ventas después de recoger: antes que nada, devolver lo que sobra.
+    const conSobrante = orden.estado !== "TERMINADA" ? lineasConSobrante(orden) : [];
+    if (conSobrante.length > 0 && handlers.emitirDevolucionSobrante) {
+        const linea = conSobrante[0];
+        const emitir = handlers.emitirDevolucionSobrante;
+        return {
+            label: "Devolver sobrante",
+            instruccion: `El pedido ha cambiado: sobran ${sobranteLinea(linea)} de ${linea.sku} (${linea.articulo}). ` +
+                "Déjalas en una ubicación o caja y léela" +
+                (conSobrante.length > 1 ? ` (${conSobrante.length} líneas con sobrante)` : ""),
+            onClick: () => emitir(linea),
+        };
+    }
+
+    if (ordenAlbaranable(orden)) {
+        return {
+            label: "Albaranar",
+            instruccion: "Salida preparada, usa el botón Albaranar para generar el albarán y terminar la orden",
+            onClick: handlers.emitirAlbaranadoSolicitado,
+        };
+    }
+
     if (orden.estado !== "PENDIENTE") return null;
 
     const lineasOrdenadas = [...orden.lineas].sort((a, b) => a.id.localeCompare(b.id));
@@ -135,16 +152,8 @@ export function calcularAccionPrincipal(
         faseActual = 'PICK';
     } else {
         // TRASPASO
-        const tienePick =
-            orden.pasosPick !== null || lineasOrdenadas.some((l) => l.pasosPick !== null);
-        if (!tienePick) {
-            faseActual = 'DROP';
-        } else {
-            const todasPickCompletas = lineasOrdenadas.every((l) =>
-                isPickCompleta(l, orden.pasosPick)
-            );
-            faseActual = todasPickCompletas ? 'DROP' : 'PICK';
-        }
+        const todasPickCompletas = lineasOrdenadas.every((l) => isCompleta(l, orden, "PICK"));
+        faseActual = todasPickCompletas ? 'DROP' : 'PICK';
     }
 
     if (faseActual === 'PICK') {

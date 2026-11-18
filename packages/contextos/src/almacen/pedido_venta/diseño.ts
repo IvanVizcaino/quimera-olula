@@ -2,6 +2,31 @@ import { Entidad, Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/d
 
 export type DisponibilidadPedido = 'total' | 'parcial' | 'sin_stock' | 'en_salida' | 'parcial_salida';
 
+export type DisponibilidadLinea = 'total' | 'parcial' | 'sin_stock' | 'en_salida';
+
+export type PosicionCompetidor = 'delante' | 'detras' | 'en_salida';
+
+export interface CompetidorLinea {
+    pedidoId: string;
+    codigo: string;
+    fecha: Date;
+    cliente: string;
+    lineaId: string;
+    pendiente: number;
+    asignado: number;
+    posicion: PosicionCompetidor;
+    prioritaria: boolean;
+}
+
+export interface EstadoLinea {
+    lineaId: string;
+    pendiente: number;
+    asignado: number;
+    estado: DisponibilidadLinea;
+    prioritaria: boolean;
+    competidores: CompetidorLinea[];
+}
+
 export interface ItemPedidoVenta extends Entidad {
     id: string;
     fecha: Date;
@@ -19,6 +44,7 @@ export interface LineaPedidoVenta extends Entidad {
     pvpTotal: number;
     servida: number;
     cerrada: boolean;
+    prioritaria: boolean;
 }
 
 export interface PedidoVenta extends ItemPedidoVenta {
@@ -34,7 +60,15 @@ export type GenerarSalidaDesdePedidos = (pedidoIds: number[], ubicacionDestinoId
 
 export type GenerarSalidaVentaDesdePedidos = (pedidoIds: number[], zonas: number[]) => Promise<string>;
 
+export type CambiarPrioridadLinea = (pedidoId: string, lineaId: string, prioritaria: boolean) => Promise<void>;
+
+export type CambiarPrioridadPedido = (pedidoId: string, prioritaria: boolean) => Promise<void>;
+
 export type ComprobarReservas = (
     zonas: number[],
-    limite: number,
 ) => Promise<{ pedido_id: number; estado: DisponibilidadPedido }[]>;
+
+export type ComprobarReservasLineas = (
+    pedidoId: string,
+    zonas: number[],
+) => Promise<EstadoLinea[]>;

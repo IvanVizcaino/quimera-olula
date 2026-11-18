@@ -1,0 +1,36 @@
+.ConciliarRemesaMovimientoBancario {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+
+    p {
+        margin: 0;
+    }
+
+    .recibos-remesa {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 40vh;
+        overflow-y: auto;
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--espaciado-s);
+        }
+    }
+
+    .importe-recibo {
+        white-space: nowrap;
+    }
+
+    .resumen-remesa {
+        font-weight: bold;
+
+        &.descuadre {
+            color: var(--color-error);
+        }
+    }
+}

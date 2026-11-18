@@ -8,8 +8,6 @@ import { useCallback } from "react";
 import { comprobarReservas } from "../../infraestructura.ts";
 import { comprobarReservasVacio, metaComprobarReservas } from "./comprobar_reservas.ts";
 
-const LIMITE_PEDIDOS = 10;
-
 export const ComprobarReservasPedidoVenta = ({
     publicar,
 }: {
@@ -18,9 +16,9 @@ export const ComprobarReservasPedidoVenta = ({
     const { modelo, uiProps, valido } = useModelo(metaComprobarReservas, comprobarReservasVacio);
 
     const comprobar_ = useCallback(async () => {
-        const zonaId = parseInt(modelo.zonaId as string, 10);
-        const resultados = await comprobarReservas([zonaId], LIMITE_PEDIDOS);
-        publicar("reservas_comprobadas", resultados);
+        const zonas = [parseInt(modelo.zonaId as string, 10)];
+        const resultados = await comprobarReservas(zonas);
+        publicar("reservas_comprobadas", { zonas, resultados });
     }, [modelo.zonaId, publicar]);
 
     const cancelar_ = useCallback(() => publicar("comprobar_reservas_cancelado"), [publicar]);
@@ -31,7 +29,7 @@ export const ComprobarReservasPedidoVenta = ({
         <QModal
             abierto={true}
             nombre="comprobarReservasPedidoVenta"
-            titulo={`Comprobar disponibilidad (${LIMITE_PEDIDOS} pedidos prioritarios)`}
+            titulo="Comprobar disponibilidad"
             onCerrar={cancelar}
         >
             <quimera-formulario>

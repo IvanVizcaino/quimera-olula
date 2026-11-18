@@ -1,0 +1,33 @@
+.ConfigTesoreria {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-l);
+    max-width: 48rem;
+    padding: var(--espaciado-l);
+
+    h2,
+    h3,
+    p {
+        margin: 0;
+    }
+
+    .aviso-modo,
+    .explicacion-modo {
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+    }
+
+    .modo-remesa {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+        padding: var(--espaciado-m);
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-xs);
+    }
+
+    .botones {
+        display: flex;
+        justify-content: flex-end;
+    }
+}

@@ -1,6 +1,13 @@
 /*
- * DetalleConciliacion.css — el detalle no tiene campos fuera de los tabs;
- * el posicionado vive en TabGeneral.css y TabConciliacion.css.
+ * DetalleConciliacion.css — fuera de los tabs solo está la cabecera con fecha
+ * e importe; el posicionado de los campos vive en TabGeneral.css y TabConciliacion.css.
  */
 .DetalleConciliacion {
+    .DetalleConciliacion-cabecera {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        margin-bottom: 8px;
+        font-size: 1.1em;
+    }
 }

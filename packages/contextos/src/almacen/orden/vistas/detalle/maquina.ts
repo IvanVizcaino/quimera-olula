@@ -28,10 +28,13 @@ export type EstadoOrdenAlmacen =
     | 'LEYENDO_GUION_LINEA'
     | 'LEYENDO_GUION_PICK_LINEA'
     | 'LEYENDO_GUION_DROP_LINEA'
+    | 'DEVOLVIENDO_SOBRANTE'
     | 'CREANDO_CAJA'
     | 'LEYENDO_PICK'
     | 'LEYENDO_DROP'
-    | 'COLOCANDO';
+    | 'COLOCANDO'
+    | 'ALBARANANDO'
+    | 'GENERANDO_ENVIO';
 
 export type ContextoOrdenAlmacen = {
     estado: EstadoOrdenAlmacen;
@@ -66,6 +69,14 @@ export const getMaquina: () => Maquina<EstadoOrdenAlmacen, ContextoOrdenAlmacen>
             lectura_pick_solicitada: "LEYENDO_PICK",
             lectura_drop_solicitada: "LEYENDO_DROP",
             colocacion_solicitada: "COLOCANDO",
+            albaranado_solicitado: "ALBARANANDO",
+            envio_solicitado: "GENERANDO_ENVIO",
+            devolucion_sobrante_solicitada: [Lineas.activar, "DEVOLVIENDO_SOBRANTE"],
+        },
+
+        DEVOLVIENDO_SOBRANTE: {
+            sobrante_devuelto: [refrescarOrden, "ABIERTA"],
+            devolucion_sobrante_cancelada: "ABIERTA",
         },
 
         BORRANDO: {
@@ -144,6 +155,16 @@ export const getMaquina: () => Maquina<EstadoOrdenAlmacen, ContextoOrdenAlmacen>
         COLOCANDO: {
             colocacion_creada: [refrescarOrden, "ABIERTA"],
             colocacion_cancelada: "ABIERTA",
+        },
+
+        ALBARANANDO: {
+            orden_albaranada: [refrescarOrden, "ABIERTA"],
+            albaranado_cancelado: "ABIERTA",
+        },
+
+        GENERANDO_ENVIO: {
+            envio_generado: [refrescarOrden, "ABIERTA"],
+            envio_cancelado: "ABIERTA",
         },
     };
 };

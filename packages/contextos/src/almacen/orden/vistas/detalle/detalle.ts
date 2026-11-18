@@ -128,7 +128,8 @@ export const refrescarOrdenConCierre: ProcesarDetalle = async (contexto) => {
             total: orden.lineas.length,
         },
     };
-    if (orden.estado === "TERMINADA") {
+    // Una SALIDA con el pick completo queda PREPARADA (pendiente de albaranar).
+    if (orden.estado === "TERMINADA" || orden.estado === "PREPARADA") {
         return [
             { ...nuevoContexto, estado: 'ABIERTA' as EstadoOrdenAlmacen },
             [["orden_cambiada", orden]] as [[string, unknown]],

@@ -1,4 +1,3 @@
-import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { MetaTabla } from "@olula/componentes/index.js";
@@ -7,8 +6,8 @@ import { MovimientoBancario } from "../diseño.js";
 import {
     cuentaMovimientoBancario,
     esIngresoMovimientoBancario,
-    etiquetaEstadoConCasaciones,
-    urlReciboMovimientoBancario,
+    etiquetaEstadoConConciliaciones,
+    reciboAsociadoMovimientoBancario,
     varianteEstadoMovimientoBancario,
 } from "../dominio.js";
 
@@ -26,6 +25,7 @@ export const metaTablaMovimientoBancario: MetaTabla<MovimientoBancario> = [
     {
         id: "importe",
         cabecera: "Importe",
+        tipo: "moneda",
         render: (movimiento) => (
             <span className={esIngresoMovimientoBancario(movimiento) ? "importe-ingreso" : "importe-cargo"}>
                 {formatearMoneda(movimiento.importe, movimiento.divisa ?? "EUR")}
@@ -33,12 +33,25 @@ export const metaTablaMovimientoBancario: MetaTabla<MovimientoBancario> = [
         ),
     },
     {
+        id: "saldo_tras",
+        cabecera: "Saldo",
+        tipo: "moneda",
+        render: (movimiento) =>
+            movimiento.saldo !== null ? (
+                <span className={movimiento.saldo < 0 ? "importe-cargo" : undefined}>
+                    {formatearMoneda(movimiento.saldo, movimiento.divisa ?? "EUR")}
+                </span>
+            ) : (
+                "—"
+            ),
+    },
+    {
         id: "estado",
         cabecera: "Estado",
         render: (movimiento) => (
             <div className="celda-estado-movimiento-bancario">
                 <QEtiqueta variante={varianteEstadoMovimientoBancario(movimiento.estado)}>
-                    {etiquetaEstadoConCasaciones(movimiento)}
+                    {etiquetaEstadoConConciliaciones(movimiento)}
                 </QEtiqueta>
                 {movimiento.requiereRevision && (
                     <QEtiqueta variante="advertencia">Revisar</QEtiqueta>
@@ -54,23 +67,9 @@ export const metaTablaMovimientoBancario: MetaTabla<MovimientoBancario> = [
         ),
     },
     {
-        id: "codigo_recibo",
-        cabecera: "Recibo",
-        render: (movimiento) => {
-            const url = urlReciboMovimientoBancario(movimiento);
-            if (!url) return "—";
-
-            return (
-                <div className="celda-recibo-movimiento-bancario">
-                    <span>{movimiento.nombreTercero ?? movimiento.codigoRecibo}</span>
-                    {/* Sin stopPropagation el clic también seleccionaría la fila. */}
-                    <QBoton tamaño="pequeño" variante="borde" enlace={url}
-                        onClick={(evento) => evento.stopPropagation()}>
-                        Ver recibo
-                    </QBoton>
-                </div>
-            );
-        },
+        id: "num_items_conciliacion",
+        cabecera: "Conciliación",
+        render: reciboAsociadoMovimientoBancario,
     },
     { id: "contraparte", cabecera: "Contraparte", render: (m) => m.contraparte ?? "—" },
     { id: "nombre_cuenta", cabecera: "Cuenta", render: cuentaMovimientoBancario },

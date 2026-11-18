@@ -8,6 +8,19 @@
     padding: 8px;
 }
 
+.tarjeta-pedido-compra-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.tarjeta-pedido-compra-fecha {
+    font-size: 0.85em;
+    color: var(--color-texto-secundario, #666);
+    white-space: nowrap;
+}
+
 .tarjeta-pedido-compra-codigo {
     font-weight: bold;
 }

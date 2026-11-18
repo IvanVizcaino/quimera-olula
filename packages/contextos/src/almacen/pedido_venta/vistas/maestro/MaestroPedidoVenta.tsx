@@ -12,20 +12,13 @@ import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useLayout } from "@olula/lib/useLayout.js";
 import { useEffect, useMemo } from "react";
 import { DetallePedidoVenta } from "../../detalle/DetallePedidoVenta.tsx";
-import { DisponibilidadPedido, ItemPedidoVenta } from "../../diseño.ts";
+import { ItemPedidoVenta } from "../../diseño.ts";
+import { ESTILO_DISPONIBILIDAD } from "../../dominio.ts";
 import { GenerarSalidaPedidoVenta } from "../generar_salida/GenerarSalidaPedidoVenta.tsx";
 import { SalidaGenerada } from "../salida_generada/SalidaGenerada.tsx";
 import { ComprobarReservasPedidoVenta } from "../comprobar_reservas/ComprobarReservasPedidoVenta.tsx";
 import { ContextoMaestroPedidoVenta } from "./diseño.ts";
 import { getMaquina } from "./maquina.ts";
-
-const COLORES_DISPONIBILIDAD: Record<DisponibilidadPedido, { label: string; color: string }> = {
-    total:          { label: '✓ Total',        color: '#22c55e' },
-    parcial:        { label: '~ Parcial',      color: '#f59e0b' },
-    sin_stock:      { label: '✗ Sin stock',    color: '#ef4444' },
-    en_salida:      { label: '↗ En salida',    color: '#3b82f6' },
-    parcial_salida: { label: '↗ Parc. salida', color: '#8b5cf6' },
-};
 
 const metaTablaPedidoVenta: MetaTabla<ItemPedidoVenta> = [
     { id: "codigo", cabecera: "Código" },
@@ -36,7 +29,7 @@ const metaTablaPedidoVenta: MetaTabla<ItemPedidoVenta> = [
         cabecera: "Stock",
         render: (p: ItemPedidoVenta) => {
             if (!p.disponibilidad) return null;
-            const { label, color } = COLORES_DISPONIBILIDAD[p.disponibilidad];
+            const { label, color } = ESTILO_DISPONIBILIDAD[p.disponibilidad];
             return <span style={{ color, fontWeight: 600 }}>{label}</span>;
         },
     },
@@ -78,6 +71,7 @@ export const MaestroPedidoVenta = () => {
         pedidos: listaActivaEntidadesInicial<ItemPedidoVenta>(id, criteriaInicial),
         seleccionadas: [],
         idOrdenCreada: "",
+        zonas: [],
     } as ContextoMaestroPedidoVenta);
 
     useUrlParams(ctx.pedidos.activo, ctx.pedidos.criteria);
@@ -132,7 +126,7 @@ export const MaestroPedidoVenta = () => {
                         />
                     </>
                 }
-                Detalle={<DetallePedidoVenta id={ctx.pedidos.activo} publicar={emitir} />}
+                Detalle={<DetallePedidoVenta id={ctx.pedidos.activo} zonas={ctx.zonas} publicar={emitir} />}
                 seleccionada={ctx.pedidos.activo}
                 modoDisposicion="maestro-50"
             />

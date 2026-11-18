@@ -1,0 +1,66 @@
+/**
+ * Layout de pantallas de proceso / informe a pantalla completa
+ * (sin MaestroDetalle). Usa tokens de tema: superficie elevada, paddings.
+ */
+.InformeContable,
+.PaginaProceso {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100%;
+    padding: var(--padding-vertical) var(--padding-horizontal);
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m, 1rem);
+}
+
+.InformeContable > h2,
+.PaginaProceso > h2 {
+    margin: 0;
+}
+
+.InformeContable > p,
+.PaginaProceso > p {
+    margin: 0;
+    max-width: 52rem;
+    color: var(--color-texto-secundario, var(--gris-5));
+    line-height: var(--altura-linea-normal, 1.45);
+}
+
+.InformeContable > quimera-formulario {
+    display: block;
+    background: linear-gradient(
+        180deg,
+        var(--color-superficie) 0%,
+        var(--color-superficie-elevada) 100%
+    );
+    border: var(--tamaño-borde-s, 1px) solid var(--color-borde-sutil, var(--gris-2));
+    border-radius: var(--redondeo-borde-m, 8px);
+    box-shadow: var(--sombra-xs, 0 1px 2px rgba(0, 0, 0, 0.04));
+    padding: var(--espaciado-m, 1rem);
+}
+
+.InformeContable > .maestro-botones,
+.InformeContable > .botones,
+.PaginaProceso > .maestro-botones {
+    margin-top: var(--espaciado-s, 0.5rem);
+    margin-bottom: 0;
+    justify-content: flex-start;
+}
+
+.InformeContable > .informe-cabecera {
+    background: var(--color-superficie-sunken, var(--gris-1));
+    border: var(--tamaño-borde-s, 1px) solid var(--color-borde-sutil, var(--gris-2));
+    border-radius: var(--redondeo-borde-m, 8px);
+    padding: var(--espaciado-m, 1rem);
+}
+
+.InformeContable > .informe-cabecera p {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .InformeContable,
+    .PaginaProceso {
+        padding: var(--padding-vertical) var(--padding-horizontal);
+    }
+}

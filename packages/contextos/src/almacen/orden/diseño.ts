@@ -2,6 +2,9 @@ import { Entidad, Filtro, Modelo, Orden, Paginacion, RespuestaLista } from "@olu
 
 export type TipoOrden = "ENTRADA" | "SALIDA" | "TRASPASO";
 
+/** Cambio en el pedido de venta posterior a generar la salida. */
+export type CambioPedido = "ANADIDA" | "CAMBIADA" | "BORRADA";
+
 export interface OrdenAlmacen extends Entidad {
     id: string;
     fecha: string;
@@ -21,6 +24,8 @@ export interface OrdenAlmacen extends Entidad {
     pasosDrop: string | null;
     lineas: LineaOrdenAlmacen[];
     lecturasCaja: LecturaCajaOrden[];
+    /** Albaranes de venta generados al albaranar la orden (solo SALIDA). */
+    albaranes: AlbaranGenerado[];
 }
 
 export interface LineaOrdenAlmacen extends Entidad {
@@ -43,6 +48,13 @@ export interface LineaOrdenAlmacen extends Entidad {
     pasosPick: string | null;
     pasosDrop: string | null;
     cantidadPick?: number;
+    /** Pedido de venta del que procede la línea (salidas). */
+    pedidoVentaId: string | null;
+    pedidoVenta: string | null;
+    cliente: string | null;
+    cambioPedido: CambioPedido | null;
+    /** Prevista antes del primer cambio del pedido (CAMBIADA / BORRADA). */
+    cantidadPedidoAnterior: number | null;
     lecturas: LecturaLineaOrden[];
 }
 
@@ -158,5 +170,61 @@ export type PatchLineaOrden = (id: string, lineaId: string, cambios: CambiosLine
 export type DeleteLineasOrden = (id: string, lineaIds: string[]) => Promise<void>;
 export type PostEntradaDesdePedido = (nueva: NuevaEntradaDesdePedido) => Promise<string>;
 export type TerminarOrden = (id: string) => Promise<void>;
+export type AlbaranGenerado = {
+    id: string;
+    codigo: string;
+    /** Agencia y nº de envío, solo si el albarán ya tiene envío por agencia. */
+    agenciaEnvio?: string;
+    numeroTracking?: string;
+};
+/** Genera los albaranes de una SALIDA PREPARADA y la termina; devuelve los albaranes generados. */
+export type AlbaranarOrden = (id: string) => Promise<AlbaranGenerado[]>;
+
+/** Línea de pedido que no cuadra con lo recogido en la salida (aviso al albaranar).
+ * FALTA: el pedido pide más de lo que sale; SOBRA: la orden saca más de lo pendiente. */
+export interface DiferenciaPedidoOrden {
+    tipo: "FALTA" | "SOBRA";
+    pedidoId: string;
+    pedido: string;
+    lineaPedidoId: string;
+    sku: string;
+    descripcion: string;
+    pendientePedido: number;
+    enOrden: number;
+    enOtrasSalidas: number;
+    diferencia: number;
+}
+export type GetDiferenciasPedidoOrden = (id: string) => Promise<DiferenciaPedidoOrden[]>;
+export type AdquirirOrden = (id: string) => Promise<void>;
 export type PostColocacion = (id: string) => Promise<string>;
 export type GetReportEtiquetasOrden = (id: string) => Promise<Blob>;
+
+/** Agencia de transporte activa en la app (plugins transporte_*). */
+export interface ServicioAgenciaEnvio {
+    codigo: string;
+    descripcion: string;
+}
+
+export interface AgenciaEnvio {
+    codigo: string;
+    nombre: string;
+    servicios: ServicioAgenciaEnvio[];
+}
+
+export interface NuevoEnvioAgencia extends Modelo {
+    albaranId: string;
+    agenciaId: string;
+    servicio: string;
+    bultos: number;
+    kilos: number;
+    fechaRecogida: Date;
+    observaciones: string;
+}
+
+export type EnvioAgenciaGenerado = { albaranId: string; agenciaId: string; numeroTracking: string };
+
+export type GetAgenciasEnvio = () => Promise<AgenciaEnvio[]>;
+/** Pide a la agencia el envío de un albarán de una SALIDA terminada. */
+export type PostEnvioAgencia = (ordenId: string, envio: NuevoEnvioAgencia) => Promise<EnvioAgenciaGenerado>;
+/** PDF con las etiquetas del envío de un albarán. */
+export type GetEtiquetaEnvio = (albaranId: string) => Promise<Blob>;

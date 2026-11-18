@@ -19,7 +19,7 @@ export const metaCambioClienteFactura: MetaModelo<CambioClienteFactura> = metaCa
 export type EstadoVentaTpv = (
     'INICIAL' | "ABIERTA" | "EMITIDA"
     | "BORRANDO_VENTA" | "EMITIENDO_VENTA"
-    | "PAGANDO_EN_EFECTIVO" | "PAGANDO_CON_TARJETA" | "PAGANDO_CON_VALE"
+    | "PAGANDO_EN_EFECTIVO" | "PAGANDO_CON_TARJETA" | "PAGANDO_CON_VALE" | "PAGANDO_CON_QR"
     | "BORRANDO_PAGO" | "CAMBIANDO_CLIENTE" | "CAMBIANDO_DESCUENTO"
     | "CREANDO_LINEA" | "BORRANDO_LINEA" | "CAMBIANDO_LINEA"
     | "DEVOLVIENDO_VENTA"
@@ -382,21 +382,30 @@ export const cargarContexto: ProcesarVentaTpv = async (contexto, payload) => {
 
 
 
-export const imprimirTicketOFactura = async (venta: VentaTpv, pagos: PagoVentaTpv[]) => {
+export const imprimirTicketOFactura = async (
+    venta: VentaTpv,
+    pagos: PagoVentaTpv[],
+    valesAntesQueTique = false
+) => {
     if (venta.cliente) {
         const blob = await getReportFactura(venta.id);
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
-    } else {
-        const blob = await getReportVenta(venta.id);
-        console.log('imprimiendo venta');
-        await imprimir_blob(blob);
-        console.log('imprimiendo venta impresa');
-        const pagos_vale = pagos.filter((p) => p.vale && p.saldoVale && p.saldoVale > 0);
-        for (const p of pagos_vale) {
-            console.log("Imprimiendo vale", p.vale);
+        return;
+    }
+    const imprimirTique = async () => imprimir_blob(await getReportVenta(venta.id));
+    const imprimirValesConSaldo = async () => {
+        const pagosVale = pagos.filter((p) => p.vale && p.saldoVale && p.saldoVale > 0);
+        for (const p of pagosVale) {
             await imprimirVale(p.vale!);
         }
+    };
+    if (valesAntesQueTique) {
+        await imprimirValesConSaldo();
+        await imprimirTique();
+    } else {
+        await imprimirTique();
+        await imprimirValesConSaldo();
     }
 }
 

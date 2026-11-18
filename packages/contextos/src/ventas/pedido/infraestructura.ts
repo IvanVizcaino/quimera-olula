@@ -111,6 +111,20 @@ export const getPedido: GetPedido = async (id) => {
         });
 }
 
+export interface OrdenAlmacenDePedido {
+    id: string;
+    tipo: string;
+    estado: string;
+}
+
+/** Órdenes de almacén (no terminadas) en las que se está preparando el pedido. */
+export const getOrdenesAlmacenDePedido = async (pedidoId: string): Promise<OrdenAlmacenDePedido[]> => {
+    const respuesta = await RestAPI.get<{ datos: OrdenAlmacenDePedido[] }>(
+        `/almacen/orden/de_pedido_venta/${pedidoId}`
+    );
+    return respuesta.datos;
+};
+
 export const getReportPedido: GetReportPedido = async (id) =>
     RestAPI.blob(`${baseUrl}/${id}/report`, "Error al obtener el report del pedido");
 
@@ -128,7 +142,7 @@ export const getPedidos: GetPedidos = async (
 export const postPedido: PostPedido = async (pedido) => {
     const payload = {
         cliente: payloadCambioCliente(pedido),
-        empresa_id: empresaActual()
+        empresa_id: pedido.empresa_id || empresaActual()
     }
     return await RestAPI.post(baseUrl, payload, "Error al crear pedido").then((respuesta) => respuesta.id);
 }

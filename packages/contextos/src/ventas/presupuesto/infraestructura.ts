@@ -89,7 +89,7 @@ export const getPresupuestos: GetPresupuestos = async (
 export const postPresupuesto: PostPresupuesto = async (presupuesto): Promise<string> => {
     const payload = {
         cliente: payloadCambioCliente(presupuesto),
-        empresa_id: empresaActual()
+        empresa_id: presupuesto.empresa_id || empresaActual()
     };
 
     return await RestAPI.post(baseUrl, payload, "Error al crear presupuesto").then((respuesta) => respuesta.id);

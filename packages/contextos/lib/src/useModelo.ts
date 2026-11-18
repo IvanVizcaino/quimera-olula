@@ -81,7 +81,14 @@ export function useModelo<T extends Modelo>(
         modeloUltimoDisparo.current = modeloAUsar;
     }, [modeloInicialProp]);
 
+    // Prop del último resincronizado; en el montaje el estado ya sale de modeloInicialProp,
+    // así que resincronizar ahí solo serviría para pisar lo que un hijo haya puesto desde su
+    // efecto (los efectos del hijo corren antes que los del padre).
+    const propInicialPrevia = useRef(modeloInicialProp);
+
     useEffect(() => {
+        if (propInicialPrevia.current === modeloInicialProp) return;
+        propInicialPrevia.current = modeloInicialProp;
         setErrorGuardado(null);
         setModelo(modeloInicialProp);
         setModeloInicial(modeloInicialProp);

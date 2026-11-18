@@ -1,0 +1,7 @@
+.CompetidoresLinea {
+    margin-top: var(--espaciado-m, 1rem);
+}
+
+.CompetidoresLinea h3 {
+    margin-bottom: var(--espaciado-s, 0.5rem);
+}

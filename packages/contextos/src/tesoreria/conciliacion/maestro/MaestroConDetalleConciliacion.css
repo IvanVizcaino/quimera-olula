@@ -1,4 +1,122 @@
 .Conciliacion {
+    .CabeceraConciliacion {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s);
+
+        quimera-select {
+            flex: 1 1 16em;
+        }
+    }
+
+    .CuadreBancario {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+        margin-bottom: var(--espaciado-s);
+    }
+
+    .CuadreCuenta {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+        padding: var(--espaciado-xs) var(--espaciado-s);
+        border-radius: var(--radio-borde);
+        border: 1px solid var(--color-borde);
+        background: var(--color-fondo-secundario);
+        font-size: var(--fuente-s);
+
+        &.CuadreCuenta--alertas {
+            border-color: var(--color-advertencia);
+            background: var(--color-advertencia-fondo);
+        }
+    }
+
+    .CuadreCuenta-cabecera {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+        flex-wrap: wrap;
+    }
+
+    .CuadreCuenta-nombre {
+        font-weight: 500;
+        flex: 1;
+    }
+
+    .CuadreCuenta-sincronizacion {
+        color: var(--color-texto-secundario);
+
+        strong {
+            color: var(--color-texto);
+        }
+    }
+
+    .CuadreCuenta-saldos {
+        display: flex;
+        gap: var(--espaciado-s);
+        flex-wrap: wrap;
+        color: var(--color-texto-secundario);
+
+        strong {
+            color: var(--color-texto);
+        }
+    }
+
+    .CuadreCuenta-diferencia--error strong {
+        color: var(--color-error-oscuro);
+    }
+
+    .CuadreCuenta-alertas {
+        display: flex;
+        gap: var(--espaciado-xs);
+        flex-wrap: wrap;
+    }
+
+    button.alerta {
+        font-family: inherit;
+        line-height: inherit;
+        cursor: pointer;
+    }
+
+    .alerta {
+        padding: 2px var(--espaciado-xs);
+        border-radius: var(--radio-borde-s);
+        font-size: var(--fuente-xs);
+        white-space: nowrap;
+        text-decoration: none;
+
+        &:hover {
+            filter: brightness(0.92);
+        }
+    }
+
+    .alerta--pendiente {
+        background: var(--color-advertencia-fondo);
+        color: var(--color-advertencia-oscuro);
+        border: 1px solid var(--color-advertencia);
+    }
+
+    .alerta--ignorado {
+        background: var(--color-fondo-secundario);
+        color: var(--color-texto-secundario);
+        border: 1px solid var(--color-borde);
+    }
+
+    .alerta--revision {
+        background: var(--color-info-fondo);
+        color: var(--color-info-oscuro);
+        border: 1px solid var(--color-info);
+    }
+
+    .alerta--eliminado,
+    .alerta--error {
+        background: var(--color-error-fondo);
+        color: var(--color-error-oscuro);
+        border: 1px solid var(--color-error);
+    }
+
     .importe-ingreso {
         color: var(--color-exito-oscuro);
         font-variant-numeric: tabular-nums;
@@ -33,5 +151,41 @@
         flex-direction: column;
         gap: 4px;
         width: 100%;
+    }
+
+    .tarjeta-movimiento-bancario-linea {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--espaciado-s);
+    }
+
+    .tarjeta-movimiento-bancario-concepto {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tarjeta-movimiento-bancario-importe,
+    .tarjeta-movimiento-bancario-fecha {
+        flex-shrink: 0;
+    }
+
+    .FiltroCuadreActivo {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+        padding: var(--espaciado-xs) var(--espaciado-s);
+        border-radius: var(--radio-borde);
+        border: 1px solid var(--color-info);
+        background: var(--color-info-fondo);
+        color: var(--color-info-oscuro);
+        font-size: var(--fuente-s);
+        margin-bottom: var(--espaciado-s);
+
+        span {
+            flex: 1;
+        }
     }
 }

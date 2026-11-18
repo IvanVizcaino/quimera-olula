@@ -8,11 +8,11 @@ export const getMaquina: () => Maquina<EstadoMaestroConciliacion, ContextoMaestr
             movimiento_seleccionado: [maestro.Movimientos.activar],
             movimiento_deseleccionado: [maestro.Movimientos.desactivar],
 
-            movimiento_cambiado: [maestro.Movimientos.cambiar],
+            movimiento_cambiado: [maestro.aplicarMovimientoCambiado],
 
             // Emitido por detalle/detalle.ts (onDesconciliado) cuando el banco
             // ya había retirado el movimiento y desconciliar lo borra del todo.
-            movimiento_borrado: [maestro.Movimientos.quitar],
+            movimiento_borrado: [maestro.aplicarMovimientoBorrado],
 
             recarga_de_movimientos_solicitada: maestro.recargarMovimientos,
 
@@ -29,6 +29,9 @@ export const getMaquina: () => Maquina<EstadoMaestroConciliacion, ContextoMaestr
             resumen_conciliacion_automatica_cerrado: [maestro.cerrarResumenConciliacionAutomatica],
 
             conciliacion_automatica_solicitada: "CONCILIANDO_AUTOMATICAMENTE",
+
+            filtro_cuadre_establecido: [maestro.establecerFiltroCuadre],
+            filtro_cuadre_limpiado: [maestro.limpiarFiltroCuadre],
         },
 
         SINCRONIZANDO: {

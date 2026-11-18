@@ -7,6 +7,10 @@ import { MovimientoRecibo, ReciboVenta } from "./diseño.ts";
  */
 const ESTADOS_PAGABLES = ["emitido", "devuelto"];
 
+/** El recibo no está en la divisa de la empresa: el cobro y la devolución piden tasa de cambio. */
+export const enDivisaExtranjera = (recibo: ReciboVenta): boolean =>
+    !!recibo.divisaEmpresaId && !!recibo.divisaId && recibo.divisaEmpresaId !== recibo.divisaId;
+
 export const reciboPagable = (recibo: ReciboVenta): boolean =>
     ESTADOS_PAGABLES.includes(recibo.estado.trim().toLowerCase());
 

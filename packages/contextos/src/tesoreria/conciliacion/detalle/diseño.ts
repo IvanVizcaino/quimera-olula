@@ -1,43 +1,54 @@
-import { CandidatoConciliacion, Casacion, CuotaCasacion, MovimientoBancario, TipoCasacion } from "../diseño.js";
+import {
+    CandidatoConciliacion, CandidatoListaConciliacion, Conciliacion, ItemConciliacion, MovimientoBancario,
+    PartidaHuerfana, RemesaCandidata,
+} from "../diseño.js";
 
 /**
- * CASANDO / DESCONCILIANDO / IGNORANDO / REACTIVANDO: modales de las acciones
- * (ver casar/, casar_asiento/, desconciliar/, ignorar/, reactivar/ a nivel de módulo).
+ * CONCILIANDO / CONCILIANDO_REMESA / DESCONCILIANDO / IGNORANDO / REACTIVANDO: modales de
+ * las acciones (ver conciliar/, conciliar_asiento/, conciliar_remesa/, desconciliar/,
+ * ignorar/, reactivar/ a nivel de módulo).
  */
 export type EstadoDetalleConciliacion =
     | 'INICIAL'
     | 'ABIERTO'
-    | 'CASANDO'
+    | 'CONCILIANDO'
+    | 'CONCILIANDO_REMESA'
     | 'DESCONCILIANDO'
     | 'IGNORANDO'
     | 'REACTIVANDO';
 
 /**
- * Casación elegida, pendiente de confirmar en el modal: una candidata
- * (`casacionId`) o una a mano (un recibo de la búsqueda o un asiento).
+ * Conciliación elegida, pendiente de confirmar en el modal: una candidata
+ * (`conciliacionId`) o una a mano (un recibo de la búsqueda o un asiento).
+ * `items` contiene los movimientos ERP a resolver (1 en el caso habitual).
  */
-export type CasacionSeleccionada = {
-    casacionId: string | null;
-    tipo: TipoCasacion;
-    params: Record<string, unknown>;
+export type ConciliacionSeleccionada = {
+    conciliacionId: string | null;
+    items: ItemConciliacion[];
     probabilidad: number | null;
     justificacion: string | null;
-    recibo: {
-        codigo: string;
-        tercero: string | null;
-        importe: number;
-        fechaVencimiento: Date;
-    } | null;
-    cuota: CuotaCasacion | null;
 };
 
 export type ContextoDetalleConciliacion = {
     estado: EstadoDetalleConciliacion;
     movimiento: MovimientoBancario;
-    /** Casaciones candidatas propuestas por las reglas o la IA. */
-    casaciones: Casacion[];
-    /** Recibos para casar a mano; solo tiene sentido si el movimiento no está resuelto. */
+    /** Conciliaciones candidatas propuestas por las reglas o la IA. */
+    conciliaciones: Conciliacion[];
+    /** Conciliación ya aplicada (solo cuando movimiento.estado === 'conciliado'). */
+    conciliacionAplicada: Conciliacion | null;
+    /** Recibos para conciliar a mano; solo tiene sentido si el movimiento no está resuelto. */
     candidatos: CandidatoConciliacion[];
     candidatosTexto: string;
-    casacionSeleccionada: CasacionSeleccionada | null;
+    /** Remesas de cobro que puede pagar el movimiento; solo si es un ingreso no resuelto. */
+    remesas: RemesaCandidata[];
+    /** Partidas contables de la cuenta sin movimiento bancario; solo si el movimiento no está resuelto. */
+    partidas: PartidaHuerfana[];
+    conciliacionSeleccionada: ConciliacionSeleccionada | null;
+    /**
+     * Candidatos reunidos para conciliarlos juntos. Guarda los candidatos completos, no sus
+     * ids, para conservarlos al buscar otro texto (la búsqueda recarga los recibos).
+     */
+    seleccion: CandidatoListaConciliacion[];
+    /** Remesa elegida, pendiente de que el usuario confirme sus recibos en el modal. */
+    remesaSeleccionada: RemesaCandidata | null;
 };

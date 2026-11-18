@@ -8,4 +8,5 @@ export type ContextoMaestroPedidoVenta = {
     pedidos: ListaActivaEntidades<ItemPedidoVenta>;
     seleccionadas: string[];
     idOrdenCreada: string;
+    zonas: number[];
 };

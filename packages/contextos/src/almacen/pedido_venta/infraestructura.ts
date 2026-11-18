@@ -1,6 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
-import { ComprobarReservas, DisponibilidadPedido, GenerarSalidaDesdePedidos, GenerarSalidaVentaDesdePedidos, GetPedidoVenta, GetPedidosVenta, ItemPedidoVenta, LineaPedidoVenta, PedidoVenta } from "./diseño.ts";
+import { CambiarPrioridadLinea, CambiarPrioridadPedido, CompetidorLinea, ComprobarReservas, ComprobarReservasLineas, DisponibilidadLinea, DisponibilidadPedido, EstadoLinea, GenerarSalidaDesdePedidos, GenerarSalidaVentaDesdePedidos, GetPedidoVenta, GetPedidosVenta, ItemPedidoVenta, LineaPedidoVenta, PedidoVenta } from "./diseño.ts";
 
 
 interface ItemPedidoVentaApi {
@@ -24,6 +24,7 @@ interface LineaPedidoVentaApi {
     pvp_total: number;
     servida: number;
     cerrada: boolean;
+    prioritaria?: boolean;
 }
 
 interface OrdenDesdePedidosVentaApi {
@@ -49,6 +50,7 @@ const lineaPedidoVentaDesdeApi = (api: LineaPedidoVentaApi): LineaPedidoVenta =>
     pvpTotal: api.pvp_total,
     servida: api.servida,
     cerrada: api.cerrada,
+    prioritaria: !!api.prioritaria,
 });
 
 const pedidoVentaDesdeApi = (pedido: PedidoVentaApi, lineas: LineaPedidoVentaApi[]): PedidoVenta => ({
@@ -104,11 +106,79 @@ export const generarSalidaVentaDesdePedidos: GenerarSalidaVentaDesdePedidos = as
     return respuesta.id;
 };
 
-export const comprobarReservas: ComprobarReservas = async (zonas, limite) => {
-    const respuesta = await RestAPI.query<{ zonas: number[]; limite: number }, { pedido_id: number; estado: DisponibilidadPedido }[]>(
+export const comprobarReservas: ComprobarReservas = async (zonas) => {
+    const respuesta = await RestAPI.query<{ zonas: number[] }, { pedido_id: number; estado: DisponibilidadPedido }[]>(
         `${baseUrl}/comprobar_reservas`,
-        { zonas, limite },
+        { zonas },
         'Error al comprobar reservas de pedidos'
     );
     return respuesta;
+};
+
+interface CompetidorLineaApi {
+    pedido_id: number;
+    codigo: string;
+    fecha: string;
+    cliente: string;
+    linea_id: number;
+    pendiente: number;
+    asignado: number;
+    posicion: CompetidorLinea['posicion'];
+    prioritaria?: boolean;
+}
+
+export interface EstadoLineaApi {
+    linea_id: number;
+    sku: string;
+    pendiente: number;
+    asignado: number;
+    estado: DisponibilidadLinea;
+    prioritaria?: boolean;
+    competidores: CompetidorLineaApi[];
+}
+
+const competidorLineaDesdeApi = (api: CompetidorLineaApi): CompetidorLinea => ({
+    pedidoId: String(api.pedido_id),
+    codigo: api.codigo,
+    fecha: new Date(Date.parse(api.fecha)),
+    cliente: api.cliente,
+    lineaId: String(api.linea_id),
+    pendiente: api.pendiente,
+    asignado: api.asignado,
+    posicion: api.posicion,
+    prioritaria: !!api.prioritaria,
+});
+
+export const estadoLineaDesdeApi = (api: EstadoLineaApi): EstadoLinea => ({
+    lineaId: String(api.linea_id),
+    pendiente: api.pendiente,
+    asignado: api.asignado,
+    estado: api.estado,
+    prioritaria: !!api.prioritaria,
+    competidores: api.competidores.map(competidorLineaDesdeApi),
+});
+
+export const comprobarReservasLineas: ComprobarReservasLineas = async (pedidoId, zonas) => {
+    const respuesta = await RestAPI.query<{ zonas: number[] }, EstadoLineaApi[]>(
+        `${baseUrl}/${pedidoId}/comprobar_reservas_lineas`,
+        { zonas },
+        'Error al comprobar la disponibilidad de las líneas'
+    );
+    return respuesta.map(estadoLineaDesdeApi);
+};
+
+export const cambiarPrioridadLinea: CambiarPrioridadLinea = async (pedidoId, lineaId, prioritaria) => {
+    await RestAPI.patch(
+        `/ventas/pedido/${pedidoId}/linea/${lineaId}/prioridad`,
+        { prioritaria },
+        'Error al cambiar la prioridad de la línea'
+    );
+};
+
+export const cambiarPrioridadPedido: CambiarPrioridadPedido = async (pedidoId, prioritaria) => {
+    await RestAPI.patch(
+        `/ventas/pedido/${pedidoId}/prioridad`,
+        { prioritaria },
+        'Error al cambiar la prioridad del pedido'
+    );
 };

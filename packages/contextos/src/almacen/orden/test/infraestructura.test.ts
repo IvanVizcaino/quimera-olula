@@ -27,6 +27,11 @@ describe("[orden-infra-01] lineaOrdenDesdeApi convierte correctamente de snake_c
         linea_pick_id: null,
         pasos_pick: null,
         pasos_drop: null,
+        pedido_venta_id: "123",
+        pedido_venta: "PV-0001",
+        cliente: "Cliente Uno",
+        cambio_pedido: "CAMBIADA",
+        cantidad_pedido_anterior: 10,
         lecturas: [],
     };
 
@@ -63,6 +68,28 @@ describe("[orden-infra-01] lineaOrdenDesdeApi convierte correctamente de snake_c
     test("mapea caja_destino_id a idCajaDestino (null)", () => {
         const linea = lineaOrdenDesdeApi(lineaApi);
         expect(linea.idCajaDestino).toBeNull();
+    });
+
+    test("mapea el pedido de venta de origen y su cliente", () => {
+        const linea = lineaOrdenDesdeApi(lineaApi);
+        expect(linea.pedidoVentaId).toBe("123");
+        expect(linea.pedidoVenta).toBe("PV-0001");
+        expect(linea.cliente).toBe("Cliente Uno");
+    });
+
+    test("mapea la marca de cambio en el pedido y la cantidad anterior", () => {
+        const linea = lineaOrdenDesdeApi(lineaApi);
+        expect(linea.cambioPedido).toBe("CAMBIADA");
+        expect(linea.cantidadPedidoAnterior).toBe(10);
+    });
+
+    test("sin pedido de venta deja los campos a null", () => {
+        const linea = lineaOrdenDesdeApi({
+            ...lineaApi, pedido_venta_id: null, pedido_venta: null, cliente: null,
+        });
+        expect(linea.pedidoVentaId).toBeNull();
+        expect(linea.pedidoVenta).toBeNull();
+        expect(linea.cliente).toBeNull();
     });
 
     test("mapea lote_id null correctamente", () => {

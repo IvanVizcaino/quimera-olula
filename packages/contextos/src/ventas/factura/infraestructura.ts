@@ -119,7 +119,7 @@ export const postFactura: PostFactura = async (factura) => {
 
     const payload = {
         cliente,
-        empresa_id: empresaActual()
+        empresa_id: factura.empresa_id || empresaActual()
     };
     return await RestAPI.post(baseUrl, payload, "Error al crear factura").then((respuesta) => respuesta.id);
 };

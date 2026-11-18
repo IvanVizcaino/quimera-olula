@@ -24,9 +24,11 @@ import { useCallback, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
 import { BorrarPedido } from "../borrar/BorrarPedido.tsx";
 import { Pedido } from "../diseño.ts";
+import { pedidoPendiente } from "../dominio.ts";
 import { getReportPedido, getTrazaPedido } from "../infraestructura.ts";
 import { editable, metaPedido, pedidoVacio } from "./detalle.ts";
 import "./DetallePedido.css";
+import { AvisoPreparacionAlmacen } from "./aviso_almacen/AvisoPreparacionAlmacen.tsx";
 import { Lineas } from "./lineas/Lineas.tsx";
 import { getMaquina } from "./maquina.ts";
 import { TabCliente } from "./TabCliente/TabCliente.tsx";
@@ -120,7 +122,7 @@ export const DetallePedidoBase = ({
       texto: "Borrar",
       advertencia: true,
       onClick: () => emitir("borrar_solicitado"),
-      deshabilitado: !esEditable,
+      deshabilitado: !pedidoPendiente(ctx.pedido),
     },
   ];
 
@@ -144,6 +146,8 @@ export const DetallePedidoBase = ({
         />
         <QuimeraAcciones acciones={acciones} vertical />
       </div>
+
+      <AvisoPreparacionAlmacen pedido={ctx.pedido} />
 
       <Tabs>
         <Tab label="Líneas">

@@ -1,0 +1,40 @@
+.CrearRemesaNominas {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+
+    quimera-formulario > * {
+        grid-column: span 6;
+    }
+
+    .nominas-remesables {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+        max-height: 40vh;
+        margin: 0;
+        padding: 0;
+        overflow-y: auto;
+        list-style: none;
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--espaciado-s);
+        }
+    }
+
+    .importe-nomina {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .botones {
+        align-items: center;
+    }
+
+    .total-remesa {
+        flex: 1;
+        color: var(--color-texto-secundario);
+    }
+}

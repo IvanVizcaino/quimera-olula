@@ -13,6 +13,14 @@ export const getMaquina: () => Maquina<EstadoMaestroReciboCompra, ContextoMaestr
             criteria_cambiado: [maestro.Recibos.filtrar, maestro.recargarRecibos],
 
             siguiente_pagina: [maestro.Recibos.filtrar, maestro.ampliarRecibos],
+
+            seleccionados_cambiados: maestro.seleccionadosCambiados,
+            remesado_solicitado: "REMESANDO",
+        },
+
+        REMESANDO: {
+            remesado_confirmado: maestro.remesarSeleccionados,
+            remesado_cancelado: "INICIAL",
         },
     };
 };

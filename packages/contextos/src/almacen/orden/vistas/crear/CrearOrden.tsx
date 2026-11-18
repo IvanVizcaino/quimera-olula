@@ -7,6 +7,8 @@ import { useCallback, useState } from "react";
 import { Almacen } from "../../../comun/componentes/Almacen.tsx";
 import { TipoOrden } from "../../../comun/componentes/TipoOrden.tsx";
 import { postOrden } from "../../infraestructura.ts";
+import { flujoPorCodigo, flujosDeTipo } from "../../pasos/flujos.ts";
+import { SelectorFlujo } from "../selector_flujo/SelectorFlujo.tsx";
 import "./CrearOrden.css";
 import { nuevaOrdenAlmacenVacia } from "./crear.ts";
 import { metaNuevaOrden } from "./diseño.ts";
@@ -21,21 +23,21 @@ export const CrearOrden = ({
         nuevaOrdenAlmacenVacia
     );
 
-    const [pasosPick, setPasosPick] = useState<string | null>(null);
+    const [codigoFlujo, setCodigoFlujo] = useState<string | null>(null);
+    // Si se cambia el tipo de orden, el flujo elegido deja de valer y se usa el primero del tipo.
+    const elegido = flujoPorCodigo(codigoFlujo);
+    const flujo = elegido?.tipo === modelo.tipoOrden ? elegido : (flujosDeTipo(modelo.tipoOrden)[0] ?? null);
 
     const crear_ = useCallback(
         async () => {
-            const pasosDrop = (modelo.tipoOrden === "TRASPASO" && pasosPick)
-                ? "CAJAS-UBICACION"
-                : null;
             const id = await postOrden({
                 ...modelo,
-                pasosPick: pasosPick ?? null,
-                pasosDrop,
+                pasosPick: flujo?.pasosPick ?? null,
+                pasosDrop: flujo?.pasosDrop ?? null,
             });
             publicar("modulo_creado", id);
         },
-        [modelo, pasosPick, publicar]
+        [modelo, flujo, publicar]
     );
 
     const cancelar_ = useCallback(
@@ -44,8 +46,6 @@ export const CrearOrden = ({
     );
 
     const [crear, cancelar] = useForm(crear_, cancelar_);
-
-    console.log('modelo', modelo);
 
     return (
         <QModal
@@ -59,18 +59,13 @@ export const CrearOrden = ({
                     <TipoOrden {...uiProps("tipoOrden")} />
                     <Almacen {...uiProps("almacenId")} />
                     <QInput label="Abierta" {...uiProps("abierta")} />
-                    {modelo.tipoOrden === "TRASPASO" && (
-                        <div>
-                            <label>Tipo de pick (palé)</label>
-                            <select
-                                value={pasosPick ?? ""}
-                                onChange={(e) => setPasosPick(e.target.value || null)}
-                            >
-                                <option value="">Sin pick especial</option>
-                                <option value="LOTE-CAJAS">Palé c/lotes → cajas</option>
-                                <option value="CAJA-CAJAS">Palé s/lotes → cajas</option>
-                            </select>
-                        </div>
+                    {flujo && (
+                        <SelectorFlujo
+                            tipo={modelo.tipoOrden}
+                            valor={flujo.codigo}
+                            onChange={(f) => setCodigoFlujo(f?.codigo ?? null)}
+                            label="Flujo por defecto de las líneas"
+                        />
                     )}
                 </quimera-formulario>
 

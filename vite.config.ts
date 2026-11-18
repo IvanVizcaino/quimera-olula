@@ -10,6 +10,9 @@ export default defineConfig({
   build: {
     target: 'esnext',
   },
+  server: {
+    allowedHosts: true,
+  },
   plugins: [
     react(),
     ViteYaml(),

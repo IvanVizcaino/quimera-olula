@@ -6,10 +6,20 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Listado } from "@olula/componentes/maestro/Listado.tsx";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
+import { ClausulaFiltro, Criteria } from "@olula/lib/diseño.ts";
+import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { ItemOrdenAlmacen } from "../../diseño.ts";
+import {
+    ESTADOS_ORDEN_DEFECTO,
+    estadosOrdenDesdeFiltro,
+    filtroEstadoOrden,
+    opcionesEstadoOrden,
+    ordenAdquirible,
+    usuarioActualId,
+} from "../../dominio.ts";
 import { CrearOrden } from "../crear/CrearOrden.tsx";
 import { DetalleOrden } from "../detalle/DetalleOrden.tsx";
 import { ContextoMaestroOrden, getMaquina } from "./maquina.ts";
@@ -26,6 +36,14 @@ const OPCIONES_TIPO = [
 ];
 
 const metaFiltroOrden: MetaFiltro = {
+    estado: {
+        id: "estado",
+        label: "Estado",
+        tipo: "multiseleccion",
+        opciones: opcionesEstadoOrden,
+        filtro: filtroEstadoOrden,
+        fromFiltro: estadosOrdenDesdeFiltro,
+    },
     tipo: {
         id: "tipo",
         campo: "tipo",
@@ -58,10 +76,7 @@ const metaFiltroOrden: MetaFiltro = {
             if (!valor || valor === "") return null;
             if (valor === "libres") return ["responsable_id", "null"];
             if (valor === "mios") {
-                const whoamiRaw = localStorage.getItem("whoami");
-                const usuarioId = whoamiRaw
-                    ? (JSON.parse(whoamiRaw) as { usuario_id: string }).usuario_id
-                    : null;
+                const usuarioId = usuarioActualId();
                 if (!usuarioId) return null;
                 return ["responsable_id", "=", usuarioId];
             }
@@ -91,18 +106,31 @@ const metaTablaOrden: MetaTabla<ItemOrdenAlmacen> = [
     { id: "descripcion", cabecera: "Orden" },
     { id: "fecha", cabecera: "Fecha", tipo:"fecha" },
     { id: "estado", cabecera: "Estado", render: (orden: ItemOrdenAlmacen) => {
-        const variante = orden.estado === "PENDIENTE" ? "error" : orden.estado === "EN_CURSO" ? "advertencia" : "exito";
+        const variante =
+            orden.estado === "PENDIENTE" ? "error"
+            : orden.estado === "EN_CURSO" ? "advertencia"
+            : orden.estado === "PREPARADA" ? "primario"
+            : "exito";
         return <QEtiqueta variante={variante}>{orden.estado}</QEtiqueta>;
     }},
     { id: "idResponsable", cabecera: "Responsable"},
 ];
 
+const criteriaOrdenesAbiertas = (): Criteria => ({
+    ...criteriaDefecto,
+    filtro: [
+        ["estado", "in", ESTADOS_ORDEN_DEFECTO as unknown as string],
+    ] as ClausulaFiltro[],
+});
+
 export const MaestroOrden = () => {
+    const criteriaBase = useMemo(criteriaOrdenesAbiertas, []);
     const { id, criteria } = getUrlParams();
+    const criteriaInicial = criteria.filtro.length > 0 ? criteria : criteriaBase;
 
     const { ctx, emitir } = useMaquina(getMaquina, {
         estado: "INICIAL",
-        ordenes: listaActivaEntidadesInicial<ItemOrdenAlmacen>(id, criteria),
+        ordenes: listaActivaEntidadesInicial<ItemOrdenAlmacen>(id, criteriaInicial),
     } as ContextoMaestroOrden);
 
     useUrlParams(ctx.ordenes.activo, ctx.ordenes.criteria);
@@ -111,6 +139,9 @@ export const MaestroOrden = () => {
         emitir("recarga_solicitada", ctx.ordenes.criteria);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const ordenActiva = ctx.ordenes.lista.find((o) => o.id === ctx.ordenes.activo);
+    const puedeAdquirir = !!ordenActiva && ordenAdquirible(ordenActiva, usuarioActualId());
 
     return (
         <div className="OrdenAlmacen">
@@ -133,6 +164,12 @@ export const MaestroOrden = () => {
                                 <div className="maestro-botones">
                                     <QBoton onClick={() => emitir("crear_modulo_solicitado")}>
                                         Nueva orden
+                                    </QBoton>
+                                    <QBoton
+                                        onClick={() => emitir("adquirir_solicitado")}
+                                        deshabilitado={!puedeAdquirir}
+                                    >
+                                        Adquirir
                                     </QBoton>
                                 </div>
                             )}

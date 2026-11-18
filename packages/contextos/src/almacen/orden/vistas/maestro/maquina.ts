@@ -21,6 +21,7 @@ export const getMaquina: () => Maquina<EstadoMaestroOrden, ContextoMaestroOrden>
             criteria_cambiado: [maestro.Ordenes.filtrar, maestro.recargarOrdenes],
             siguiente_pagina: [maestro.Ordenes.filtrar, maestro.ampliarOrdenes],
             crear_modulo_solicitado: "CREANDO",
+            adquirir_solicitado: maestro.adquirirOrdenActiva,
         },
 
         CREANDO: {

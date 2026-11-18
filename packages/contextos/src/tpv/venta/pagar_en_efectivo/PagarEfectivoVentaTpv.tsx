@@ -3,10 +3,11 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { ContextoError } from "@olula/lib/contexto.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import { formatearMoneda, redondeaMoneda } from "@olula/lib/dominio.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { VentaTpv } from "../diseño.ts";
 import { postPago } from "../infraestructura.ts";
 import {
@@ -14,6 +15,7 @@ import {
   nuevoPagoEfectivoInicial,
 } from "./pagar_en_efectivo.ts";
 import { EuroDenominacion } from "#/tpv/comun/componentes/EuroDenominacion.tsx";
+import { publicarEnVisor } from "#/tpv/visor/canal.ts";
 import "./PagarEfectivoVentaTpv.css";
 
 export const PagarEfectivoVentaTpv = ({
@@ -24,6 +26,8 @@ export const PagarEfectivoVentaTpv = ({
   venta: VentaTpv;
 }) => {
   const pendiente = redondeaMoneda(venta.total - venta.pagado, venta.divisa_id);
+
+  const enviarEfectivoEntregado = (FactoryObj.app.TPV?.venta_enviarEfectivoEntregado as boolean | undefined) ?? false;
 
   const { modelo, uiProps, valido, set } = useModelo(
     metaNuevoPagoEfectivo,
@@ -39,12 +43,20 @@ export const PagarEfectivoVentaTpv = ({
 
   const { intentar } = useContext(ContextoError);
 
+  // El cliente ve en el visor lo que ha entregado y su cambio.
+  const entregado = Number(modelo.importe) || 0;
+  useEffect(() => {
+    publicarEnVisor({ tipo: "entregado", importe: entregado });
+  }, [entregado]);
+
   const pagar = useCallback(
     async () => {
       const idPago = await intentar(() =>
         postPago(venta.id, {
           importe: Math.min(pendiente, modelo.importe),
           formaPago: "EFECTIVO",
+          // Solo al cobrar: en devoluciones no hay entregado ni cambio
+          entregado: enviarEfectivoEntregado && pendiente > 0 ? Number(modelo.importe) : undefined,
         })
       );
       setPagando(true);

@@ -11,6 +11,10 @@ export interface MovimientoReciboApi {
     estado: boolean;
     cuenta_pago_id?: string | null;
     nombre_cuenta_pago?: string | null;
+    pasarela?: string | null;
+    modo_pasarela?: "test" | "live" | null;
+    url_panel?: string | null;
+    incidencia_pasarela?: string | null;
 }
 
 export interface ReciboVentaApi {
@@ -25,6 +29,8 @@ export interface ReciboVentaApi {
     cliente_id: string;
     nombre_cliente: string;
     id_fiscal: string;
+    divisa_id?: string;
+    divisa_empresa_id?: string | null;
     pagos?: MovimientoReciboApi[];
     recibos_agrupados?: ReciboVentaApi[];
 }
@@ -38,6 +44,10 @@ const movimientoReciboDesdeApi = (api: MovimientoReciboApi): MovimientoRecibo =>
     estado: api.estado,
     cuentaPagoId: api.cuenta_pago_id ?? "",
     nombreCuentaPago: api.nombre_cuenta_pago ?? "",
+    pasarela: api.pasarela ?? null,
+    modoPasarela: api.modo_pasarela ?? null,
+    urlPanel: api.url_panel ?? null,
+    incidenciaPasarela: api.incidencia_pasarela ?? null,
 });
 
 export const reciboVentaDesdeApi = (api: ReciboVentaApi): ReciboVenta => ({
@@ -52,6 +62,8 @@ export const reciboVentaDesdeApi = (api: ReciboVentaApi): ReciboVenta => ({
     clienteId: api.cliente_id,
     nombreCliente: api.nombre_cliente,
     idFiscal: api.id_fiscal,
+    divisaId: api.divisa_id ?? "",
+    divisaEmpresaId: api.divisa_empresa_id ?? null,
     pagos: (api.pagos ?? []).map(movimientoReciboDesdeApi),
     recibosAgrupados: (api.recibos_agrupados ?? []).map(reciboVentaDesdeApi),
 });
@@ -99,6 +111,7 @@ export const patchPagarReciboVenta: PatchPagarReciboVenta = async (id, pago) => 
         {
             cuenta_pago_id: pago.cuentaPagoId,
             fecha: pago.fecha,
+            ...(pago.tasaConversion !== undefined && { tasa_conversion: String(pago.tasaConversion) }),
         },
         "Error al pagar el recibo de cobro"
     );
@@ -110,6 +123,10 @@ export const patchDevolverReciboVenta: PatchDevolverReciboVenta = async (id, dev
         {
             cuenta_pago_id: devolucion.cuentaPagoId,
             fecha: devolucion.fecha,
+            ...(devolucion.tasaConversion !== undefined && {
+                tasa_conversion: String(devolucion.tasaConversion),
+            }),
+            ...(devolucion.reembolsarEnPasarela && { reembolsar_en_pasarela: true }),
         },
         "Error al devolver el recibo de cobro"
     );
