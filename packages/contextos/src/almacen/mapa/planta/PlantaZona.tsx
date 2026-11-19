@@ -1,3 +1,4 @@
+import { KeyboardEvent } from "react";
 import { CapaMapa, PuntoRecorrido, UbicacionMapa, ZonaMapa } from "../diseño.ts";
 import {
     geometriaZona, MEDIDAS, puntoDeModulo, resumenModulo, resumenUbicacion, tonoModulo, tonoUbicacion,
@@ -14,6 +15,14 @@ type Props = {
     recorrido: PuntoRecorrido[];
     onPasillo: (pasilloId: string) => void;
     onUbicacion: (ubicacionId: string) => void;
+};
+
+/** Enter o espacio sobre un elemento SVG con role="button". */
+const alPulsar = (accion: () => void) => (e: KeyboardEvent<SVGElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        accion();
+    }
 };
 
 /** Planta esquemática de una zona: pasillos por su orden, módulos a cada lado. */
@@ -38,7 +47,7 @@ export const PlantaZona = ({
                         viewBox={`0 0 ${ancho} ${alto}`}
                         width={ancho * 1.6}
                         height={alto * 1.6}
-                        role="img"
+                        role="group"
                         aria-label={`Planta de la zona ${zona.zona}`}
                     >
                         {zona.pasillos.map((p, i) => {
@@ -70,7 +79,11 @@ export const PlantaZona = ({
                                                 width={c.ancho - 2}
                                                 height={c.alto - 2}
                                                 rx={2}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label={resumenModulo(p.pasillo, c.modulo, us).replace(/\n/g, ". ")}
                                                 onClick={() => onPasillo(p.pasilloId)}
+                                                onKeyDown={alPulsar(() => onPasillo(p.pasilloId))}
                                             >
                                                 <title>{resumenModulo(p.pasillo, c.modulo, us)}</title>
                                             </rect>

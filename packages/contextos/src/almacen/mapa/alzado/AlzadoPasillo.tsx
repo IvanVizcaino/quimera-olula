@@ -48,7 +48,7 @@ export const AlzadoPasillo = ({ pasillo, ubicaciones, capa, paleta, ubicacionId,
                                                                     type="button"
                                                                     className={`mapa-hueco tono-${tonoUbicacion(u, capa, paleta)}${u.ubicacionId === ubicacionId ? " seleccionada" : ""}`}
                                                                     title={resumenUbicacion(u)}
-                                                                    aria-label={u.ubicacion}
+                                                                    aria-label={resumenUbicacion(u).replace(/\n/g, ". ")}
                                                                     onClick={() => onUbicacion(u.ubicacionId)}
                                                                 />
                                                             ))}
@@ -61,7 +61,7 @@ export const AlzadoPasillo = ({ pasillo, ubicaciones, capa, paleta, ubicacionId,
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th />
+                                        <th aria-hidden="true" />
                                         {modulos.map((m) => <th key={m} scope="col">{m}</th>)}
                                     </tr>
                                 </tfoot>

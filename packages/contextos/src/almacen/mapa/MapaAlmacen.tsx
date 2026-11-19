@@ -103,13 +103,13 @@ export const MapaAlmacen = () => {
                 <ul className="mapa-leyenda" aria-label="Leyenda">
                     {leyenda(capa, paleta).map((e) => (
                         <li key={e.tono}>
-                            <span className={`mapa-muestra tono-${e.tono}`} />
+                            <span className={`mapa-muestra tono-${e.tono}`} aria-hidden="true" />
                             {e.texto}
                         </li>
                     ))}
                     {ctx.recorrido && (
                         <li>
-                            <span className="mapa-muestra mapa-muestra-recorrido" />
+                            <span className="mapa-muestra mapa-muestra-recorrido" aria-hidden="true" />
                             Recorrido {ctx.recorrido.ordenId}: {ctx.recorrido.paradas.length} paradas,{" "}
                             {ctx.recorrido.modulosRecorridos} módulos
                         </li>
@@ -125,7 +125,7 @@ export const MapaAlmacen = () => {
 
             {mapa && mapa.zonas.length === 0 && <p>El almacén no tiene zonas.</p>}
 
-            <div className="mapa-zonas">
+            <div className="mapa-zonas" aria-label="Zonas del almacén" role="group">
                 {zonas.map((z) => (
                     <PlantaZona
                         key={z.zonaId}
