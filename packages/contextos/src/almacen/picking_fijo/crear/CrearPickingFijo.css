@@ -1,0 +1,15 @@
+.CrearPickingFijo {
+    quimera-autocompletar[nombre="articuloId"],
+    quimera-autocompletar[nombre="ubicacionId"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="minimo"],
+    quimera-input[nombre="maximo"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="unidadReposicion"] {
+        grid-column: span 6;
+    }
+}

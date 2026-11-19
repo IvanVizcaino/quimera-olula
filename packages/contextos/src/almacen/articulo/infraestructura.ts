@@ -58,6 +58,11 @@ interface ArticuloItemApi {
     sin_stock: boolean;
     se_compra: boolean;
     se_vende: boolean;
+    clase_almacenamiento_id?: string | null;
+    clase_almacenamiento?: string | null;
+    largo?: number | null;
+    ancho?: number | null;
+    alto?: number | null;
 }
 
 interface ArticuloApi extends ArticuloItemApi {
@@ -75,6 +80,11 @@ const articuloItemDesdeApi = (api: ArticuloItemApi): ArticuloItem => ({
     noStock: api.sin_stock,
     seCompra: api.se_compra,
     seVende: api.se_vende,
+    claseAlmacenamientoId: api.clase_almacenamiento_id ?? "",
+    claseAlmacenamiento: api.clase_almacenamiento ?? "",
+    largo: api.largo ?? null,
+    ancho: api.ancho ?? null,
+    alto: api.alto ?? null,
 });
 
 const articuloDesdeApi = (api: ArticuloApi): Articulo => ({
@@ -106,6 +116,10 @@ const cambiosArticuloAApi = (cambios: CambiosArticulo): Record<string, unknown> 
     if (cambios.noStock !== undefined) api.sin_stock = cambios.noStock;
     if (cambios.seCompra !== undefined) api.se_compra = cambios.seCompra;
     if (cambios.seVende !== undefined) api.se_vende = cambios.seVende;
+    if (cambios.claseAlmacenamientoId !== undefined) api.clase_almacenamiento_id = oNulo(cambios.claseAlmacenamientoId);
+    if (cambios.largo !== undefined) api.largo = cambios.largo;
+    if (cambios.ancho !== undefined) api.ancho = cambios.ancho;
+    if (cambios.alto !== undefined) api.alto = cambios.alto;
 
     return api;
 };

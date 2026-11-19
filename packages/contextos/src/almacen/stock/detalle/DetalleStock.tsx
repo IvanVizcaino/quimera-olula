@@ -1,8 +1,11 @@
+import { MovimientosStockUbicacion } from "#/almacen/comun/componentes/MovimientosStockUbicacion.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
+import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { formatearFechaString, formatearNumero } from "@olula/lib/dominio.ts";
+import { criteriaDefecto, formatearFechaString, formatearNumero } from "@olula/lib/dominio.ts";
 import { useEffect } from "react";
 import { Stock, StockUbicacion } from "../diseño.ts";
 import { stockVacio } from "../dominio.ts";
@@ -17,25 +20,32 @@ const numero = (valor: number | null | undefined) =>
 const fecha = (valor: string | null | undefined) =>
     valor ? formatearFechaString(valor) : "";
 
+const ExpansionMovimientos = ({ entidad }: { entidad: StockUbicacion }) => (
+    <MovimientosStockUbicacion stockUbicacionId={entidad.id} />
+);
+
+const metaTablaUbicaciones: MetaTabla<StockUbicacion> = {
+    cols: [
+        { id: "ubicacion", cabecera: "Ubicación" },
+        { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
+    ],
+    expansion: ExpansionMovimientos,
+};
+
 const UbicacionesStock = ({ ubicaciones }: { ubicaciones: StockUbicacion[] }) => (
     <details className="DetalleStock-ubicaciones">
         <summary>Ubicaciones ({ubicaciones.length})</summary>
-        <table>
-            <thead>
-                <tr>
-                    <th>Ubicación</th>
-                    <th>Cantidad</th>
-                </tr>
-            </thead>
-            <tbody>
-                {ubicaciones.map((ub) => (
-                    <tr key={ub.id}>
-                        <td>{ub.ubicacion}</td>
-                        <td>{ub.cantidad.toLocaleString("es-ES")}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+        <ListadoSemiControlado
+            metaTabla={metaTablaUbicaciones}
+            entidades={ubicaciones}
+            totalEntidades={ubicaciones.length}
+            cargando={false}
+            seleccionada={null}
+            onSeleccion={() => {}}
+            criteriaInicial={criteriaDefecto}
+            onCriteriaChanged={() => null}
+            modo="tabla"
+        />
     </details>
 );
 

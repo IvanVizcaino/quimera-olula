@@ -1,0 +1,82 @@
+/* Reparto de campos por línea (rejilla de 12 columnas de quimera-formulario) */
+.Slotting {
+    quimera-select[nombre="almacenId"] {
+        grid-column: span 6;
+    }
+
+    quimera-select[nombre="origen"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="diasAbc"],
+    quimera-input[nombre="diasPicking"],
+    quimera-input[nombre="coberturaPicking"],
+    quimera-input[nombre="reposicionPicking"],
+    quimera-input[nombre="diasRecolocacion"],
+    quimera-input[nombre="limiteRecolocacion"],
+    quimera-input[nombre="limitePropuesta"] {
+        grid-column: span 3;
+    }
+
+    quimera-select[nombre="clasesPicking"] {
+        grid-column: span 3;
+    }
+
+    quimera-autocompletar[nombre="referencia"],
+    quimera-autocompletar[nombre="ubicacionMigracion"] {
+        grid-column: span 8;
+    }
+
+    /* Separación: explicación -> formulario -> botones -> resultados */
+    .botones {
+        margin-block: 0 var(--espaciado-m);
+    }
+
+    .resumen-picking,
+    .resultado-propuesta > p:first-child {
+        margin-block: var(--espaciado-s);
+    }
+}
+
+.Slotting .slotting-input-numero {
+    width: 6em;
+    padding: var(--espaciado-xs) var(--espaciado-s);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--redondeo-borde-xs);
+    background: var(--color-superficie);
+    color: var(--color-texto-primario);
+    text-align: right;
+}
+
+.Slotting .slotting-input-numero:disabled {
+    color: var(--color-texto-deshabilitado);
+    background: var(--color-superficie-sunken);
+}
+
+.Slotting .slotting-error {
+    color: var(--color-error);
+    font-size: var(--tamaño-letra-xs);
+}
+
+.Slotting .slotting-sin-hueco {
+    color: var(--color-texto-secundario);
+    font-style: italic;
+}
+
+.Slotting .resumen-picking {
+    font-weight: var(--grosor-letra-5);
+}
+
+.Slotting .slotting-explicacion {
+    margin: var(--espaciado-s) 0 var(--espaciado-l);
+    padding: var(--espaciado-s) var(--espaciado-m);
+    border-left: 3px solid var(--color-primario);
+    background: var(--color-superficie-sunken);
+    color: var(--color-texto-secundario);
+    font-size: var(--tamaño-letra-s);
+}
+
+.Slotting .slotting-explicacion ul {
+    margin: var(--espaciado-xs) 0 0;
+    padding-left: var(--espaciado-l);
+}

@@ -1,0 +1,26 @@
+.DetallePickingFijo {
+    dl {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        gap: var(--espaciado-xs) var(--espaciado-l);
+        margin: 0 0 var(--espaciado-l);
+    }
+
+    dt {
+        color: var(--color-texto-secundario);
+    }
+
+    dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    quimera-input[nombre="minimo"],
+    quimera-input[nombre="maximo"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="unidadReposicion"] {
+        grid-column: span 6;
+    }
+}

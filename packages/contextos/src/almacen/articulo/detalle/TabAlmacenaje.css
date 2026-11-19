@@ -1,0 +1,11 @@
+.TabAlmacenaje {
+    quimera-select[nombre="claseAlmacenamientoId"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="largo"],
+    quimera-input[nombre="ancho"],
+    quimera-input[nombre="alto"] {
+        grid-column: span 4;
+    }
+}
