@@ -9,6 +9,7 @@ type ProcesarFamilia = ProcesarContexto<EstadoFamilia, ContextoFamilia>;
 export const familiaVacia = (): Familia => ({
     id: "",
     descripcion: "",
+    unidadId: "",
 });
 
 export const metaFamilia: MetaModelo<Familia> = {

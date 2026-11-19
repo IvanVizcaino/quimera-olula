@@ -15,6 +15,7 @@ import { MaestroConDetallePickingFijo } from "./picking_fijo/maestro/MaestroConD
 import { ReposicionPicking } from "./reposicion/ReposicionPicking.tsx"
 import { Slotting } from "./slotting/Slotting.tsx"
 import { MaestroConDetalleZona } from "./zona/vistas/maestro/MaestroConDetalleZona.tsx"
+import { MaestroConDetallePesoMedida } from "./peso_medida/maestro/MaestroConDetallePesoMedida.tsx"
 
 export class RouterFactoryAlmacenOlula {
         static router = {
@@ -23,6 +24,7 @@ export class RouterFactoryAlmacenOlula {
                 "almacen/cajas": MaestroConDetalleCaja,
                 "almacen/almacenes": MaestroAlmacen,
                 "almacen/familias": MaestroFamilia,
+                "almacen/pesos_medidas": MaestroConDetallePesoMedida,
                 "almacen/ordenes": MaestroOrden,
                 "almacen/pedidos_compra": MaestroConDetallePedidoCompra,
                 "almacen/pedidos_venta": MaestroPedidoVenta,

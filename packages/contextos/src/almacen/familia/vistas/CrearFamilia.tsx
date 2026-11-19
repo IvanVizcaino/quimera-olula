@@ -1,7 +1,9 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { PesoMedida } from "#/almacen/comun/componentes/PesoMedida.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { Mostrar } from "@olula/componentes/moleculas/Mostrar.tsx";
 import { ContextoError } from "@olula/lib/contexto.ts";
+import { plugin } from "@olula/lib/dominio.ts";
 import { ProcesarEvento } from "@olula/lib/useMaquina.js";
 import { HookModelo, useModelo } from "@olula/lib/useModelo.ts";
 import { useContext } from "react";
@@ -61,6 +63,9 @@ const FormAltaFamilia = ({
       <quimera-formulario>
         <QInput label="Código familia" {...familia.uiProps("id")} />
         <QInput label="Descripción" {...familia.uiProps("descripcion")} />
+        {plugin("pesos_medidas") === "activo" && (
+          <PesoMedida {...familia.uiProps("unidadId")} />
+        )}
       </quimera-formulario>
       <div className="botones">
         <QBoton onClick={crear} deshabilitado={!familia.valido}>

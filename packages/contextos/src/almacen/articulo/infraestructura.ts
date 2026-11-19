@@ -55,6 +55,7 @@ interface ArticuloItemApi {
     tipo_barcode: string | null;
     familia_id: string | null;
     descripcion_familia: string | null;
+    unidad_id?: string | null;
     sin_stock: boolean;
     se_compra: boolean;
     se_vende: boolean;
@@ -77,6 +78,7 @@ const articuloItemDesdeApi = (api: ArticuloItemApi): ArticuloItem => ({
     tipoCodBarras: tipoCodBarrasDesdeApi(api.tipo_barcode),
     familiaId: api.familia_id ?? "",
     descripcionFamilia: api.descripcion_familia ?? "",
+    unidadId: api.unidad_id ?? "",
     noStock: api.sin_stock,
     seCompra: api.se_compra,
     seVende: api.se_vende,
@@ -113,6 +115,7 @@ const cambiosArticuloAApi = (cambios: CambiosArticulo): Record<string, unknown> 
     if (cambios.codbarras !== undefined) api.barcode = oNulo(cambios.codbarras);
     if (cambios.tipoCodBarras !== undefined) api.tipo_barcode = oNulo(cambios.tipoCodBarras);
     if (cambios.familiaId !== undefined) api.familia_id = oNulo(cambios.familiaId);
+    if (cambios.unidadId !== undefined) api.unidad_id = oNulo(cambios.unidadId);
     if (cambios.noStock !== undefined) api.sin_stock = cambios.noStock;
     if (cambios.seCompra !== undefined) api.se_compra = cambios.seCompra;
     if (cambios.seVende !== undefined) api.se_vende = cambios.seVende;
