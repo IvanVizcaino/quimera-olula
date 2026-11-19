@@ -19,7 +19,7 @@ export default parent => {
         // width: 100,
         // height: 32,
         // flexGrow: 0,
-        color: "#00000",
+        color: "#000000",
         borderRadius: 16,
         display: "flex",
         flexDirection: "column",

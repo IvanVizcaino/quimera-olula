@@ -12,7 +12,9 @@
     "quimera": "workspace:@quimera/core@*",
     "@quimera-extension/core": "workspace:*",
     "@quimera-extension/login": "workspace:*",
+    "@quimera-extension/vbarba-firma_albaranes": "workspace:*",
     "@quimera-extension/vbarba-facturacion": "workspace:*",
+    "@quimera-extension/vbarba-almacen": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
