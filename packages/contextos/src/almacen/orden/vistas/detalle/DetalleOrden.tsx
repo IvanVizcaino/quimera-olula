@@ -33,6 +33,7 @@ import { AlbaranarOrden } from "../albaranar/AlbaranarOrden.tsx";
 import { BorrarOrden } from "../borrar/BorrarOrden.tsx";
 import { GenerarEnvioOrden } from "../generar_envio/GenerarEnvioOrden.tsx";
 import { ColocacionOrden } from "../colocar/ColocacionOrden.tsx";
+import { RecorridoOrden } from "../recorrido/RecorridoOrden.tsx";
 import { TerminarOrden } from "../terminar/TerminarOrden.tsx";
 import { calcularAccionPrincipal } from "./accion_principal.ts";
 import { guardarOrden } from "./detalle.ts";
@@ -162,6 +163,7 @@ export const DetalleOrden = ({
                 {ordenPermiteEnvio(modelo, hayAgenciasEnvio()) && (
                     <QBoton variante="borde" onClick={() => emitir("envio_solicitado")}>Generar envío</QBoton>
                 )}
+                <QBoton variante="borde" onClick={() => emitir("recorrido_solicitado")}>Recorrido</QBoton>
                 <QBoton variante="borde" onClick={imprimirEtiquetas}>Imprimir etiquetas</QBoton>
                 {sgaActivo && (
                     <QBoton variante="borde" onClick={generarCajas}>Crear cajas</QBoton>
@@ -318,6 +320,9 @@ export const DetalleOrden = ({
             )}
             {ctx.estado === "ALBARANANDO" && (
                 <AlbaranarOrden publicar={emitir} orden={ctx.orden} />
+            )}
+            {ctx.estado === "VIENDO_RECORRIDO" && (
+                <RecorridoOrden publicar={emitir} orden={ctx.orden} />
             )}
             {ctx.estado === "GENERANDO_ENVIO" && (
                 <GenerarEnvioOrden publicar={emitir} orden={ctx.orden} />

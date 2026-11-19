@@ -1,24 +1,9 @@
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
-import { MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
-import { Ubicacion } from "../../diseño.ts";
+import { ubicacionVacia } from "../../dominio.ts";
 import { getStocksUbicacion, getUbicacion } from "../../infraestructura.ts";
 import { ContextoUbicacion, EstadoUbicacion } from "./diseño.ts";
 
 type ProcesarUbicacion = ProcesarContexto<EstadoUbicacion, ContextoUbicacion>;
-
-export const ubicacionVacia = (): Ubicacion => ({
-    id: "",
-    codigo: "",
-    idZona: "",
-    zona: "",
-});
-
-export const metaUbicacion: MetaModelo<Ubicacion> = {
-    campos: {
-        codigo: { requerido: true, validacion: (m: Ubicacion) => stringNoVacio(m.codigo) },
-        idZona: { requerido: true, validacion: (m: Ubicacion) => stringNoVacio(m.idZona) },
-    },
-};
 
 export const cargarContexto: ProcesarUbicacion = async (contexto, payload) => {
     const id = payload as string;

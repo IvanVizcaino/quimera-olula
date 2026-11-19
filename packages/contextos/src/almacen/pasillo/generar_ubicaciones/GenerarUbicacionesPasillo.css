@@ -1,0 +1,16 @@
+quimera-modal[nombre="generarUbicacionesPasillo"] quimera-formulario {
+    quimera-input[nombre="nivelDesde"],
+    quimera-input[nombre="nivelHasta"],
+    quimera-input[nombre="huecosPorNivel"] {
+        grid-column: span 4;
+    }
+
+    quimera-select[nombre="tipoUbicacionId"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="moduloDesde"],
+    quimera-input[nombre="moduloHasta"] {
+        grid-column: span 6;
+    }
+}

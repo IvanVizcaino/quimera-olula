@@ -1,0 +1,13 @@
+.ReposicionPicking {
+    quimera-select[nombre="almacenId"] {
+        grid-column: span 6;
+    }
+
+    .botones {
+        margin-block: 0 var(--espaciado-m);
+    }
+
+    .mensaje {
+        margin-block: var(--espaciado-s) var(--espaciado-m);
+    }
+}

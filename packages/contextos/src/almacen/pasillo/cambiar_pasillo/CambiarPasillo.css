@@ -1,0 +1,12 @@
+quimera-modal[nombre="cambiarPasillo"] quimera-formulario {
+    quimera-input[nombre="codigo"],
+    quimera-input[nombre="orden"] {
+        grid-column: span 6;
+    }
+
+    quimera-select[nombre="caras"],
+    quimera-input[nombre="modulos"],
+    quimera-select[nombre="accesos"] {
+        grid-column: span 4;
+    }
+}
