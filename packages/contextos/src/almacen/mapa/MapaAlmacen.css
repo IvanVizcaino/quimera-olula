@@ -175,6 +175,39 @@
 
 /* ─── Planta ────────────────────────────────────────────── */
 
+/* Planta (izquierda) y alzado del pasillo (derecha) en la misma línea */
+.MapaAlmacen .mapa-vistas {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--espaciado-m);
+
+    > .mapa-zonas {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    > .mapa-panel-alzado {
+        flex: 0 1 auto;
+        min-width: 18rem;
+        max-width: 55%;
+        position: sticky;
+        top: var(--espaciado-m);
+    }
+}
+
+@media (max-width: 1024px) {
+    .MapaAlmacen .mapa-vistas {
+        flex-direction: column;
+        align-items: stretch;
+
+        > .mapa-panel-alzado {
+            max-width: none;
+            min-width: 0;
+            position: static;
+        }
+    }
+}
+
 .MapaAlmacen .mapa-zonas {
     display: flex;
     flex-wrap: wrap;

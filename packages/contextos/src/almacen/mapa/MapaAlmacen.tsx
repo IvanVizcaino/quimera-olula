@@ -134,41 +134,43 @@ export const MapaAlmacen = () => {
 
             {mapa && mapa.zonas.length === 0 && <p>El almacén no tiene zonas.</p>}
 
-            <div className="mapa-zonas" aria-label="Zonas del almacén" role="group">
-                {zonas.map((z) => (
-                    <PlantaZona
-                        key={z.zonaId}
-                        zona={z}
-                        ubicaciones={mapa!.ubicaciones}
-                        capa={capa}
-                        paleta={paleta}
-                        pasilloId={ctx.pasilloId}
-                        ubicacionId={ctx.ubicacionId}
-                        recorrido={puntos}
-                        onPasillo={(id) => emitir("pasillo_seleccionado", id)}
-                        onUbicacion={(id) => emitir("ubicacion_seleccionada", id)}
-                    />
-                ))}
-            </div>
+            <div className="mapa-vistas">
+                <div className="mapa-zonas" aria-label="Zonas del almacén" role="group">
+                    {zonas.map((z) => (
+                        <PlantaZona
+                            key={z.zonaId}
+                            zona={z}
+                            ubicaciones={mapa!.ubicaciones}
+                            capa={capa}
+                            paleta={paleta}
+                            pasilloId={ctx.pasilloId}
+                            ubicacionId={ctx.ubicacionId}
+                            recorrido={puntos}
+                            onPasillo={(id) => emitir("pasillo_seleccionado", id)}
+                            onUbicacion={(id) => emitir("ubicacion_seleccionada", id)}
+                        />
+                    ))}
+                </div>
 
-            {mapa && pasillo && (
-                <section className="mapa-panel">
-                    <div className="mapa-panel-cabecera">
-                        <h3>Pasillo {pasillo.pasillo}</h3>
-                        <QBoton variante="texto" onClick={() => emitir("pasillo_seleccionado", null)}>
-                            Cerrar
-                        </QBoton>
-                    </div>
-                    <AlzadoPasillo
-                        pasillo={pasillo}
-                        ubicaciones={mapa.ubicaciones}
-                        capa={capa}
-                        paleta={paleta}
-                        ubicacionId={ctx.ubicacionId}
-                        onUbicacion={(id) => emitir("ubicacion_seleccionada", id)}
-                    />
-                </section>
-            )}
+                {mapa && pasillo && (
+                    <section className="mapa-panel mapa-panel-alzado">
+                        <div className="mapa-panel-cabecera">
+                            <h3>Pasillo {pasillo.pasillo}</h3>
+                            <QBoton variante="texto" onClick={() => emitir("pasillo_seleccionado", null)}>
+                                Cerrar
+                            </QBoton>
+                        </div>
+                        <AlzadoPasillo
+                            pasillo={pasillo}
+                            ubicaciones={mapa.ubicaciones}
+                            capa={capa}
+                            paleta={paleta}
+                            ubicacionId={ctx.ubicacionId}
+                            onUbicacion={(id) => emitir("ubicacion_seleccionada", id)}
+                        />
+                    </section>
+                )}
+            </div>
 
             {ubicacion && (
                 <DetalleUbicacionMapa
