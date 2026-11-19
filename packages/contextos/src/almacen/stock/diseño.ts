@@ -11,6 +11,12 @@ export interface StockItem extends Entidad {
     cantidadDisponible: number;
     cantidadReservada: number;
     cantidadPendiente: number;
+    necesidad?: number | null;
+    stockMinimo?: number | null;
+    stockMaximo?: number | null;
+    fechaUltimaRegularizacion?: string | null;
+    horaUltimaRegularizacion?: string | null;
+    cantidadUltimaRegularizacion?: number | null;
 }
 
 export interface StockUbicacion extends Entidad {
@@ -34,6 +40,12 @@ export interface StockAPI extends Entidad {
     cantidad_disponible: number;
     cantidad_reservada: number;
     cantidad_pendiente: number;
+    necesidad?: number | null;
+    stock_minimo?: number | null;
+    stock_maximo?: number | null;
+    fecha_ultima_regularizacion?: string | null;
+    hora_ultima_regularizacion?: string | null;
+    cantidad_ultima_regularizacion?: number | null;
 }
 
 export type GetStock = (id: string) => Promise<Stock>;

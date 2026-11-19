@@ -4,8 +4,10 @@ export interface ElementoMenuBase {
     nombre: string;
     icono?: string;
     regla?: string | string[];
-    /** Plugins que deben estar activos para mostrar la entrada (todos). */
-    plugin?: string | string[];
+    /** Plugins que pide la entrada (todos). Un nombre suelto exige el estado
+     *  "activo"; un objeto { nombre: estados } exige que el plugin esté en
+     *  alguno de esos estados (p.ej. { estado_expedicion_factura: ["firma", "emision"] }). */
+    plugin?: string | string[] | Record<string, string | string[]>;
     color?: string;
     variant?: string;
     posicion?: number;
@@ -64,8 +66,14 @@ export const conReglaEnResumen = (elemento: ElementoMenu): ElementoMenu => {
 };
 
 /** Los plugins que pide la entrada están activos en esta instalación (whoami). */
-export const pluginsActivos = (e: ElementoMenuBase): boolean =>
-    !e.plugin || [e.plugin].flat().every((nombre) => plugin(nombre) === "activo");
+export const pluginsActivos = (e: ElementoMenuBase): boolean => {
+    if (!e.plugin) return true;
+    if (typeof e.plugin === "string" || Array.isArray(e.plugin))
+        return [e.plugin].flat().every((nombre) => plugin(nombre) === "activo");
+    return Object.entries(e.plugin).every(([nombre, estados]) =>
+        [estados].flat().includes(plugin(nombre))
+    );
+};
 
 /** SaaS: la entrada no es de un módulo que la empresa no tiene contratado. */
 export const disponibleEnSaas = (e: ElementoMenuBase): boolean =>

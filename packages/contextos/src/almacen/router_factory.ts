@@ -1,4 +1,3 @@
-import { ConfigAlmacen } from "./config/vistas/ConfigAlmacen.tsx";
 import { MaestroAlmacen } from "./almacen/vistas/maestro/MaestroAlmacen.tsx"
 import { MaestroConDetalleArticulo } from "./articulo/maestro/MaestroConDetalleArticulo.tsx"
 import { MaestroConDetalleCaja } from "./caja/maestro/MaestroConDetalleCaja.tsx"
@@ -19,7 +18,6 @@ import { MaestroConDetalleZona } from "./zona/vistas/maestro/MaestroConDetalleZo
 
 export class RouterFactoryAlmacenOlula {
         static router = {
-                "almacen/config": ConfigAlmacen,
                 "almacen/transferencias": MaestroDetalleTransferenciasStock,
                 "almacen/articulo": MaestroConDetalleArticulo,
                 "almacen/cajas": MaestroConDetalleCaja,

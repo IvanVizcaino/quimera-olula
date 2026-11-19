@@ -5,6 +5,8 @@
 export interface ConfigEmpresa {
     /** G.IVA Negocio: código de `gruposcontablesivaneg`. Obligatorio; vacío si no se ha configurado. */
     grupoIvaNegocioId: string;
+    /** Campos cuya columna no existe en la BD de esta instalación (no se muestran). */
+    noDisponibles?: string[];
 }
 
 export type GetConfigEmpresa = () => Promise<ConfigEmpresa>;

@@ -51,6 +51,8 @@ export const ConfigVentas = () => {
                         opcion && cambiar("crearFacturasBorrador", opcion.valor as SiNoPreguntar)}
                 />
             </section>
+            {/* Sin la columna `correocopias` en la BD (p. ej. almafiber) no hay copia de correos. */}
+            {!config.noDisponibles?.includes("correo_copias") && (
             <section className="grupo-config">
                 <h3>Correo</h3>
                 <QInput
@@ -64,6 +66,7 @@ export const ConfigVentas = () => {
                     onChange={(valor) => cambiar("correoCopias", valor)}
                 />
             </section>
+            )}
         </PantallaConfig>
     );
 };
