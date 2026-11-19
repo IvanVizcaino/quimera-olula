@@ -56,7 +56,11 @@ const cambiarAlmacen: ProcesarMapa = async (ctx, payload) => cargar({
     recorrido: null,
 });
 
-const cambiarOrigen: ProcesarMapa = async (ctx, payload) => ({ ...ctx, origen: origenRotacion(payload as string) });
+/** La rotación cambia las capas ABC y slotting: con el mapa ya cargado, se recalcula. */
+const cambiarOrigen: ProcesarMapa = async (ctx, payload) => {
+    const nuevo = { ...ctx, origen: origenRotacion(payload as string) };
+    return ctx.mapa && nuevo.origen !== ctx.origen ? cargar(nuevo) : nuevo;
+};
 
 const cambiarDias: ProcesarMapa = async (ctx, payload) => ({ ...ctx, dias: (payload as string) ?? "" });
 

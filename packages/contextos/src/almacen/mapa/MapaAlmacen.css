@@ -3,7 +3,8 @@
  *
  * Formulario (12 columnas, ancho limitado por PaginaProceso):
  *   almacén 4 · zona 4 · capa 4
- *   [origen 4 · días 2]  recorrido de la orden 6 (si no hay origen/días, queda solo a la izquierda)
+ * Barras (campos + botón al lado): [rotación según 8 · días 4] Recalcular
+ *                                  [recorrido de la orden 8]   Ver recorrido
  *
  * Los tonos `tono-*` valen para celdas SVG (fill) y para botones/muestras (background).
  * Solo tokens de tema (`--color-texto-primario`, `--color-borde-fuerte`...): los que no existen
@@ -46,28 +47,50 @@
 
         [nombre="almacenId"],
         [nombre="zonaId"],
-        [nombre="capa"],
-        [nombre="origen"] {
+        [nombre="capa"] {
             grid-column: span 4;
-        }
-
-        [nombre="dias"] {
-            grid-column: span 2;
-        }
-
-        [nombre="ordenId"] {
-            grid-column: span 6;
         }
     }
 
-    > .botones {
-        margin-top: 0;
+    /* Campos con su botón al lado: rotación + Recalcular, orden + Ver recorrido */
+    > .mapa-barra {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: var(--espaciado-m, 1rem);
+
+        > .mapa-barra-campos {
+            flex: 0 1 28rem;
+            min-width: 16rem;
+        }
+
+        quimera-formulario {
+            padding-bottom: 0;
+        }
+
+        [nombre="origen"],
+        [nombre="ordenId"] {
+            grid-column: span 8;
+        }
+
+        [nombre="dias"] {
+            grid-column: span 4;
+        }
+
+        > .botones {
+            margin: 0;
+            padding-bottom: var(--espaciado-xs, 0.25rem);
+        }
     }
 }
 
 @media (max-width: 768px) {
     .MapaAlmacen > quimera-formulario [nombre] {
         grid-column: 1 / -1;
+    }
+
+    .MapaAlmacen > .mapa-barra > .mapa-barra-campos {
+        flex-basis: 100%;
     }
 }
 
@@ -385,6 +408,10 @@
     flex: 1;
     min-width: 1.5rem;
     padding: 0;
+    font-size: var(--tamaño-letra-xs, 0.75rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--mapa-texto);
     border: 1px solid var(--mapa-borde);
     border-radius: 3px;
     background: var(--tono);
@@ -445,4 +472,14 @@
     outline: none;
     stroke: var(--color-borde-focus, var(--color-primario));
     stroke-width: 2.5;
+}
+
+/* Letra ABC sobre el color, para no depender solo de él */
+.MapaAlmacen .mapa-planta .mapa-celda-letra {
+    font-size: 9px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+    fill: var(--mapa-texto);
+    pointer-events: none;
 }

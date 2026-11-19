@@ -1,7 +1,7 @@
 import { KeyboardEvent } from "react";
 import { CapaMapa, PuntoRecorrido, UbicacionMapa, ZonaMapa } from "../diseño.ts";
 import {
-    geometriaZona, MEDIDAS, puntoDeModulo, resumenModulo, resumenUbicacion, tonoModulo, tonoUbicacion,
+    geometriaZona, letraModulo, MEDIDAS, puntoDeModulo, resumenModulo, resumenUbicacion, tonoModulo, tonoUbicacion,
     trazoRecorrido, ubicacionesPorModulo, ubicacionesSueltas,
 } from "../dominio.ts";
 
@@ -70,23 +70,35 @@ export const PlantaZona = ({
                                     {g.celdas.map((c) => {
                                         const us = porModulo.get(c.modulo) ?? [];
                                         const contieneSeleccion = us.some((u) => u.ubicacionId === ubicacionId);
+                                        const letra = letraModulo(us, capa);
                                         return (
-                                            <rect
-                                                key={c.modulo}
-                                                className={`mapa-celda tono-${tonoModulo(us, capa, paleta)}${contieneSeleccion ? " seleccionada" : ""}`}
-                                                x={c.x + 1}
-                                                y={c.y + 1}
-                                                width={c.ancho - 2}
-                                                height={c.alto - 2}
-                                                rx={2}
-                                                role="button"
-                                                tabIndex={0}
-                                                aria-label={resumenModulo(p.pasillo, c.modulo, us).replace(/\n/g, ". ")}
-                                                onClick={() => onPasillo(p.pasilloId)}
-                                                onKeyDown={alPulsar(() => onPasillo(p.pasilloId))}
-                                            >
-                                                <title>{resumenModulo(p.pasillo, c.modulo, us)}</title>
-                                            </rect>
+                                            <g key={c.modulo}>
+                                                <rect
+                                                    className={`mapa-celda tono-${tonoModulo(us, capa, paleta)}${contieneSeleccion ? " seleccionada" : ""}`}
+                                                    x={c.x + 1}
+                                                    y={c.y + 1}
+                                                    width={c.ancho - 2}
+                                                    height={c.alto - 2}
+                                                    rx={2}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    aria-label={resumenModulo(p.pasillo, c.modulo, us).replace(/\n/g, ". ")}
+                                                    onClick={() => onPasillo(p.pasilloId)}
+                                                    onKeyDown={alPulsar(() => onPasillo(p.pasilloId))}
+                                                >
+                                                    <title>{resumenModulo(p.pasillo, c.modulo, us)}</title>
+                                                </rect>
+                                                {letra && (
+                                                    <text
+                                                        className="mapa-celda-letra"
+                                                        x={c.x + c.ancho / 2}
+                                                        y={c.y + c.alto / 2}
+                                                        aria-hidden="true"
+                                                    >
+                                                        {letra}
+                                                    </text>
+                                                )}
+                                            </g>
                                         );
                                     })}
                                 </g>

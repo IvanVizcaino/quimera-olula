@@ -20,10 +20,6 @@ export const CAPA_POR_DEFECTO: CapaMapa = "OCUPACION";
 export const capaMapa = (valor: string | null | undefined): CapaMapa =>
     capasMapa.find((c) => c.valor === valor)?.valor ?? CAPA_POR_DEFECTO;
 
-/** Las capas que dependen de la rotación (días y origen). */
-export const capaUsaRotacion = (capa: CapaMapa): boolean =>
-    capa === "ABC_ARTICULO" || capa === "SLOTTING";
-
 // ─── Layout ───────────────────────────────────────────────────────────────
 
 /** Impares a la izquierda, pares a la derecha (como una calle). */
@@ -189,6 +185,23 @@ export const tonoModulo = (us: UbicacionMapa[], capa: CapaMapa, paleta: Map<stri
         }
     }
 };
+
+/** Letra ABC que se escribe en el hueco (para no depender solo del color); null fuera de esas capas. */
+export const letraUbicacion = (u: UbicacionMapa, capa: CapaMapa): ClaseAbc | null => {
+    switch (capa) {
+        case "ABC_UBICACION":
+            return u.claseUbicacion;
+        case "ABC_ARTICULO":
+        case "SLOTTING":
+            return u.claseArticulo;
+        default:
+            return null;
+    }
+};
+
+/** Letra de un módulo de la planta: la mejor de sus huecos. */
+export const letraModulo = (us: UbicacionMapa[], capa: CapaMapa): ClaseAbc | null =>
+    mejorClase(us.map((u) => letraUbicacion(u, capa)));
 
 export const mejorClase = (clases: (ClaseAbc | null)[]): ClaseAbc | null =>
     clases.filter((c): c is ClaseAbc => c !== null).sort((a, b) => RANGO[a] - RANGO[b])[0] ?? null;

@@ -11,7 +11,7 @@ import { useEffect, useState } from "react";
 import { UbicacionMapa } from "./diseño.ts";
 import { AlzadoPasillo } from "./alzado/AlzadoPasillo.tsx";
 import {
-    capasMapa, capaUsaRotacion, leyenda, paletaClases, paradasSinPasillo, puntosRecorrido, resumenUbicacion,
+    capasMapa, leyenda, paletaClases, paradasSinPasillo, puntosRecorrido, resumenUbicacion,
 } from "./dominio.ts";
 import { contextoMapaInicial, getMaquina } from "./maquina.ts";
 import { PlantaZona } from "./planta/PlantaZona.tsx";
@@ -57,8 +57,11 @@ export const MapaAlmacen = () => {
                     opciones={capasMapa}
                     onChange={(opcion) => emitir("capa_cambiada", opcion?.valor ?? "")}
                 />
-                {capaUsaRotacion(capa) && (
-                    <>
+            </quimera-formulario>
+
+            <div className="mapa-barra">
+                <div className="mapa-barra-campos">
+                    <quimera-formulario>
                         <QSelect
                             label="Rotación según"
                             nombre="origen"
@@ -70,33 +73,39 @@ export const MapaAlmacen = () => {
                             label="Días" nombre="dias" tipo="numero" valor={ctx.dias}
                             onChange={(v: string) => emitir("dias_cambiados", v)}
                         />
-                    </>
-                )}
-                <QInput
-                    label="Recorrido de la orden" nombre="ordenId" valor={ctx.ordenId}
-                    deshabilitado={!mapa}
-                    onChange={(v: string) => emitir("orden_cambiada", v)}
-                />
-            </quimera-formulario>
-
-            <div className="botones maestro-botones">
-                <QBoton deshabilitado={!ctx.almacenId} onClick={() => emitir("actualizacion_solicitada")}>
-                    {capaUsaRotacion(capa) && mapa
-                        ? `Recalcular (${enteroPositivo(ctx.dias, DIAS_POR_DEFECTO)} días)`
-                        : "Actualizar"}
-                </QBoton>
-                <QBoton
-                    variante="borde"
-                    deshabilitado={!mapa || !ctx.ordenId.trim()}
-                    onClick={() => emitir("recorrido_solicitado")}
-                >
-                    Ver recorrido
-                </QBoton>
-                {ctx.recorrido && (
-                    <QBoton variante="texto" onClick={() => emitir("recorrido_quitado")}>
-                        Quitar recorrido
+                    </quimera-formulario>
+                </div>
+                <div className="botones">
+                    <QBoton deshabilitado={!ctx.almacenId} onClick={() => emitir("actualizacion_solicitada")}>
+                        {mapa ? `Recalcular (${enteroPositivo(ctx.dias, DIAS_POR_DEFECTO)} días)` : "Cargar"}
                     </QBoton>
-                )}
+                </div>
+            </div>
+
+            <div className="mapa-barra">
+                <div className="mapa-barra-campos">
+                    <quimera-formulario>
+                        <QInput
+                            label="Recorrido de la orden" nombre="ordenId" valor={ctx.ordenId}
+                            deshabilitado={!mapa}
+                            onChange={(v: string) => emitir("orden_cambiada", v)}
+                        />
+                    </quimera-formulario>
+                </div>
+                <div className="botones">
+                    <QBoton
+                        variante="borde"
+                        deshabilitado={!mapa || !ctx.ordenId.trim()}
+                        onClick={() => emitir("recorrido_solicitado")}
+                    >
+                        Ver recorrido
+                    </QBoton>
+                    {ctx.recorrido && (
+                        <QBoton variante="texto" onClick={() => emitir("recorrido_quitado")}>
+                            Quitar recorrido
+                        </QBoton>
+                    )}
+                </div>
             </div>
 
             {mapa && (

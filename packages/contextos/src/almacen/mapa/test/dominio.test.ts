@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { RecorridoOrden } from "#/almacen/orden/diseño.ts";
 import { MapaAlmacen, PasilloMapa, UbicacionMapa } from "../diseño.ts";
 import {
-    geometriaPasillo, huecosDe, listaCorta, ladoDeModulo, leyenda, mejorClase, modulosDeLado, paletaClases,
+    geometriaPasillo, huecosDe, letraModulo, letraUbicacion, listaCorta, ladoDeModulo, leyenda, mejorClase, modulosDeLado, paletaClases,
     paradasSinPasillo, posicionEnPasillo, puntosRecorrido, tonoModulo, tonoSlotting, tonoUbicacion,
     trazoRecorrido, ubicacionesSueltas, MEDIDAS,
 } from "../dominio.ts";
@@ -84,6 +84,16 @@ describe("mapa · capas", () => {
         expect(tonoUbicacion(m.ubicaciones[0], "CLASE_ALMACENAMIENTO", paleta)).toBe("clase-1");
         expect(tonoModulo(m.ubicaciones, "CLASE_ALMACENAMIENTO", paleta)).toBe("mezcla");
         expect(leyenda("CLASE_ALMACENAMIENTO", paleta)[0]).toEqual({ tono: "clase-0", texto: "PNQ" });
+    });
+
+    it("letra ABC según la capa", () => {
+        const u = ubi("1", { claseUbicacion: "B", claseArticulo: "A" });
+        expect(letraUbicacion(u, "ABC_UBICACION")).toBe("B");
+        expect(letraUbicacion(u, "ABC_ARTICULO")).toBe("A");
+        expect(letraUbicacion(u, "SLOTTING")).toBe("A");
+        expect(letraUbicacion(u, "OCUPACION")).toBeNull();
+        expect(letraModulo([u, ubi("2", { claseUbicacion: "A" })], "ABC_UBICACION")).toBe("A");
+        expect(letraModulo([ubi("3")], "ABC_ARTICULO")).toBeNull();
     });
 
     it("lista corta de artículos", () => {

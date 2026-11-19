@@ -1,6 +1,6 @@
 import { CapaMapa, Lado, PasilloMapa, UbicacionMapa } from "../diseño.ts";
 import {
-    huecosDe, ladosDePasillo, modulosDeLado, resumenUbicacion, tonoUbicacion, ubicacionesPorModulo,
+    huecosDe, ladosDePasillo, letraUbicacion, modulosDeLado, resumenUbicacion, tonoUbicacion, ubicacionesPorModulo,
 } from "../dominio.ts";
 
 type Props = {
@@ -50,7 +50,9 @@ export const AlzadoPasillo = ({ pasillo, ubicaciones, capa, paleta, ubicacionId,
                                                                     title={resumenUbicacion(u)}
                                                                     aria-label={resumenUbicacion(u).replace(/\n/g, ". ")}
                                                                     onClick={() => onUbicacion(u.ubicacionId)}
-                                                                />
+                                                                >
+                                                                    {letraUbicacion(u, capa)}
+                                                                </button>
                                                             ))}
                                                         </div>
                                                     </td>
