@@ -1,5 +1,9 @@
 import { ejercicioActual } from "#/contabilidad/asiento/dominio.ts";
+import { conChecks } from "#/contabilidad/comun/checks_informe.ts";
+import { subcuentasRequeridas } from "#/contabilidad/comun/rangos_ejercicio.ts";
 import { ASCENDENTE } from "#/contabilidad/libro_diario/dominio.ts";
+import { Modelo } from "@olula/lib/diseño.ts";
+import { MetaModelo } from "@olula/lib/dominio.ts";
 import { LibroMayor, NuevoLibroMayor } from "./diseño.ts";
 
 export { ASCENDENTE, ejercicioActual };
@@ -25,6 +29,30 @@ export const libroMayorVacio = (): LibroMayor => ({
     orden: "Fecha",
     tipoOrden: ASCENDENTE,
 });
+
+/** Campos `bool` de `co_i_mayor` que se editan como casilla. */
+export const CHECKS_LIBRO_MAYOR = [
+    "todasSubcuentas",
+    "saldoInicial",
+    "excluirPartidasCero",
+] as const;
+
+/** Meta común del alta y de la ficha: casillas y subcuentas obligatorias
+ * sin «todas las subcuentas» (`co_i_mayor.qs`). */
+export const metaFormularioLibroMayor = <
+    T extends Modelo & Pick<LibroMayor, "todasSubcuentas">,
+>(): MetaModelo<T> =>
+    conChecks<T>(
+        {
+            campos: {
+                descripcion: { requerido: true },
+                ejercicioId: { requerido: true },
+                subcuentaDesde: { requerido: subcuentasRequeridas },
+                subcuentaHasta: { requerido: subcuentasRequeridas },
+            },
+        },
+        CHECKS_LIBRO_MAYOR
+    );
 
 export const nuevoLibroMayorInicial = (
     ejercicioId: string

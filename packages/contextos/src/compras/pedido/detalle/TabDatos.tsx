@@ -45,6 +45,8 @@ export const TabDatos = ({
           {...uiProps("grupoIvaNegocioId")}
           nombre="grupoIvaNegocioId"
         />
+        {/* Solo lectura: la serie se fija al crear el documento (ver metaPedido). */}
+        <QInput label="Serie" {...uiProps("serieId")} />
       </quimera-formulario>
     </div>
   );

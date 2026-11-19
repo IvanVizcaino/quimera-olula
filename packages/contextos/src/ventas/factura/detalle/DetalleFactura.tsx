@@ -29,10 +29,8 @@ import { etiquetaEstadoFactura, facturaEmitible } from "../dominio.ts";
 import { IndicadorGuardado } from "../../comun/componentes/IndicadorGuardado.tsx";
 import "../../comun/estilos/campos.css";
 import "../../comun/estilos/detalle_documento.css";
-import {
-  datosClaveDocumentoVenta,
-  tituloDocumentoVenta,
-} from "../../venta/dominio.ts";
+import { tituloDocumentoVenta } from "../../venta/dominio.ts";
+import { useDatosClaveDocumentoVenta } from "../../venta/vistas/useDatosClaveDocumentoVenta.ts";
 import { facturaVacia } from "../dominio.ts";
 import { getReportFactura, getTrazaFactura } from "../infraestructura.ts";
 import "./DetalleFactura.css";
@@ -90,7 +88,7 @@ export const DetalleFactura = ({
     <EtiquetaEstado {...etiquetaEstadoFactura(factura)} />
   );
 
-  const datosClave = datosClaveDocumentoVenta;
+  const datosClave = useDatosClaveDocumentoVenta();
 
   const imprimir = useCallback(async () => {
     const blob = await getReportFactura(ctx.factura.id);
@@ -190,7 +188,7 @@ export const DetalleFactura = ({
 
         {puede("contabilidad.asiento") && (
           <Tab label="Contabilidad">
-            <AsientoDeDocumento asientoId={ctx.factura.asiento_id ?? null} />
+            <AsientoDeDocumento asientoId={ctx.factura.asiento_id ?? null} sinDatosDocumento />
           </Tab>
         )}
       </Tabs>

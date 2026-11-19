@@ -1,3 +1,4 @@
+import { preferencias } from "@olula/lib/preferencias.ts";
 import { ClausulaFiltro, Criteria } from "@olula/lib/diseño.ts";
 import { formatearFechaDate, MetaModelo } from "@olula/lib/dominio.ts";
 import {
@@ -89,7 +90,19 @@ export const asientoCuadrado = (
 export const etiquetaAsiento = (a: ItemAsiento | Asiento): string =>
     `${a.ejercicioId} · nº ${a.numero} · ${formatearFechaDate(a.fecha)}`;
 
-export const ejercicioActual = (): string => String(new Date().getFullYear());
+/** Clave de preferencias con el ejercicio de trabajo elegido en la pantalla
+ * de ejercicios (el servidor lo guarda además en `flsettings`, como Eneboo). */
+export const PREFERENCIA_EJERCICIO_ACTUAL = "contabilidad.ejercicioActual";
+
+export const ejercicioActual = (): string => {
+    try {
+        const elegido = preferencias.get<string>(PREFERENCIA_EJERCICIO_ACTUAL, "");
+        if (elegido) return elegido;
+    } catch {
+        // Sin almacenamiento local: el año en curso.
+    }
+    return String(new Date().getFullYear());
+};
 
 const clausulasFiltro = (filtro: Criteria["filtro"]): ClausulaFiltro[] => {
     if (Array.isArray(filtro) && filtro.length > 0 && Array.isArray(filtro[0])) {

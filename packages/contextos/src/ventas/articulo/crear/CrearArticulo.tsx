@@ -1,3 +1,6 @@
+import { conImpuestoDefecto } from "#/almacen/config/dominio.ts";
+import { useAplicarImpuestoDefecto } from "#/almacen/config/useImpuestoDefecto.ts";
+import { GrupoIvaProducto } from "#/ventas/comun/componentes/grupo_iva_producto.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
@@ -20,11 +23,18 @@ export const CrearArticulo = ({
   activo = false,
 }: CrearArticuloProps) => {
   const nuevoArticulo = useModelo(metaNuevoArticulo, nuevoArticuloVacio);
+  const impuestoDefecto = useAplicarImpuestoDefecto(
+    nuevoArticulo,
+    "grupoIvaProductoId",
+    "articulo"
+  );
   const { intentar } = useContext(ContextoError);
 
   const guardar = async () => {
     const id = await intentar(() => postArticulo(nuevoArticulo.modelo));
-    nuevoArticulo.init(nuevoArticuloVacio);
+    nuevoArticulo.init(
+      conImpuestoDefecto(nuevoArticuloVacio, "grupoIvaProductoId", impuestoDefecto)
+    );
     const articuloCreado = await getArticulo(id);
     publicar("articulo_creado", articuloCreado);
     onCancelar();
@@ -41,11 +51,12 @@ export const CrearArticulo = ({
     >
       <>
         <quimera-formulario>
+          <QInput label="Referencia" autoSeleccion={true} {...nuevoArticulo.uiProps("id")} />
           <QInput
             label="Descripción"
-            autoSeleccion={true}
             {...nuevoArticulo.uiProps("descripcion")}
           />
+          <GrupoIvaProducto {...nuevoArticulo.uiProps("grupoIvaProductoId")} />
         </quimera-formulario>
         <div className="botones">
           <QBoton

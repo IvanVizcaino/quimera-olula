@@ -20,6 +20,11 @@ export interface Venta extends Entidad {
     forma_pago_id: string;
     nombre_forma_pago: string;
     grupo_iva_negocio_id: string;
+    /**
+     * Serie de facturación (BD: codserie). Solo lectura: no se cambia tras crear el
+     * documento. Opcional porque la venta de TPV no la trae.
+     */
+    serie_id?: string;
     observaciones: string;
 }
 

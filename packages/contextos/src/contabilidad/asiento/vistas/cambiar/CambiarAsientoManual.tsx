@@ -32,6 +32,10 @@ const partidasDesdeAsiento = (asiento: Asiento): PartidaManualInput[] =>
         grupoIvaNegocioId: p.grupoIvaNegocioId ?? undefined,
         contrapartidaId: p.contrapartidaId ?? undefined,
         casilla303: p.casilla303 ?? undefined,
+        divisaId: p.divisaId ?? undefined,
+        tasaConversion: p.tasaConversion ?? 1,
+        debeMe: p.debeMe ?? 0,
+        haberMe: p.haberMe ?? 0,
     }));
 
 const modeloDesdeAsiento = (asiento: Asiento): NuevoAsientoManual => ({

@@ -1,18 +1,11 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QDate } from "@olula/componentes/atomos/qdate.tsx";
-import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useMemo } from "react";
-import {
-    FormatoCuentasAnuales,
-    NivelDesgloseCuentasAnuales,
-    TipoCuentasAnuales,
-} from "#/contabilidad/comun/componentes/OpcionesCuentasAnuales.tsx";
-import { admiteDesglose } from "../dominio.ts";
+import { CamposCuentasAnuales } from "../detalle/CamposCuentasAnuales.tsx";
 import { postCuentasAnuales } from "../infraestructura.ts";
 import { metaNuevaCuentasAnuales, nuevaCuentasAnualesInicial } from "./crear.ts";
 
@@ -58,30 +51,10 @@ export const CrearCuentasAnuales = ({
         >
             <div className="CrearCuentasAnuales">
                 <quimera-formulario>
-                    <QInput label="Descripción" {...uiProps("descripcion")} ref={focus} />
-                    <TipoCuentasAnuales {...uiProps("tipo")} />
-                    <FormatoCuentasAnuales {...uiProps("formato")} />
-                    <NivelDesgloseCuentasAnuales
-                        {...uiProps("nivelDesglose")}
-                        soloLectura={!admiteDesglose(informe.formato)}
-                    />
-                    <QInput label="Ejercicio" {...uiProps("ejercicioId")} />
-                    <QDate label="Fecha desde" {...uiProps("fechaDesde")} opcional />
-                    <QDate label="Fecha hasta" {...uiProps("fechaHasta")} opcional />
-                    <QInput
-                        label="Ejercicio anterior"
-                        {...uiProps("ejercicioAnteriorId")}
-                        opcional
-                    />
-                    <QDate
-                        label="Fecha desde anterior"
-                        {...uiProps("fechaDesdeAnterior")}
-                        opcional
-                    />
-                    <QDate
-                        label="Fecha hasta anterior"
-                        {...uiProps("fechaHastaAnterior")}
-                        opcional
+                    <CamposCuentasAnuales
+                        uiProps={uiProps}
+                        informe={informe}
+                        refDescripcion={focus}
                     />
                 </quimera-formulario>
 

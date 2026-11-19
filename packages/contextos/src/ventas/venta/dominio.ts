@@ -1,6 +1,6 @@
 import { ConfigWidgets } from "@olula/componentes/index.js";
 import { Direccion } from "@olula/lib/diseño.js";
-import { formatearFechaDate, formatearMoneda, MetaCampo, MetaModelo, plugin } from "@olula/lib/dominio.ts";
+import { formatearFechaDate, MetaCampo, MetaModelo, plugin } from "@olula/lib/dominio.ts";
 import { CambioClienteVenta, ClienteVenta, ConTipoArticulo, LineaVenta, ModeloNuevaLinea, NuevaLineaVenta, NuevaVenta, NuevaVentaClienteNoRegistrado, TipoArticuloLinea, Venta } from "./diseño.ts";
 
 export const direccionVacia = (): Direccion => ({
@@ -42,6 +42,7 @@ export const ventaVacia: Venta = {
     forma_pago_id: '',
     nombre_forma_pago: '',
     grupo_iva_negocio_id: '',
+    serie_id: '',
     observaciones: '',
     dtoPorcentual: 0,
     netoSinDto: 0,
@@ -122,6 +123,8 @@ export const metaVenta: MetaModelo<Venta> = {
         tasa_conversion: { tipo: "numero", requerido: false },
         total_divisa_empresa: { tipo: "numero", bloqueado: true },
         codigo: { bloqueado: true },
+        /** La serie se fija al crear el documento (Eneboo la bloquea en edición). */
+        serie_id: { bloqueado: true },
         divisa_id: { requerido: true },
     },
 };
@@ -358,17 +361,39 @@ export const payloadCambioCliente = (cambio: CambioClienteVenta) =>
             },
         };
 
-/** Franja de datos clave del detalle de un documento de venta. */
-export const datosClaveDocumentoVenta = (documento: {
+/** Documento de venta tal y como lo necesita la franja de datos clave. */
+export type DocumentoDatosClave = {
     fecha: Date;
-    nombre_agente?: string;
-    total?: number;
-    divisa_id?: string;
-}) => [
-    { etiqueta: "Fecha", valor: documento.fecha ? formatearFechaDate(new Date(documento.fecha)) : "—" },
-    { etiqueta: "Agente", valor: documento.nombre_agente || "—" },
-    { etiqueta: "Total", valor: formatearMoneda(documento.total ?? 0, documento.divisa_id || "EUR") },
-];
+    cliente?: { nombre_cliente?: string; id_fiscal?: string };
+    grupo_iva_negocio_id?: string;
+    serie_id?: string;
+};
+
+/**
+ * Franja de datos clave del detalle de un documento de venta (presupuesto, pedido,
+ * albarán y factura): Fecha · Cliente · CIF/NIF · Grupo IVA negocio · Serie.
+ *
+ * Nombre y CIF/NIF son los del documento (también para clientes no registrados).
+ * El grupo de IVA se muestra con su descripción si `descripcionGrupoIvaNegocio` la
+ * conoce (si no, con el código) y no sale en `iva_nav=legacy`, donde el documento
+ * no lleva grupo (igual que en la pestaña Datos).
+ */
+export const datosClaveDocumentoVenta = (
+    documento: DocumentoDatosClave,
+    descripcionGrupoIvaNegocio: (id: string) => string | undefined = () => undefined,
+) => {
+    const grupo = documento.grupo_iva_negocio_id ?? "";
+
+    return [
+        { etiqueta: "Fecha", valor: documento.fecha ? formatearFechaDate(new Date(documento.fecha)) : "—" },
+        { etiqueta: "Cliente", valor: documento.cliente?.nombre_cliente?.trim() || "—" },
+        { etiqueta: "CIF/NIF", valor: documento.cliente?.id_fiscal?.trim() || "—" },
+        ...(grupoIvaNegocioEnDocumento()
+            ? [{ etiqueta: "Grupo IVA negocio", valor: (grupo && descripcionGrupoIvaNegocio(grupo)) || grupo || "—" }]
+            : []),
+        { etiqueta: "Serie", valor: documento.serie_id || "—" },
+    ];
+};
 
 /** Medidas de un documento de venta que se ofrecen al personalizar widgets. */
 const camposWidgetsVenta: ConfigWidgets["campos"] = [

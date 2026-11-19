@@ -1,5 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { LibroFacturasRecibidas } from "../diseño.ts";
+import { metaLibroFacturasRecibidas } from "../detalle/detalle.ts";
+import { metaNuevoLibroFacturasRecibidas } from "../crear/crear.ts";
 import {
     admiteNumeroDesde,
     admitePorcentaje,
@@ -75,5 +77,68 @@ describe("nombre del fichero", () => {
         expect(
             nombreFicheroLibroFacturasRecibidas(ficha({ descripcion: "" }))
         ).toBe("facturas-recibidas-2026.pdf");
+    });
+});
+
+describe("casillas del formulario", () => {
+    const CHECKS = [
+        "todos",
+        "conIva",
+        "mostrarTotalFactura",
+        "mostrarNif",
+        "mostrarDocumento",
+        "mostrarAsiento",
+        "numeracionAutomatica",
+    ];
+
+    test("alta y ficha pintan como casilla los bool de co_i_facturasrec", () => {
+        for (const meta of [
+            metaNuevoLibroFacturasRecibidas,
+            metaLibroFacturasRecibidas,
+        ]) {
+            for (const campo of CHECKS) {
+                expect(meta.campos?.[campo]?.tipo).toBe("checkbox");
+            }
+        }
+    });
+
+    test("al cambiar, las casillas quedan como booleanos", () => {
+        const resultado = metaLibroFacturasRecibidas.onChange?.(
+            ficha({ mostrarAsiento: "false" as unknown as boolean }),
+            "mostrarAsiento",
+            true
+        );
+        expect(resultado?.mostrarAsiento).toBe(false);
+    });
+});
+
+describe("% de I.V.A.", () => {
+    test("es un número decimal libre en alta y ficha", () => {
+        for (const meta of [
+            metaNuevoLibroFacturasRecibidas,
+            metaLibroFacturasRecibidas,
+        ]) {
+            expect(meta.campos?.porcentaje?.tipo).toBe("decimal");
+            expect(meta.campos?.porcentaje?.decimales).toBe(2);
+        }
+    });
+
+    test("al marcar todos los tipos pasa a 0 (co_i_facturasrec.qs)", () => {
+        const resultado = metaLibroFacturasRecibidas.onChange?.(
+            ficha({
+                todos: "true" as unknown as boolean,
+                porcentaje: 4,
+            }),
+            "todos",
+            false
+        );
+        expect(resultado?.porcentaje).toBe(0);
+    });
+
+    test("sin todos los tipos es obligatorio", () => {
+        const requerido = metaLibroFacturasRecibidas.campos?.porcentaje
+            ?.requerido as (m: LibroFacturasRecibidas) => boolean;
+        expect(requerido(ficha({ todos: false }))).toBe(true);
+        expect(requerido(ficha({ todos: true }))).toBe(false);
     });
 });

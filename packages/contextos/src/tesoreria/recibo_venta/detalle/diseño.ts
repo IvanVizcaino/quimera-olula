@@ -7,7 +7,9 @@ export type EstadoDetalleReciboVenta =
     | 'ENLACE_COBRO'
     | 'ENLACE_TARJETA'
     | 'DESAGRUPANDO'
-    | 'DEVOLVIENDO';
+    | 'DEVOLVIENDO'
+    | 'ANULANDO_PAGO'
+    | 'CAMBIANDO';
 
 export type ContextoDetalleReciboVenta = {
     estado: EstadoDetalleReciboVenta;

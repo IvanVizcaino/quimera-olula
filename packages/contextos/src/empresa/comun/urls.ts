@@ -6,6 +6,7 @@
 class Empresa_Urls {
     readonly EMPRESA = `/empresa/empresa`;
     readonly EMPRESAS_BASICAS = `/empresa/empresa/basicas`;
+    readonly CONFIG = `/empresa/config`;
 }
 
 export default Empresa_Urls;

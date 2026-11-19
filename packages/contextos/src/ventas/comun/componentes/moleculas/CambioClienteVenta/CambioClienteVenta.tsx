@@ -137,6 +137,7 @@ export const CambioClienteVenta = <T extends VentaConCliente>({
               <Cliente
                 {...uiProps("cliente_id", "nombre_cliente")}
                 nombre="cliente_id_cambio"
+                avisarObservaciones
               />
               <DirCliente
                 clienteId={modelo.cliente_id}

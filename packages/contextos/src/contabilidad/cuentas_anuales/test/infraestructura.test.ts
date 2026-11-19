@@ -166,4 +166,67 @@ describe("balance calculado", () => {
 
         expect(balanceDesdeApi(sinDesglose).datos[0].desglose).toEqual([]);
     });
+
+    test("las filas del servidor traen la negrita por nivel (B11-1)", () => {
+        const balance = balanceDesdeApi({
+            ...balanceApi,
+            filas: [
+                {
+                    tipo: "cabecera",
+                    nivel: 1,
+                    concepto: "1. Importe neto de la cifra de negocios.",
+                    saldo_actual: 1250,
+                    saldo_anterior: 1000,
+                    negrita: true,
+                },
+                {
+                    tipo: "detalle",
+                    nivel: 1,
+                    concepto: "2. Variación de existencias",
+                    saldo_actual: -50,
+                    saldo_anterior: -10,
+                    negrita: true,
+                },
+                {
+                    tipo: "detalle",
+                    nivel: 3,
+                    concepto: "a1) En empresas del grupo",
+                    saldo_actual: 10,
+                    saldo_anterior: 0,
+                    negrita: false,
+                },
+            ],
+        });
+
+        expect(balance.filas?.map((f) => f.negrita)).toEqual([
+            true,
+            true,
+            false,
+        ]);
+        expect(balance.filas?.[0].saldoActual).toBe(1250);
+    });
+
+    test("sin negrita del servidor, la deciden los tipos de fila", () => {
+        const balance = balanceDesdeApi({
+            ...balanceApi,
+            filas: [
+                {
+                    tipo: "subtotal",
+                    nivel: 0,
+                    concepto: "A.1)",
+                    saldo_actual: 1,
+                    saldo_anterior: 1,
+                },
+                {
+                    tipo: "detalle",
+                    nivel: 2,
+                    concepto: "a) Ventas",
+                    saldo_actual: 1,
+                    saldo_anterior: 1,
+                },
+            ],
+        });
+
+        expect(balance.filas?.map((f) => f.negrita)).toEqual([true, false]);
+    });
 });

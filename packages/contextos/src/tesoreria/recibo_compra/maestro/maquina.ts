@@ -7,6 +7,7 @@ export const getMaquina: () => Maquina<EstadoMaestroReciboCompra, ContextoMaestr
         INICIAL: {
             recibo_seleccionado: [maestro.Recibos.activar],
             recibo_deseleccionado: [maestro.Recibos.desactivar],
+            recibo_cambiado: [maestro.Recibos.cambiar],
 
             recarga_de_recibos_solicitada: maestro.recargarRecibos,
 

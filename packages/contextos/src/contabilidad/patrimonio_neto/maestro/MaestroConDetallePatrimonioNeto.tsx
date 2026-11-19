@@ -1,0 +1,98 @@
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
+import { Listado } from "@olula/componentes/maestro/Listado.js";
+import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
+import { puede } from "@olula/lib/dominio.ts";
+import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
+import { useEffect, useMemo } from "react";
+import { CrearPatrimonioNeto } from "../crear/CrearPatrimonioNeto.tsx";
+import { DetallePatrimonioNeto } from "../detalle/DetallePatrimonioNeto.tsx";
+import { PatrimonioNeto } from "../diseño.ts";
+import { ejercicioActual } from "../dominio.ts";
+import {
+    criteriaPatrimonioNetoDefecto,
+    metaFiltroPatrimonioNeto,
+    metaTablaPatrimonioNeto,
+} from "./diseño.ts";
+import { getMaquina } from "./maquina.ts";
+
+/** Informes de estado de cambios en el patrimonio neto guardados: cada ficha
+ * son los ejercicios a comparar. Se comparten con el ERP de escritorio, que
+ * usa la misma tabla (`co_i_patrimonio`). */
+export const MaestroConDetallePatrimonioNeto = () => {
+    const criteriaInicial = useMemo(criteriaPatrimonioNetoDefecto, []);
+
+    const { ctx, emitir } = useMaquina(getMaquina, {
+        estado: "INICIAL",
+        informes: listaActivaEntidadesInicial<PatrimonioNeto>(
+            undefined,
+            criteriaInicial
+        ),
+    });
+
+    const { estado, informes } = ctx;
+
+    const autorizado = puede("contabilidad.asiento");
+
+    useEffect(() => {
+        if (!autorizado) return;
+        emitir("recarga_de_informes_solicitada", informes.criteria);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    if (!autorizado) {
+        return <p>No tienes permiso para ver el estado del patrimonio neto.</p>;
+    }
+
+    return (
+        <div className="PatrimonioNeto">
+            <MaestroDetalle<PatrimonioNeto>
+                seleccionada={informes.activo}
+                Maestro={
+                    <Listado<PatrimonioNeto>
+                        metaTabla={metaTablaPatrimonioNeto}
+                        metaFiltro={metaFiltroPatrimonioNeto}
+                        criteria={informes.criteria}
+                        modoInicial="tabla"
+                        entidades={informes.lista}
+                        totalEntidades={informes.total}
+                        seleccionada={informes.activo}
+                        renderAcciones={() => (
+                            <div className="maestro-botones">
+                                <QBoton
+                                    onClick={() =>
+                                        emitir("crear_informe_solicitado")
+                                    }
+                                >
+                                    Nuevo informe
+                                </QBoton>
+                            </div>
+                        )}
+                        onSeleccion={(payload) =>
+                            emitir("informe_seleccionado", payload)
+                        }
+                        onCriteriaChanged={(payload) =>
+                            emitir("criteria_cambiado", payload)
+                        }
+                        onSiguientePagina={(payload) =>
+                            emitir("siguiente_pagina", payload)
+                        }
+                    />
+                }
+                Detalle={
+                    <DetallePatrimonioNeto
+                        id={informes.activo}
+                        publicar={emitir}
+                    />
+                }
+            />
+
+            {estado === "CREANDO" && (
+                <CrearPatrimonioNeto
+                    publicar={emitir}
+                    ejercicioId={ejercicioActual()}
+                />
+            )}
+        </div>
+    );
+};

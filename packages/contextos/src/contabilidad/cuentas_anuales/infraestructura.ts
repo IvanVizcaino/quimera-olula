@@ -14,6 +14,7 @@ import {
     NuevaCuentasAnuales,
     PatchCuentasAnuales,
     PostCuentasAnuales,
+    TipoFilaInforme,
 } from "./diseño.ts";
 
 const urls = new ApiUrls();
@@ -94,7 +95,18 @@ export interface BalanceCuentasAnualesApi {
         debe: number;
         haber: number;
     }[];
+    filas?: {
+        tipo: TipoFilaInforme;
+        nivel: number;
+        concepto: string;
+        saldo_actual: number | null;
+        saldo_anterior: number | null;
+        negrita?: boolean;
+    }[];
 }
+
+/** Si el servidor no dice la negrita (versiones anteriores), la deciden los tipos. */
+export const NEGRITA_POR_TIPO: TipoFilaInforme[] = ["cabecera", "subtotal", "total"];
 
 export const balanceDesdeApi = (
     api: BalanceCuentasAnualesApi
@@ -131,6 +143,16 @@ export const balanceDesdeApi = (
         saldoActual: t.saldo_actual,
         saldoAnterior: t.saldo_anterior,
     })),
+    ...(api.filas && {
+        filas: api.filas.map((f) => ({
+            tipo: f.tipo,
+            nivel: f.nivel,
+            concepto: f.concepto,
+            saldoActual: f.saldo_actual,
+            saldoAnterior: f.saldo_anterior,
+            negrita: f.negrita ?? NEGRITA_POR_TIPO.includes(f.tipo),
+        })),
+    }),
     avisosSinCodigoBalance: api.avisos_sin_codigo_balance.map((a) => ({
         codigoSubcuenta: a.codigo_subcuenta,
         codigoCuenta: a.codigo_cuenta,

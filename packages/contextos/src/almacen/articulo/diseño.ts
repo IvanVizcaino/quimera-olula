@@ -79,6 +79,9 @@ export type GetArticulos = (
 ) => RespuestaLista<ArticuloItem>;
 export type LeerCodBarras = (codigo: string) => Promise<SkuLote>;
 
-export type PostArticulo = (Articulo: Partial<Articulo>) => Promise<string>;
+/** Alta de artículo: la descripción y, opcional, el impuesto (grupo de IVA de producto). */
+export type NuevoArticulo = Partial<Articulo> & { grupoIvaProductoId?: string };
+
+export type PostArticulo = (Articulo: NuevoArticulo) => Promise<string>;
 export type PatchArticulo = (id: string, cambios: CambiosArticulo) => Promise<void>;
 export type DeleteArticulo = (id: string) => Promise<void>;

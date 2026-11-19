@@ -108,6 +108,7 @@ export const CrearPedido = ({
               <Cliente
                 {...pedidoRegistrado.uiProps("cliente_id", "nombre")}
                 nombre="ClientePedido"
+                avisarObservaciones
                 ref={focus}
               />
               <DirCliente

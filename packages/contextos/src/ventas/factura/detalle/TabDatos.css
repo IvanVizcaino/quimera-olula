@@ -6,6 +6,7 @@
  *           + agente_id (3) + por_comision (2) + icono cambiar agente (1)
  *   Fila 3: total en divisa de empresa (12, desde TotalDivisaEmpresa.css)
  *   Fila 4: forma_pago_id (6) + grupo_iva_negocio_id (6)
+ *   Fila 5: serie_id (3, solo lectura)
  */
 .Factura .TabDatos {
     quimera-date[nombre="fecha"] {
@@ -63,6 +64,10 @@
     quimera-select[nombre="grupo_iva_negocio_id"] {
         grid-column: span 6;
     }
+
+    quimera-input[nombre="serie_id"] {
+        grid-column: 1 / span 3;
+    }
 }
 
 /*
@@ -105,6 +110,10 @@
 
         quimera-select[nombre="grupo_iva_negocio_id"] {
             grid-column: 2 / -1 !important;
+        }
+
+        quimera-input[nombre="serie_id"] {
+            grid-column: 1 / span 1 !important;
         }
 
         .TabDatos-accion {

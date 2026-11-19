@@ -3,6 +3,7 @@ import { LibroMayor } from "../diseño.ts";
 import {
     etiquetaLibroMayor,
     libroMayorVacio,
+    metaFormularioLibroMayor,
     nombreFicheroLibroMayor,
     nuevoLibroMayorInicial,
 } from "../dominio.ts";
@@ -54,5 +55,38 @@ describe("nombre del fichero", () => {
         expect(nombreFicheroLibroMayor(ficha({ descripcion: "" }))).toBe(
             "libro-mayor-2026.pdf"
         );
+    });
+});
+
+describe("formulario del libro mayor", () => {
+    const meta = metaFormularioLibroMayor<LibroMayor>();
+
+    test("las opciones booleanas de co_i_mayor son casillas", () => {
+        for (const campo of [
+            "todasSubcuentas",
+            "saldoInicial",
+            "excluirPartidasCero",
+        ]) {
+            expect(meta.campos?.[campo]?.tipo).toBe("checkbox");
+        }
+    });
+
+    test("las casillas quedan como booleanos al cambiar", () => {
+        const informe = {
+            ...libroMayorVacio(),
+            saldoInicial: "false" as unknown as boolean,
+            excluirPartidasCero: "true" as unknown as boolean,
+        };
+        const resultado = meta.onChange?.(informe, "saldoInicial", true);
+        expect(resultado?.saldoInicial).toBe(false);
+        expect(resultado?.excluirPartidasCero).toBe(true);
+    });
+
+    test("sin «todas las subcuentas» desde y hasta son obligatorias", () => {
+        const requerido = meta.campos?.subcuentaHasta?.requerido as (
+            m: LibroMayor
+        ) => boolean;
+        expect(requerido({ ...libroMayorVacio(), todasSubcuentas: false })).toBe(true);
+        expect(requerido(libroMayorVacio())).toBe(false);
     });
 });

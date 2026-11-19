@@ -32,7 +32,7 @@ describe("ficha del informe", () => {
 
         expect(ficha.id).toBe("7");
         expect(ficha.todos).toBe(false);
-        expect(ficha.porcentaje).toBe("21");
+        expect(ficha.porcentaje).toBe(21);
         expect(ficha.conIva).toBe(true);
         expect(ficha.mostrarTotalFactura).toBe(false);
         expect(ficha.numeracionAutomatica).toBe(true);
@@ -48,19 +48,33 @@ describe("alta de la ficha", () => {
 
         expect(api.filtro).toEqual({
             todos: true,
-            porcentaje: null,
+            porcentaje: 0,
             con_iva: false,
         });
         expect(api.presentacion.numero_desde).toBe(1);
     });
 
-    test("con todos los tipos marcado el porcentaje no viaja", () => {
+    test("con todos los tipos marcado el porcentaje viaja a 0, como en Eneboo", () => {
         const api = nuevoLibroFacturasRecibidasAApi({
             ...nuevoLibroFacturasRecibidasInicial("2026"),
-            porcentaje: "21",
+            porcentaje: 21,
         });
 
-        expect(api.filtro.porcentaje).toBeNull();
+        expect(api.filtro.porcentaje).toBe(0);
+    });
+
+    test("sin todos los tipos el porcentaje viaja como número", () => {
+        const api = nuevoLibroFacturasRecibidasAApi({
+            ...nuevoLibroFacturasRecibidasInicial("2026"),
+            todos: false,
+            porcentaje: 10.5,
+        });
+
+        expect(api.filtro).toEqual({
+            todos: false,
+            porcentaje: 10.5,
+            con_iva: false,
+        });
     });
 });
 

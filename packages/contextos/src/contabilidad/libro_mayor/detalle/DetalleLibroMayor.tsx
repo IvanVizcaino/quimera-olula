@@ -5,6 +5,7 @@ import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { puede } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
+import { useRangosEjercicio } from "#/contabilidad/comun/use_rangos_ejercicio.ts";
 import { useCallback, useEffect } from "react";
 import { BorrarLibroMayor } from "../borrar/BorrarLibroMayor.tsx";
 import { LibroMayor } from "../diseño.ts";
@@ -40,6 +41,10 @@ export const DetalleLibroMayor = ({
     );
 
     const formModelo = useModelo(metaLibroMayor, ctx.informe, autoGuardar);
+
+    useRangosEjercicio(formModelo.modelo, formModelo.set, {
+        subcuentas: true,
+    });
 
     const { estado, informe, resultado } = ctx;
 
@@ -79,7 +84,7 @@ export const DetalleLibroMayor = ({
                             children={
                                 <TabCriterios
                                     form={formModelo}
-                                    informe={informe}
+                                    informe={formModelo.modelo}
                                 />
                             }
                         />,

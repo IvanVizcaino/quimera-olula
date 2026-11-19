@@ -29,6 +29,11 @@ export interface PartidaAsiento extends Entidad {
     grupoIvaNegocioId?: string | null;
     contrapartidaId?: number | null;
     casilla303?: string | null;
+    /** Divisa de la partida (coddivisa) y sus importes en ella (debeme / haberme). */
+    divisaId?: string | null;
+    tasaConversion?: number;
+    debeMe?: number;
+    haberMe?: number;
 }
 
 export interface Asiento extends ItemAsiento {
@@ -54,6 +59,13 @@ export interface PartidaManualInput extends Modelo {
     contrapartidaId?: number;
     contrapartidaCodigo?: string;
     casilla303?: string;
+    /** Divisa de la partida; sin ella, la de la empresa. En otra divisa se
+     * informan debeMe / haberMe y debe / haber salen de multiplicar por la tasa
+     * (co_partidas.qs, controlDivisa y calculateField). */
+    divisaId?: string;
+    tasaConversion?: number;
+    debeMe?: number;
+    haberMe?: number;
 }
 
 export interface NuevoAsientoManual extends Modelo {

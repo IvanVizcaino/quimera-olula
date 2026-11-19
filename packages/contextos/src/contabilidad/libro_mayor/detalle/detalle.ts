@@ -1,7 +1,7 @@
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
 import { CambiosLibroMayor, LibroMayor } from "../diseño.ts";
-import { libroMayorVacio } from "../dominio.ts";
+import { libroMayorVacio, metaFormularioLibroMayor } from "../dominio.ts";
 import {
     getLibroMayor,
     getResultadoLibroMayor,
@@ -22,12 +22,8 @@ const pipeInforme = ejecutarListaProcesos<
     ContextoDetalleLibroMayor
 >;
 
-export const metaLibroMayor: MetaModelo<LibroMayor> = {
-    campos: {
-        descripcion: { requerido: true },
-        ejercicioId: { requerido: true },
-    },
-};
+export const metaLibroMayor: MetaModelo<LibroMayor> =
+    metaFormularioLibroMayor<LibroMayor>();
 
 export const contextoDetalleLibroMayorInicial: ContextoDetalleLibroMayor = {
     estado: "INICIAL",

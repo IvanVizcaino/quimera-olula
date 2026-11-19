@@ -70,6 +70,7 @@ interface AlbaranAPI {
   forma_pago_id: string;
   nombre_forma_pago: string;
   grupo_iva_negocio_id: string;
+  serie_id: string;
   por_comision: number;
   observaciones: string;
   facturado: boolean;
@@ -80,6 +81,7 @@ export const albaranDesdeAPI = (p: AlbaranAPI): Albaran => ({
   fecha: new Date(Date.parse(p.fecha)),
   dtoPorcentual: p.por_descuento,
   netoSinDto: p.neto_sin_dto,
+  serie_id: p.serie_id ?? "",
   cliente: {
     cliente_id: p.cliente_id ?? null,
     nombre_cliente: p.nombre_cliente ?? "",

@@ -1,0 +1,12 @@
+/* Ocupa toda la fila del formulario (rejilla de 12 columnas) bajo el campo Cliente. */
+.q-aviso.aviso-observaciones-cliente {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+
+    .aviso-observaciones-cliente-texto {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+        white-space: pre-line;
+    }
+}
