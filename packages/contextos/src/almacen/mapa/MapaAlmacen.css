@@ -385,11 +385,43 @@
     }
 }
 
-.MapaAlmacen .mapa-resumen {
-    white-space: pre-line;
-    margin: 0 0 var(--espaciado-m);
-    color: var(--color-texto-secundario);
+.MapaAlmacen .mapa-detalle-articulos {
+    list-style: none;
+    margin: 0 0 var(--espaciado-s);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
     line-height: var(--altura-linea-normal, 1.45);
+
+    .mapa-detalle-stock {
+        margin-left: var(--espaciado-m);
+        color: var(--color-texto-secundario);
+        white-space: nowrap;
+    }
+}
+
+.MapaAlmacen .mapa-detalle-clases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-s) var(--espaciado-l, 1.5rem);
+    margin: 0 0 var(--espaciado-m);
+
+    > div {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+    }
+
+    dt {
+        color: var(--color-texto-secundario);
+        font-size: var(--tamaño-letra-s);
+    }
+
+    dd {
+        margin: 0;
+        font-weight: 600;
+    }
 }
 
 .MapaAlmacen .mapa-alzado {

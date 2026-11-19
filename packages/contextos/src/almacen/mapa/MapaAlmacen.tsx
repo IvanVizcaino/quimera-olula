@@ -1,17 +1,13 @@
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { DIAS_POR_DEFECTO, enteroPositivo, origenesRotacion } from "#/almacen/slotting/dominio.ts";
-import { StockUbicacionItem } from "#/almacen/ubicacion/diseño.ts";
-import { getStocksUbicacion } from "#/almacen/ubicacion/infraestructura.ts";
-import { StocksUbicacion } from "#/almacen/ubicacion/vistas/detalle/stocks/StocksUbicacion.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/index.js";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
-import { useEffect, useState } from "react";
-import { UbicacionMapa } from "./diseño.ts";
 import { AlzadoPasillo } from "./alzado/AlzadoPasillo.tsx";
+import { DetalleUbicacionMapa } from "./detalle/DetalleUbicacionMapa.tsx";
 import {
-    capasMapa, leyenda, paletaClases, paradasSinPasillo, puntosRecorrido, resumenUbicacion,
+    capasMapa, leyenda, paletaClases, paradasSinPasillo, puntosRecorrido,
 } from "./dominio.ts";
 import { contextoMapaInicial, getMaquina } from "./maquina.ts";
 import { PlantaZona } from "./planta/PlantaZona.tsx";
@@ -179,27 +175,5 @@ export const MapaAlmacen = () => {
                 />
             )}
         </div>
-    );
-};
-
-const DetalleUbicacionMapa = ({ ubicacion, onCerrar }: { ubicacion: UbicacionMapa; onCerrar: () => void }) => {
-    const [stocks, setStocks] = useState<StockUbicacionItem[] | null>(null);
-
-    useEffect(() => {
-        setStocks(null);
-        getStocksUbicacion(ubicacion.ubicacionId).then(setStocks);
-    }, [ubicacion.ubicacionId]);
-
-    return (
-        <section className="mapa-panel">
-            <div className="mapa-panel-cabecera">
-                <h3>{ubicacion.ubicacion}</h3>
-                <QBoton variante="texto" onClick={onCerrar}>Cerrar</QBoton>
-            </div>
-            <p className="mapa-resumen">{resumenUbicacion(ubicacion)}</p>
-            {stocks === null ? <p>Cargando stock…</p>
-                : stocks.length === 0 ? <p>Sin stock.</p>
-                    : <StocksUbicacion stocks={stocks} />}
-        </section>
     );
 };
