@@ -28,6 +28,10 @@ export const Plantilla = ({ children }: PropsWithChildren<object>) => {
   // apps/olula lo registra hoy (ver apps/olula/src/factory.ts).
   const PanelAsistente = app.Componentes?.panel_asistente as (() => React.ReactNode) | undefined;
 
+  // Otro punto de extensión: banda de aviso a todo el ancho bajo la cabecera (la app
+  // decide cuándo pintarla; ver apps/olula_saas). Debe ser un `div.banda-aviso-app`.
+  const BandaAviso = app.Componentes?.banda_aviso as (() => React.ReactNode) | undefined;
+
   return (
     <>
       <MenuProvider>
@@ -37,6 +41,8 @@ export const Plantilla = ({ children }: PropsWithChildren<object>) => {
         <Slot nombre="cabecera" {...slots}>
           <Cabecera />
         </Slot>
+
+        {BandaAviso ? <BandaAviso /> : null}
 
         <section role="main">
           <MenuLateral />

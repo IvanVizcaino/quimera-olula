@@ -18,6 +18,7 @@ import { MessageProcessor } from "@a2ui/web_core/v0_9";
 import type { SurfaceModel } from "@a2ui/web_core/v0_9";
 import type { ReactComponentImplementation } from "@a2ui/react/v0_9";
 import { describirPantalla, ejecutarAccionPantalla } from "@olula/lib/controles_pantalla.ts";
+import { accionErrorLimite, analizarErrorLimite } from "@olula/lib/errores_limite.ts";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
 import { catalogoAsistente } from "#/asistente/vistas/catalogo/catalogo.ts";
@@ -379,8 +380,22 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
                                     aplicarIdsAdjuntos(userMessageId, evento.adjuntos);
                                 }
                             } else if (evento.tipo === "error") {
+                                // Límites del plan (`[limite:consultas_ia] ...`): texto sin prefijo y, si la
+                                // app lo ofrece, un botón "Ir a ..." hacia la suscripción.
+                                const limite = analizarErrorLimite(evento.contenido);
+                                const accionLimite = limite ? accionErrorLimite(limite) : null;
+                                if (accionLimite?.url) {
+                                    setAccionNavegacionPorMensaje(prev => ({
+                                        ...prev,
+                                        [assistantId]: { ruta: accionLimite.url!, descripcion: "Mi suscripción" },
+                                    }));
+                                }
+                                const textoError = limite
+                                    ? [limite.mensaje, accionLimite && !accionLimite.url ? accionLimite.texto : null]
+                                        .filter(Boolean).join(" ")
+                                    : `Error: ${evento.contenido}`;
                                 setMensajes(prev =>
-                                    prev.map(m => (m.id === assistantId ? { ...m, texto: `Error: ${evento.contenido}` } : m))
+                                    prev.map(m => (m.id === assistantId ? { ...m, texto: textoError } : m))
                                 );
                             } else if (evento.tipo === "encolado") {
                                 setMensajes(prev =>
@@ -413,9 +428,24 @@ export function AsistenteRuntimeProvider({ children, onAccionNavegacion }: Props
                 }
             } catch (err) {
                 if ((err as Error).name === "AbortError") return;
+                const textoErr = (err as Error).message ?? (err as { descripcion?: string }).descripcion ?? "";
+                const limiteErr = analizarErrorLimite(textoErr);
+                const accionErr = limiteErr ? accionErrorLimite(limiteErr) : null;
+                const idErr = nuevoId();
+                if (accionErr?.url) {
+                    setAccionNavegacionPorMensaje(prev => ({
+                        ...prev,
+                        [idErr]: { ruta: accionErr.url!, descripcion: "Mi suscripción" },
+                    }));
+                }
                 setMensajes(prev => [
                     ...prev,
-                    { id: nuevoId(), rol: "assistant", texto: `Error: ${(err as Error).message}` },
+                    {
+                        id: idErr, rol: "assistant",
+                        texto: limiteErr
+                            ? [limiteErr.mensaje, accionErr && !accionErr.url ? accionErr.texto : null].filter(Boolean).join(" ")
+                            : `Error: ${textoErr}`,
+                    },
                 ]);
             } finally {
                 setIsRunning(false);

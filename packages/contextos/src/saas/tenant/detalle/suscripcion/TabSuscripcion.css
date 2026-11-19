@@ -1,0 +1,26 @@
+.TabSuscripcion {
+    h4 { margin: 16px 0 4px; }
+    .resumen-suscripcion {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 4px 16px;
+        margin: 8px 0;
+    }
+    .resumen-suscripcion dt { opacity: 0.7; }
+    .resumen-suscripcion dd { margin: 0; }
+    .totales-cuota {
+        display: grid;
+        grid-template-columns: 1fr max-content;
+        gap: 2px 16px;
+        max-width: 320px;
+        margin: 8px 0 8px auto;
+    }
+    .totales-cuota dd { margin: 0; text-align: right; }
+    .modulo-origen { display: flex; gap: 8px; align-items: center; padding: 2px 0; }
+    quimera-input[nombre="descuentoPct"] { grid-column: span 3; }
+    quimera-date[nombre="precioFijadoHasta"] { grid-column: span 3; }
+    quimera-select[nombre="pasarelaId"] { grid-column: span 6; }
+    quimera-date[nombre="finPrueba"] { grid-column: span 6; }
+    quimera-date[nombre="finPeriodo"] { grid-column: span 6; }
+    quimera-textarea[nombre="notas"] { grid-column: span 12; }
+}

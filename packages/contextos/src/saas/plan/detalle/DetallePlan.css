@@ -1,0 +1,5 @@
+.DetallePlan {
+    .estado-plan { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .aviso-precio { margin: 8px 0; }
+    .problemas-plan { color: var(--color-error, #c62828); margin: 8px 0; }
+}

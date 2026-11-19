@@ -1,3 +1,4 @@
+import { getConfiguracionCredenciales } from "../configuracion.js";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -191,7 +192,7 @@ const ResultadoConexionStripe = ({ conexion }: { conexion: ConexionStripe }) => 
         ...(conexion.cuenta.cobrosActivos
             ? []
             : ["La cuenta todavía no tiene los cobros activados en Stripe."]),
-        ...(conexion.cuentaCobros
+        ...(conexion.cuentaCobros || getConfiguracionCredenciales().sinCuentaBancaria
             ? []
             : ["Falta la cuenta donde se apuntan los cobros: los recibos pagados no se marcarán solos. Elígela en «Editar credencial»."]),
     ];

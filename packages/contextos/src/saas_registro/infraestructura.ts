@@ -1,4 +1,8 @@
-import { EstadoRegistro, GetEstadoRegistro, NuevoRegistro, PostRegistro, PostVerificar } from "./diseño.ts";
+import { catalogoDesdeApi, CatalogoApi } from "../saas_suscripcion/infraestructura.ts";
+import {
+    EstadoRegistro, GetEstadoRegistro, GetPlanesPublicos, NuevoRegistro, PostRegistro, PostVerificar,
+    SeleccionPlanRegistro,
+} from "./diseño.ts";
 
 /**
  * El registro público vive en el backoffice del SaaS (olula_saas_admin), no en la
@@ -34,22 +38,31 @@ interface RegistroApi {
     email: string;
     contraseña: string;
     captcha: string | null;
+    plan_id?: string;
+    periodicidad?: SeleccionPlanRegistro["periodicidad"];
 }
 
-export const registroAApi = (r: NuevoRegistro, captcha: string | null): RegistroApi => ({
+export const registroAApi = (
+    r: NuevoRegistro, captcha: string | null, plan?: SeleccionPlanRegistro | null,
+): RegistroApi => ({
     nombre_empresa: r.nombreEmpresa.trim(),
     nif: r.nif.trim() || null,
     nombre: r.nombre.trim(),
     email: r.email.trim(),
     contraseña: r.contraseña,
     captcha,
+    ...(plan ? { plan_id: plan.planId, periodicidad: plan.periodicidad } : {}),
 });
 
-export const postRegistro: PostRegistro = async (registro, captcha) =>
+export const postRegistro: PostRegistro = async (registro, captcha, plan) =>
     await llamar("/public/saas/registro", {
         method: "POST",
-        body: JSON.stringify(registroAApi(registro, captcha)),
+        body: JSON.stringify(registroAApi(registro, captcha, plan)),
     });
+
+/** Planes públicos y activos (mismo formato que el catálogo público de la app de las empresas). */
+export const getPlanesPublicos: GetPlanesPublicos = async () =>
+    catalogoDesdeApi(await llamar<CatalogoApi>("/public/saas/planes"));
 
 export const postVerificar: PostVerificar = async (token) =>
     await llamar<EstadoRegistro>("/public/saas/registro/verificar", {

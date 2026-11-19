@@ -1,5 +1,6 @@
 import { formatearFechaDate } from "@olula/lib/dominio.js";
 import { Empresa } from "../../componentes/empresa.js";
+import { getConfiguracionCredenciales } from "../configuracion.js";
 import { OPCIONES_TIPO_AUTH } from "../dominio.js";
 import { CredencialExterna } from "../diseño.js";
 
@@ -18,8 +19,12 @@ export const TabInformacion = ({ credencial }: TabInformacionProps) => {
     return (
         <div className="TabInformacion">
             <dl>
-                <dt>Empresa</dt>
-                <dd><Empresa valor={credencial.empresaId} soloLectura /></dd>
+                {!getConfiguracionCredenciales().empresaFija && (
+                    <>
+                        <dt>Empresa</dt>
+                        <dd><Empresa valor={credencial.empresaId} soloLectura /></dd>
+                    </>
+                )}
                 <dt>Categoría</dt>
                 <dd>{credencial.categoria === "llm" ? "Modelo de IA" : "Conector"}</dd>
                 <dt>Tipo de autenticación</dt>

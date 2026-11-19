@@ -1,4 +1,5 @@
 import { MetaModelo } from "@olula/lib/dominio.js";
+import { Plan } from "../../plan/diseño.js";
 import { NuevoTenant } from "../diseño.js";
 import { idTenantValido } from "../dominio.js";
 
@@ -16,5 +17,14 @@ export const metaNuevoTenant: MetaModelo<NuevoTenant> = {
         adminEmail: { requerido: true, validacion: (m) => stringNoVacio(m.adminEmail) },
         adminNombre: { requerido: true, validacion: (m) => stringNoVacio(m.adminNombre) },
         adminContrasena: { requerido: true, validacion: (m) => stringNoVacio(m.adminContrasena) },
+        planId: { requerido: false },
+        periodicidad: { requerido: true },
+        conPrueba: { tipo: "checkbox" },
     },
+};
+
+/** Plan de partida del alta: el destacado, o el primero activo. Vacío si no hay ninguno. */
+export const planInicialAlta = (planes: Plan[]): string => {
+    const activos = planes.filter((p) => p.activo);
+    return (activos.find((p) => p.destacado) ?? activos[0])?.id ?? "";
 };
