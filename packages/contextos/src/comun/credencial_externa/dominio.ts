@@ -2,6 +2,7 @@ import { MetaModelo, puede, stringNoVacio } from "@olula/lib/dominio.ts";
 import {
     CategoriaCredencialExterna, CredencialExterna, SecretoCredencialExterna, TipoAuthCredencialExterna,
 } from "./diseño.ts";
+import { getConfiguracionCredenciales } from "./configuracion.ts";
 
 const CAMPOS_SECRETO_POR_TIPO: Record<TipoAuthCredencialExterna, string[]> = {
     api_key: ["api_key"],
@@ -242,6 +243,8 @@ export const secretoCompleto = (
 ): boolean => {
     const campos = buscarProveedorConocido(proveedor)?.campos
         .filter((campo) => !campo.opcional)
+        // Lo que la app oculta (p. ej. la cuenta bancaria en el backoffice) no se exige.
+        .filter((campo) => !(campo.tipo === "cuenta_bancaria" && getConfiguracionCredenciales().sinCuentaBancaria))
         .map((campo) => campo.clave)
         ?? CAMPOS_SECRETO_POR_TIPO[tipoAuth];
 

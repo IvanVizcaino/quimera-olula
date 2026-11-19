@@ -1,5 +1,6 @@
 import { authMiddleware } from "#/auth/middlewares.ts";
 import { useTimerRefresco } from "#/auth/useTimerRefresco.ts";
+import { configurarCredenciales } from "#/comun/credencial_externa/configuracion.ts";
 import { InicioOlula, Vista } from "@olula/componentes/index.ts";
 import { FactoryObj, FactoryProvider } from "@olula/lib/factory_ctx.tsx";
 import { crearMenu, MenuContextFactory } from "@olula/lib/menu.ts";
@@ -8,6 +9,9 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouteObject, RouterProvider } from "react-router";
 import FactorySaasAdmin from "./factory.ts";
 import { router } from "./router_factory.ts";
+
+// El backoffice no tiene empresas ni tesorería: las credenciales son de una empresa fija.
+configurarCredenciales({ empresaFija: "olula", sinCuentaBancaria: true });
 
 const root = createRoot(document.getElementById("root")!);
 const factory = new FactorySaasAdmin();

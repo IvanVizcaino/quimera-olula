@@ -2,6 +2,7 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { CuentaBancariaSelect } from "#/tesoreria/comun/componentes/cuenta_bancaria_select.tsx";
 import { SecretoCredencialExterna, TipoAuthCredencialExterna } from "../diseño.js";
+import { getConfiguracionCredenciales } from "../configuracion.js";
 import { buscarProveedorConocido } from "../dominio.js";
 
 interface CamposSecretoProps {
@@ -25,9 +26,13 @@ export const CamposSecreto = ({ proveedor, tipoAuth, valor, onChange }: CamposSe
 
     const proveedorConocido = buscarProveedorConocido(proveedor);
     if (proveedorConocido) {
+        const { sinCuentaBancaria } = getConfiguracionCredenciales();
+        const campos = sinCuentaBancaria
+            ? proveedorConocido.campos.filter((c) => c.tipo !== "cuenta_bancaria")
+            : proveedorConocido.campos;
         return (
             <>
-                {proveedorConocido.campos.map((campo) => campo.tipo === "cuenta_bancaria" ? (
+                {campos.map((campo) => campo.tipo === "cuenta_bancaria" ? (
                     <CuentaBancariaSelect
                         key={campo.clave}
                         label={campo.etiqueta}

@@ -23,6 +23,9 @@ export const nuevoTenantVacio: NuevoTenant = {
     adminEmail: '',
     adminNombre: '',
     adminContrasena: '',
+    planId: '',
+    periodicidad: 'mensual',
+    conPrueba: true,
 };
 
 export const etiquetaEstadoTenant: Record<EstadoTenant, string> = {

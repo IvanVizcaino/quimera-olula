@@ -1,4 +1,6 @@
+import { CategoriaModulo } from "../catalogo/diseño.ts";
 import { Criteria, Entidad, Modelo, RespuestaLista } from "@olula/lib/diseño.ts";
+import { OrigenModulo, Periodicidad } from "./suscripcion/diseño.js";
 
 export type EstadoTenant =
     | 'pendiente_verificacion'
@@ -15,6 +17,9 @@ export interface ModuloTenant {
     dependeDe: string[];
     esBase: boolean;
     activo: boolean;
+    /** De dónde viene el módulo activo (null si no hay suscripción o está inactivo). */
+    origen: OrigenModulo | null;
+    categoria: CategoriaModulo;
 }
 
 export type EstadoProvision = 'en_curso' | 'correcta' | 'error';
@@ -67,6 +72,10 @@ export interface NuevoTenant extends Modelo {
     adminEmail: string;
     adminNombre: string;
     adminContrasena: string;
+    /** Plan de partida; vacío = el que decida el backend (Pro con prueba). */
+    planId: string;
+    periodicidad: Periodicidad;
+    conPrueba: boolean;
 }
 
 export interface CambiosTenant {

@@ -1,0 +1,25 @@
+.banda-suscripcion {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--espaciado-m);
+    padding: var(--espaciado-xs) var(--espaciado-m);
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-primario);
+    background: var(--color-primario-claro);
+
+    &.advertencia {
+        background: var(--color-advertencia-claro);
+    }
+
+    &.error {
+        background: var(--color-error-claro);
+    }
+
+    a {
+        font-weight: bold;
+        color: inherit;
+        text-decoration: underline;
+    }
+}
