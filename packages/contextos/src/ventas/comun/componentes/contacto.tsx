@@ -1,5 +1,6 @@
 import { QAutocompletar } from "@olula/componentes/moleculas/qautocompletar.tsx";
 import { Filtro, Orden } from "@olula/lib/diseño.ts";
+import { CrmContacto } from "../../cliente/diseño.ts";
 import { getCrmContactos } from "../../cliente/infraestructura.ts";
 
 interface ContactoSelectorProps {
@@ -9,6 +10,8 @@ interface ContactoSelectorProps {
   label?: string;
   deshabilitado?: boolean;
   excluir?: string[];
+  /** De dónde se buscan los contactos. Por defecto, los del CRM. */
+  obtenerContactos?: (filtro: Filtro, orden: Orden) => Promise<CrmContacto[]>;
   onChange: (opcion: { valor: string; descripcion: string } | null) => void;
 }
 
@@ -19,6 +22,7 @@ export const ContactoSelector = ({
   label = "Seleccionar contacto",
   deshabilitado = false,
   excluir = [],
+  obtenerContactos = getCrmContactos,
   onChange,
 }: ContactoSelectorProps) => {
   const obtenerOpciones = async (valor: string) => {
@@ -29,7 +33,7 @@ export const ContactoSelector = ({
       orden: ["id"],
     };
 
-    const contactos = await getCrmContactos(
+    const contactos = await obtenerContactos(
       criteria.filtro as unknown as Filtro,
       criteria.orden as Orden
     );

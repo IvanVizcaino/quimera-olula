@@ -6,6 +6,7 @@ export const TarjetaCrmContacto = (contacto: CrmContacto) => {
     <QTarjetaGenerica
       avatar={<QAvatar nombre={contacto.nombre} />}
       arribaIzquierda={contacto.nombre}
+      arribaDerecha={contacto.cargo}
       abajoIzquierda={contacto.email}
       abajoDerecha={contacto.telefono1}
     />

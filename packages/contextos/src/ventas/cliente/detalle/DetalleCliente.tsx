@@ -7,7 +7,7 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { puedeAlguna } from "@olula/lib/dominio.ts";
+import { puede, puedeAlguna } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router";
@@ -141,15 +141,19 @@ export const DetalleCliente = ({
                     <TabCuentasBanco cliente={ctx.cliente} publicar={emitir} />
                   }
                 />,
-                <Tab
-                  key="tab-5"
-                  label="Agenda"
-                  children={
-                    <div className="detalle-cliente-tab-contenido">
-                      <TabCrmContactos clienteId={ctx.cliente.id} />
-                    </div>
-                  }
-                />,
+                ...(puede("ventas.contacto")
+                  ? [
+                      <Tab
+                        key="tab-5"
+                        label="Agenda"
+                        children={
+                          <div className="detalle-cliente-tab-contenido">
+                            <TabCrmContactos clienteId={ctx.cliente.id} />
+                          </div>
+                        }
+                      />,
+                    ]
+                  : []),
                 ...(puedeAlguna(documentos.map((documento) => documento.regla))
                   ? [
                       <Tab

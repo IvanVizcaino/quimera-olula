@@ -1,45 +1,50 @@
 import { ProcesarContexto } from "@olula/lib/diseño.js";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.js";
-import {
-    desvincularContactoCliente,
-    vincularContactoCliente,
-} from "../../../../crm/cliente/infraestructura.ts";
 import { CrmContacto, NuevoCrmContacto } from "../../diseño.ts";
 import {
     deleteCrmContacto,
+    desvincularContactoAgenda,
     getCrmContactosCliente,
     patchCrmContacto,
     postCrmContactoCliente,
+    vincularContactoAgenda,
 } from "../../infraestructura.ts";
 import { ContextoCrmContactos, EstadoCrmContactos } from "./diseño.ts";
 
-export const metaCrmContacto: MetaModelo<CrmContacto> = {
-    campos: {
-        nombre: { requerido: true },
-        email: { requerido: false, tipo: "email" },
-        telefono1: { requerido: false, tipo: "telefono" },
-    }
+// Longitudes de las columnas de crm_contactos (crm_contactos.mtd).
+const longitud = (campo: keyof NuevoCrmContacto, maximo: number) =>
+    (modelo: NuevoCrmContacto) =>
+        String(modelo[campo] ?? "").length <= maximo || `Como mucho ${maximo} caracteres`;
+
+const camposContacto = {
+    nombre: { requerido: true, validacion: longitud("nombre", 100) },
+    cargo: { requerido: false, validacion: longitud("cargo", 100) },
+    email: { requerido: false, tipo: "email" as const, validacion: longitud("email", 50) },
+    telefono1: { requerido: false, tipo: "telefono" as const, validacion: longitud("telefono1", 30) },
+    telefono2: { requerido: false, tipo: "telefono" as const, validacion: longitud("telefono2", 30) },
+    observaciones: { requerido: false },
 };
 
-export const metaNuevoCrmContacto: MetaModelo<NuevoCrmContacto> = {
-    campos: {
-        nombre: { requerido: true },
-        email: { requerido: false, tipo: "email" },
-        telefono1: { requerido: false, tipo: "telefono" },
-    }
-};
+export const metaCrmContacto: MetaModelo<CrmContacto> = { campos: camposContacto };
+
+export const metaNuevoCrmContacto: MetaModelo<NuevoCrmContacto> = { campos: camposContacto };
 
 export const nuevoCrmContactoVacio: NuevoCrmContacto = {
     nombre: '',
+    cargo: '',
     email: '',
     telefono1: '',
+    telefono2: '',
+    observaciones: '',
 }
 
 export const metaTablaCrmContactos = [
-    { id: "id", cabecera: "ID" },
+    { id: "id", cabecera: "Código" },
     { id: "nombre", cabecera: "Nombre" },
+    { id: "cargo", cabecera: "Cargo" },
     { id: "email", cabecera: "Email" },
-    { id: "telefono1", cabecera: "Teléfono" },
+    { id: "telefono1", cabecera: "Teléfono 1" },
+    { id: "telefono2", cabecera: "Teléfono 2" },
 ];
 
 
@@ -98,7 +103,7 @@ export const borrarContacto: ProcesarCrmContactos = async (contexto) => {
 
 export const vincularContacto: ProcesarCrmContactos = async (contexto, payload) => {
     const idContactoCrm = payload as string;
-    await vincularContactoCliente(idContactoCrm, contexto.clienteId);
+    await vincularContactoAgenda(idContactoCrm, contexto.clienteId);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -109,7 +114,7 @@ export const desvincularContacto: ProcesarCrmContactos = async (contexto) => {
     const idContacto = contexto.contactoActivo?.id;
     if (!idContacto) return contexto;
 
-    await desvincularContactoCliente(idContacto, contexto.clienteId);
+    await desvincularContactoAgenda(idContacto, contexto.clienteId);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
