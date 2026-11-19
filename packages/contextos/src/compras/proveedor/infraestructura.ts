@@ -1,3 +1,4 @@
+import { crearApiAgenda } from "#/comun/agenda/infraestructura.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { normalizarIban } from "@olula/lib/iban.ts";
 import ApiUrls from "../comun/urls.ts";
@@ -371,3 +372,10 @@ export const asignarCuentaPago: AsignarCuentaPago = async (id, cuentaId) => {
         "Error al asignar la cuenta de pago"
     );
 };
+
+// Agenda del proveedor: los mismos contactos que la de clientes, vinculados en
+// contactosproveedores, con las rutas y la regla de Compras (compras.contacto).
+export const apiAgendaProveedor = crearApiAgenda(
+  (proveedorId) => `/compras/proveedor/${proveedorId}/contacto`,
+  "/compras/contacto",
+);

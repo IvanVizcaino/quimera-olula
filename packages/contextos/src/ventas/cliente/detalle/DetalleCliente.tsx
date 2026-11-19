@@ -14,6 +14,7 @@ import { useParams } from "react-router";
 import { BorrarCliente } from "../borrar/BorrarCliente.tsx";
 import { BajaCliente } from "../dar_de_baja/BajaCliente.tsx";
 import { Cliente } from "../diseño.ts";
+import { apiAgendaCliente } from "../infraestructura.ts";
 import { TabCrmContactos } from "./crm_contactos/TabCrmContactos.tsx";
 import { TabCuentasBanco } from "./cuentas_banco/TabCuentasBanco.tsx";
 import "./DetalleCliente.css";
@@ -148,7 +149,7 @@ export const DetalleCliente = ({
                         label="Agenda"
                         children={
                           <div className="detalle-cliente-tab-contenido">
-                            <TabCrmContactos clienteId={ctx.cliente.id} />
+                            <TabCrmContactos entidadId={ctx.cliente.id} api={apiAgendaCliente} />
                           </div>
                         }
                       />,
