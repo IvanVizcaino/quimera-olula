@@ -16,6 +16,7 @@ export const menuAlmacen = {
     "Almacén/Tipos de Caja": { url: "/almacen/tipos_caja", regla: "almacen.tipo_caja", plugin: "sga" },
     "Almacén/Tipos de Ubicación": { url: "/almacen/tipos_ubicacion", regla: "almacen.tipo_ubicacion", plugin: "sga" },
     "Almacén/Clases de almacenamiento": { url: "/almacen/clases_almacenamiento", regla: "almacen.clase_almacenamiento", plugin: "sga" },
+    "Almacén/Mapa del almacén": { alias: ["plano", "layout"], url: "/almacen/mapa", regla: "almacen.ubicacion", plugin: "sga" },
     "Almacén/Picking fijo": { url: "/almacen/picking_fijo", regla: "almacen.picking_fijo", plugin: "sga" },
     "Almacén/Reposición de picking": { url: "/almacen/reposicion", regla: "almacen.picking_fijo", plugin: "sga" },
     "Almacén/Slotting": { url: "/almacen/slotting", regla: "almacen.picking_fijo", plugin: "sga" },

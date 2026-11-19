@@ -1,0 +1,318 @@
+/*
+ * MapaAlmacen.css — mapa del almacén (planta SVG por zona, alzado de pasillo, capas).
+ *
+ * Formulario (12 columnas):
+ *   almacén 4 · zona 4 · capa 4
+ *   [origen 4 · días 2]  recorrido de la orden 4
+ *
+ * Los tonos `tono-*` valen para celdas SVG (fill) y para botones/muestras (background).
+ */
+
+.MapaAlmacen {
+    --tono-vacio: var(--color-superficie-sunken, #eef0f3);
+    --tono-parcial: var(--color-primario-claro, #c9dcf5);
+    --tono-lleno: var(--color-primario, #2f6fbd);
+    --tono-a: var(--color-exito, #2e9b5f);
+    --tono-b: var(--color-advertencia, #e0a224);
+    --tono-c: var(--color-error, #d24c4c);
+    --tono-sin-dato: var(--color-deshabilitado-claro, #e3e5e8);
+    --tono-sin-ubicaciones: transparent;
+    --tono-ok: var(--color-exito-claro, #bfe6cf);
+    --tono-rota-mas: var(--color-advertencia, #e0a224);
+    --tono-rota-menos: var(--color-primario-claro, #9cc0ec);
+    --tono-picking: var(--color-exito, #2e9b5f);
+    --tono-bajo-minimo: var(--color-error, #d24c4c);
+    --tono-activa: var(--color-exito-claro, #bfe6cf);
+    --tono-parcial-bloqueada: var(--color-advertencia-claro, #f6dfaa);
+    --tono-bloqueada: var(--color-error, #d24c4c);
+    --tono-mezcla: var(--color-texto-secundario, #6b7280);
+    --tono-clase-0: #3b82c4;
+    --tono-clase-1: #e07b39;
+    --tono-clase-2: #4aa564;
+    --tono-clase-3: #9b59b6;
+    --tono-clase-4: #c9a227;
+    --tono-clase-5: #2bb3b1;
+
+    quimera-formulario {
+        [nombre="almacenId"],
+        [nombre="zonaId"],
+        [nombre="capa"],
+        [nombre="origen"],
+        [nombre="ordenId"] {
+            grid-column: span 4;
+        }
+
+        [nombre="dias"] {
+            grid-column: span 2;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .MapaAlmacen quimera-formulario [nombre] {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* ─── Tonos ─────────────────────────────────────────────── */
+
+.MapaAlmacen {
+    .tono-vacio { --tono: var(--tono-vacio); }
+    .tono-parcial { --tono: var(--tono-parcial); }
+    .tono-lleno { --tono: var(--tono-lleno); }
+    .tono-a { --tono: var(--tono-a); }
+    .tono-b { --tono: var(--tono-b); }
+    .tono-c { --tono: var(--tono-c); }
+    .tono-sin-dato { --tono: var(--tono-sin-dato); }
+    .tono-sin-ubicaciones { --tono: var(--tono-sin-ubicaciones); }
+    .tono-ok { --tono: var(--tono-ok); }
+    .tono-rota-mas { --tono: var(--tono-rota-mas); }
+    .tono-rota-menos { --tono: var(--tono-rota-menos); }
+    .tono-picking { --tono: var(--tono-picking); }
+    .tono-bajo-minimo { --tono: var(--tono-bajo-minimo); }
+    .tono-activa { --tono: var(--tono-activa); }
+    .tono-parcial-bloqueada { --tono: var(--tono-parcial-bloqueada); }
+    .tono-bloqueada { --tono: var(--tono-bloqueada); }
+    .tono-mezcla { --tono: var(--tono-mezcla); }
+    .tono-clase-0 { --tono: var(--tono-clase-0); }
+    .tono-clase-1 { --tono: var(--tono-clase-1); }
+    .tono-clase-2 { --tono: var(--tono-clase-2); }
+    .tono-clase-3 { --tono: var(--tono-clase-3); }
+    .tono-clase-4 { --tono: var(--tono-clase-4); }
+    .tono-clase-5 { --tono: var(--tono-clase-5); }
+}
+
+/* ─── Leyenda ───────────────────────────────────────────── */
+
+.MapaAlmacen .mapa-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--tamaño-letra-s, 0.875rem);
+
+    li {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--espaciado-xs, 0.25rem);
+    }
+}
+
+.MapaAlmacen .mapa-muestra {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--tono);
+    border: 1px solid var(--color-borde-sutil, #d6d9de);
+}
+
+.MapaAlmacen .mapa-muestra-recorrido {
+    background: none;
+    border: none;
+    border-top: 3px solid var(--color-texto, #1f2937);
+    height: 0;
+}
+
+.MapaAlmacen .mapa-aviso {
+    color: var(--color-advertencia-oscuro, #8a5a00);
+}
+
+/* ─── Planta ────────────────────────────────────────────── */
+
+.MapaAlmacen .mapa-zonas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-m, 1rem);
+    align-items: flex-start;
+}
+
+.MapaAlmacen .mapa-zona {
+    max-width: 100%;
+    background: var(--color-superficie-elevada, #fff);
+    border: 1px solid var(--color-borde-sutil, #d6d9de);
+    border-radius: var(--redondeo-borde-m, 8px);
+    padding: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+
+    h3 {
+        margin: 0 0 var(--espaciado-s, 0.5rem);
+        font-size: var(--tamaño-letra-m, 1rem);
+    }
+}
+
+.MapaAlmacen .mapa-zona-funcion {
+    font-weight: normal;
+    font-size: var(--tamaño-letra-xs, 0.75rem);
+    color: var(--color-texto-secundario, #6b7280);
+}
+
+.MapaAlmacen .mapa-planta-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.MapaAlmacen .mapa-planta {
+    display: block;
+
+    .mapa-pasillo-suelo {
+        fill: var(--color-fondo, #f7f8fa);
+        stroke: var(--color-borde-sutil, #d6d9de);
+        stroke-dasharray: 2 2;
+        stroke-width: 0.5;
+        cursor: pointer;
+    }
+
+    .mapa-pasillo.seleccionado .mapa-pasillo-suelo {
+        fill: var(--color-primario-claro, #c9dcf5);
+        stroke: var(--color-primario, #2f6fbd);
+        stroke-dasharray: none;
+    }
+
+    .mapa-pasillo-codigo {
+        font-size: 10px;
+        font-weight: 600;
+        text-anchor: middle;
+        fill: var(--color-texto, #1f2937);
+    }
+
+    .mapa-celda {
+        fill: var(--tono);
+        stroke: var(--color-borde, #b8bdc5);
+        stroke-width: 0.5;
+        cursor: pointer;
+    }
+
+    .mapa-celda.tono-sin-ubicaciones {
+        stroke-dasharray: 2 2;
+    }
+
+    .mapa-celda:hover,
+    .mapa-celda.seleccionada {
+        stroke: var(--color-texto, #1f2937);
+        stroke-width: 1.5;
+    }
+
+    .mapa-recorrido {
+        fill: none;
+        stroke: var(--color-texto, #1f2937);
+        stroke-width: 1.5;
+        stroke-linejoin: round;
+        opacity: 0.8;
+        pointer-events: none;
+    }
+
+    .mapa-parada circle {
+        fill: var(--color-texto, #1f2937);
+    }
+
+    .mapa-parada text {
+        font-size: 8px;
+        font-weight: 600;
+        fill: var(--color-superficie-elevada, #fff);
+        text-anchor: middle;
+        dominant-baseline: central;
+    }
+}
+
+.MapaAlmacen .mapa-sueltas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-xs, 0.25rem);
+    margin-top: var(--espaciado-s, 0.5rem);
+}
+
+.MapaAlmacen .mapa-ficha {
+    padding: 2px 8px;
+    border-radius: var(--redondeo-borde-xs, 4px);
+    border: 1px solid var(--color-borde, #b8bdc5);
+    background: var(--tono);
+    font-size: var(--tamaño-letra-xs, 0.75rem);
+    cursor: pointer;
+}
+
+/* ─── Paneles: alzado y ubicación ───────────────────────── */
+
+.MapaAlmacen .mapa-panel {
+    background: var(--color-superficie-elevada, #fff);
+    border: 1px solid var(--color-borde-sutil, #d6d9de);
+    border-radius: var(--redondeo-borde-m, 8px);
+    padding: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+}
+
+.MapaAlmacen .mapa-panel-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    h3 {
+        margin: 0;
+        font-size: var(--tamaño-letra-m, 1rem);
+    }
+}
+
+.MapaAlmacen .mapa-resumen {
+    white-space: pre-line;
+    margin: var(--espaciado-s, 0.5rem) 0;
+    color: var(--color-texto-secundario, #6b7280);
+}
+
+.MapaAlmacen .mapa-alzado {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m, 1rem);
+
+    h4 {
+        margin: 0 0 var(--espaciado-xs, 0.25rem);
+        font-size: var(--tamaño-letra-s, 0.875rem);
+        font-weight: 600;
+    }
+}
+
+.MapaAlmacen .mapa-alzado-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.MapaAlmacen .mapa-alzado-rejilla {
+    border-collapse: collapse;
+
+    th {
+        font-size: var(--tamaño-letra-xs, 0.75rem);
+        font-weight: normal;
+        color: var(--color-texto-secundario, #6b7280);
+        padding: 0 4px;
+        text-align: center;
+    }
+
+    td {
+        padding: 2px;
+        border-left: 2px solid var(--color-borde, #b8bdc5);
+        border-bottom: 2px solid var(--color-borde, #b8bdc5);
+    }
+}
+
+.MapaAlmacen .mapa-alzado-modulo {
+    display: flex;
+    gap: 2px;
+    min-width: 34px;
+    height: 26px;
+}
+
+.MapaAlmacen .mapa-hueco {
+    flex: 1;
+    min-width: 10px;
+    padding: 0;
+    border: 1px solid var(--color-borde, #b8bdc5);
+    border-radius: 2px;
+    background: var(--tono);
+    cursor: pointer;
+}
+
+.MapaAlmacen .mapa-hueco:hover,
+.MapaAlmacen .mapa-hueco.seleccionada,
+.MapaAlmacen .mapa-ficha.seleccionada {
+    outline: 2px solid var(--color-texto, #1f2937);
+    outline-offset: 1px;
+}

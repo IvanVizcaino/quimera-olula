@@ -13,6 +13,7 @@ import { MaestroConDetallePedidoCompra } from "./pedido_compra/maestro/MaestroCo
 import { MaestroConDetalleTipoUbicacion } from "./tipo_ubicacion/maestro/MaestroConDetalleTipoUbicacion.tsx"
 import { MaestroConDetalleClaseAlmacenamiento } from "./clase_almacenamiento/maestro/MaestroConDetalleClaseAlmacenamiento.tsx"
 import { MaestroConDetallePickingFijo } from "./picking_fijo/maestro/MaestroConDetallePickingFijo.tsx"
+import { MapaAlmacen } from "./mapa/MapaAlmacen.tsx"
 import { ReposicionPicking } from "./reposicion/ReposicionPicking.tsx"
 import { Slotting } from "./slotting/Slotting.tsx"
 import { MaestroConDetalleZona } from "./zona/vistas/maestro/MaestroConDetalleZona.tsx"
@@ -37,5 +38,6 @@ export class RouterFactoryAlmacenOlula {
                 "almacen/picking_fijo": MaestroConDetallePickingFijo,
                 "almacen/reposicion": ReposicionPicking,
                 "almacen/slotting": Slotting,
+                "almacen/mapa": MapaAlmacen,
         }
 }
