@@ -42,7 +42,7 @@ export const getMaquina: () => Maquina<EstadoCrmContactos, ContextoCrmContactos>
         },
 
         edicion: {
-            actualizar_contacto: [actualizarContacto],
+            actualizar_contacto: [actualizarContacto, "lista"],
 
             edicion_cancelada: cancelarEdicion,
         },

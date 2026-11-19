@@ -10,7 +10,7 @@ export const menuComun = {
     "Tablas generales/Divisas": { alias: ["moneda", "tasa de conversión", "cambio"], url: "/comun/divisa", regla: "comun.divisa" },
     "Dashboards": { icono: "grafico_barras", url: "/comun/dashboard", area: "Sistema" },
     "Asistente IA": { icono: "asistente", area: "Sistema" },
-    "Asistente IA/Chat": { url: "/comun/asistente" },
+    "Asistente IA/Chat": { url: "/comun/asistente", regla: "comun.ia" },
     "Asistente IA/Memoria del asistente": { url: "/comun/ia-memoria", regla: "comun.ia_memoria" },
     "Asistente IA/Flujos de trabajo": { url: "/comun/ia-flujo", regla: "comun.ia_flujo" },
     "Asistente IA/Tareas programadas": { url: "/comun/ia-tarea-programada", regla: "comun.ia_tarea_programada" },

@@ -883,6 +883,10 @@ export const moduloBloqueadoEnUrl = (url: string): boolean => {
     }
 };
 
+/** Regla del asistente IA (chat, panel lateral, modo voz y pregunta de la búsqueda
+ *  rápida). El servidor protege con ella las consultas del chat. */
+export const REGLA_ASISTENTE = "comun.ia";
+
 export const puede = (regla: string): boolean => {
     if (regla === "Dashboard:visit" || regla === 'Home:visit') return true;
     if (moduloBloqueado(regla)) return false;

@@ -237,17 +237,69 @@ export const cuentaBancoFromAPI = (c: CuentaBancoAPI): CuentaBanco => ({
   cuenta: c.cuenta.cuenta ?? "",
 });
 
-export const getCrmContactosCliente = async (clienteId: string): Promise<CrmContacto[]> =>
-  await RestAPI.get<{ datos: CrmContacto[] }>(`${UrlsCrm.CLIENTE}/${clienteId}/contactos`).then((respuesta) => respuesta.datos);
+// Agenda del cliente: rutas de Ventas (/ventas/contacto), no las del CRM, para que
+// funcione en las apps que no cargan el contexto CRM.
+const urlContactoVentas = "/ventas/contacto";
+const urlAgendaCliente = (clienteId: string) => `${UrlsVentas.CLIENTE}/${clienteId}/contacto`;
 
-export const postCrmContactoCliente = async (clienteId: string, contacto: NuevoCrmContacto): Promise<string> => {
-  const payload = {
-    nombre: contacto.nombre,
-    email: contacto.email,
-    telefono1: contacto.telefono1,
-  };
-  return await RestAPI.post(`${UrlsCrm.CLIENTE}/${clienteId}/contacto`, payload, "Error al crear contacto").then((respuesta) => respuesta.id);
+export interface ContactoAgendaApi {
+  id: string;
+  nombre: string;
+  cargo: string | null;
+  email: string | null;
+  telefono1: string | null;
+  telefono2: string | null;
+  observaciones: string | null;
+}
+
+export const contactoAgendaDesdeApi = (api: ContactoAgendaApi): CrmContacto => ({
+  id: api.id,
+  nombre: api.nombre ?? "",
+  cargo: api.cargo ?? "",
+  email: api.email ?? "",
+  telefono1: api.telefono1 ?? "",
+  telefono2: api.telefono2 ?? "",
+  observaciones: api.observaciones ?? "",
+});
+
+const contactoAgendaAApi = (contacto: NuevoCrmContacto) => ({
+  nombre: contacto.nombre,
+  cargo: contacto.cargo,
+  email: contacto.email,
+  telefono1: contacto.telefono1,
+  telefono2: contacto.telefono2,
+  observaciones: contacto.observaciones,
+});
+
+export const getCrmContactosCliente = async (clienteId: string): Promise<CrmContacto[]> =>
+  await RestAPI.get<{ datos: ContactoAgendaApi[] }>(urlAgendaCliente(clienteId))
+    .then((respuesta) => respuesta.datos.map(contactoAgendaDesdeApi));
+
+export const postCrmContactoCliente = async (clienteId: string, contacto: NuevoCrmContacto): Promise<string> =>
+  await RestAPI.post(urlAgendaCliente(clienteId), contactoAgendaAApi(contacto), "Error al crear contacto")
+    .then((respuesta) => respuesta.id);
+
+/** Busca en todos los contactos (para añadir uno existente a la agenda). */
+export const getContactosAgenda = async (filtro: Filtro, orden: Orden): Promise<CrmContacto[]> => {
+  const q = criteriaQuery(filtro, orden);
+  return RestAPI.get<{ datos: ContactoAgendaApi[] }>(urlContactoVentas + q)
+    .then((respuesta) => respuesta.datos.map(contactoAgendaDesdeApi));
 };
+
+export const vincularContactoAgenda = async (contactoId: string, clienteId: string): Promise<void> => {
+  try {
+    await RestAPI.post(`${urlAgendaCliente(clienteId)}/${contactoId}`, {}, "Error al añadir el contacto a la agenda");
+  } catch (error) {
+    const fallo = error as { estado?: number; descripcion?: string };
+    if (fallo?.estado === 409) {
+      throw { nombre: "Contacto ya vinculado", descripcion: fallo.descripcion, estado: 409 };
+    }
+    throw error;
+  }
+};
+
+export const desvincularContactoAgenda = async (contactoId: string, clienteId: string): Promise<void> =>
+  await RestAPI.delete(`${urlAgendaCliente(clienteId)}/${contactoId}`, "Error al quitar el contacto de la agenda");
 
 export const getCrmContactos = async (filtro: Filtro, orden: Orden): Promise<CrmContacto[]> => {
   const q = criteriaQuery(filtro, orden);
@@ -255,13 +307,8 @@ export const getCrmContactos = async (filtro: Filtro, orden: Orden): Promise<Crm
 }
 
 export const patchCrmContacto = async (contacto: CrmContacto): Promise<void> => {
-  const payload = {
-    nombre: contacto.nombre,
-    email: contacto.email,
-    telefono1: contacto.telefono1,
-  };
-  await RestAPI.patch(`${UrlsCrm.CONTACTO}/${contacto.id}`, payload, "Error al actualizar contacto");
+  await RestAPI.patch(`${urlContactoVentas}/${contacto.id}`, contactoAgendaAApi(contacto), "Error al actualizar contacto");
 };
 
 export const deleteCrmContacto = async (contactoId: string): Promise<void> =>
-  await RestAPI.delete(`${UrlsCrm.CONTACTO}/${contactoId}`, "Error al borrar contacto");
+  await RestAPI.delete(`${urlContactoVentas}/${contactoId}`, "Error al borrar contacto");

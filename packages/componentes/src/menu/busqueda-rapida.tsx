@@ -1,3 +1,4 @@
+import { REGLA_ASISTENTE, puede } from "@olula/lib/dominio.ts";
 import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
 import { solicitarPreguntaAsistente } from "@olula/lib/panel_lateral_events.ts";
 import { useContext, useState } from "react";
@@ -40,7 +41,7 @@ export const BusquedaRapida = () => {
   const [texto, setTexto] = useState("");
   const [seleccion, setSeleccion] = useState(0);
   const { grupos, cargando } = useBusquedaDatos(texto);
-  const hayAsistente = !!app.Componentes?.panel_asistente;
+  const hayAsistente = !!app.Componentes?.panel_asistente && puede(REGLA_ASISTENTE);
   const consulta = texto.trim();
 
   const ir = (url: string, nuevaPestana: boolean) => {

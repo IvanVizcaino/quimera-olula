@@ -1,4 +1,5 @@
 import { ContactoSelector } from "#/ventas/comun/componentes/contacto.tsx";
+import { getContactosAgenda } from "../../infraestructura.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
@@ -31,11 +32,11 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
 
   const acciones = [
     {
-      texto: "Asociar Contacto",
+      texto: "Añadir contacto existente",
       onClick: () => emitir("asociar_solicitado"),
     },
     {
-      texto: "Eliminar asociación",
+      texto: "Quitar de la agenda",
       onClick: () => emitir("eliminar_asociacion"),
       deshabilitado: !ctx.contactoActivo,
     },
@@ -64,7 +65,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="confirmacionBorrarContacto"
         abierto={estado === "confirmar_borrado"}
         titulo="Confirmar borrar"
-        mensaje="¿Está seguro de que desea borrar este contacto?"
+        mensaje="¿Borrar este contacto? Se quitará también de la agenda de todos sus clientes."
         onCerrar={() => emitir("borrado_cancelado")}
         onAceptar={() => emitir("borrado_confirmado")}
       />
@@ -72,8 +73,8 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
       <QModalConfirmacion
         nombre="confirmacionEliminarAsociacion"
         abierto={estado === "confirmar_eliminar_asociacion"}
-        titulo="Confirmar eliminación de asociación"
-        mensaje="¿Está seguro de que desea eliminar la asociación de este contacto?"
+        titulo="Quitar de la agenda"
+        mensaje="¿Quitar este contacto de la agenda del cliente? El contacto no se borra."
         onCerrar={() => emitir("eliminacion_cancelada")}
         onAceptar={() => emitir("eliminacion_solicitada")}
       />
@@ -82,7 +83,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="altaCrmContacto"
         abierto={estado === "alta"}
         onCerrar={() => emitir("alta_cancelada")}
-        titulo="Nuevo Contacto CRM"
+        titulo="Nuevo contacto"
       >
         {estado === "alta" && <CrearCrmContactos emitir={emitir} />}
       </QModal>
@@ -91,7 +92,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="edicionCrmContacto"
         abierto={estado === "edicion"}
         onCerrar={() => emitir("edicion_cancelada")}
-        titulo="Editar Contacto CRM"
+        titulo="Editar contacto"
       >
         {estado === "edicion" && ctx.contactoActivo && (
           <EdicionCrmContactos contacto={ctx.contactoActivo} emitir={emitir} />
@@ -102,7 +103,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="asociarCrmContacto"
         abierto={estado === "asociar"}
         onCerrar={() => emitir("asociacion_cancelada")}
-        titulo="Asociar Contacto"
+        titulo="Añadir contacto existente"
       >
         <ContactoSelector
           valor={contactoSeleccionado?.valor || ""}
@@ -110,6 +111,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
           nombre="cliente/contacto_id"
           label="Seleccionar contacto"
           excluir={ctx.contactos.map((contacto) => contacto.id)}
+          obtenerContactos={getContactosAgenda}
           onChange={(contacto) => setContactoSeleccionado(contacto)}
         />
         <div className="botones">
