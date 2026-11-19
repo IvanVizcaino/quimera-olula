@@ -38,7 +38,7 @@ export const DetalleUbicacionMapa = ({ ubicacion, onCerrar }: { ubicacion: Ubica
                         : conStock.map((s) => (
                             <li key={s.id}>
                                 <strong>{s.articuloId}</strong> {s.articulo}
-                                <span className="mapa-detalle-stock">Stock: {fmt(s.cantidadFisica)}</span>
+                                <span className="mapa-detalle-stock">Stock: <strong>{fmt(s.cantidadFisica)}</strong></span>
                             </li>
                         ))}
                 {pf && (
