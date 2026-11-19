@@ -12,6 +12,7 @@ import {
     GetDiferenciasPedidoOrden,
     GetOrden,
     GetOrdenes,
+    AccionParada,
     GetRecorridoOrden,
     RecorridoOrden,
     ItemOrdenAlmacen,
@@ -688,6 +689,7 @@ export const getEtiquetaEnvio: GetEtiquetaEnvio = async (albaranId) =>
 
 export interface RecorridoOrdenApi {
     orden_id: string;
+    estado?: string;
     modulos_recorridos: number;
     pasillos_cruzados: number;
     paradas: {
@@ -699,12 +701,14 @@ export interface RecorridoOrdenApi {
         modulo?: number | null;
         nivel?: number | null;
         hueco?: number | null;
+        accion?: AccionParada;
         lineas: { linea_id: string; sku: string; pendiente: number }[];
     }[];
 }
 
 export const recorridoOrdenDesdeApi = (r: RecorridoOrdenApi): RecorridoOrden => ({
     ordenId: r.orden_id,
+    estado: r.estado ?? "",
     modulosRecorridos: r.modulos_recorridos,
     pasillosCruzados: r.pasillos_cruzados,
     paradas: r.paradas.map((p) => ({
@@ -716,6 +720,7 @@ export const recorridoOrdenDesdeApi = (r: RecorridoOrdenApi): RecorridoOrden => 
         modulo: p.modulo ?? null,
         nivel: p.nivel ?? null,
         hueco: p.hueco ?? null,
+        accion: p.accion ?? "RECOGER",
         lineas: p.lineas.map((l) => ({
             lineaId: String(l.linea_id),
             sku: l.sku,

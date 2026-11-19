@@ -320,6 +320,13 @@
         stroke-width: 1;
     }
 
+    /* Dejar: anillo en vez de círculo lleno, para no depender solo del color */
+    .mapa-parada-dejar circle {
+        fill: var(--color-primario);
+        stroke: var(--mapa-texto);
+        stroke-width: 1.5;
+    }
+
     .mapa-parada text {
         font-size: 8px;
         font-weight: 700;
@@ -547,4 +554,18 @@
     dominant-baseline: central;
     fill: var(--mapa-texto);
     pointer-events: none;
+}
+
+/* Muestras de la leyenda para las paradas del recorrido */
+.MapaAlmacen .mapa-muestra-parada {
+    border-radius: 50%;
+}
+
+.MapaAlmacen .mapa-muestra-parada.mapa-parada-recoger {
+    background: var(--mapa-texto);
+}
+
+.MapaAlmacen .mapa-muestra-parada.mapa-parada-dejar {
+    background: var(--color-primario);
+    border: 2px solid var(--mapa-texto);
 }

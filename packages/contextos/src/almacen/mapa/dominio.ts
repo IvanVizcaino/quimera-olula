@@ -298,7 +298,10 @@ export const puntosRecorrido = (recorrido: RecorridoOrden, mapa: MapaAlmacen): P
     return recorrido.paradas.flatMap((p) => {
         const u = porId.get(p.ubicacionId);
         return u?.pasilloId && u.modulo !== null
-            ? [{ secuencia: p.secuencia, ubicacionId: u.ubicacionId, ubicacion: u.ubicacion, pasilloId: u.pasilloId, modulo: u.modulo }]
+            ? [{
+                secuencia: p.secuencia, ubicacionId: u.ubicacionId, ubicacion: u.ubicacion,
+                pasilloId: u.pasilloId, modulo: u.modulo, accion: p.accion,
+            }]
             : [];
     });
 };

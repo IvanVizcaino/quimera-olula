@@ -1,4 +1,5 @@
 import { KeyboardEvent } from "react";
+import { textoAccionParada } from "#/almacen/orden/dominio.ts";
 import { CapaMapa, PuntoRecorrido, UbicacionMapa, ZonaMapa } from "../diseño.ts";
 import {
     geometriaZona, letraModulo, MEDIDAS, puntoDeModulo, resumenModulo, resumenUbicacion, tonoModulo, tonoUbicacion,
@@ -115,10 +116,10 @@ export const PlantaZona = ({
                             if (!g) return null;
                             const { x, y } = puntoDeModulo(g, p.modulo);
                             return (
-                                <g key={p.secuencia} className="mapa-parada">
+                                <g key={p.secuencia} className={`mapa-parada mapa-parada-${p.accion.toLowerCase()}`}>
                                     <circle cx={x} cy={y} r={7} />
                                     <text x={x} y={y}>{p.secuencia}</text>
-                                    <title>{`${p.secuencia}. ${p.ubicacion}`}</title>
+                                    <title>{`${p.secuencia}. ${textoAccionParada[p.accion]} en ${p.ubicacion}`}</title>
                                 </g>
                             );
                         })}

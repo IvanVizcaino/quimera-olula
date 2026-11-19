@@ -1,4 +1,5 @@
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
+import { motivoRecorridoVacio, textoAccionParada } from "#/almacen/orden/dominio.ts";
 import { DIAS_POR_DEFECTO, enteroPositivo, origenesRotacion } from "#/almacen/slotting/dominio.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -112,19 +113,34 @@ export const MapaAlmacen = () => {
                             {e.texto}
                         </li>
                     ))}
-                    {ctx.recorrido && (
-                        <li>
-                            <span className="mapa-muestra mapa-muestra-recorrido" aria-hidden="true" />
-                            Recorrido {ctx.recorrido.ordenId}: {ctx.recorrido.paradas.length} paradas,{" "}
-                            {ctx.recorrido.modulosRecorridos} módulos
-                        </li>
+                    {ctx.recorrido && ctx.recorrido.paradas.length > 0 && (
+                        <>
+                            <li>
+                                <span className="mapa-muestra mapa-muestra-recorrido" aria-hidden="true" />
+                                Recorrido {ctx.recorrido.ordenId}: {ctx.recorrido.paradas.length} paradas,{" "}
+                                {ctx.recorrido.modulosRecorridos} módulos
+                            </li>
+                            <li>
+                                <span className="mapa-muestra mapa-muestra-parada mapa-parada-recoger" aria-hidden="true" />
+                                Recoger
+                            </li>
+                            <li>
+                                <span className="mapa-muestra mapa-muestra-parada mapa-parada-dejar" aria-hidden="true" />
+                                Dejar
+                            </li>
+                        </>
                     )}
                 </ul>
             )}
 
+            {ctx.recorrido && ctx.recorrido.paradas.length === 0 && (
+                <p className="mapa-aviso">{motivoRecorridoVacio(ctx.recorrido)}</p>
+            )}
+
             {sinPasillo.length > 0 && (
                 <p className="mapa-aviso">
-                    Paradas fuera de pasillo: {sinPasillo.map((p) => `${p.secuencia}. ${p.ubicacion}`).join(", ")}
+                    Paradas fuera de pasillo:{" "}
+                    {sinPasillo.map((p) => `${p.secuencia}. ${textoAccionParada[p.accion]} en ${p.ubicacion}`).join(", ")}
                 </p>
             )}
 

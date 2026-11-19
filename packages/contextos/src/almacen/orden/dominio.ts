@@ -304,6 +304,14 @@ export const nuevoEnvioAgenciaInicial = (
 const plural = (n: number, singular: string, plural: string) => `${n} ${n === 1 ? singular : plural}`;
 
 /** Texto resumen del recorrido: módulos recorridos y pasillos cruzados. */
+/** Por qué un recorrido no tiene paradas. */
+export const motivoRecorridoVacio = (r: { ordenId: string; estado: string }): string =>
+    r.estado === "TERMINADA"
+        ? `La orden ${r.ordenId} está terminada: no queda nada por recoger ni dejar.`
+        : `La orden ${r.ordenId} no tiene nada pendiente en ubicaciones${r.estado ? ` (${r.estado.toLowerCase()})` : ""}.`;
+
+export const textoAccionParada = { RECOGER: "Recoger", DEJAR: "Dejar" } as const;
+
 export const resumenRecorrido = (r: { modulosRecorridos: number; pasillosCruzados: number }): string =>
     `${plural(r.modulosRecorridos, "módulo recorrido", "módulos recorridos")}, ` +
     plural(r.pasillosCruzados, "pasillo cruzado", "pasillos cruzados");

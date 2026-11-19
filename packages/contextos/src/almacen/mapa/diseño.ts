@@ -1,3 +1,4 @@
+import { AccionParada } from "#/almacen/orden/diseño.ts";
 import { ClaseAbc, OrigenRotacion } from "#/almacen/slotting/diseño.ts";
 
 export type CarasPasillo = "AMBAS" | "IZQUIERDA" | "DERECHA";
@@ -95,6 +96,7 @@ export interface PuntoRecorrido {
     ubicacion: string;
     pasilloId: string;
     modulo: number;
+    accion: AccionParada;
 }
 
 export type GetMapa = (almacenId: string, dias: number, origen: OrigenRotacion) => Promise<MapaAlmacen>;

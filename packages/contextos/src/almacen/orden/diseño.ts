@@ -235,6 +235,9 @@ export interface LineaParadaRecorrido {
     pendiente: number;
 }
 
+/** En una parada se recoge (origen) o se deja (destino). */
+export type AccionParada = "RECOGER" | "DEJAR";
+
 export interface ParadaRecorrido {
     secuencia: number;
     ubicacionId: string;
@@ -244,11 +247,14 @@ export interface ParadaRecorrido {
     modulo: number | null;
     nivel: number | null;
     hueco: number | null;
+    accion: AccionParada;
     lineas: LineaParadaRecorrido[];
 }
 
 export interface RecorridoOrden {
     ordenId: string;
+    /** Estado de la orden: terminada, sin paradas. */
+    estado: string;
     modulosRecorridos: number;
     pasillosCruzados: number;
     paradas: ParadaRecorrido[];

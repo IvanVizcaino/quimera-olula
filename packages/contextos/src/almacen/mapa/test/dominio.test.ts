@@ -110,11 +110,11 @@ describe("mapa · capas", () => {
 
 describe("mapa · recorrido", () => {
     const recorrido: RecorridoOrden = {
-        ordenId: "S1", modulosRecorridos: 10, pasillosCruzados: 2,
+        ordenId: "S1", estado: "PENDIENTE", modulosRecorridos: 10, pasillosCruzados: 2,
         paradas: [
-            { secuencia: 1, ubicacionId: "1", ubicacion: "U1", zona: "PIC", pasillo: "P1", modulo: 1, nivel: 0, hueco: 1, lineas: [] },
-            { secuencia: 2, ubicacionId: "2", ubicacion: "U2", zona: "PIC", pasillo: "P2", modulo: 3, nivel: 0, hueco: 1, lineas: [] },
-            { secuencia: 3, ubicacionId: "9", ubicacion: "PLAYA", zona: "SAL", pasillo: null, modulo: null, nivel: null, hueco: null, lineas: [] },
+            { secuencia: 1, ubicacionId: "1", ubicacion: "U1", zona: "PIC", pasillo: "P1", modulo: 1, nivel: 0, hueco: 1, accion: "RECOGER", lineas: [] },
+            { secuencia: 2, ubicacionId: "2", ubicacion: "U2", zona: "PIC", pasillo: "P2", modulo: 3, nivel: 0, hueco: 1, accion: "RECOGER", lineas: [] },
+            { secuencia: 3, ubicacionId: "9", ubicacion: "PLAYA", zona: "SAL", pasillo: null, modulo: null, nivel: null, hueco: null, accion: "DEJAR", lineas: [] },
         ],
     };
     const m = mapa([ubi("1"), ubi("2", { pasilloId: "P2", modulo: 3 }), ubi("9", { pasilloId: null, modulo: null })]);
