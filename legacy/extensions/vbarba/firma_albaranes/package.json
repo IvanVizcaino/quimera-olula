@@ -16,6 +16,7 @@
     "@quimera-extension/base-almacen": "workspace:*",
     "@quimera-extension/base-albaranes": "workspace:*",
     "@quimera-extension/base-firma_albaranes": "workspace:*",
-    "@quimera-extension/base-facturas": "workspace:*"
+    "@quimera-extension/base-facturas": "workspace:*",
+    "@quimera-extension/vbarba-almacen": "workspace:*"
   }
 }

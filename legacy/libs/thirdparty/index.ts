@@ -1,4 +1,11 @@
 import { useMediaQuery } from "@mui/material";
+import { createElement } from "react";
+import {
+  Draggable as RbdDraggable,
+  DraggableProps,
+  Droppable as RbdDroppable,
+  DroppableProps,
+} from "react-beautiful-dnd";
 export {
   Alert,
   AppBar,
@@ -117,7 +124,24 @@ export {
   subMonths
 } from "date-fns";
 export * as localesFns from "date-fns/locale";
-export { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+export { DragDropContext } from "react-beautiful-dnd";
+// React 19 ignora los defaultProps de react-beautiful-dnd y sus invariants fallan con props undefined
+export const Droppable = (props: DroppableProps) =>
+  createElement(RbdDroppable, {
+    type: "DEFAULT",
+    direction: "vertical",
+    isDropDisabled: false,
+    isCombineEnabled: false,
+    ignoreContainerClipping: false,
+    ...props,
+  });
+export const Draggable = (props: DraggableProps) =>
+  createElement(RbdDraggable, {
+    isDragDisabled: false,
+    disableInteractiveElementBlocking: false,
+    shouldRespectForcePress: false,
+    ...props,
+  });
 export { initReactI18next, Trans, useTranslation } from "react-i18next";
 export { default as InfiniteScroll } from "react-infinite-scroll-component";
 export { NumericFormat as NumberFormat } from "react-number-format";
