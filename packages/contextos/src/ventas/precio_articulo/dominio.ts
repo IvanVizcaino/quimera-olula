@@ -1,4 +1,4 @@
-import { MetaModelo } from "@olula/lib/dominio.ts";
+import { fuentesPrecioArticulo, MetaModelo, puede } from "@olula/lib/dominio.ts";
 import { NuevoPrecioArticulo, PrecioArticulo } from "./diseño.ts";
 
 type CondicionPrecio = Pick<PrecioArticulo, "cantidadMin" | "cantidadMax" | "dtoPorcentual" | "pvp">;
@@ -62,3 +62,12 @@ export const pvpIgnorado = (p: Pick<PrecioArticulo, "dtoPorcentual">): boolean =
 
 export const descripcionPrecioArticulo = (p: PrecioArticulo): string =>
     p.descripcionArticulo ? `${p.articuloId} - ${p.descripcionArticulo}` : p.articuloId;
+
+/**
+ * La pestaña de precios por artículo del cliente solo tiene sentido si el
+ * servidor usa la fuente `precios_articulos` (whoami:
+ * `config.ventas.precio_articulo`) y el usuario puede consultarla.
+ */
+export const muestraPreciosArticulo = (): boolean =>
+    fuentesPrecioArticulo().includes("precios_articulos") &&
+    puede("ventas.precio_articulo");

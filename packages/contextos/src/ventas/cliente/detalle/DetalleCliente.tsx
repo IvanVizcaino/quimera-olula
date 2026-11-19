@@ -9,6 +9,8 @@ import { puedeAlguna } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router";
+import { TabPreciosArticulo } from "#/ventas/precio_articulo/detalle/TabPreciosArticulo.tsx";
+import { muestraPreciosArticulo } from "#/ventas/precio_articulo/dominio.ts";
 import { BorrarCliente } from "../borrar/BorrarCliente.tsx";
 import { BajaCliente } from "../dar_de_baja/BajaCliente.tsx";
 import { Cliente } from "../diseño.ts";
@@ -17,7 +19,6 @@ import { TabCuentasBanco } from "./cuentas_banco/TabCuentasBanco.tsx";
 import "./DetalleCliente.css";
 import { documentos, TabDocumentos } from "./documentos/TabDocumentos.tsx";
 import { TabDirecciones } from "./direcciones/TabDirecciones.tsx";
-import { TabAdicionalCliente } from "./diseño.ts";
 import { clienteVacio, metaCliente } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
 import { TabComercial } from "./TabComercial.tsx";
@@ -26,11 +27,9 @@ import { TabGeneral } from "./TabGeneral.tsx";
 export const DetalleCliente = ({
   id,
   publicar = async () => {},
-  tabsAdicionales = [],
 }: {
   id?: string;
   publicar?: EmitirEvento;
-  tabsAdicionales?: TabAdicionalCliente[];
 }) => {
   const params = useParams();
   const clienteId = id ?? params.id;
@@ -159,13 +158,17 @@ export const DetalleCliente = ({
                       />,
                     ]
                   : []),
-                ...tabsAdicionales.map((tab) => (
-                  <Tab
-                    key={tab.id}
-                    label={tab.label}
-                    children={tab.contenido(ctx.cliente)}
-                  />
-                )),
+                ...(muestraPreciosArticulo()
+                  ? [
+                      <Tab
+                        key="tab-7"
+                        label="Precios por artículo"
+                        children={
+                          <TabPreciosArticulo clienteId={ctx.cliente.id} />
+                        }
+                      />,
+                    ]
+                  : []),
               ]}
             />
             {estado === "CAMBIANDO_ID_FISCAL" && (

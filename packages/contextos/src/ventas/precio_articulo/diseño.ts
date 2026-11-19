@@ -1,8 +1,9 @@
 import { Entidad, Modelo, RespuestaLista } from "@olula/lib/diseño.ts";
 
 /**
- * Condición de precio de un cliente para un artículo (tabla legacy
- * `preciosarticulos` de DTS-OABE), por tramo de cantidad.
+ * Condición de precio de un cliente para un artículo (tabla
+ * `preciosarticulos`), por tramo de cantidad. La aplica el servidor cuando la
+ * secuencia del plugin `precio_articulo` incluye la fuente `precios_articulos`.
  *
  * - Con `dtoPorcentual` distinto de 0 se aplica ese descuento sobre el precio
  *   de tarifa o de la ficha del artículo, y `pvp` se ignora.

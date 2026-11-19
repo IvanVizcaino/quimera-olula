@@ -1,5 +1,5 @@
-import { describe, expect, test } from "vitest";
-import { pvpIgnorado, textoTramo, tramoValido } from "../dominio.ts";
+import { afterEach, describe, expect, test } from "vitest";
+import { muestraPreciosArticulo, pvpIgnorado, textoTramo, tramoValido } from "../dominio.ts";
 import {
     cambiosPrecioArticuloAApi,
     nuevoPrecioArticuloAApi,
@@ -45,5 +45,31 @@ describe("precio por artículo", () => {
             id: "1", cliente_id: "C1", articulo_id: "REF", descripcion_articulo: null,
             cantidad_min: null, cantidad_max: 9, dto_porcentual: 0, pvp: 2,
         })).toMatchObject({ descripcionArticulo: "", cantidadMin: 0, cantidadMax: 9 });
+    });
+});
+
+describe("pestaña de precios por artículo en el cliente", () => {
+    const conWhoami = (fuentes: string[], permisos: { id_regla: string; valor: boolean }[] = []) =>
+        localStorage.setItem("whoami", JSON.stringify({
+            permisos,
+            config: { ventas: { precio_articulo: fuentes } },
+        }));
+
+    afterEach(() => localStorage.clear());
+
+    test("se ve si la secuencia de precios usa precios_articulos", () => {
+        conWhoami(["precios_articulos", "tarifa_grupo", "ficha_articulo"]);
+        expect(muestraPreciosArticulo()).toBe(true);
+    });
+
+    test("no se ve con otra secuencia", () => {
+        conWhoami(["tarifa_grupo", "ficha_articulo"]);
+        expect(muestraPreciosArticulo()).toBe(false);
+    });
+
+    test("no se ve si el usuario no tiene permiso", () => {
+        conWhoami(["precios_articulos", "ficha_articulo"],
+            [{ id_regla: "ventas.precio_articulo", valor: false }]);
+        expect(muestraPreciosArticulo()).toBe(false);
     });
 });

@@ -9,8 +9,10 @@ import { PreciosArticuloLista } from "./PreciosArticuloLista.tsx";
 import { contextoInicial } from "./precios_articulo.ts";
 
 /**
- * Pestaña "Precios por artículo" del detalle de cliente de dts_oabe:
- * condiciones de `preciosarticulos` del cliente, con alta, cambio y borrado.
+ * Pestaña "Precios por artículo" del detalle de cliente: condiciones de
+ * `preciosarticulos` del cliente, con alta, cambio y borrado. Se muestra solo
+ * si la secuencia de precios incluye `precios_articulos` (ver
+ * `muestraPreciosArticulo`).
  *
  * Orquesta la lista y los modales; estos no reciben prop `activo` y reciben
  * la condición ya resuelta.

@@ -1,5 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Criteria } from "@olula/lib/diseño.ts";
+import ApiUrls from "../comun/urls.ts";
 import {
     CambiosPrecioArticulo,
     DeletePrecioArticulo,
@@ -10,7 +11,7 @@ import {
     PrecioArticulo,
 } from "./diseño.ts";
 
-const baseUrl = "/ventas/precio_articulo";
+const baseUrl = new ApiUrls().PRECIO_ARTICULO;
 
 interface PrecioArticuloApi {
     id: string;
