@@ -1,6 +1,7 @@
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { UiProps } from "@olula/lib/useModelo.ts";
 import { pvpIgnorado, tramoValido } from "../dominio.ts";
+import "./CamposCondicion.css";
 
 type Condicion = { cantidadMin: number; cantidadMax: number; dtoPorcentual: number; pvp: number };
 

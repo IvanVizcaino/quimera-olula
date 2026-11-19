@@ -1,0 +1,45 @@
+/* Alta y cambio de precio por artículo: ancho estable (no depende de que
+   aparezcan la nota o el aviso de tramo) y rejilla de 12 columnas. */
+quimera-modal[nombre="crear_precio_articulo"] dialog,
+quimera-modal[nombre="cambiar_precio_articulo"] dialog {
+    width: 540px;
+    max-width: 100%;
+}
+
+quimera-modal[nombre="cambiar_precio_articulo"] dialog h2 {
+    overflow-wrap: anywhere;
+}
+
+:is(
+    quimera-modal[nombre="crear_precio_articulo"],
+    quimera-modal[nombre="cambiar_precio_articulo"]
+) quimera-formulario {
+    quimera-autocompletar[nombre="articuloId"] {
+        grid-column: 1 / span 12;
+    }
+
+    quimera-input[nombre="cantidadMin"],
+    quimera-input[nombre="cantidadMax"],
+    quimera-input[nombre="dtoPorcentual"],
+    quimera-input[nombre="pvp"] {
+        grid-column: span 6;
+    }
+
+    /* Aviso de tramo y nota: ancho completo, no una celda de la rejilla */
+    .texto-validacion,
+    .nota {
+        grid-column: 1 / -1;
+        margin: 0;
+        overflow-wrap: break-word;
+    }
+
+    .texto-validacion {
+        color: var(--color-error);
+        font-size: var(--tamaño-letra-s);
+    }
+
+    .nota {
+        color: var(--color-texto-secundario);
+        font-size: var(--tamaño-letra-s);
+    }
+}
