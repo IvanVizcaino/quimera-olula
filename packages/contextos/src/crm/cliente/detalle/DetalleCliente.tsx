@@ -1,3 +1,4 @@
+import { apiAgendaCliente } from "#/ventas/cliente/infraestructura.ts";
 import { TabCrmContactos } from "#/ventas/cliente/detalle/crm_contactos/TabCrmContactos.tsx";
 import { CambiarIdFiscal } from "#/ventas/comun/componentes/moleculas/CambiarIdFiscal/CambiarIdFiscal.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -76,7 +77,7 @@ export const DetalleCliente = ({
             </Tab>
 
             <Tab label="Contactos">
-              <TabCrmContactos clienteId={clienteId} />
+              <TabCrmContactos entidadId={clienteId} api={apiAgendaCliente} />
             </Tab>
 
             <Tab label="Oportunidades">

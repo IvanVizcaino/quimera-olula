@@ -1,5 +1,5 @@
 import { ContactoSelector } from "#/ventas/comun/componentes/contacto.tsx";
-import { getContactosAgenda } from "../../infraestructura.ts";
+import { ApiAgenda } from "#/comun/agenda/infraestructura.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
@@ -10,19 +10,21 @@ import { EdicionCrmContactos } from "./EdicionCrmContactos.tsx";
 import { TabCrmContactosLista } from "./TabCrmContactosLista.tsx";
 import { getMaquina } from "./maquina.ts";
 
-export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
+/** Agenda de contactos de un cliente o un proveedor: `api` dice contra qué rutas trabaja. */
+export const TabCrmContactos = ({ entidadId, api }: { entidadId: string; api: ApiAgenda }) => {
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "lista",
     contactos: [],
     contactoActivo: null,
     cargando: true,
-    clienteId,
+    entidadId,
+    api,
   });
 
   useEffect(() => {
-    if (clienteId) emitir("cargar_contactos", clienteId, true);
+    if (entidadId) emitir("cargar_contactos", entidadId, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clienteId]);
+  }, [entidadId]);
 
   const estado = ctx.estado;
   const [contactoSeleccionado, setContactoSeleccionado] = useState<{
@@ -65,7 +67,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="confirmacionBorrarContacto"
         abierto={estado === "confirmar_borrado"}
         titulo="Confirmar borrar"
-        mensaje="¿Borrar este contacto? Se quitará también de la agenda de todos sus clientes."
+        mensaje="¿Borrar este contacto? Se quitará también de todas las agendas de clientes y proveedores en las que esté."
         onCerrar={() => emitir("borrado_cancelado")}
         onAceptar={() => emitir("borrado_confirmado")}
       />
@@ -74,7 +76,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="confirmacionEliminarAsociacion"
         abierto={estado === "confirmar_eliminar_asociacion"}
         titulo="Quitar de la agenda"
-        mensaje="¿Quitar este contacto de la agenda del cliente? El contacto no se borra."
+        mensaje="¿Quitar este contacto de la agenda? El contacto no se borra."
         onCerrar={() => emitir("eliminacion_cancelada")}
         onAceptar={() => emitir("eliminacion_solicitada")}
       />
@@ -111,7 +113,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
           nombre="cliente/contacto_id"
           label="Seleccionar contacto"
           excluir={ctx.contactos.map((contacto) => contacto.id)}
-          obtenerContactos={getContactosAgenda}
+          obtenerContactos={api.buscar}
           onChange={(contacto) => setContactoSeleccionado(contacto)}
         />
         <div className="botones">

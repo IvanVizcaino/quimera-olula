@@ -6,7 +6,7 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { puedeAlguna } from "@olula/lib/dominio.ts";
+import { puede, puedeAlguna } from "@olula/lib/dominio.ts";
 import { useCallback, useEffect } from "react";
 import { BorrarProveedor } from "../borrar/BorrarProveedor.tsx";
 import { Proveedor } from "../diseño.ts";
@@ -21,6 +21,8 @@ import "./DetalleProveedor.css";
 import { DireccionesProveedor } from "./direcciones/DireccionesProveedor.tsx";
 import { documentosProveedor } from "./documentos/documentos.ts";
 import { TabDocumentos } from "./documentos/TabDocumentos.tsx";
+import { TabCrmContactos } from "#/ventas/cliente/detalle/crm_contactos/TabCrmContactos.tsx";
+import { apiAgendaProveedor } from "../infraestructura.ts";
 import { getMaquina } from "./maquina.ts";
 import { TabComercial } from "./TabComercial.tsx";
 import { TabGeneral } from "./TabGeneral.tsx";
@@ -126,6 +128,19 @@ export const DetalleProveedor = ({
                 />
               }
             />,
+            ...(puede("compras.contacto")
+              ? [
+                  <Tab
+                    key="tab-agenda"
+                    label="Agenda"
+                    children={
+                      <div className="detalle-cliente-tab-contenido">
+                        <TabCrmContactos entidadId={proveedor.id} api={apiAgendaProveedor} />
+                      </div>
+                    }
+                  />,
+                ]
+              : []),
             ...(puedeAlguna(documentosProveedor.map((d) => d.regla))
               ? [
                   <Tab

@@ -1,14 +1,6 @@
 import { ProcesarContexto } from "@olula/lib/diseño.js";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.js";
 import { CrmContacto, NuevoCrmContacto } from "../../diseño.ts";
-import {
-    deleteCrmContacto,
-    desvincularContactoAgenda,
-    getCrmContactosCliente,
-    patchCrmContacto,
-    postCrmContactoCliente,
-    vincularContactoAgenda,
-} from "../../infraestructura.ts";
 import { ContextoCrmContactos, EstadoCrmContactos } from "./diseño.ts";
 
 // Longitudes de las columnas de crm_contactos (crm_contactos.mtd).
@@ -53,11 +45,11 @@ type ProcesarCrmContactos = ProcesarContexto<EstadoCrmContactos, ContextoCrmCont
 const pipeCrmContactos = ejecutarListaProcesos<EstadoCrmContactos, ContextoCrmContactos>;
 
 export const cargarCrmContactos: ProcesarCrmContactos = async (contexto, payload) => {
-    const clienteId = (payload as string) || contexto.clienteId;
-    const contactos = await getCrmContactosCliente(clienteId);
+    const entidadId = (payload as string) || contexto.entidadId;
+    const contactos = await contexto.api.cargar(entidadId);
     return {
         ...contexto,
-        clienteId,
+        entidadId,
         contactos,
         cargando: false,
     }
@@ -73,7 +65,7 @@ export const activarContacto: ProcesarCrmContactos = async (contexto, payload) =
 
 export const crearContacto: ProcesarCrmContactos = async (contexto, payload) => {
     const nuevoContacto = payload as NuevoCrmContacto;
-    await postCrmContactoCliente(contexto.clienteId, nuevoContacto);
+    await contexto.api.crear(contexto.entidadId, nuevoContacto);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -82,7 +74,7 @@ export const crearContacto: ProcesarCrmContactos = async (contexto, payload) => 
 
 export const actualizarContacto: ProcesarCrmContactos = async (contexto, payload) => {
     const contactoActualizado = payload as CrmContacto;
-    await patchCrmContacto(contactoActualizado);
+    await contexto.api.cambiar(contactoActualizado);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -93,7 +85,7 @@ export const borrarContacto: ProcesarCrmContactos = async (contexto) => {
     const idContacto = contexto.contactoActivo?.id;
     if (!idContacto) return contexto;
 
-    await deleteCrmContacto(idContacto);
+    await contexto.api.borrar(idContacto);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -103,7 +95,7 @@ export const borrarContacto: ProcesarCrmContactos = async (contexto) => {
 
 export const vincularContacto: ProcesarCrmContactos = async (contexto, payload) => {
     const idContactoCrm = payload as string;
-    await vincularContactoAgenda(idContactoCrm, contexto.clienteId);
+    await contexto.api.vincular(idContactoCrm, contexto.entidadId);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -114,7 +106,7 @@ export const desvincularContacto: ProcesarCrmContactos = async (contexto) => {
     const idContacto = contexto.contactoActivo?.id;
     if (!idContacto) return contexto;
 
-    await desvincularContactoAgenda(idContacto, contexto.clienteId);
+    await contexto.api.desvincular(idContacto, contexto.entidadId);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,

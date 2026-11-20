@@ -41,6 +41,9 @@ export interface Factura extends Entidad {
     editable: boolean;
     servicios: boolean;
     noGenerarAsiento: boolean;
+    /** Inversión del sujeto pasivo (plugin contauto_isp): sin IVA en los totales; el asiento
+     *  autorrepercute el IVA. */
+    inversionSujetoPasivo: boolean;
     asientoId: string | null;
     observaciones: string | null;
     estadoExpedicion: EstadoExpedicion;
