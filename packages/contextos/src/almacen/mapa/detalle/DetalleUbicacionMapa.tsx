@@ -6,6 +6,7 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { useEffect, useState } from "react";
 import { UbicacionMapa } from "../diseño.ts";
+import { textoDistancias } from "../dominio.ts";
 
 const fmt = (n: number) => n.toLocaleString("es-ES");
 
@@ -65,6 +66,8 @@ export const DetalleUbicacionMapa = ({ ubicacion, onCerrar }: { ubicacion: Ubica
                     <dd>{ubicacion.clasesAlmacenamiento.length ? ubicacion.clasesAlmacenamiento.join(", ") : "—"}</dd>
                 </div>
             </dl>
+
+            {textoDistancias(ubicacion) && <p className="mapa-detalle-distancia">{textoDistancias(ubicacion)}</p>}
 
             {conStock.length > 0 && <StocksUbicacion stocks={conStock} />}
         </section>

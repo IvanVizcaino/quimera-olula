@@ -4,8 +4,8 @@ import {
     CapaMapa, ElegidoPlanta, MapaAlmacen, PlantaAlmacen, PuntoRecorrido,
 } from "../diseño.ts";
 import {
-    geometriaEnPlanta, letraModulo, PASO_PLANTA, puntoEnPlanta, resumenModulo, rotuloPasillo, todosLosPasillos,
-    tonoModulo, ubicacionesPorModulo,
+    geometriaEnPlanta, letraModulo, ParadaEnElemento, PASO_PLANTA, puntoEnPlanta, resumenModulo, resumenUbicacion,
+    rotuloPasillo, todosLosPasillos, tonoModulo, tonoUbicacion, ubicacionesPorModulo, usoElemento,
 } from "../dominio.ts";
 
 type Props = {
@@ -18,7 +18,11 @@ type Props = {
     pasilloId: string | null;
     ubicacionId: string | null;
     recorrido: PuntoRecorrido[];
+    /** Paradas en ubicaciones situadas en elementos (muelles, playas). */
+    paradasElementos?: ParadaEnElemento[];
     onPasillo: (pasilloId: string) => void;
+    /** Pulsar una ubicación situada en un elemento (solo fuera de la edición). */
+    onUbicacion?: (ubicacionId: string) => void;
     /** Solo en edición: elegir y mover piezas. */
     edicion?: {
         elegido: ElegidoPlanta | null;
@@ -42,7 +46,8 @@ const FLECHAS: Record<string, [number, number]> = {
 
 /** Planta real de la nave, en metros: contorno con rejilla, elementos fijos y pasillos colocados. */
 export const PlantaReal = ({
-    mapa, planta, capa, paleta, zonaId, pasilloId, ubicacionId, recorrido, onPasillo, edicion,
+    mapa, planta, capa, paleta, zonaId, pasilloId, ubicacionId, recorrido, paradasElementos = [], onPasillo,
+    onUbicacion, edicion,
 }: Props) => {
     const zonaDe = new Map(mapa.zonas.flatMap((z) => z.pasillos.map((p) => [p.pasilloId, z.zonaId])));
     const svg = useRef<SVGSVGElement>(null);
@@ -105,11 +110,17 @@ export const PlantaReal = ({
     const lineasRejilla = (total: number, cada: number) =>
         Array.from({ length: Math.floor(total / cada) + 1 }, (_, i) => i * cada);
 
-    const puntos = recorrido.flatMap((r) => {
-        const p = pasillos.get(r.pasilloId);
-        const c = planta.pasillos.find((x) => x.pasilloId === r.pasilloId);
-        return p && c ? [{ ...r, ...puntoEnPlanta(p, c, planta.medidas, r.modulo) }] : [];
-    });
+    const puntos = [
+        ...recorrido.flatMap((r) => {
+            const p = pasillos.get(r.pasilloId);
+            const c = planta.pasillos.find((x) => x.pasilloId === r.pasilloId);
+            return p && c
+                ? [{ secuencia: r.secuencia, ubicacion: r.ubicacion, accion: r.accion, ...puntoEnPlanta(p, c, planta.medidas, r.modulo) }]
+                : [];
+        }),
+        ...paradasElementos,
+    ].sort((a, b) => a.secuencia - b.secuencia);
+    const ubicacionPorId = new Map(mapa.ubicaciones.map((u) => [u.ubicacionId, u]));
 
     const margen = 1;
 
@@ -140,10 +151,13 @@ export const PlantaReal = ({
                 {planta.elementos.map((el, indice) => {
                     const pieza: ElegidoPlanta = { tipo: "ELEMENTO", indice };
                     const elegidoEl = mismo(edicion?.elegido ?? null, pieza);
+                    const uso = usoElemento(mapa, el);
+                    const textoUso = uso.salida && uso.entrada ? "salida y entrada" : uso.salida ? "salida" : uso.entrada ? "entrada" : "";
+                    const conFichas = el.ubicaciones.length > 0;
                     return (
+                        <g key={indice}>
                         <g
-                            key={indice}
-                            className={`mapa-elemento mapa-elemento-${el.tipo.toLowerCase()}${elegidoEl ? " elegido" : ""}`}
+                            className={`mapa-elemento mapa-elemento-${el.tipo.toLowerCase()}${elegidoEl ? " elegido" : ""}${uso.salida ? " uso-salida" : ""}${uso.entrada ? " uso-entrada" : ""}`}
                             transform={desplazamiento(pieza)}
                             {...(edicion
                                 ? {
@@ -158,8 +172,47 @@ export const PlantaReal = ({
                                 : {})}
                         >
                             <rect x={el.x} y={el.y} width={el.ancho} height={el.largo} />
-                            <text x={el.x + el.ancho / 2} y={el.y + el.largo / 2}>{el.nombre}</text>
-                            <title>{`${el.nombre} (${el.ancho} × ${el.largo} m)`}</title>
+                            <text x={el.x + el.ancho / 2} y={conFichas ? el.y + 0.6 : el.y + el.largo / 2}>
+                                {el.nombre}{textoUso ? ` · ${textoUso}` : ""}
+                            </text>
+                            <title>{`${el.nombre} (${el.ancho} × ${el.largo} m)${textoUso ? `, punto de ${textoUso}` : ""}`}</title>
+                        </g>
+                        {conFichas && (
+                            <g className="mapa-elemento-fichas" transform={desplazamiento(pieza)}>
+                                {el.ubicaciones.map((id, i) => {
+                                    const u = ubicacionPorId.get(id);
+                                    if (!u) return null;
+                                    const ancho = Math.max(Math.min(el.ancho - 0.4, 3), 0.5);
+                                    const x = el.x + (el.ancho - ancho) / 2;
+                                    const y = el.y + 1.1 + i * 1.0;
+                                    const interactiva = !edicion && onUbicacion;
+                                    return (
+                                        <g
+                                            key={id}
+                                            className={`mapa-elemento-ficha tono-${tonoUbicacion(u, capa, paleta)}${u.ubicacionId === ubicacionId ? " seleccionada" : ""}`}
+                                            {...(interactiva
+                                                ? {
+                                                    role: "button",
+                                                    tabIndex: 0,
+                                                    "aria-label": resumenUbicacion(u).replace(/\n/g, ". "),
+                                                    onClick: () => onUbicacion(u.ubicacionId),
+                                                    onKeyDown: (e: KeyboardEvent<SVGGElement>) => {
+                                                        if (e.key === "Enter" || e.key === " ") {
+                                                            e.preventDefault();
+                                                            onUbicacion(u.ubicacionId);
+                                                        }
+                                                    },
+                                                }
+                                                : {})}
+                                        >
+                                            <rect x={x} y={y} width={ancho} height={0.8} rx={0.15} />
+                                            <text x={x + ancho / 2} y={y + 0.4}>{u.ubicacion}</text>
+                                            <title>{resumenUbicacion(u)}</title>
+                                        </g>
+                                    );
+                                })}
+                            </g>
+                        )}
                         </g>
                     );
                 })}

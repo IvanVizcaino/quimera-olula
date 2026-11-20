@@ -15,11 +15,15 @@ const pasillo = (id: string, extra: Partial<PasilloMapa> = {}): PasilloMapa => (
 const ubi = (id: string, extra: Partial<UbicacionMapa> = {}): UbicacionMapa => ({
     ubicacionId: id, ubicacion: `U${id}`, zonaId: "Z", pasilloId: "P1", modulo: 1, nivel: 0, hueco: 1,
     formato: "HUECO_PALET", bloqueada: false, cantidad: 0, articulos: [], claseArticulo: null,
-    clasesAlmacenamiento: [], accesibilidad: 1, claseUbicacion: "A", pickingFijo: null, ...extra,
+    clasesAlmacenamiento: [], accesibilidad: 1, claseUbicacion: "A", metrosSalida: null, metrosEntrada: null,
+    pickingFijo: null, ...extra,
 });
 
 const mapa = (ubicaciones: UbicacionMapa[]): MapaAlmacen => ({
-    zonas: [{ zonaId: "Z", zona: "PIC", funcion: "PICKING", pasillos: [pasillo("P1"), pasillo("P2")] }],
+    zonas: [{
+        zonaId: "Z", zona: "PIC", funcion: "PICKING", pasillos: [pasillo("P1"), pasillo("P2")],
+        accesibilidad: { calculo: "FORMULA", motivo: "SIN_PLANTA", pasillosSinColocar: [] },
+    }],
     ubicaciones,
     planta: null,
 });

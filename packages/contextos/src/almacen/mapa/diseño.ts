@@ -16,11 +16,22 @@ export interface PasilloMapa {
     niveles: number;
 }
 
+/** Por qué una zona usa la fórmula estimada en vez de la distancia real a la salida. */
+export type MotivoFormula = "SIN_PLANTA" | "SIN_SALIDA" | "PASILLOS_SIN_COLOCAR" | "SIN_PASILLOS";
+
+export interface CalculoZona {
+    calculo: "DISTANCIA" | "FORMULA";
+    motivo: MotivoFormula | null;
+    pasillosSinColocar: string[];
+}
+
 export interface ZonaMapa {
     zonaId: string;
     zona: string;
     funcion: string;
     pasillos: PasilloMapa[];
+    /** Cómo se calcula la accesibilidad de sus ubicaciones (doc sga_distancias.md). */
+    accesibilidad: CalculoZona;
 }
 
 export interface PickingFijoMapa {
@@ -45,6 +56,9 @@ export interface UbicacionMapa {
     clasesAlmacenamiento: string[];
     accesibilidad: number | null;
     claseUbicacion: ClaseAbc | null;
+    /** Metros a pie hasta la salida y desde la recepción (null sin distancia real). */
+    metrosSalida: number | null;
+    metrosEntrada: number | null;
     pickingFijo: PickingFijoMapa | null;
 }
 
@@ -89,12 +103,16 @@ export interface ElementoPlanta {
     y: number;
     ancho: number;
     largo: number;
+    /** Ubicaciones sin pasillo situadas en el elemento (muelles, playas). */
+    ubicaciones: string[];
 }
 
 export interface PlantaAlmacen {
     ancho: number;
     largo: number;
     medidas: MedidasPlanta;
+    /** Metros a pie equivalentes a subir o bajar un nivel. */
+    metrosNivel: number;
     pasillos: PasilloEnPlanta[];
     elementos: ElementoPlanta[];
 }

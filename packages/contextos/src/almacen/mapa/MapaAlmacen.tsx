@@ -10,8 +10,8 @@ import { AlzadoPasillo } from "./alzado/AlzadoPasillo.tsx";
 import { DetalleUbicacionMapa } from "./detalle/DetalleUbicacionMapa.tsx";
 import { ElegidoPlanta, PlantaAlmacen, UbicacionMapa } from "./diseño.ts";
 import {
-    capasMapa, leyenda, paletaClases, paradasSinPasillo, puntosRecorrido, resumenUbicacion,
-    tonoUbicacion,
+    avisosAccesibilidad, capasMapa, leyenda, paletaClases, paradasEnElementos, paradasSinPasillo,
+    puntosRecorrido, resumenUbicacion, textoCalculo, tonoUbicacion, vinculadas,
 } from "./dominio.ts";
 import { contextoMapaInicial, desplazarEnBorrador, getMaquina } from "./maquina.ts";
 import { PlantaZona } from "./planta/PlantaZona.tsx";
@@ -33,9 +33,16 @@ export const MapaAlmacen = () => {
     const planta: PlantaAlmacen | null = editando ? ctx.borrador : mapa?.planta ?? null;
     const enPlanta = (editando || ctx.vista === "PLANTA") && planta !== null;
     const puedeEditar = puede("almacen.pasillo");
+    // En la planta, las ubicaciones situadas en un elemento se dibujan dentro de él.
+    const enElementos = enPlanta && planta ? vinculadas(planta) : new Set<string>();
     const sueltas = mapa
-        ? mapa.ubicaciones.filter((u) => u.pasilloId === null && (!ctx.zonaId || u.zonaId === ctx.zonaId))
+        ? mapa.ubicaciones.filter((u) =>
+            u.pasilloId === null && !enElementos.has(u.ubicacionId) && (!ctx.zonaId || u.zonaId === ctx.zonaId))
         : [];
+    const paradasElementos = enPlanta && planta && ctx.recorrido ? paradasEnElementos(ctx.recorrido, planta) : [];
+    const sinPosicion = sinPasillo.filter((p) => !paradasElementos.some((e) => e.secuencia === p.secuencia));
+    const avisosCalculo = mapa && !editando ? avisosAccesibilidad(mapa) : [];
+    const capaDeAccesibilidad = capa === "ABC_UBICACION" || capa === "SLOTTING";
 
     return (
         <div className="MapaAlmacen PaginaProceso">
@@ -144,6 +151,7 @@ export const MapaAlmacen = () => {
                             {e.texto}
                         </li>
                     ))}
+                    {capaDeAccesibilidad && <li className="mapa-leyenda-calculo">{textoCalculo(mapa)}</li>}
                     {ctx.recorrido && ctx.recorrido.paradas.length > 0 && (
                         <>
                             <li>
@@ -168,11 +176,17 @@ export const MapaAlmacen = () => {
                 <p className="mapa-aviso">{motivoRecorridoVacio(ctx.recorrido)}</p>
             )}
 
-            {sinPasillo.length > 0 && (
+            {sinPosicion.length > 0 && (
                 <p className="mapa-aviso">
                     Paradas fuera de pasillo:{" "}
-                    {sinPasillo.map((p) => `${p.secuencia}. ${textoAccionParada[p.accion]} en ${p.ubicacion}`).join(", ")}
+                    {sinPosicion.map((p) => `${p.secuencia}. ${textoAccionParada[p.accion]} en ${p.ubicacion}`).join(", ")}
                 </p>
+            )}
+
+            {avisosCalculo.length > 0 && (
+                <ul className="mapa-avisos-calculo" aria-label="Cálculo de la accesibilidad">
+                    {avisosCalculo.map((a) => <li key={a}>{a}</li>)}
+                </ul>
             )}
 
             {mapa && mapa.zonas.length === 0 && <p>El almacén no tiene zonas.</p>}
@@ -190,6 +204,8 @@ export const MapaAlmacen = () => {
                                 pasilloId={ctx.pasilloId}
                                 ubicacionId={ctx.ubicacionId}
                                 recorrido={editando ? [] : puntos}
+                                paradasElementos={editando ? [] : paradasElementos}
+                                onUbicacion={(id) => emitir("ubicacion_seleccionada", id)}
                                 onPasillo={(id) => emitir("pasillo_seleccionado", id)}
                                 edicion={editando
                                     ? {

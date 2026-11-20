@@ -4,7 +4,7 @@ import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/index.js";
 import { ElegidoPlanta, MapaAlmacen, MedidasPlanta, PlantaAlmacen, TipoElemento } from "../diseño.ts";
 import {
-    avisosPlanta, cambiarElemento, cambiarPasilloEnPlanta, colocarPasillo, girarPasillo, medidasEfectivas,
+    avisosDistancia, avisosPlanta, cambiarElemento, desvincularUbicacion, sinVincular, vincularUbicaciones, cambiarPasilloEnPlanta, colocarPasillo, girarPasillo, medidasEfectivas,
     metrosNoNegativos, metrosPositivos, moverPieza, nuevoElemento, pasillosSinColocar, quitarElemento,
     quitarPasilloDePlanta, rotuloPasillo, tiposElemento,
 } from "../dominio.ts";
@@ -67,7 +67,7 @@ const CAMPOS_MEDIDA: (keyof MedidasPlanta)[] = ["largoModulo", "fondo", "anchoPa
 /** Panel del editor de la planta: nave, medidas, pieza elegida, pasillos sin colocar y avisos. */
 export const EditorPlanta = ({ mapa, planta, elegido, onCambiar, onGuardar, onCancelar }: Props) => {
     const sinColocar = pasillosSinColocar(mapa, planta);
-    const avisos = avisosPlanta(mapa, planta);
+    const avisos = [...avisosDistancia(mapa, planta), ...avisosPlanta(mapa, planta)];
     const colocacion = elegido?.tipo === "PASILLO"
         ? planta.pasillos.find((c) => c.pasilloId === elegido.pasilloId) ?? null
         : null;
@@ -96,7 +96,12 @@ export const EditorPlanta = ({ mapa, planta, elegido, onCambiar, onGuardar, onCa
                             valor={planta.medidas[campo]}
                             onCambio={(v) => v !== null && onCambiar({ ...planta, medidas: { ...planta.medidas, [campo]: v } })} />
                     ))}
+                    <CampoMetros label="Metros por nivel" nombre="metrosNivel" valor={planta.metrosNivel}
+                        onCambio={(v) => v !== null && onCambiar({ ...planta, metrosNivel: v })} />
                 </quimera-formulario>
+                <p className="mapa-editor-nota">
+                    Metros a pie que equivalen a subir o bajar un nivel al medir la distancia a la salida.
+                </p>
             </fieldset>
 
             {colocacion && (
@@ -162,6 +167,12 @@ export const EditorPlanta = ({ mapa, planta, elegido, onCambiar, onGuardar, onCa
                         <CampoMetros label="Largo (m)" nombre="elementoLargo" valor={elemento.largo}
                             onCambio={(v) => v !== null && onCambiar(cambiarElemento(planta, indiceElemento, { largo: v }))} />
                     </quimera-formulario>
+                    <UbicacionesElemento
+                        mapa={mapa}
+                        planta={planta}
+                        indice={indiceElemento}
+                        onCambiar={(p) => onCambiar(p)}
+                    />
                     <div className="botones">
                         <QBoton variante="texto" onClick={() => onCambiar(quitarElemento(planta, indiceElemento), null)}>
                             Quitar elemento
@@ -207,5 +218,82 @@ export const EditorPlanta = ({ mapa, planta, elegido, onCambiar, onGuardar, onCa
                 <QBoton variante="texto" onClick={onCancelar}>Cancelar</QBoton>
             </div>
         </section>
+    );
+};
+
+/**
+ * Ubicaciones sin pasillo situadas en el elemento (muelles, playas): les da posición en la planta y,
+ * por la función de su zona, hacen del elemento un punto de salida o de entrada.
+ */
+const UbicacionesElemento = ({ mapa, planta, indice, onCambiar }: {
+    mapa: MapaAlmacen;
+    planta: PlantaAlmacen;
+    indice: number;
+    onCambiar: (planta: PlantaAlmacen) => void;
+}) => {
+    const elemento = planta.elementos[indice];
+    const porId = new Map(mapa.ubicaciones.map((u) => [u.ubicacionId, u]));
+    const zonaDe = (zonaId: string) => mapa.zonas.find((z) => z.zonaId === zonaId);
+    const libres = sinVincular(mapa, planta);
+    const zonasLibres = [...new Set(libres.map((u) => u.zonaId))].flatMap((id) => {
+        const z = zonaDe(id);
+        return z ? [z] : [];
+    });
+
+    return (
+        <div className="mapa-editor-ubicaciones">
+            <h4>Ubicaciones en el elemento</h4>
+            {elemento.ubicaciones.length === 0 && (
+                <p className="mapa-editor-nota">Ninguna. Vincula aquí los muelles o playas que están en este sitio.</p>
+            )}
+            <ul>
+                {elemento.ubicaciones.map((id) => {
+                    const u = porId.get(id);
+                    const z = u && zonaDe(u.zonaId);
+                    return (
+                        <li key={id}>
+                            <span>
+                                {u?.ubicacion ?? id}
+                                {z && <span className="mapa-editor-nota"> · {z.zona} ({z.funcion.toLowerCase()})</span>}
+                            </span>
+                            <QBoton variante="texto" onClick={() => onCambiar(desvincularUbicacion(planta, indice, id))}>
+                                Quitar
+                            </QBoton>
+                        </li>
+                    );
+                })}
+            </ul>
+            {libres.length > 0 && (
+                <>
+                    <quimera-formulario>
+                        <QSelect
+                            label="Añadir ubicación"
+                            nombre="elementoUbicacion"
+                            valor=""
+                            opciones={[
+                                { valor: "", descripcion: "Elegir…" },
+                                ...libres.map((u) => ({
+                                    valor: u.ubicacionId,
+                                    descripcion: `${u.ubicacion} · ${zonaDe(u.zonaId)?.zona ?? ""}`,
+                                })),
+                            ]}
+                            onChange={(o) => o?.valor && onCambiar(vincularUbicaciones(planta, indice, [o.valor]))}
+                        />
+                    </quimera-formulario>
+                    <div className="botones">
+                        {zonasLibres.map((z) => (
+                            <QBoton
+                                key={z.zonaId}
+                                variante="texto"
+                                onClick={() => onCambiar(vincularUbicaciones(
+                                    planta, indice, libres.filter((u) => u.zonaId === z.zonaId).map((u) => u.ubicacionId)))}
+                            >
+                                Todas las de {z.zona}
+                            </QBoton>
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
     );
 };

@@ -3,7 +3,7 @@ import { RecorridoOrden } from "#/almacen/orden/diseño.ts";
 import {
     CapaMapa, CeldaModulo, ElegidoPlanta, ElementoPlanta, EntradaLeyenda, GeometriaPasillo,
     GeometriaPasilloPlanta, Giro, Lado, MapaAlmacen, MedidasPlanta, MedidasPropias, PasilloEnPlanta,
-    PasilloMapa, PlantaAlmacen, PuntoRecorrido, Rect, TipoElemento, Tono, UbicacionMapa,
+    PasilloMapa, PlantaAlmacen, PuntoRecorrido, Rect, TipoElemento, Tono, UbicacionMapa, ZonaMapa,
 } from "./diseño.ts";
 
 export const capasMapa: { valor: CapaMapa; descripcion: string }[] = [
@@ -347,6 +347,8 @@ export const trazoRecorrido = (
 
 export const MEDIDAS_PLANTA_POR_DEFECTO: MedidasPlanta = { largoModulo: 2.7, fondo: 1.1, anchoPasillo: 3 };
 
+export const METROS_NIVEL_POR_DEFECTO = 3;
+
 export const GIROS: Giro[] = [0, 90, 180, 270];
 
 export const tiposElemento: { valor: TipoElemento; descripcion: string }[] = [
@@ -572,6 +574,7 @@ export const plantaInicial = (mapa: Pick<MapaAlmacen, "zonas">): PlantaAlmacen =
         ancho: Math.max(10, Math.ceil(x)),
         largo: Math.max(10, Math.ceil(largo + SEPARACION_INICIAL * 2)),
         medidas,
+        metrosNivel: METROS_NIVEL_POR_DEFECTO,
         pasillos,
         elementos: [],
     };
@@ -619,7 +622,10 @@ export const nuevoElemento = (planta: PlantaAlmacen, tipo: TipoElemento = "MUELL
     const tamano = { ancho: 4, largo: 3 };
     return {
         ...planta,
-        elementos: [...planta.elementos, { tipo, nombre: `${descripcion} ${numero}`, ...dentroDeNave(planta, { x: 0, y: 0, ...tamano }), ...tamano }],
+        elementos: [...planta.elementos, {
+            tipo, nombre: `${descripcion} ${numero}`, ...dentroDeNave(planta, { x: 0, y: 0, ...tamano }), ...tamano,
+            ubicaciones: [],
+        }],
     };
 };
 
@@ -670,4 +676,140 @@ export const metrosPositivos = (valor: string): number | null => {
 export const metrosNoNegativos = (valor: string): number | null => {
     const n = Number(String(valor).replace(",", "."));
     return Number.isFinite(n) && n >= 0 ? redondear(n) : null;
+};
+
+
+// ─── Distancia real (doc/especificaciones/sga_distancias.md) ─────────────
+
+const FUNCIONES_SALIDA = ["PREPARACION", "EXPEDICION"];
+const FUNCIONES_ENTRADA = ["RECEPCION"];
+
+/** Aviso de una zona con pasillos que no usa la distancia real a la salida; null si la usa. */
+export const avisoAccesibilidad = (zona: ZonaMapa): string | null => {
+    if (zona.pasillos.length === 0 || zona.accesibilidad.calculo === "DISTANCIA") return null;
+    const prefijo = `${zona.zona}: accesibilidad estimada (fórmula)`;
+    switch (zona.accesibilidad.motivo) {
+        case "PASILLOS_SIN_COLOCAR": {
+            const sin = zona.accesibilidad.pasillosSinColocar;
+            return `${prefijo}; falta colocar en la planta ${sin.length === 1 ? "el pasillo" : "los pasillos"} ${sin.join(", ")}`;
+        }
+        case "SIN_SALIDA":
+            return `${prefijo}; no hay punto de salida en la planta (un elemento con ubicaciones de preparación o expedición)`;
+        case "SIN_PLANTA":
+            return `${prefijo}; el almacén no tiene planta`;
+        default:
+            return prefijo;
+    }
+};
+
+/** Avisos de cálculo del almacén: si no hay planta, uno solo; si la hay, uno por zona afectada. */
+export const avisosAccesibilidad = (mapa: MapaAlmacen): string[] => {
+    const conPasillos = mapa.zonas.filter((z) => z.pasillos.length > 0);
+    if (!mapa.planta) {
+        return conPasillos.length
+            ? ["Accesibilidad estimada (fórmula): el almacén no tiene planta. Créala para medir la distancia real a la salida."]
+            : [];
+    }
+    // Sin punto de salida afecta a todas por igual: un solo aviso con todas las zonas.
+    const sinSalida = conPasillos.filter((z) => z.accesibilidad.calculo === "FORMULA" && z.accesibilidad.motivo === "SIN_SALIDA");
+    const resto = conPasillos.filter((z) => !sinSalida.includes(z));
+    return [
+        ...(sinSalida.length
+            ? [`${sinSalida.map((z) => z.zona).join(", ")}: accesibilidad estimada (fórmula); no hay punto de salida en la planta (un elemento con ubicaciones de preparación o expedición)`]
+            : []),
+        ...resto.map(avisoAccesibilidad).filter((a): a is string => a !== null),
+    ];
+};
+
+/** Texto de la leyenda de las capas que dependen de la accesibilidad. */
+export const textoCalculo = (mapa: MapaAlmacen): string => {
+    const conPasillos = mapa.zonas.filter((z) => z.pasillos.length > 0);
+    const reales = conPasillos.filter((z) => z.accesibilidad.calculo === "DISTANCIA").length;
+    if (reales === 0) return "Accesibilidad estimada (fórmula)";
+    return reales === conPasillos.length
+        ? "Accesibilidad por distancia a la salida"
+        : "Accesibilidad por distancia a la salida en parte de las zonas (ver avisos)";
+};
+
+const fmtMetros = (m: number) => `${Math.round(m).toLocaleString("es-ES")} m`;
+
+/** «A 23 m de la salida · 41 m de la recepción», o null sin distancia real. */
+export const textoDistancias = (u: Pick<UbicacionMapa, "metrosSalida" | "metrosEntrada">): string | null => {
+    const partes = [
+        ...(u.metrosSalida !== null ? [`${fmtMetros(u.metrosSalida)} de la salida`] : []),
+        ...(u.metrosEntrada !== null ? [`${fmtMetros(u.metrosEntrada)} de la recepción`] : []),
+    ];
+    return partes.length ? `A ${partes.join(" · ")}` : null;
+};
+
+/** Ubicaciones sin pasillo del almacén (las que se pueden situar en un elemento). */
+export const ubicacionesSinPasillo = (mapa: Pick<MapaAlmacen, "ubicaciones">): UbicacionMapa[] =>
+    mapa.ubicaciones.filter((u) => u.pasilloId === null);
+
+export const vinculadas = (planta: PlantaAlmacen): Set<string> =>
+    new Set(planta.elementos.flatMap((e) => e.ubicaciones));
+
+/** Las sin pasillo que todavía no están en ningún elemento. */
+export const sinVincular = (mapa: Pick<MapaAlmacen, "ubicaciones">, planta: PlantaAlmacen): UbicacionMapa[] => {
+    const ya = vinculadas(planta);
+    return ubicacionesSinPasillo(mapa).filter((u) => !ya.has(u.ubicacionId));
+};
+
+/** Añade ubicaciones a un elemento quitándolas de cualquier otro (cada una en uno solo). */
+export const vincularUbicaciones = (planta: PlantaAlmacen, indice: number, ids: string[]): PlantaAlmacen => ({
+    ...planta,
+    elementos: planta.elementos.map((e, i) =>
+        i === indice
+            ? { ...e, ubicaciones: [...new Set([...e.ubicaciones, ...ids])] }
+            : { ...e, ubicaciones: e.ubicaciones.filter((u) => !ids.includes(u)) }
+    ),
+});
+
+export const desvincularUbicacion = (planta: PlantaAlmacen, indice: number, id: string): PlantaAlmacen =>
+    cambiarElemento(planta, indice, { ubicaciones: planta.elementos[indice].ubicaciones.filter((u) => u !== id) });
+
+const funcionDe = (mapa: Pick<MapaAlmacen, "zonas" | "ubicaciones">, ubicacionId: string): string | undefined => {
+    const u = mapa.ubicaciones.find((x) => x.ubicacionId === ubicacionId);
+    return u ? mapa.zonas.find((z) => z.zonaId === u.zonaId)?.funcion : undefined;
+};
+
+/** Si el elemento es punto de salida y/o de entrada, por la función de las zonas de sus ubicaciones. */
+export const usoElemento = (
+    mapa: Pick<MapaAlmacen, "zonas" | "ubicaciones">, e: ElementoPlanta,
+): { salida: boolean; entrada: boolean } => {
+    const funciones = e.ubicaciones.map((u) => funcionDe(mapa, u));
+    return {
+        salida: funciones.some((f) => f !== undefined && FUNCIONES_SALIDA.includes(f)),
+        entrada: funciones.some((f) => f !== undefined && FUNCIONES_ENTRADA.includes(f)),
+    };
+};
+
+/** Avisos del editor sobre la distancia real (se suman a los de solapes). */
+export const avisosDistancia = (mapa: MapaAlmacen, planta: PlantaAlmacen): string[] => {
+    const avisos: string[] = [];
+    if (!planta.elementos.some((e) => usoElemento(mapa, e).salida)) {
+        avisos.push("No hay punto de salida: vincula a un elemento las ubicaciones de preparación o expedición");
+    }
+    const sueltas = sinVincular(mapa, planta);
+    if (sueltas.length) {
+        avisos.push(`Ubicaciones sin pasillo sin situar en la planta: ${listaCorta(sueltas.map((u) => u.ubicacion))}`);
+    }
+    return avisos;
+};
+
+export interface ParadaEnElemento {
+    secuencia: number;
+    ubicacion: string;
+    accion: PuntoRecorrido["accion"];
+    x: number;
+    y: number;
+}
+
+/** Paradas del recorrido en ubicaciones situadas en elementos: en el centro del elemento. */
+export const paradasEnElementos = (recorrido: RecorridoOrden, planta: PlantaAlmacen): ParadaEnElemento[] => {
+    const elementoDe = new Map(planta.elementos.flatMap((e) => e.ubicaciones.map((u) => [u, e] as const)));
+    return recorrido.paradas.flatMap((p) => {
+        const e = elementoDe.get(p.ubicacionId);
+        return e ? [{ secuencia: p.secuencia, ubicacion: p.ubicacion, accion: p.accion, x: e.x + e.ancho / 2, y: e.y + e.largo / 2 }] : [];
+    });
 };

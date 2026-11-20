@@ -975,3 +975,96 @@
 .MapaAlmacen > .mapa-barra[hidden] {
     display: none;
 }
+
+/* ─── Distancia real (sga_distancias.md) ─────────────────── */
+
+/* Avisos de zonas con accesibilidad estimada (fórmula) */
+.MapaAlmacen .mapa-avisos-calculo {
+    margin: 0;
+    padding: var(--espaciado-xs) var(--espaciado-m);
+    list-style: none;
+    border-left: 3px solid var(--color-advertencia);
+    background: var(--color-superficie-sunken);
+    border-radius: var(--redondeo-borde-xs);
+
+    li {
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-advertencia-oscuro);
+    }
+}
+
+.MapaAlmacen .mapa-leyenda .mapa-leyenda-calculo {
+    font-style: italic;
+}
+
+.MapaAlmacen .mapa-detalle-distancia {
+    margin: var(--espaciado-s) 0 0;
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+}
+
+/* Puntos de salida y de entrada: borde continuo y marcado */
+.MapaAlmacen .mapa-planta-real {
+    .mapa-elemento.uso-salida rect,
+    .mapa-elemento.uso-entrada rect {
+        stroke: var(--mapa-texto);
+        stroke-width: 2;
+        stroke-dasharray: none;
+    }
+
+    .mapa-elemento-ficha rect {
+        fill: var(--tono);
+        stroke: var(--mapa-borde);
+        stroke-width: 1;
+    }
+
+    .mapa-elemento-ficha.seleccionada rect {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
+    }
+
+    .mapa-elemento-ficha[role="button"] {
+        cursor: pointer;
+    }
+
+    .mapa-elemento-ficha[role="button"]:hover rect {
+        stroke: var(--mapa-texto);
+        stroke-width: 2;
+    }
+
+    .mapa-elemento-ficha:focus {
+        outline: none;
+    }
+
+    .mapa-elemento-ficha:focus-visible rect {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
+    }
+
+    .mapa-elemento-ficha text {
+        font-size: 0.5px;
+        text-anchor: middle;
+        dominant-baseline: central;
+        fill: var(--mapa-texto);
+        pointer-events: none;
+    }
+}
+
+.MapaAlmacen .mapa-planta-real.editando .mapa-elemento-fichas {
+    pointer-events: none;
+}
+
+.MapaAlmacen .mapa-editor-ubicaciones {
+    padding-bottom: var(--espaciado-s);
+
+    li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+    }
+
+    [nombre="elementoUbicacion"] {
+        grid-column: 1 / -1;
+    }
+}

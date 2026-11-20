@@ -3,7 +3,8 @@ import { MapaAlmacen, PasilloEnPlanta, PasilloMapa, PlantaAlmacen } from "../dis
 import {
     ajustarARejilla, avisosPlanta, colocarPasillo, geometriaEnPlanta, girarPasillo, medidasEfectivas,
     MEDIDAS_PLANTA_POR_DEFECTO, metrosPositivos, moverPieza, pasillosSinColocar, plantaInicial, puntoEnPlanta,
-    tamanoPasillo,
+    tamanoPasillo, avisoAccesibilidad, avisosAccesibilidad, avisosDistancia, paradasEnElementos, sinVincular,
+    textoDistancias, usoElemento, vincularUbicaciones,
 } from "../dominio.ts";
 import { plantaAApi, plantaDesdeApi } from "../infraestructura.ts";
 
@@ -14,10 +15,12 @@ const pasillo = (id: string, extra: Partial<PasilloMapa> = {}): PasilloMapa => (
     pasilloId: id, pasillo: id, orden: 1, caras: "AMBAS", modulos: 4, accesos: "AMBOS_EXTREMOS", niveles: 1, ...extra,
 });
 
+const FORMULA = { calculo: "FORMULA" as const, motivo: "SIN_PLANTA" as const, pasillosSinColocar: [] };
+
 const mapa: Pick<MapaAlmacen, "zonas"> = {
     zonas: [
-        { zonaId: "Z1", zona: "APQ", funcion: "RESERVA", pasillos: [pasillo("A"), pasillo("B", { caras: "IZQUIERDA" })] },
-        { zonaId: "Z2", zona: "PIC", funcion: "PICKING", pasillos: [pasillo("C", { caras: "DERECHA", modulos: 2 })] },
+        { zonaId: "Z1", zona: "APQ", funcion: "RESERVA", accesibilidad: FORMULA, pasillos: [pasillo("A"), pasillo("B", { caras: "IZQUIERDA" })] },
+        { zonaId: "Z2", zona: "PIC", funcion: "PICKING", accesibilidad: FORMULA, pasillos: [pasillo("C", { caras: "DERECHA", modulos: 2 })] },
     ],
 };
 
@@ -25,7 +28,7 @@ const colocado = (pasilloId: string, x: number, y: number, giro: PasilloEnPlanta
     ({ pasilloId, x, y, giro, medidas: {} });
 
 const planta = (pasillos: PasilloEnPlanta[] = [], extra: Partial<PlantaAlmacen> = {}): PlantaAlmacen => ({
-    ancho: 30, largo: 20, medidas: M, pasillos, elementos: [], ...extra,
+    ancho: 30, largo: 20, medidas: M, metrosNivel: 3, pasillos, elementos: [], ...extra,
 });
 
 describe("geometría de la planta real", () => {
@@ -115,7 +118,7 @@ describe("edición de la planta", () => {
 
     it("avisa de solapes y de piezas fuera de la nave", () => {
         const p = planta([colocado("A", 0, 0), colocado("B", 3, 0)], {
-            elementos: [{ tipo: "MUELLE", nombre: "Muelle 1", x: 28, y: 0, ancho: 4, largo: 3 }],
+            elementos: [{ tipo: "MUELLE", nombre: "Muelle 1", x: 28, y: 0, ancho: 4, largo: 3, ubicaciones: [] }],
         });
         expect(avisosPlanta(mapa, p)).toEqual([
             "Muelle 1 se sale de la nave",
@@ -135,5 +138,61 @@ describe("edición de la planta", () => {
         expect(api.pasillos[0].medidas).toEqual({ largo_modulo: null, fondo: 1.2, ancho_pasillo: null });
         expect(plantaDesdeApi(api)).toEqual(p);
         expect(plantaDesdeApi(null)).toBeNull();
+    });
+});
+
+describe("distancia real", () => {
+    const zona = (accesibilidad: MapaAlmacen["zonas"][number]["accesibilidad"], pasillos = [pasillo("A")]) =>
+        ({ zonaId: "Z1", zona: "APQ", funcion: "RESERVA", pasillos, accesibilidad });
+    const ubi = (id: string, zonaId: string) => ({
+        ubicacionId: id, ubicacion: id, zonaId, pasilloId: null, modulo: null, nivel: null, hueco: null, formato: null,
+        bloqueada: false, cantidad: 0, articulos: [], claseArticulo: null, clasesAlmacenamiento: [], accesibilidad: null,
+        claseUbicacion: null, metrosSalida: null, metrosEntrada: null, pickingFijo: null,
+    });
+    const real: MapaAlmacen = {
+        zonas: [
+            { zonaId: "SAL", zona: "SAL", funcion: "EXPEDICION", pasillos: [], accesibilidad: FORMULA },
+            { zonaId: "REC", zona: "REC", funcion: "RECEPCION", pasillos: [], accesibilidad: FORMULA },
+        ],
+        ubicaciones: [ubi("MU-2", "SAL"), ubi("MU-1", "REC"), ubi("MU-3", "REC")],
+        planta: null,
+    };
+    const muelle = (ubicaciones: string[]) =>
+        ({ tipo: "MUELLE" as const, nombre: "M", x: 0, y: 0, ancho: 4, largo: 3, ubicaciones });
+
+    it("avisa de por qué una zona usa la fórmula", () => {
+        expect(avisoAccesibilidad(zona({ calculo: "DISTANCIA", motivo: null, pasillosSinColocar: [] }))).toBeNull();
+        expect(avisoAccesibilidad(zona({ calculo: "FORMULA", motivo: "PASILLOS_SIN_COLOCAR", pasillosSinColocar: ["C"] })))
+            .toBe("APQ: accesibilidad estimada (fórmula); falta colocar en la planta el pasillo C");
+        expect(avisoAccesibilidad(zona(FORMULA, []))).toBeNull();
+        expect(avisosAccesibilidad({ zonas: [zona(FORMULA)], ubicaciones: [], planta: null })).toHaveLength(1);
+        const sinSalida = { calculo: "FORMULA" as const, motivo: "SIN_SALIDA" as const, pasillosSinColocar: [] };
+        const conPlanta = { ...planta(), elementos: [] };
+        expect(avisosAccesibilidad({
+            zonas: [zona(sinSalida), { ...zona(sinSalida), zonaId: "Z2", zona: "PIC" }], ubicaciones: [], planta: conPlanta,
+        })).toEqual(["APQ, PIC: accesibilidad estimada (fórmula); no hay punto de salida en la planta (un elemento con ubicaciones de preparación o expedición)"]);
+    });
+
+    it("distancias del hueco", () => {
+        expect(textoDistancias({ metrosSalida: 23.4, metrosEntrada: 41 })).toBe("A 23 m de la salida · 41 m de la recepción");
+        expect(textoDistancias({ metrosSalida: null, metrosEntrada: null })).toBeNull();
+    });
+
+    it("vincular ubicaciones: cada una en un solo elemento; uso por la función de su zona", () => {
+        let p = planta([], { elementos: [muelle(["MU-1"]), muelle([])] });
+        expect(sinVincular(real, p).map((u) => u.ubicacionId)).toEqual(["MU-2", "MU-3"]);
+        p = vincularUbicaciones(p, 1, ["MU-1", "MU-2"]);
+        expect(p.elementos.map((e) => e.ubicaciones)).toEqual([[], ["MU-1", "MU-2"]]);
+        expect(usoElemento(real, p.elementos[1])).toEqual({ salida: true, entrada: true });
+        expect(avisosDistancia(real, p)).toEqual(["Ubicaciones sin pasillo sin situar en la planta: MU-3"]);
+        expect(avisosDistancia(real, planta())[0]).toMatch(/No hay punto de salida/);
+    });
+
+    it("paradas en elementos, en su centro", () => {
+        const p = planta([], { elementos: [{ ...muelle(["MU-1"]), x: 10, y: 2 }] });
+        const recorrido = { ordenId: "T1", estado: "", modulosRecorridos: 0, pasillosCruzados: 0, paradas: [
+            { secuencia: 2, ubicacionId: "MU-1", ubicacion: "MU-1", accion: "DEJAR" as const },
+        ] } as unknown as Parameters<typeof paradasEnElementos>[0];
+        expect(paradasEnElementos(recorrido, p)).toEqual([{ secuencia: 2, ubicacion: "MU-1", accion: "DEJAR", x: 12, y: 3.5 }]);
     });
 });

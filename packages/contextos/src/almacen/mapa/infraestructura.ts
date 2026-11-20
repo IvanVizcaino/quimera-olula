@@ -3,8 +3,9 @@ import { construirQuery } from "#/almacen/slotting/dominio.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import {
     CarasPasillo, ElementoPlanta, GetMapa, Giro, GuardarPlanta, MapaAlmacen, MedidasPlanta, MedidasPropias,
-    PlantaAlmacen, UbicacionMapa, ZonaMapa,
+    MotivoFormula, PlantaAlmacen, UbicacionMapa, ZonaMapa,
 } from "./diseño.ts";
+import { METROS_NIVEL_POR_DEFECTO } from "./dominio.ts";
 
 const baseUrl = `/almacen/mapa`;
 
@@ -18,11 +19,18 @@ interface PasilloMapaApi {
     niveles: number;
 }
 
+interface CalculoZonaApi {
+    calculo: "DISTANCIA" | "FORMULA";
+    motivo: MotivoFormula | null;
+    pasillos_sin_colocar: string[];
+}
+
 interface ZonaMapaApi {
     zona_id: string;
     zona: string;
     funcion: string;
     pasillos: PasilloMapaApi[];
+    accesibilidad?: CalculoZonaApi;
 }
 
 interface UbicacionMapaApi {
@@ -41,6 +49,8 @@ interface UbicacionMapaApi {
     clases_almacenamiento: string[];
     accesibilidad: number | null;
     clase_ubicacion: ClaseAbc | null;
+    metros_salida?: number | null;
+    metros_entrada?: number | null;
     picking_fijo: { articulo_id: string; minimo: number; maximo: number } | null;
 }
 
@@ -54,6 +64,7 @@ interface PlantaApi {
     ancho: number;
     largo: number;
     medidas: MedidasApi;
+    metros_nivel?: number;
     pasillos: { pasillo_id: string; x: number; y: number; giro: number; medidas: MedidasApi }[];
     elementos: ElementoPlanta[];
 }
@@ -84,10 +95,11 @@ export const plantaDesdeApi = (p: PlantaApi | null | undefined): PlantaAlmacen |
             ancho: p.ancho,
             largo: p.largo,
             medidas: medidasDesdeApi(p.medidas),
+            metrosNivel: p.metros_nivel ?? METROS_NIVEL_POR_DEFECTO,
             pasillos: p.pasillos.map((c) => ({
                 pasilloId: c.pasillo_id, x: c.x, y: c.y, giro: giroDesdeApi(c.giro), medidas: propiasDesdeApi(c.medidas),
             })),
-            elementos: p.elementos.map((e) => ({ ...e })),
+            elementos: p.elementos.map((e) => ({ ...e, ubicaciones: e.ubicaciones ?? [] })),
         }
         : null;
 
@@ -101,6 +113,7 @@ export const plantaAApi = (p: PlantaAlmacen): PlantaApi => ({
     ancho: p.ancho,
     largo: p.largo,
     medidas: medidasAApi(p.medidas),
+    metros_nivel: p.metrosNivel,
     pasillos: p.pasillos.map((c) => ({ pasillo_id: c.pasilloId, x: c.x, y: c.y, giro: c.giro, medidas: medidasAApi(c.medidas) })),
     elementos: p.elementos,
 });
@@ -109,6 +122,13 @@ const zonaDesdeApi = (z: ZonaMapaApi): ZonaMapa => ({
     zonaId: z.zona_id,
     zona: z.zona,
     funcion: z.funcion,
+    accesibilidad: z.accesibilidad
+        ? {
+            calculo: z.accesibilidad.calculo,
+            motivo: z.accesibilidad.motivo,
+            pasillosSinColocar: z.accesibilidad.pasillos_sin_colocar ?? [],
+        }
+        : { calculo: "FORMULA", motivo: "SIN_PLANTA", pasillosSinColocar: [] },
     pasillos: z.pasillos.map((p) => ({
         pasilloId: p.pasillo_id,
         pasillo: p.pasillo,
@@ -136,6 +156,8 @@ const ubicacionDesdeApi = (u: UbicacionMapaApi): UbicacionMapa => ({
     clasesAlmacenamiento: u.clases_almacenamiento,
     accesibilidad: u.accesibilidad,
     claseUbicacion: u.clase_ubicacion,
+    metrosSalida: u.metros_salida ?? null,
+    metrosEntrada: u.metros_entrada ?? null,
     pickingFijo: u.picking_fijo
         ? { articuloId: u.picking_fijo.articulo_id, minimo: u.picking_fijo.minimo, maximo: u.picking_fijo.maximo }
         : null,
