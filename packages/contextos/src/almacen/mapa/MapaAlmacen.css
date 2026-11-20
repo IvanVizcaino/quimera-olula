@@ -651,6 +651,8 @@
         stroke-width: 0.75;
     }
 
+    /* Línea intermitente: se puede pasar (muelle, puerta, otro), como el suelo de los pasillos.
+       Continua: no se puede (columna, oficina). Así lo trata el cálculo de distancias. */
     .mapa-elemento rect {
         fill: var(--color-borde-sutil);
         fill-opacity: 0.6;
@@ -659,9 +661,13 @@
         stroke-dasharray: 4 2;
     }
 
+    .mapa-elemento-columna rect,
+    .mapa-elemento-oficina rect {
+        stroke-dasharray: none;
+    }
+
     .mapa-elemento-columna rect {
         fill: var(--color-texto-secundario);
-        stroke-dasharray: none;
     }
 
     .mapa-elemento-muelle rect {
@@ -840,6 +846,9 @@
     .mapa-elemento.elegido rect {
         stroke: var(--color-accion, var(--color-primario-oscuro));
         stroke-width: 3;
+    }
+
+    .elegido .mapa-pasillo-contorno {
         stroke-dasharray: none;
     }
 
@@ -854,6 +863,9 @@
     .mapa-elemento:focus-visible rect {
         stroke: var(--color-accion, var(--color-primario-oscuro));
         stroke-width: 3;
+    }
+
+    .mapa-pasillo-real:focus-visible .mapa-pasillo-contorno {
         stroke-dasharray: none;
     }
 }
@@ -1009,11 +1021,12 @@
 
 /* Puntos de salida y de entrada: borde continuo y marcado */
 .MapaAlmacen .mapa-planta-real {
+    /* Puntos de salida y de entrada: trazo más oscuro y grueso; la línea sigue intermitente si es
+       transitable (y la segunda línea del texto dice «salida»/«entrada») */
     .mapa-elemento.uso-salida rect,
     .mapa-elemento.uso-entrada rect {
         stroke: var(--mapa-texto);
         stroke-width: 2;
-        stroke-dasharray: none;
     }
 
     .mapa-elemento-ficha rect {
