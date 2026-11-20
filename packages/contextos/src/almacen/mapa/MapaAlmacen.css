@@ -896,6 +896,7 @@
         /* Etiquetas largas ("Fondo de estantería (m)"): una por fila; X/Y y ancho/largo, por parejas */
         [nombre="elementoNombre"],
         [nombre="elementoTipo"],
+        [nombre="metrosNivel"],
         [nombre^="planta-"],
         [nombre^="pasillo-"] {
             grid-column: 1 / -1;
@@ -983,6 +984,9 @@
     margin: 0;
     padding: var(--espaciado-xs) var(--espaciado-m);
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xxs);
     border-left: 3px solid var(--color-advertencia);
     background: var(--color-superficie-sunken);
     border-radius: var(--redondeo-borde-xs);
@@ -1018,11 +1022,6 @@
         stroke-width: 1;
     }
 
-    .mapa-elemento-ficha.seleccionada rect {
-        stroke: var(--color-accion, var(--color-primario-oscuro));
-        stroke-width: 3;
-    }
-
     .mapa-elemento-ficha[role="button"] {
         cursor: pointer;
     }
@@ -1032,21 +1031,36 @@
         stroke-width: 2;
     }
 
-    .mapa-elemento-ficha:focus {
-        outline: none;
-    }
-
-    .mapa-elemento-ficha:focus-visible rect {
+    /* Después del hover: la ficha seleccionada conserva su marca aunque el puntero esté encima */
+    .mapa-elemento-ficha.seleccionada rect {
         stroke: var(--color-accion, var(--color-primario-oscuro));
         stroke-width: 3;
     }
 
+    .mapa-elemento-ficha:focus {
+        outline: none;
+    }
+
+    /* Foco de teclado como en las celdas del alzado, distinto del azul de la seleccionada */
+    .mapa-elemento-ficha:focus-visible rect {
+        stroke: var(--color-borde-focus, var(--color-primario));
+        stroke-width: 3;
+    }
+
+    /* 0.6 m = ~10 px a 16 px/m (0.5 quedaba en 8 px); cabe en la ficha de 0.8 m de alto */
     .mapa-elemento-ficha text {
-        font-size: 0.5px;
+        font-size: 0.6px;
+        font-weight: 600;
         text-anchor: middle;
         dominant-baseline: central;
         fill: var(--mapa-texto);
         pointer-events: none;
+    }
+
+    /* Texto blanco sobre los tonos saturados, como .mapa-ficha (sin halo claro alrededor) */
+    .mapa-elemento-ficha:is(.tono-lleno, .tono-mezcla, .tono-c, .tono-bajo-minimo, .tono-bloqueada, .tono-clase-0, .tono-clase-3) text {
+        fill: #fff;
+        stroke: none;
     }
 }
 
@@ -1064,7 +1078,24 @@
         gap: var(--espaciado-s);
     }
 
-    [nombre="elementoUbicacion"] {
-        grid-column: 1 / -1;
+    ul:not(:empty) {
+        padding-bottom: var(--espaciado-xs);
     }
+
+    /* El .botones del editor ya lleva padding-bottom; el del contenedor basta */
+    .botones {
+        padding-bottom: 0;
+    }
+}
+
+/* Con el prefijo del editor: la regla genérica `quimera-formulario [nombre]` (span 6) pesa más que
+   un selector suelto, y el select con "MUELLE-01 · Zona" necesita la fila entera */
+.MapaAlmacen .mapa-editor-planta .mapa-editor-ubicaciones quimera-formulario [nombre="elementoUbicacion"] {
+    grid-column: 1 / -1;
+}
+
+/* Segunda línea del elemento: punto de salida o de entrada */
+.MapaAlmacen .mapa-planta-real .mapa-elemento .mapa-elemento-uso {
+    font-size: 0.6px;
+    font-style: italic;
 }

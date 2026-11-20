@@ -173,7 +173,11 @@ export const PlantaReal = ({
                         >
                             <rect x={el.x} y={el.y} width={el.ancho} height={el.largo} />
                             <text x={el.x + el.ancho / 2} y={conFichas ? el.y + 0.6 : el.y + el.largo / 2}>
-                                {el.nombre}{textoUso ? ` · ${textoUso}` : ""}
+                                {el.nombre}
+                                {/* El uso en otra línea: con el nombre en la misma desbordaría un muelle de 4 m. */}
+                                {textoUso && (
+                                    <tspan className="mapa-elemento-uso" x={el.x + el.ancho / 2} dy={0.8}>{textoUso}</tspan>
+                                )}
                             </text>
                             <title>{`${el.nombre} (${el.ancho} × ${el.largo} m)${textoUso ? `, punto de ${textoUso}` : ""}`}</title>
                         </g>
@@ -182,9 +186,13 @@ export const PlantaReal = ({
                                 {el.ubicaciones.map((id, i) => {
                                     const u = ubicacionPorId.get(id);
                                     if (!u) return null;
-                                    const ancho = Math.max(Math.min(el.ancho - 0.4, 3), 0.5);
+                                    const ancho = Math.max(Math.min(el.ancho - 0.4, 3.4), 0.5);
                                     const x = el.x + (el.ancho - ancho) / 2;
-                                    const y = el.y + 1.1 + i * 1.0;
+                                    // Bajo el nombre (y el uso), repartidas en el alto que queda.
+                                    const inicio = el.y + (textoUso ? 1.9 : 1.1);
+                                    const paso = Math.min(1.0, Math.max(el.largo - (inicio - el.y) - 0.1, 0.4) / el.ubicaciones.length);
+                                    const alto = paso * 0.8;
+                                    const y = inicio + i * paso;
                                     const interactiva = !edicion && onUbicacion;
                                     return (
                                         <g
@@ -193,6 +201,7 @@ export const PlantaReal = ({
                                             {...(interactiva
                                                 ? {
                                                     role: "button",
+                                                    "aria-pressed": u.ubicacionId === ubicacionId,
                                                     tabIndex: 0,
                                                     "aria-label": resumenUbicacion(u).replace(/\n/g, ". "),
                                                     onClick: () => onUbicacion(u.ubicacionId),
@@ -205,8 +214,8 @@ export const PlantaReal = ({
                                                 }
                                                 : {})}
                                         >
-                                            <rect x={x} y={y} width={ancho} height={0.8} rx={0.15} />
-                                            <text x={x + ancho / 2} y={y + 0.4}>{u.ubicacion}</text>
+                                            <rect x={x} y={y} width={ancho} height={alto} rx={0.15} />
+                                            <text x={x + ancho / 2} y={y + alto / 2}>{u.ubicacion}</text>
                                             <title>{resumenUbicacion(u)}</title>
                                         </g>
                                     );
