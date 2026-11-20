@@ -7,13 +7,16 @@ import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useEffect, useRef } from "react";
 import { CambiarContrasenaUsuario } from "../cambiar_contrasena/CambiarContrasenaUsuario.js";
+import { CambiarPlanTenant } from "../cambiar_plan/CambiarPlanTenant.js";
 import { DarDeBajaTenant } from "../dar_de_baja/DarDeBajaTenant.js";
 import { Tenant } from "../diseño.js";
 import {
     etiquetaEstadoTenant, migracionesPendientes, puedeDarDeBaja, puedeEliminarBd, puedeReactivar,
     puedeSuspender, varianteEstadoTenant,
 } from "../dominio.js";
+import { EditarExcepcionLimite } from "../editar_excepcion/EditarExcepcionLimite.js";
 import { EliminarBdTenant } from "../eliminar_bd/EliminarBdTenant.js";
+import { QuitarExcepcionLimite } from "../quitar_excepcion/QuitarExcepcionLimite.js";
 import { contextoDetalleTenantInicial, guardarTenant, metaTenant } from "./detalle.js";
 import "./DetalleTenant.css";
 import { getMaquina } from "./maquina.js";
@@ -21,6 +24,7 @@ import { TabAuditoria } from "./TabAuditoria.js";
 import { TabGeneral } from "./TabGeneral.js";
 import { TabHistorial } from "./TabHistorial.js";
 import { TabModulos } from "./TabModulos.js";
+import { TabSuscripcion } from "./suscripcion/TabSuscripcion.js";
 import { TabUsuarios } from "./TabUsuarios.js";
 
 const INTERVALO_SONDEO_MS = 2000;
@@ -134,6 +138,16 @@ export const DetalleTenant = ({
                             />
                         }
                     />,
+                    <Tab label="Suscripción" key="tab-suscripcion"
+                        children={
+                            <TabSuscripcion
+                                datos={ctx.suscripcion}
+                                error={ctx.suscripcionError}
+                                editable={operativa}
+                                publicar={emitir}
+                            />
+                        }
+                    />,
                     <Tab label="Usuarios" key="tab-usuarios"
                         children={
                             <TabUsuarios
@@ -158,6 +172,20 @@ export const DetalleTenant = ({
             )}
             {estado === "ELIMINANDO_BD" && (
                 <EliminarBdTenant tenant={tenant} publicar={emitir} />
+            )}
+            {estado === "CAMBIANDO_PLAN" && (
+                <CambiarPlanTenant idTenant={tenant.id} datos={ctx.suscripcion} publicar={emitir} />
+            )}
+            {estado === "EDITANDO_EXCEPCION" && ctx.suscripcion?.derechos && (
+                <EditarExcepcionLimite
+                    idTenant={tenant.id}
+                    excepcion={ctx.excepcion}
+                    limites={ctx.suscripcion.derechos.limites}
+                    publicar={emitir}
+                />
+            )}
+            {estado === "QUITANDO_EXCEPCION" && ctx.excepcion && (
+                <QuitarExcepcionLimite idTenant={tenant.id} excepcion={ctx.excepcion} publicar={emitir} />
             )}
             {estado === "CAMBIANDO_CONTRASENA" && ctx.usuarioContrasena && (
                 <CambiarContrasenaUsuario

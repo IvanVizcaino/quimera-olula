@@ -1,10 +1,12 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { PesoMedida } from "#/almacen/comun/componentes/PesoMedida.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { plugin } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useContext, useEffect } from "react";
 import { useParams } from "react-router";
@@ -79,6 +81,9 @@ export const DetalleFamilia = ({
                       label="Descripción"
                       {...familia.uiProps("descripcion")}
                     />
+                    {plugin("pesos_medidas") === "activo" && (
+                      <PesoMedida {...familia.uiProps("unidadId")} />
+                    )}
                   </quimera-formulario>
                 </Tab>,
               ]}

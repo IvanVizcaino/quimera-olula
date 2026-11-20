@@ -1,4 +1,4 @@
-import { configuracion, puede } from "@olula/lib/dominio.ts";
+import { configuracion, formatearMoneda, puede } from "@olula/lib/dominio.ts";
 import { SubcuentaTercero } from "./diseño.ts";
 
 /** La pestaña Contabilidad de cliente y proveedor sólo se ve con contabilidad
@@ -17,3 +17,13 @@ export const subcuentaInicial = (
             !elegida || s.ejercicioId > elegida.ejercicioId ? s : elegida,
         null
     );
+
+/** Texto de la subcuenta en el combo: «ejercicio · subcuenta · saldo». */
+export const descripcionOpcionSubcuenta = (s: SubcuentaTercero): string =>
+    `${s.ejercicioId} · ${s.codigoSubcuenta} · ${formatearMoneda(s.saldo ?? 0, "EUR")}`;
+
+/** Opciones del combo de subcuentas por ejercicio, del más reciente al más antiguo. */
+export const opcionesSubcuentas = (subcuentas: SubcuentaTercero[]) =>
+    [...subcuentas]
+        .sort((a, b) => b.ejercicioId.localeCompare(a.ejercicioId))
+        .map((s) => ({ valor: s.id, descripcion: descripcionOpcionSubcuenta(s) }));

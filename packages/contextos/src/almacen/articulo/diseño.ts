@@ -14,6 +14,8 @@ export interface ArticuloItem extends Entidad {
     tipoCodBarras: TipoCodBarras | "";
     familiaId: string;
     descripcionFamilia: string;
+    /** Unidad de peso o medida ("" si no tiene). Solo con el plugin pesos_medidas. */
+    unidadId: string;
     noStock: boolean;
     seCompra: boolean;
     seVende: boolean;
@@ -67,6 +69,7 @@ export type CambiosArticulo = Partial<
         | "codbarras"
         | "tipoCodBarras"
         | "familiaId"
+        | "unidadId"
         | "noStock"
         | "seCompra"
         | "seVende"

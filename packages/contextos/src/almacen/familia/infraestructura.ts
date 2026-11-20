@@ -13,12 +13,19 @@ import {
 const baseUrlFamilia = `/almacen/familia`;
 
 export const moduloFromApi = (moduloApi: FamiliaAPI): Familia => ({
-    ...moduloApi,
+    id: moduloApi.id,
+    descripcion: moduloApi.descripcion,
+    unidadId: moduloApi.unidad_id ?? "",
 });
 
-export const moduloToApi = (modulo: Familia): FamiliaAPI => ({
-    ...modulo,
-});
+export const moduloToApi = (modulo: Partial<Familia>): FamiliaAPI => {
+    const { unidadId, ...resto } = modulo;
+    return {
+        ...resto,
+        // Sin el plugin pesos_medidas la unidad no viaja (el servidor la ignora igualmente).
+        ...(unidadId !== undefined ? { unidad_id: unidadId || null } : {}),
+    } as FamiliaAPI;
+};
 
 export const getFamilia: GetFamilia = async (id) =>
     await RestAPI.get<{ datos: FamiliaAPI }>(`${baseUrlFamilia}/${id}`).then((respuesta) =>
@@ -36,13 +43,13 @@ export const getFamilias: GetFamilias = async (
 };
 
 export const postFamilia: PostFamilia = async (modulo) => {
-    return await RestAPI.post(baseUrlFamilia, modulo, "Error al guardar Familia").then(
+    return await RestAPI.post(baseUrlFamilia, moduloToApi(modulo), "Error al guardar Familia").then(
         (respuesta) => respuesta.id
     );
 };
 
 export const patchFamilia: PatchFamilia = async (id, modulo) => {
-    const apiFamilia = moduloToApi(modulo as Familia);
+    const apiFamilia = moduloToApi(modulo);
     const moduloSinNulls = Object.fromEntries(
         Object.entries(apiFamilia).map(([k, v]) => [k, v === null ? "" : v])
     );

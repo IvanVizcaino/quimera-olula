@@ -3,11 +3,14 @@ import { Entidad, Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/d
 export interface Familia extends Entidad {
     id: string;
     descripcion: string;
+    /** Unidad de peso o medida por defecto de sus artículos ("" si no tiene). Plugin pesos_medidas. */
+    unidadId: string;
 }
 
 export interface FamiliaAPI extends Entidad {
     id: string;
     descripcion: string;
+    unidad_id?: string | null;
 }
 
 export type GetFamilia = (id: string) => Promise<Familia>;
@@ -24,4 +27,5 @@ export type DeleteFamilia = (id: string) => Promise<void>;
 export type NuevaFamilia = {
     id: string;
     descripcion: string;
+    unidadId: string;
 };

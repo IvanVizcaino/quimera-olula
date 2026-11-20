@@ -1,0 +1,18 @@
+.TabVistaPreviaPlan {
+    .tarjeta-plan-previa {
+        max-width: 360px;
+        border: 1px solid var(--color-borde, #e0e0e0);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+    .tarjeta-plan-previa.destacado { border-color: var(--color-primario, #2563eb); border-width: 2px; }
+    .tarjeta-plan-cabecera { display: flex; align-items: center; gap: 8px; }
+    .tarjeta-plan-cabecera h3 { margin: 0; }
+    .tarjeta-plan-descripcion { opacity: 0.8; }
+    .precio-mensual { font-size: 1.8em; font-weight: 700; }
+    .precio-anual { font-size: 0.9em; opacity: 0.75; }
+    h4 { margin: 12px 0 4px; }
+    ul { margin: 0; padding-left: 18px; }
+    .tarjeta-plan-estado { margin-top: 12px; }
+}

@@ -159,9 +159,11 @@ bunch:
       path: enviando 
       value: 
         const: false
-    - _type: alert 
-      text: Error al enviar correo
-      severity: error
+    # - _type: alert 
+    #   text: Error al enviar correo
+    #   severity: error
+    - _type: grape
+      name: mostrarErrorEnvioEmail
     - _type: grape
       name: onCancelarEnviarEmailClicked
   setNuevoEmail:  

@@ -17,7 +17,7 @@ export default parent => {
         },
       },
       chipTo: {
-        color: "#00000",
+        color: "#000000",
         borderRadius: 16,
         display: "flex",
         flexDirection: "column",

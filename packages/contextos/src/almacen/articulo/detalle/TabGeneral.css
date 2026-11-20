@@ -11,7 +11,8 @@
         grid-column: span 9;
     }
 
-    quimera-select[nombre="familiaId"] {
+    quimera-select[nombre="familiaId"],
+    quimera-select[nombre="unidadId"] {
         grid-column: span 4;
     }
 

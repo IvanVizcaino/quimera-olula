@@ -24,7 +24,8 @@ export const TabCrmContactosLista = ({
       <ListadoSemiControlado
         metaTabla={metaTablaCrmContactos}
         tarjeta={TarjetaCrmContacto}
-        modosDisponibles={["tarjetas"]}
+        modoInicial="tabla"
+        modosDisponibles={["tabla"]}
         entidades={contactos}
         totalEntidades={contactos.length}
         cargando={cargando}

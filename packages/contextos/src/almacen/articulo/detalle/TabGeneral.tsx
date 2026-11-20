@@ -1,4 +1,5 @@
 import { Familia } from "#/almacen/comun/componentes/Familia.tsx";
+import { PesoMedida } from "#/almacen/comun/componentes/PesoMedida.tsx";
 import { TipoCodBarras } from "#/comun/componentes/tipoCodBarras.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -21,6 +22,7 @@ export const TabGeneral = ({
 }) => {
   const { uiProps } = form;
   const sgaActivo = plugin("sga") === "activo";
+  const pesosMedidasActivo = plugin("pesos_medidas") === "activo";
   
   return (
     <div className="TabGeneral">
@@ -34,6 +36,7 @@ export const TabGeneral = ({
         />
         <QInput label="Descripción" {...uiProps("descripcion")} />
         <Familia {...uiProps("familiaId")} />
+        {pesosMedidasActivo && <PesoMedida {...uiProps("unidadId")} />}
         <QInput label="Código de barras" {...uiProps("codbarras")} />
         <TipoCodBarras {...uiProps("tipoCodBarras")} />
         <QCheckbox label="No controla stock" {...uiProps("noStock")} />

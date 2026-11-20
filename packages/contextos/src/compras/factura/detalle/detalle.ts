@@ -57,6 +57,7 @@ export const metaFactura: MetaModelo<Factura> = {
         deAbono: { tipo: "checkbox" },
         servicios: { tipo: "checkbox" },
         noGenerarAsiento: { tipo: "checkbox" },
+        inversionSujetoPasivo: { tipo: "checkbox" },
         neto: { tipo: "moneda", bloqueado: true },
         totalIva: { tipo: "moneda", bloqueado: true },
         totalRecargo: { tipo: "moneda", bloqueado: true },
@@ -103,6 +104,7 @@ export const facturaVacia = (): Factura => ({
     editable: true,
     servicios: false,
     noGenerarAsiento: false,
+    inversionSujetoPasivo: false,
     asientoId: null,
     observaciones: null,
     estadoExpedicion: '',
@@ -142,6 +144,7 @@ export const guardarFactura = async (
         "deAbono",
         "servicios",
         "noGenerarAsiento",
+        "inversionSujetoPasivo",
     ];
 
     const cambios = Object.fromEntries(

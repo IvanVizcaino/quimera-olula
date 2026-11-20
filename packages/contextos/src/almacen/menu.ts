@@ -7,6 +7,13 @@ export const menuAlmacen = {
     "Almacén/Almacenes": { url: "/almacen/almacenes", regla: "almacen.almacen" },
     "Almacén/Cajas": { url: "/almacen/cajas", regla: "almacen.caja", plugin: "sga" },
     "Almacén/Familias": { url: "/almacen/familias", regla: "almacen.familia" },
+    // Extensión pesos_medidas de Eneboo: solo con su plugin activo.
+    "Almacén/Unidades de pesos y medidas": {
+        alias: ["unidades", "medidas", "pesos"],
+        url: "/almacen/pesos_medidas",
+        regla: "almacen.peso_medida",
+        plugin: "pesos_medidas",
+    },
     "Almacén/Transferencias de Stock": { url: "/almacen/transferencias", regla: "almacen.transferencia_stock.leer" },
     "Almacén/Órdenes": { url: "/almacen/ordenes", regla: "almacen.orden.leer", plugin: "sga" },
     "Almacén/Pedidos de Compra": { url: "/almacen/pedidos_compra", regla: "almacen.pedido_compra.leer", plugin: "sga" },
@@ -21,5 +28,4 @@ export const menuAlmacen = {
     "Almacén/Reposición de picking": { url: "/almacen/reposicion", regla: "almacen.picking_fijo", plugin: "sga" },
     "Almacén/Slotting": { url: "/almacen/slotting", regla: "almacen.picking_fijo", plugin: "sga" },
     "Almacén/Zonas": { url: "/almacen/zonas", regla: "almacen.zona", plugin: "sga" },
-    "Almacén/Configuración": { alias: ["IVA por defecto"], url: "/almacen/config", regla: "almacen.config" },
 };
