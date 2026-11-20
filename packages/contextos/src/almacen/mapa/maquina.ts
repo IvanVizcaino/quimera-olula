@@ -96,8 +96,14 @@ const cambiarOrden: ProcesarMapa = async (ctx, payload) => ({ ...ctx, ordenId: (
 
 /** Con planta, el camino a pie entre las paradas (en su orden). */
 const conTrazado: ProcesarMapa = async (ctx) => {
-    if (!ctx.recorrido || !ctx.mapa?.planta || ctx.recorrido.paradas.length < 2) return { ...ctx, trazado: null };
-    const ubicaciones = [...ctx.recorrido.paradas].sort((a, b) => a.secuencia - b.secuencia).map((p) => p.ubicacionId);
+    if (!ctx.recorrido || !ctx.mapa?.planta || ctx.recorrido.paradas.length === 0) return { ...ctx, trazado: null };
+    // Desde el punto de inicio (muelle de salida o de recepción) y de vuelta al de fin, si los hay.
+    const { inicioUbicacionId, finUbicacionId } = ctx.recorrido;
+    const ubicaciones = [
+        ...(inicioUbicacionId ? [inicioUbicacionId] : []),
+        ...[...ctx.recorrido.paradas].sort((a, b) => a.secuencia - b.secuencia).map((p) => p.ubicacionId),
+        ...(finUbicacionId ? [finUbicacionId] : []),
+    ];
     return { ...ctx, trazado: await getTrazado(ctx.almacenId, ubicaciones) };
 };
 

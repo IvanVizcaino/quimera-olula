@@ -123,6 +123,7 @@ describe("mapa · capas", () => {
 describe("mapa · recorrido", () => {
     const recorrido: RecorridoOrden = {
         ordenId: "S1", estado: "PENDIENTE", modulosRecorridos: 10, pasillosCruzados: 2,
+        calculo: "FORMULA", motivo: "SIN_PLANTA", metros: null, inicioUbicacionId: null, finUbicacionId: null,
         paradas: [
             { secuencia: 1, ubicacionId: "1", ubicacion: "U1", zona: "PIC", pasillo: "P1", modulo: 1, nivel: 0, hueco: 1, accion: "RECOGER", lineas: [] },
             { secuencia: 2, ubicacionId: "2", ubicacion: "U2", zona: "PIC", pasillo: "P2", modulo: 3, nivel: 0, hueco: 1, accion: "RECOGER", lineas: [] },

@@ -7,6 +7,7 @@ import {
     DiferenciaPedidoOrden,
     ItemOrdenAlmacen,
     LineaOrdenAlmacen,
+    MotivoRecorridoFormula,
     NuevoEnvioAgencia,
     OrdenAlmacen,
 } from "./diseño.ts";
@@ -312,6 +313,23 @@ export const motivoRecorridoVacio = (r: { ordenId: string; estado: string }): st
 
 export const textoAccionParada = { RECOGER: "Recoger", DEJAR: "Dejar" } as const;
 
-export const resumenRecorrido = (r: { modulosRecorridos: number; pasillosCruzados: number }): string =>
-    `${plural(r.modulosRecorridos, "módulo recorrido", "módulos recorridos")}, ` +
-    plural(r.pasillosCruzados, "pasillo cruzado", "pasillos cruzados");
+const textoMotivoRecorrido: Record<MotivoRecorridoFormula, string> = {
+    SIN_PLANTA: "el almacén no tiene planta",
+    PARADAS_SIN_POSICION: "hay paradas en pasillos sin colocar en la planta",
+    SIN_CAMINO: "no hay camino a pie entre alguna de las paradas",
+};
+
+export const resumenRecorrido = (r: {
+    modulosRecorridos: number;
+    pasillosCruzados: number;
+    calculo?: "DISTANCIA" | "FORMULA";
+    motivo?: MotivoRecorridoFormula | null;
+    metros?: number | null;
+}): string => {
+    if (r.calculo === "DISTANCIA" && r.metros != null) {
+        return `${Math.round(r.metros).toLocaleString("es-ES")} m a pie, ordenado por la planta`;
+    }
+    const estimado = `${plural(r.modulosRecorridos, "módulo recorrido", "módulos recorridos")}, ` +
+        plural(r.pasillosCruzados, "pasillo cruzado", "pasillos cruzados");
+    return r.motivo && r.motivo !== "SIN_PLANTA" ? `${estimado} (estimado: ${textoMotivoRecorrido[r.motivo]})` : estimado;
+};

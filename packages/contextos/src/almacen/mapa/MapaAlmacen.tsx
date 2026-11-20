@@ -157,9 +157,11 @@ export const MapaAlmacen = () => {
                             <li>
                                 <span className="mapa-muestra mapa-muestra-recorrido" aria-hidden="true" />
                                 Recorrido {ctx.recorrido.ordenId}: {ctx.recorrido.paradas.length} paradas,{" "}
-                                {enPlanta && ctx.trazado?.metros != null
-                                    ? `${Math.round(ctx.trazado.metros).toLocaleString("es-ES")} m a pie`
-                                    : `${ctx.recorrido.modulosRecorridos} módulos`}
+                                {ctx.recorrido.calculo === "DISTANCIA" && ctx.recorrido.metros != null
+                                    ? `${Math.round(ctx.recorrido.metros).toLocaleString("es-ES")} m a pie, ordenado por la planta`
+                                    : enPlanta && ctx.trazado?.metros != null
+                                        ? `${Math.round(ctx.trazado.metros).toLocaleString("es-ES")} m a pie`
+                                        : `${ctx.recorrido.modulosRecorridos} módulos`}
                             </li>
                             <li>
                                 <span className="mapa-muestra mapa-muestra-parada mapa-parada-recoger" aria-hidden="true" />

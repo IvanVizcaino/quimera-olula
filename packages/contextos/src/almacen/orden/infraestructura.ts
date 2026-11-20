@@ -14,6 +14,7 @@ import {
     GetOrdenes,
     AccionParada,
     GetRecorridoOrden,
+    MotivoRecorridoFormula,
     RecorridoOrden,
     ItemOrdenAlmacen,
     LecturaCajaOrden,
@@ -690,6 +691,11 @@ export const getEtiquetaEnvio: GetEtiquetaEnvio = async (albaranId) =>
 export interface RecorridoOrdenApi {
     orden_id: string;
     estado?: string;
+    calculo?: "DISTANCIA" | "FORMULA";
+    motivo?: MotivoRecorridoFormula | null;
+    metros?: number | null;
+    inicio_ubicacion_id?: string | null;
+    fin_ubicacion_id?: string | null;
     modulos_recorridos: number;
     pasillos_cruzados: number;
     paradas: {
@@ -709,6 +715,11 @@ export interface RecorridoOrdenApi {
 export const recorridoOrdenDesdeApi = (r: RecorridoOrdenApi): RecorridoOrden => ({
     ordenId: r.orden_id,
     estado: r.estado ?? "",
+    calculo: r.calculo ?? "FORMULA",
+    motivo: r.motivo ?? null,
+    metros: r.metros ?? null,
+    inicioUbicacionId: r.inicio_ubicacion_id ?? null,
+    finUbicacionId: r.fin_ubicacion_id ?? null,
     modulosRecorridos: r.modulos_recorridos,
     pasillosCruzados: r.pasillos_cruzados,
     paradas: r.paradas.map((p) => ({

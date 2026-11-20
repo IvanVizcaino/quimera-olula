@@ -60,3 +60,13 @@ describe("motivoRecorridoVacio", () => {
             .toBe("La orden T1 no tiene nada pendiente en ubicaciones (pendiente).");
     });
 });
+
+describe("resumenRecorrido por distancia real", () => {
+    it("da los metros cuando se ordena por la planta y el motivo cuando no", () => {
+        expect(resumenRecorrido({ modulosRecorridos: 34, pasillosCruzados: 4, calculo: "DISTANCIA", metros: 45.6 }))
+            .toBe("46 m a pie, ordenado por la planta");
+        expect(resumenRecorrido({
+            modulosRecorridos: 34, pasillosCruzados: 4, calculo: "FORMULA", motivo: "PARADAS_SIN_POSICION",
+        })).toBe("34 módulos recorridos, 4 pasillos cruzados (estimado: hay paradas en pasillos sin colocar en la planta)");
+    });
+});
