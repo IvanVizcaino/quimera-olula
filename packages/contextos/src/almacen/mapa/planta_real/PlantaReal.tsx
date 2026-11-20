@@ -1,7 +1,7 @@
 import { KeyboardEvent, PointerEvent, useRef, useState } from "react";
 import { textoAccionParada } from "#/almacen/orden/dominio.ts";
 import {
-    CapaMapa, ElegidoPlanta, MapaAlmacen, PlantaAlmacen, PuntoRecorrido,
+    CapaMapa, ElegidoPlanta, MapaAlmacen, PlantaAlmacen, PuntoRecorrido, TrazadoRecorrido,
 } from "../diseño.ts";
 import {
     geometriaEnPlanta, letraModulo, ParadaEnElemento, PASO_PLANTA, puntoEnPlanta, resumenModulo, resumenUbicacion,
@@ -20,6 +20,8 @@ type Props = {
     recorrido: PuntoRecorrido[];
     /** Paradas en ubicaciones situadas en elementos (muelles, playas). */
     paradasElementos?: ParadaEnElemento[];
+    /** Camino a pie entre paradas; sin él, se unen en línea recta. */
+    trazado?: TrazadoRecorrido | null;
     onPasillo: (pasilloId: string) => void;
     /** Pulsar una ubicación situada en un elemento (solo fuera de la edición). */
     onUbicacion?: (ubicacionId: string) => void;
@@ -46,7 +48,7 @@ const FLECHAS: Record<string, [number, number]> = {
 
 /** Planta real de la nave, en metros: contorno con rejilla, elementos fijos y pasillos colocados. */
 export const PlantaReal = ({
-    mapa, planta, capa, paleta, zonaId, pasilloId, ubicacionId, recorrido, paradasElementos = [], onPasillo,
+    mapa, planta, capa, paleta, zonaId, pasilloId, ubicacionId, recorrido, paradasElementos = [], trazado, onPasillo,
     onUbicacion, edicion,
 }: Props) => {
     const zonaDe = new Map(mapa.zonas.flatMap((z) => z.pasillos.map((p) => [p.pasilloId, z.zonaId])));
@@ -115,12 +117,25 @@ export const PlantaReal = ({
             const p = pasillos.get(r.pasilloId);
             const c = planta.pasillos.find((x) => x.pasilloId === r.pasilloId);
             return p && c
-                ? [{ secuencia: r.secuencia, ubicacion: r.ubicacion, accion: r.accion, ...puntoEnPlanta(p, c, planta.medidas, r.modulo) }]
+                ? [{
+                    secuencia: r.secuencia, ubicacionId: r.ubicacionId, ubicacion: r.ubicacion, accion: r.accion,
+                    ...puntoEnPlanta(p, c, planta.medidas, r.modulo),
+                }]
                 : [];
         }),
         ...paradasElementos,
     ].sort((a, b) => a.secuencia - b.secuencia);
     const ubicacionPorId = new Map(mapa.ubicaciones.map((u) => [u.ubicacionId, u]));
+    // Por el camino del trazado; los tramos sin camino (o sin trazado), en recto entre paradas.
+    const puntoDe = new Map(puntos.map((p) => [p.ubicacionId, p]));
+    const lineas: { x: number; y: number }[][] = trazado?.tramos.length
+        ? trazado.tramos.flatMap((t) => {
+            if (t.puntos.length > 1) return [t.puntos];
+            const a = puntoDe.get(t.desde);
+            const b = puntoDe.get(t.hasta);
+            return a && b ? [[a, b]] : [];
+        })
+        : puntos.length > 1 ? [puntos] : [];
 
     const margen = 1;
 
@@ -328,9 +343,13 @@ export const PlantaReal = ({
                     );
                 })}
 
-                {puntos.length > 1 && (
-                    <polyline className="mapa-recorrido" points={puntos.map((t) => `${t.x},${t.y}`).join(" ")} />
-                )}
+                {lineas.map((linea, i) => (
+                    <polyline
+                        key={i}
+                        className={`mapa-recorrido${trazado ? " por-camino" : ""}`}
+                        points={linea.map((t) => `${t.x},${t.y}`).join(" ")}
+                    />
+                ))}
                 {puntos.map((r) => (
                     <g key={r.secuencia} className={`mapa-parada mapa-parada-${r.accion.toLowerCase()}`}>
                         <circle cx={r.x} cy={r.y} r={0.65} />

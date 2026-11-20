@@ -3,7 +3,7 @@ import { construirQuery } from "#/almacen/slotting/dominio.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import {
     CarasPasillo, ElementoPlanta, GetMapa, Giro, GuardarPlanta, MapaAlmacen, MedidasPlanta, MedidasPropias,
-    MotivoFormula, PlantaAlmacen, UbicacionMapa, ZonaMapa,
+    GetTrazado, MotivoFormula, PlantaAlmacen, TrazadoRecorrido, UbicacionMapa, ZonaMapa,
 } from "./diseño.ts";
 import { METROS_NIVEL_POR_DEFECTO } from "./dominio.ts";
 
@@ -178,4 +178,28 @@ export const getMapa: GetMapa = async (almacenId, dias, origen) => {
 
 export const guardarPlanta: GuardarPlanta = async (almacenId, planta) => {
     await RestAPI.put(`/almacen/planta/${encodeURIComponent(almacenId)}`, plantaAApi(planta), "Error al guardar la planta");
+};
+
+interface TrazadoApi {
+    metros: number | null;
+    tramos: { desde: string; hasta: string; metros: number | null; puntos: [number, number][] }[];
+    sin_posicion: string[];
+}
+
+export const trazadoDesdeApi = (t: TrazadoApi): TrazadoRecorrido => ({
+    metros: t.metros,
+    tramos: (t.tramos ?? []).map((tramo) => ({
+        desde: tramo.desde,
+        hasta: tramo.hasta,
+        metros: tramo.metros,
+        puntos: (tramo.puntos ?? []).map(([x, y]) => ({ x, y })),
+    })),
+    sinPosicion: t.sin_posicion ?? [],
+});
+
+export const getTrazado: GetTrazado = async (almacenId, ubicaciones) => {
+    const respuesta = await RestAPI.get<{ datos: TrazadoApi }>(
+        `${baseUrl}/trazado` + construirQuery({ almacen_id: almacenId, ubicaciones: ubicaciones.join(",") })
+    );
+    return trazadoDesdeApi(respuesta.datos);
 };

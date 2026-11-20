@@ -799,6 +799,7 @@ export const avisosDistancia = (mapa: MapaAlmacen, planta: PlantaAlmacen): strin
 
 export interface ParadaEnElemento {
     secuencia: number;
+    ubicacionId: string;
     ubicacion: string;
     accion: PuntoRecorrido["accion"];
     x: number;
@@ -810,6 +811,8 @@ export const paradasEnElementos = (recorrido: RecorridoOrden, planta: PlantaAlma
     const elementoDe = new Map(planta.elementos.flatMap((e) => e.ubicaciones.map((u) => [u, e] as const)));
     return recorrido.paradas.flatMap((p) => {
         const e = elementoDe.get(p.ubicacionId);
-        return e ? [{ secuencia: p.secuencia, ubicacion: p.ubicacion, accion: p.accion, x: e.x + e.ancho / 2, y: e.y + e.largo / 2 }] : [];
+        return e
+            ? [{ secuencia: p.secuencia, ubicacionId: p.ubicacionId, ubicacion: p.ubicacion, accion: p.accion, x: e.x + e.ancho / 2, y: e.y + e.largo / 2 }]
+            : [];
     });
 };

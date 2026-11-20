@@ -157,7 +157,9 @@ export const MapaAlmacen = () => {
                             <li>
                                 <span className="mapa-muestra mapa-muestra-recorrido" aria-hidden="true" />
                                 Recorrido {ctx.recorrido.ordenId}: {ctx.recorrido.paradas.length} paradas,{" "}
-                                {ctx.recorrido.modulosRecorridos} módulos
+                                {enPlanta && ctx.trazado?.metros != null
+                                    ? `${Math.round(ctx.trazado.metros).toLocaleString("es-ES")} m a pie`
+                                    : `${ctx.recorrido.modulosRecorridos} módulos`}
                             </li>
                             <li>
                                 <span className="mapa-muestra mapa-muestra-parada mapa-parada-recoger" aria-hidden="true" />
@@ -205,6 +207,7 @@ export const MapaAlmacen = () => {
                                 ubicacionId={ctx.ubicacionId}
                                 recorrido={editando ? [] : puntos}
                                 paradasElementos={editando ? [] : paradasElementos}
+                                trazado={editando ? null : ctx.trazado}
                                 onUbicacion={(id) => emitir("ubicacion_seleccionada", id)}
                                 onPasillo={(id) => emitir("pasillo_seleccionado", id)}
                                 edicion={editando

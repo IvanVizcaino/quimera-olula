@@ -1099,3 +1099,8 @@
     font-size: 0.6px;
     font-style: italic;
 }
+
+/* Recorrido por el camino real: línea continua (la recta entre paradas es discontinua) */
+.MapaAlmacen .mapa-planta-real .mapa-recorrido.por-camino {
+    stroke-dasharray: none;
+}

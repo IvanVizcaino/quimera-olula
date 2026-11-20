@@ -147,6 +147,24 @@ export type ElegidoPlanta =
 
 export type GuardarPlanta = (almacenId: string, planta: PlantaAlmacen) => Promise<void>;
 
+/** Camino a pie por la planta entre una parada y la siguiente (doc sga_distancias.md). */
+export interface TramoTrazado {
+    desde: string;
+    hasta: string;
+    /** null si no hay camino entre las dos. */
+    metros: number | null;
+    /** Esquinas del camino en metros (vacío sin camino). */
+    puntos: { x: number; y: number }[];
+}
+
+export interface TrazadoRecorrido {
+    metros: number | null;
+    tramos: TramoTrazado[];
+    sinPosicion: string[];
+}
+
+export type GetTrazado = (almacenId: string, ubicaciones: string[]) => Promise<TrazadoRecorrido>;
+
 export type CapaMapa =
     | "OCUPACION"
     | "ABC_UBICACION"

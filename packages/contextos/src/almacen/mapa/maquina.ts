@@ -3,9 +3,9 @@ import { RecorridoOrden } from "#/almacen/orden/diseño.ts";
 import { OrigenRotacion } from "#/almacen/slotting/diseño.ts";
 import { DIAS_POR_DEFECTO, enteroPositivo, ORIGEN_POR_DEFECTO, origenRotacion } from "#/almacen/slotting/dominio.ts";
 import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
-import { CapaMapa, ElegidoPlanta, MapaAlmacen, PlantaAlmacen, VistaMapa } from "./diseño.ts";
+import { CapaMapa, ElegidoPlanta, MapaAlmacen, PlantaAlmacen, TrazadoRecorrido, VistaMapa } from "./diseño.ts";
 import { CAPA_POR_DEFECTO, capaMapa, desplazarPieza, plantaInicial } from "./dominio.ts";
-import { getMapa, guardarPlanta } from "./infraestructura.ts";
+import { getMapa, getTrazado, guardarPlanta } from "./infraestructura.ts";
 
 /** EDITANDO: el editor de la planta real, con su borrador. */
 export type EstadoMapa = "INICIAL" | "CARGADO" | "EDITANDO";
@@ -24,6 +24,8 @@ export type ContextoMapa = {
     ubicacionId: string | null;
     ordenId: string;
     recorrido: RecorridoOrden | null;
+    /** Camino del recorrido por la planta real (null sin planta o sin recorrido). */
+    trazado: TrazadoRecorrido | null;
     vista: VistaMapa;
     /** La planta que se está editando (solo en EDITANDO). */
     borrador: PlantaAlmacen | null;
@@ -42,6 +44,7 @@ export const contextoMapaInicial: ContextoMapa = {
     ubicacionId: null,
     ordenId: "",
     recorrido: null,
+    trazado: null,
     vista: "ESQUEMA",
     borrador: null,
     elegido: null,
@@ -63,6 +66,7 @@ const cambiarAlmacen: ProcesarMapa = async (ctx, payload) => cargar({
     pasilloId: null,
     ubicacionId: null,
     recorrido: null,
+    trazado: null,
 });
 
 /** La rotación cambia las capas ABC y slotting: con el mapa ya cargado, se recalcula. */
@@ -90,13 +94,20 @@ const seleccionarUbicacion: ProcesarMapa = async (ctx, payload) => ({
 
 const cambiarOrden: ProcesarMapa = async (ctx, payload) => ({ ...ctx, ordenId: (payload as string) ?? "" });
 
-const verRecorrido: ProcesarMapa = async (ctx) => {
-    const ordenId = ctx.ordenId.trim();
-    if (!ordenId) return { ...ctx, recorrido: null };
-    return { ...ctx, recorrido: await getRecorridoOrden(ordenId) };
+/** Con planta, el camino a pie entre las paradas (en su orden). */
+const conTrazado: ProcesarMapa = async (ctx) => {
+    if (!ctx.recorrido || !ctx.mapa?.planta || ctx.recorrido.paradas.length < 2) return { ...ctx, trazado: null };
+    const ubicaciones = [...ctx.recorrido.paradas].sort((a, b) => a.secuencia - b.secuencia).map((p) => p.ubicacionId);
+    return { ...ctx, trazado: await getTrazado(ctx.almacenId, ubicaciones) };
 };
 
-const quitarRecorrido: ProcesarMapa = async (ctx) => ({ ...ctx, recorrido: null });
+const verRecorrido: ProcesarMapa = async (ctx) => {
+    const ordenId = ctx.ordenId.trim();
+    if (!ordenId) return { ...ctx, recorrido: null, trazado: null };
+    return conTrazado({ ...ctx, recorrido: await getRecorridoOrden(ordenId) });
+};
+
+const quitarRecorrido: ProcesarMapa = async (ctx) => ({ ...ctx, recorrido: null, trazado: null });
 
 const cambiarVista: ProcesarMapa = async (ctx, payload) => ({
     ...ctx,
@@ -147,7 +158,9 @@ const cancelarEdicion: ProcesarMapa = async (ctx) => ({
 const guardar: ProcesarMapa = async (ctx) => {
     if (!ctx.borrador) return ctx;
     await guardarPlanta(ctx.almacenId, ctx.borrador);
-    return cargar({ ...ctx, borrador: null, elegido: null, vista: "PLANTA" });
+    const mapa = await getMapa(ctx.almacenId, enteroPositivo(ctx.dias, DIAS_POR_DEFECTO), ctx.origen);
+    // La planta cambia el camino: se vuelve a trazar el recorrido que hubiera.
+    return conTrazado({ ...ctx, estado: "CARGADO", mapa, borrador: null, elegido: null, vista: "PLANTA" });
 };
 
 export const getMaquina: () => Maquina<EstadoMapa, ContextoMapa> = () => ({

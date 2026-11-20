@@ -6,7 +6,7 @@ import {
     tamanoPasillo, avisoAccesibilidad, avisosAccesibilidad, avisosDistancia, paradasEnElementos, sinVincular,
     textoDistancias, usoElemento, vincularUbicaciones,
 } from "../dominio.ts";
-import { plantaAApi, plantaDesdeApi } from "../infraestructura.ts";
+import { plantaAApi, plantaDesdeApi, trazadoDesdeApi } from "../infraestructura.ts";
 
 // Medidas redondas para que las cuentas se lean: módulo 2, fondo 1, pasillo 3.
 const M = { largoModulo: 2, fondo: 1, anchoPasillo: 3 };
@@ -193,6 +193,20 @@ describe("distancia real", () => {
         const recorrido = { ordenId: "T1", estado: "", modulosRecorridos: 0, pasillosCruzados: 0, paradas: [
             { secuencia: 2, ubicacionId: "MU-1", ubicacion: "MU-1", accion: "DEJAR" as const },
         ] } as unknown as Parameters<typeof paradasEnElementos>[0];
-        expect(paradasEnElementos(recorrido, p)).toEqual([{ secuencia: 2, ubicacion: "MU-1", accion: "DEJAR", x: 12, y: 3.5 }]);
+        expect(paradasEnElementos(recorrido, p)).toEqual([{ secuencia: 2, ubicacionId: "MU-1", ubicacion: "MU-1", accion: "DEJAR", x: 12, y: 3.5 }]);
+    });
+});
+
+describe("trazado del recorrido", () => {
+    it("convierte los puntos de la API", () => {
+        expect(trazadoDesdeApi({
+            metros: 23.5,
+            tramos: [{ desde: "17", hasta: "40", metros: 23.5, puntos: [[1, 2], [3, 2]] }],
+            sin_posicion: ["99"],
+        })).toEqual({
+            metros: 23.5,
+            tramos: [{ desde: "17", hasta: "40", metros: 23.5, puntos: [{ x: 1, y: 2 }, { x: 3, y: 2 }] }],
+            sinPosicion: ["99"],
+        });
     });
 });
