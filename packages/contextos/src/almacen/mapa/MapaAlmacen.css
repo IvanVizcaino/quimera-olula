@@ -657,12 +657,13 @@
         fill: var(--color-borde-sutil);
         fill-opacity: 0.6;
         stroke: var(--color-texto-secundario);
-        stroke-width: 1.5;
+        stroke-width: 1;
         stroke-dasharray: 4 2;
     }
 
     .mapa-elemento-columna rect,
     .mapa-elemento-oficina rect {
+        stroke-width: 1.5;
         stroke-dasharray: none;
     }
 
@@ -1026,7 +1027,6 @@
     .mapa-elemento.uso-salida rect,
     .mapa-elemento.uso-entrada rect {
         stroke: var(--mapa-texto);
-        stroke-width: 2;
     }
 
     .mapa-elemento-ficha rect {
