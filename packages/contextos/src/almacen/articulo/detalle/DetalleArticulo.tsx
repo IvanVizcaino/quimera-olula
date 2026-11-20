@@ -5,7 +5,7 @@ import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { puede } from "@olula/lib/dominio.ts";
+import { plugin, puede } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router";
@@ -21,6 +21,7 @@ import {
   metaArticulo,
 } from "./dominio.ts";
 import { getMaquina } from "./maquina.ts";
+import { TabAlmacenaje } from "./TabAlmacenaje.tsx";
 import { TabGeneral } from "./TabGeneral.tsx";
 
 const titulo = (articulo: Articulo) => articulo.descripcion;
@@ -96,6 +97,13 @@ export const DetalleArticulo = ({
               label="General"
               children={<TabGeneral form={form} articulo={articulo} publicar={emitir}/>}
             />,
+            plugin("sga") === "activo" && (
+              <Tab
+                key="tab-almacenaje"
+                label="Almacenaje"
+                children={<TabAlmacenaje form={form} articuloId={articulo.id} />}
+              />
+            ),
             puede("ventas.articulo") && articulo.seVende && (
               <Tab
                 key="tab-ventas"

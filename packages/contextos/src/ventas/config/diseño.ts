@@ -14,6 +14,9 @@ export interface ConfigVentas {
     crearFacturasBorrador: SiNoPreguntar;
     /** Dirección para la copia de correos (`correocopias`); vacía si no hay. */
     correoCopias: string;
+    /** Campos de la API cuya columna no existe en la BD (extensiones del escritorio no
+     * instaladas, p. ej. `correo_copias`): no se muestran. Solo lectura. */
+    noDisponibles?: string[];
 }
 
 export type GetConfigVentas = () => Promise<ConfigVentas>;

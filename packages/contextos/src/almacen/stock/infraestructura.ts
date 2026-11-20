@@ -16,6 +16,12 @@ export const stockItemFromApi = (stockApi: StockAPI): StockItem => ({
     cantidadDisponible: stockApi.cantidad_disponible,
     cantidadReservada: stockApi.cantidad_reservada,
     cantidadPendiente: stockApi.cantidad_pendiente,
+    necesidad: stockApi.necesidad ?? null,
+    stockMinimo: stockApi.stock_minimo ?? null,
+    stockMaximo: stockApi.stock_maximo ?? null,
+    fechaUltimaRegularizacion: stockApi.fecha_ultima_regularizacion ?? null,
+    horaUltimaRegularizacion: stockApi.hora_ultima_regularizacion ?? null,
+    cantidadUltimaRegularizacion: stockApi.cantidad_ultima_regularizacion ?? null,
 });
 
 const stockUbicacionFromApi = (api: StockUbicacionItemApi): StockUbicacion => ({

@@ -7,7 +7,7 @@ import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
-import { puedeAlguna } from "@olula/lib/dominio.ts";
+import { puede, puedeAlguna } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router";
@@ -16,6 +16,7 @@ import { muestraPreciosArticulo } from "#/ventas/precio_articulo/dominio.ts";
 import { BorrarCliente } from "../borrar/BorrarCliente.tsx";
 import { BajaCliente } from "../dar_de_baja/BajaCliente.tsx";
 import { Cliente } from "../diseño.ts";
+import { apiAgendaCliente } from "../infraestructura.ts";
 import { TabCrmContactos } from "./crm_contactos/TabCrmContactos.tsx";
 import { TabCuentasBanco } from "./cuentas_banco/TabCuentasBanco.tsx";
 import "./DetalleCliente.css";
@@ -143,15 +144,19 @@ export const DetalleCliente = ({
                     <TabCuentasBanco cliente={ctx.cliente} publicar={emitir} />
                   }
                 />,
-                <Tab
-                  key="tab-5"
-                  label="Agenda"
-                  children={
-                    <div className="detalle-cliente-tab-contenido">
-                      <TabCrmContactos clienteId={ctx.cliente.id} />
-                    </div>
-                  }
-                />,
+                ...(puede("ventas.contacto")
+                  ? [
+                      <Tab
+                        key="tab-5"
+                        label="Agenda"
+                        children={
+                          <div className="detalle-cliente-tab-contenido">
+                            <TabCrmContactos entidadId={ctx.cliente.id} api={apiAgendaCliente} />
+                          </div>
+                        }
+                      />,
+                    ]
+                  : []),
                 ...(puedeAlguna(documentos.map((documento) => documento.regla))
                   ? [
                       <Tab

@@ -300,3 +300,10 @@ export const nuevoEnvioAgenciaInicial = (
         observaciones: "",
     };
 };
+
+const plural = (n: number, singular: string, plural: string) => `${n} ${n === 1 ? singular : plural}`;
+
+/** Texto resumen del recorrido: módulos recorridos y pasillos cruzados. */
+export const resumenRecorrido = (r: { modulosRecorridos: number; pasillosCruzados: number }): string =>
+    `${plural(r.modulosRecorridos, "módulo recorrido", "módulos recorridos")}, ` +
+    plural(r.pasillosCruzados, "pasillo cruzado", "pasillos cruzados");

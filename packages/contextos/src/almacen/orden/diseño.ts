@@ -228,3 +228,31 @@ export type GetAgenciasEnvio = () => Promise<AgenciaEnvio[]>;
 export type PostEnvioAgencia = (ordenId: string, envio: NuevoEnvioAgencia) => Promise<EnvioAgenciaGenerado>;
 /** PDF con las etiquetas del envío de un albarán. */
 export type GetEtiquetaEnvio = (albaranId: string) => Promise<Blob>;
+
+export interface LineaParadaRecorrido {
+    lineaId: string;
+    sku: string;
+    pendiente: number;
+}
+
+export interface ParadaRecorrido {
+    secuencia: number;
+    ubicacionId: string;
+    ubicacion: string;
+    zona: string | null;
+    pasillo: string | null;
+    modulo: number | null;
+    nivel: number | null;
+    hueco: number | null;
+    lineas: LineaParadaRecorrido[];
+}
+
+export interface RecorridoOrden {
+    ordenId: string;
+    modulosRecorridos: number;
+    pasillosCruzados: number;
+    paradas: ParadaRecorrido[];
+}
+
+/** Recorrido estimado para preparar (o colocar) la orden. */
+export type GetRecorridoOrden = (id: string) => Promise<RecorridoOrden>;

@@ -1,9 +1,11 @@
+import { CategoriaModulo } from "../catalogo/diseño.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import ApiUrls from "../comun/urls.js";
 import {
     AccesoSoporte, CambiosTenant, EstadoProvision, EstadoTenant, GetTenant, GetTenants, ModuloTenant,
     NuevoTenant, PatchTenant, PostTenant, Provision, Tenant, UsuarioSoporte, UsuariosSoporte,
 } from "./diseño.js";
+import { OrigenModulo } from "./suscripcion/diseño.js";
 
 interface ModuloTenantApi {
     id: string;
@@ -12,6 +14,8 @@ interface ModuloTenantApi {
     depende_de: string[];
     es_base: boolean;
     activo: boolean;
+    origen?: OrigenModulo | null;
+    categoria?: CategoriaModulo;
 }
 
 interface ProvisionApi {
@@ -64,6 +68,8 @@ export const moduloTenantDesdeApi = (m: ModuloTenantApi): ModuloTenant => ({
     dependeDe: m.depende_de ?? [],
     esBase: !!m.es_base,
     activo: !!m.activo,
+    origen: m.origen ?? null,
+    categoria: m.categoria ?? "contexto",
 });
 
 const provisionDesdeApi = (p: ProvisionApi): Provision => ({
@@ -156,6 +162,9 @@ export const postTenant: PostTenant = async (nuevo: NuevoTenant) => {
                 nombre: nuevo.adminNombre,
                 "contraseña": nuevo.adminContrasena,
             },
+            ...(nuevo.planId
+                ? { plan_id: nuevo.planId, periodicidad: nuevo.periodicidad, con_prueba: nuevo.conPrueba }
+                : {}),
         },
         "Error al crear la empresa"
     );

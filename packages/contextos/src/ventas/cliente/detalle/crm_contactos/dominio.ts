@@ -1,45 +1,42 @@
 import { ProcesarContexto } from "@olula/lib/diseño.js";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.js";
-import {
-    desvincularContactoCliente,
-    vincularContactoCliente,
-} from "../../../../crm/cliente/infraestructura.ts";
 import { CrmContacto, NuevoCrmContacto } from "../../diseño.ts";
-import {
-    deleteCrmContacto,
-    getCrmContactosCliente,
-    patchCrmContacto,
-    postCrmContactoCliente,
-} from "../../infraestructura.ts";
 import { ContextoCrmContactos, EstadoCrmContactos } from "./diseño.ts";
 
-export const metaCrmContacto: MetaModelo<CrmContacto> = {
-    campos: {
-        nombre: { requerido: true },
-        email: { requerido: false, tipo: "email" },
-        telefono1: { requerido: false, tipo: "telefono" },
-    }
+// Longitudes de las columnas de crm_contactos (crm_contactos.mtd).
+const longitud = (campo: keyof NuevoCrmContacto, maximo: number) =>
+    (modelo: NuevoCrmContacto) =>
+        String(modelo[campo] ?? "").length <= maximo || `Como mucho ${maximo} caracteres`;
+
+const camposContacto = {
+    nombre: { requerido: true, validacion: longitud("nombre", 100) },
+    cargo: { requerido: false, validacion: longitud("cargo", 100) },
+    email: { requerido: false, tipo: "email" as const, validacion: longitud("email", 50) },
+    telefono1: { requerido: false, tipo: "telefono" as const, validacion: longitud("telefono1", 30) },
+    telefono2: { requerido: false, tipo: "telefono" as const, validacion: longitud("telefono2", 30) },
+    observaciones: { requerido: false },
 };
 
-export const metaNuevoCrmContacto: MetaModelo<NuevoCrmContacto> = {
-    campos: {
-        nombre: { requerido: true },
-        email: { requerido: false, tipo: "email" },
-        telefono1: { requerido: false, tipo: "telefono" },
-    }
-};
+export const metaCrmContacto: MetaModelo<CrmContacto> = { campos: camposContacto };
+
+export const metaNuevoCrmContacto: MetaModelo<NuevoCrmContacto> = { campos: camposContacto };
 
 export const nuevoCrmContactoVacio: NuevoCrmContacto = {
     nombre: '',
+    cargo: '',
     email: '',
     telefono1: '',
+    telefono2: '',
+    observaciones: '',
 }
 
 export const metaTablaCrmContactos = [
-    { id: "id", cabecera: "ID" },
+    { id: "id", cabecera: "Código" },
     { id: "nombre", cabecera: "Nombre" },
+    { id: "cargo", cabecera: "Cargo" },
     { id: "email", cabecera: "Email" },
-    { id: "telefono1", cabecera: "Teléfono" },
+    { id: "telefono1", cabecera: "Teléfono 1" },
+    { id: "telefono2", cabecera: "Teléfono 2" },
 ];
 
 
@@ -48,11 +45,11 @@ type ProcesarCrmContactos = ProcesarContexto<EstadoCrmContactos, ContextoCrmCont
 const pipeCrmContactos = ejecutarListaProcesos<EstadoCrmContactos, ContextoCrmContactos>;
 
 export const cargarCrmContactos: ProcesarCrmContactos = async (contexto, payload) => {
-    const clienteId = (payload as string) || contexto.clienteId;
-    const contactos = await getCrmContactosCliente(clienteId);
+    const entidadId = (payload as string) || contexto.entidadId;
+    const contactos = await contexto.api.cargar(entidadId);
     return {
         ...contexto,
-        clienteId,
+        entidadId,
         contactos,
         cargando: false,
     }
@@ -68,7 +65,7 @@ export const activarContacto: ProcesarCrmContactos = async (contexto, payload) =
 
 export const crearContacto: ProcesarCrmContactos = async (contexto, payload) => {
     const nuevoContacto = payload as NuevoCrmContacto;
-    await postCrmContactoCliente(contexto.clienteId, nuevoContacto);
+    await contexto.api.crear(contexto.entidadId, nuevoContacto);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -77,7 +74,7 @@ export const crearContacto: ProcesarCrmContactos = async (contexto, payload) => 
 
 export const actualizarContacto: ProcesarCrmContactos = async (contexto, payload) => {
     const contactoActualizado = payload as CrmContacto;
-    await patchCrmContacto(contactoActualizado);
+    await contexto.api.cambiar(contactoActualizado);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -88,7 +85,7 @@ export const borrarContacto: ProcesarCrmContactos = async (contexto) => {
     const idContacto = contexto.contactoActivo?.id;
     if (!idContacto) return contexto;
 
-    await deleteCrmContacto(idContacto);
+    await contexto.api.borrar(idContacto);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -98,7 +95,7 @@ export const borrarContacto: ProcesarCrmContactos = async (contexto) => {
 
 export const vincularContacto: ProcesarCrmContactos = async (contexto, payload) => {
     const idContactoCrm = payload as string;
-    await vincularContactoCliente(idContactoCrm, contexto.clienteId);
+    await contexto.api.vincular(idContactoCrm, contexto.entidadId);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,
@@ -109,7 +106,7 @@ export const desvincularContacto: ProcesarCrmContactos = async (contexto) => {
     const idContacto = contexto.contactoActivo?.id;
     if (!idContacto) return contexto;
 
-    await desvincularContactoCliente(idContacto, contexto.clienteId);
+    await contexto.api.desvincular(idContacto, contexto.entidadId);
 
     return pipeCrmContactos(contexto, [
         cargarCrmContactos,

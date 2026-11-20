@@ -89,6 +89,24 @@ export const bunch = parent => {
         },
       },
     ],
+    mostrarErrorEnvioEmail: [
+      {
+        condition: ({ response }) => response,
+        type: "showMessage",
+        plug: ({ response }) => ({
+          mensaje: response,
+          tipoMensaje: "error",
+        }),
+      },
+      {
+        condition: ({ response }) => !response,
+        type: "showMessage",
+        plug: () => ({
+          mensaje: "Error al enviar correo",
+          tipoMensaje: "error",
+        }),
+      },
+    ],
   };
 
   return {

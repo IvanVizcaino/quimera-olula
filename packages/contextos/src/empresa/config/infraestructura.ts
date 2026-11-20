@@ -5,12 +5,14 @@ import { configEmpresaPorDefecto } from "./dominio.ts";
 
 export interface ConfigEmpresaApi {
     grupo_iva_negocio_id: string;
+    no_disponibles?: string[];
 }
 
 const baseUrl = new ApiUrls().CONFIG;
 
 export const configEmpresaDesdeApi = (api: ConfigEmpresaApi): ConfigEmpresa => ({
     grupoIvaNegocioId: api.grupo_iva_negocio_id ?? "",
+    noDisponibles: api.no_disponibles ?? [],
 });
 
 export const configEmpresaAApi = (config: ConfigEmpresa): ConfigEmpresaApi => ({

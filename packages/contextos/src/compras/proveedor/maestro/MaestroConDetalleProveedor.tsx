@@ -52,7 +52,7 @@ export const MaestroConDetalleProveedor = () => {
                         <Listado<Proveedor>
                             metaTabla={metaTablaProveedor}
                             criteria={proveedores.criteria}
-                            modoInicial="tarjetas"
+                            modoInicial="tabla"
                             tarjeta={TarjetaProveedor}
                             entidades={proveedores.lista}
                             totalEntidades={proveedores.total}

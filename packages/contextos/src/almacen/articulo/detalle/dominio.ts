@@ -17,9 +17,15 @@ export const articuloVacio = (): Articulo => ({
     tipoCodBarras: "",
     familiaId: "",
     descripcionFamilia: "",
+    unidadId: "",
     noStock: false,
     seCompra: false,
     seVende: false,
+    claseAlmacenamientoId: "",
+    claseAlmacenamiento: "",
+    largo: null,
+    ancho: null,
+    alto: null,
     proveedores: [],
 });
 
@@ -29,8 +35,17 @@ const camposEditables = [
     "codbarras",
     "tipoCodBarras",
     "familiaId",
+    "unidadId",
     "noStock",
+    "claseAlmacenamientoId",
+    "largo",
+    "ancho",
+    "alto",
 ] as const;
+
+/** Una dimensión es válida si falta o es un número finito >= 0. */
+export const dimensionValida = (valor: number | null | undefined): boolean =>
+    valor === null || valor === undefined || (Number.isFinite(valor) && valor >= 0);
 
 export const cambiosArticulo = (anterior: Articulo, nuevo: Articulo): CambiosArticulo =>
     Object.fromEntries(
@@ -50,6 +65,10 @@ export const metaArticulo: MetaModelo<Articulo> = {
         tipoCodBarras: { requerido: false },
         familiaId: { requerido: false },
         noStock: { tipo: "checkbox" },
+        claseAlmacenamientoId: { requerido: false },
+        largo: { requerido: false, tipo: "decimal", validacion: (m: Articulo) => dimensionValida(m.largo) },
+        ancho: { requerido: false, tipo: "decimal", validacion: (m: Articulo) => dimensionValida(m.ancho) },
+        alto: { requerido: false, tipo: "decimal", validacion: (m: Articulo) => dimensionValida(m.alto) },
     },
     editable: () => puede("almacen.articulo"),
 };

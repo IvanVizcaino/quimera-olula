@@ -5,6 +5,7 @@ import {
   notificarPanelLateralAbierto,
   solicitarTogglePanelLateral,
 } from "@olula/lib/panel_lateral_events.ts";
+import { REGLA_ASISTENTE, puede } from "@olula/lib/dominio.ts";
 import { modoCapturaVoz, useModoVozActivo } from "@olula/lib/voz/modo_voz.ts";
 import { IconMicrophone, IconMicrophoneOff } from "@tabler/icons-react";
 import { useContext, useEffect } from "react";
@@ -179,7 +180,8 @@ export const Cabecera = (props: CabeceraProps) => {
     ?.cabecera_menu_usuario as () => React.ReactNode;
   const ExtraLogo = app.Componentes
     ?.cabecera_extra_logo as () => React.ReactNode;
-  const mostrarAsistente = Boolean(app.Componentes?.panel_asistente);
+  // Sin permiso del asistente (regla comun.ia) no se muestra su icono ni el modo voz.
+  const mostrarAsistente = Boolean(app.Componentes?.panel_asistente) && puede(REGLA_ASISTENTE);
   const cProps: CabeceraProps = {
     ...props,
     NotificacionesCabecera:

@@ -1,12 +1,5 @@
 import { MetaTabla } from "@olula/componentes/atomos/qtabla.tsx";
-import { PartidaSubcuenta, SubcuentaTercero } from "../diseño.ts";
-
-/** Columnas de co_subcuentascli / co_subcuentasprov en Eneboo. */
-export const metaTablaSubcuentasTercero: MetaTabla<SubcuentaTercero> = [
-    { id: "ejercicioId", cabecera: "Ejercicio" },
-    { id: "codigoSubcuenta", cabecera: "Subcuenta" },
-    { id: "saldo", cabecera: "Saldo", tipo: "moneda" },
-];
+import { PartidaSubcuenta } from "../diseño.ts";
 
 /** Columnas de co_partidasmayor en Eneboo. */
 export const metaTablaPartidasSubcuenta: MetaTabla<PartidaSubcuenta> = [

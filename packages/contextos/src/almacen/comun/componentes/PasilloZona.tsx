@@ -1,0 +1,52 @@
+import { QSelect } from "@olula/componentes/index.js";
+import { QAutocompletarProps } from "@olula/componentes/moleculas/qautocompletar.tsx";
+import { useEffect, useState } from "react";
+import { getPasillosZona } from "../../pasillo/infraestructura.ts";
+
+type PasilloZonaProps = Omit<QAutocompletarProps, "obtenerOpciones" | "label"> & {
+    label?: string;
+    zonaId: string | null | undefined;
+};
+
+type OpcionPasillo = { valor: string; descripcion: string };
+
+const SIN_PASILLO: OpcionPasillo = { valor: "", descripcion: "(sin pasillo)" };
+
+/** Selector de pasillo restringido a los pasillos de una zona. */
+export const PasilloZona = ({
+    zonaId,
+    valor,
+    nombre = "pasillo_id",
+    label = "Pasillo",
+    onChange,
+    ...props
+}: PasilloZonaProps) => {
+    const [opciones, setOpciones] = useState<OpcionPasillo[]>([SIN_PASILLO]);
+
+    useEffect(() => {
+        if (!zonaId) {
+            setOpciones([SIN_PASILLO]);
+            return;
+        }
+        let cancelado = false;
+        getPasillosZona(zonaId).then((pasillos) => {
+            if (!cancelado) {
+                setOpciones([SIN_PASILLO, ...pasillos.map((p) => ({ valor: p.id, descripcion: p.codigo }))]);
+            }
+        });
+        return () => {
+            cancelado = true;
+        };
+    }, [zonaId]);
+
+    return (
+        <QSelect
+            label={label}
+            nombre={nombre}
+            valor={valor}
+            onChange={onChange}
+            opciones={opciones}
+            {...props}
+        />
+    );
+};

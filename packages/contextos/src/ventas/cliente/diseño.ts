@@ -87,18 +87,19 @@ export type NuevaCuentaBanco = {
   iban: string;
 };
 
+/** Contacto de la agenda del cliente (crm_contactos + contactosclientes, tablas del
+ *  módulo principal de facturación: no dependen del contexto CRM). */
 export interface CrmContacto extends Entidad {
   id: string;
   nombre: string;
+  cargo: string;
   email: string;
   telefono1: string;
+  telefono2: string;
+  observaciones: string;
 };
 
-export type NuevoCrmContacto = {
-  nombre: string;
-  email: string;
-  telefono1: string;
-};
+export type NuevoCrmContacto = Omit<CrmContacto, "id">;
 
 
 export type GetCliente = (id: string) => Promise<Cliente>;

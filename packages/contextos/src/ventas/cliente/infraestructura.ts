@@ -3,8 +3,9 @@ import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Filtro, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
 import { normalizarIban } from "@olula/lib/iban.ts";
 import { criteriaQuery } from "@olula/lib/infraestructura.ts";
+import { crearApiAgenda } from "#/comun/agenda/infraestructura.ts";
 import UrlsVentasClass from "../comun/urls.ts";
-import { Cliente, CrmContacto, CuentaBanco, DirCliente, GetCliente, NuevaCuentaBanco, NuevaDireccion, NuevoCrmContacto, PatchCliente, PostCliente } from "./diseño.ts";
+import { Cliente, CrmContacto, CuentaBanco, DirCliente, GetCliente, NuevaCuentaBanco, NuevaDireccion, PatchCliente, PostCliente } from "./diseño.ts";
 
 const UrlsVentas = new UrlsVentasClass();
 const UrlsCrm = new UrlsCrmClass();
@@ -237,31 +238,15 @@ export const cuentaBancoFromAPI = (c: CuentaBancoAPI): CuentaBanco => ({
   cuenta: c.cuenta.cuenta ?? "",
 });
 
-export const getCrmContactosCliente = async (clienteId: string): Promise<CrmContacto[]> =>
-  await RestAPI.get<{ datos: CrmContacto[] }>(`${UrlsCrm.CLIENTE}/${clienteId}/contactos`).then((respuesta) => respuesta.datos);
-
-export const postCrmContactoCliente = async (clienteId: string, contacto: NuevoCrmContacto): Promise<string> => {
-  const payload = {
-    nombre: contacto.nombre,
-    email: contacto.email,
-    telefono1: contacto.telefono1,
-  };
-  return await RestAPI.post(`${UrlsCrm.CLIENTE}/${clienteId}/contacto`, payload, "Error al crear contacto").then((respuesta) => respuesta.id);
-};
+// Agenda del cliente: rutas de Ventas (/ventas/contacto), no las del CRM, para que
+// funcione en las apps que no cargan el contexto CRM.
+export const apiAgendaCliente = crearApiAgenda(
+  (clienteId) => `${UrlsVentas.CLIENTE}/${clienteId}/contacto`,
+  "/ventas/contacto",
+);
 
 export const getCrmContactos = async (filtro: Filtro, orden: Orden): Promise<CrmContacto[]> => {
   const q = criteriaQuery(filtro, orden);
   return RestAPI.get<{ datos: CrmContacto[] }>(`${UrlsCrm.CONTACTO}` + q).then((respuesta) => respuesta.datos);
 }
 
-export const patchCrmContacto = async (contacto: CrmContacto): Promise<void> => {
-  const payload = {
-    nombre: contacto.nombre,
-    email: contacto.email,
-    telefono1: contacto.telefono1,
-  };
-  await RestAPI.patch(`${UrlsCrm.CONTACTO}/${contacto.id}`, payload, "Error al actualizar contacto");
-};
-
-export const deleteCrmContacto = async (contactoId: string): Promise<void> =>
-  await RestAPI.delete(`${UrlsCrm.CONTACTO}/${contactoId}`, "Error al borrar contacto");

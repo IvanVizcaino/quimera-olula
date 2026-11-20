@@ -1,21 +1,26 @@
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
 import { QTabla } from "@olula/componentes/atomos/qtabla.tsx";
+import { QModal } from "@olula/componentes/index.ts";
+import { Asiento } from "#/contabilidad/asiento/diseño.ts";
+import { getAsiento } from "#/contabilidad/asiento/infraestructura.ts";
+import { CambiarAsientoManual } from "#/contabilidad/asiento/vistas/cambiar/CambiarAsientoManual.tsx";
+import { DetalleAsiento } from "#/contabilidad/asiento/vistas/detalle/DetalleAsiento.tsx";
 import { useCallback, useEffect, useState } from "react";
 import { PartidaSubcuenta, SubcuentaTercero, TipoTercero } from "../diseño.ts";
-import { subcuentaInicial } from "../dominio.ts";
+import { opcionesSubcuentas, subcuentaInicial } from "../dominio.ts";
 import {
     getPartidasSubcuenta,
     getSubcuentasTercero,
 } from "../infraestructura.ts";
-import {
-    metaTablaPartidasSubcuenta,
-    metaTablaSubcuentasTercero,
-} from "./meta.ts";
+import { metaTablaPartidasSubcuenta } from "./meta.ts";
 import "./TabContabilidad.css";
 
 /** Pestaña «Contabilidad» de las fichas de cliente y proveedor (Eneboo
- * clientes.ui / proveedores.ui): subcuenta elegida arriba, subcuentas por
- * ejercicio a la izquierda y sus partidas a la derecha. */
+ * clientes.ui / proveedores.ui): subcuenta elegida arriba y, encima de sus
+ * partidas, un combo con las subcuentas por ejercicio (ejercicio, subcuenta y
+ * saldo) que filtra la tabla. Pulsar una partida abre su asiento: el formulario
+ * de edición si es manual; si no (factura, recibo…), su ficha en consulta. */
 export const TabContabilidad = ({
     tipo,
     terceroId,
@@ -32,6 +37,8 @@ export const TabContabilidad = ({
     const [activa, setActiva] = useState<SubcuentaTercero | null>(null);
     const [partidas, setPartidas] = useState<PartidaSubcuenta[]>([]);
     const [cargandoPartidas, setCargandoPartidas] = useState(false);
+    const [asiento, setAsiento] = useState<Asiento | null>(null);
+    const [recargas, setRecargas] = useState(0);
 
     useEffect(() => {
         let vigente = true;
@@ -40,13 +47,24 @@ export const TabContabilidad = ({
             .then((lista) => {
                 if (!vigente) return;
                 setSubcuentas(lista);
-                setActiva(subcuentaInicial(lista));
+                // Tras editar un asiento se mantiene la subcuenta elegida (con su saldo nuevo).
+                setActiva((previa) =>
+                    lista.find((s) => s.id === previa?.id) ?? subcuentaInicial(lista));
             })
             .finally(() => vigente && setCargandoSubcuentas(false));
         return () => {
             vigente = false;
         };
-    }, [tipo, terceroId]);
+    }, [tipo, terceroId, recargas]);
+
+    const abrirAsiento = useCallback(async (partida: PartidaSubcuenta) => {
+        if (partida.asientoId) setAsiento(await getAsiento(partida.asientoId));
+    }, []);
+
+    const cerrarAsiento = useCallback((actualizado: boolean) => {
+        setAsiento(null);
+        if (actualizado) setRecargas((n) => n + 1);
+    }, []);
 
     const cargarPartidas = useCallback(async (subcuentaId: string) => {
         setCargandoPartidas(true);
@@ -81,33 +99,47 @@ export const TabContabilidad = ({
                     deshabilitado
                 />
             </quimera-formulario>
-            <div className="TabContabilidad-tablas">
-                <div className="TabContabilidad-subcuentas">
-                    <h4>Subcuentas por ejercicio</h4>
-                    <QTabla
-                        metaTabla={metaTablaSubcuentasTercero}
-                        datos={subcuentas}
-                        cargando={cargandoSubcuentas}
-                        seleccionadaId={activa?.id}
-                        onSeleccion={setActiva}
-                        orden={["ejercicioId", "ASC"]}
-                        totalEntidades={subcuentas.length}
-                    />
-                </div>
-                <div className="TabContabilidad-partidas">
-                    <h4>
-                        Partidas
-                        {activa ? ` de ${activa.codigoSubcuenta} (${activa.ejercicioId})` : ""}
-                    </h4>
-                    <QTabla
-                        metaTabla={metaTablaPartidasSubcuenta}
-                        datos={partidas}
-                        cargando={cargandoPartidas}
-                        orden={["fecha", "ASC"]}
-                        totalEntidades={partidas.length}
-                    />
-                </div>
+            <div className="TabContabilidad-partidas">
+                <QSelect
+                    label="Subcuenta por ejercicio"
+                    nombre="subcuenta_ejercicio"
+                    valor={activa?.id ?? ""}
+                    opciones={opcionesSubcuentas(subcuentas)}
+                    deshabilitado={cargandoSubcuentas || subcuentas.length === 0}
+                    onChange={(opcion) =>
+                        setActiva(subcuentas.find((s) => s.id === opcion?.valor) ?? null)
+                    }
+                />
+                <QTabla
+                    metaTabla={metaTablaPartidasSubcuenta}
+                    datos={partidas}
+                    cargando={cargandoPartidas}
+                    orden={["fecha", "ASC"]}
+                    totalEntidades={partidas.length}
+                    onSeleccion={abrirAsiento}
+                />
             </div>
+            {asiento?.manual && (
+                <CambiarAsientoManual
+                    asiento={asiento}
+                    publicar={async (evento) => cerrarAsiento(evento === "asiento_actualizado")}
+                />
+            )}
+            {asiento && !asiento.manual && (
+                <QModal
+                    nombre="asientoDePartida"
+                    abierto
+                    titulo={`Asiento ${asiento.numero}`}
+                    onCerrar={() => cerrarAsiento(false)}
+                >
+                    <DetalleAsiento
+                        id={asiento.id}
+                        publicar={async (evento) => {
+                            if (evento === "asiento_deseleccionado") cerrarAsiento(false);
+                        }}
+                    />
+                </QModal>
+            )}
         </div>
     );
 };

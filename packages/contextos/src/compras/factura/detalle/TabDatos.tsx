@@ -6,6 +6,7 @@ import { GrupoIvaNegocio } from "#/comun/componentes/grupo_iva_negocio.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
+import { plugin } from "@olula/lib/dominio.ts";
 import { HookModelo } from "@olula/lib/useModelo.ts";
 import { Factura } from "../diseño.ts";
 import { facturaEditable } from "../dominio.ts";
@@ -57,6 +58,10 @@ export const TabDatos = ({
                 <QCheckbox label="De abono" {...uiProps("deAbono")} />
                 <QCheckbox label="Servicios" {...uiProps("servicios")} />
                 <QCheckbox label="No generar asiento" {...uiProps("noGenerarAsiento")} />
+                {/* Eneboo contauto_isp: solo con el plugin activo. */}
+                {plugin("contauto_isp") === "activo" && (
+                    <QCheckbox label="Factura ISP (inversión del sujeto pasivo)" {...uiProps("inversionSujetoPasivo")} />
+                )}
             </quimera-formulario>
         </div>
     );
