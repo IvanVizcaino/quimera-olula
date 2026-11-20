@@ -17,13 +17,14 @@
     --mapa-borde-sutil: var(--color-borde-sutil);
     --mapa-foco: var(--color-texto-primario);
 
-    --tono-vacio: var(--color-superficie-sunken);
+    /* Vacío y sin dato: gris medio, que se distinga del fondo blanco (y del gris oscuro en modo oscuro) */
+    --tono-vacio: var(--color-borde-sutil);
     --tono-parcial: var(--color-primario-claro);
     --tono-lleno: var(--mg-3, #5f6a72);
     --tono-a: var(--color-exito);
     --tono-b: var(--color-advertencia);
     --tono-c: var(--color-error);
-    --tono-sin-dato: var(--color-deshabilitado-claro);
+    --tono-sin-dato: var(--color-borde-sutil);
     --tono-sin-ubicaciones: transparent;
     --tono-ok: var(--color-exito-claro);
     --tono-rota-mas: var(--color-advertencia);
@@ -651,9 +652,10 @@
     }
 
     .mapa-elemento rect {
-        fill: var(--color-superficie-sunken);
+        fill: var(--color-borde-sutil);
+        fill-opacity: 0.6;
         stroke: var(--color-texto-secundario);
-        stroke-width: 1;
+        stroke-width: 1.5;
         stroke-dasharray: 4 2;
     }
 
@@ -681,9 +683,9 @@
 
     .mapa-pasillo-suelo {
         fill: var(--color-fondo);
-        stroke: var(--mapa-borde);
-        stroke-width: 0.5;
-        stroke-dasharray: 2 2;
+        stroke: var(--color-texto-secundario);
+        stroke-width: 1;
+        stroke-dasharray: 3 2;
         cursor: pointer;
     }
 
@@ -723,8 +725,8 @@
 
     .mapa-celda {
         fill: var(--tono);
-        stroke: var(--mapa-borde);
-        stroke-width: 0.5;
+        stroke: var(--color-texto-secundario);
+        stroke-width: 0.75;
         cursor: pointer;
     }
 
