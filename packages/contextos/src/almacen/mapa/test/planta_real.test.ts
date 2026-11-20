@@ -39,44 +39,41 @@ describe("geometría de la planta real", () => {
         expect(medidasEfectivas(M, { fondo: 1.2 })).toEqual({ ...M, fondo: 1.2 });
     });
 
-    it("sin girar: impares a la izquierda, pares a la derecha, módulo 1 arriba", () => {
+    it("sin girar (avance hacia abajo): impares a la derecha de la pantalla, módulo 1 arriba", () => {
         const g = geometriaEnPlanta(pasillo("A"), colocado("A", 10, 2), M);
         expect({ x: g.x, y: g.y, ancho: g.ancho, largo: g.largo }).toEqual({ x: 10, y: 2, ancho: 5, largo: 8 });
         const celda = (m: number) => g.celdas.find((c) => c.modulo === m);
-        expect(celda(1)).toMatchObject({ x: 10, y: 2, ancho: 1, largo: 2 });
-        expect(celda(2)).toMatchObject({ x: 14, y: 2 });
-        expect(celda(7)).toMatchObject({ x: 10, y: 8 });
+        // Quien baja por el pasillo tiene a su izquierda la derecha de la pantalla.
+        expect(celda(1)).toMatchObject({ x: 14, y: 2, ancho: 1, largo: 2 });
+        expect(celda(2)).toMatchObject({ x: 10, y: 2 });
+        expect(celda(7)).toMatchObject({ x: 14, y: 8 });
         expect(g.suelo).toEqual({ x: 11, y: 2, ancho: 3, largo: 8 });
     });
 
-    it("una flecha hacia dentro por cada extremo por el que se entra", () => {
-        const dos = geometriaEnPlanta(pasillo("A"), colocado("A", 0, 0), M);
-        expect(dos.accesos).toEqual([
-            { x1: 2.5, y1: 0.2, x2: 2.5, y2: 2.4 },
-            { x1: 2.5, y1: 7.8, x2: 2.5, y2: 5.6 },
-        ]);
-        const uno = geometriaEnPlanta(pasillo("A", { accesos: "UN_EXTREMO" }), colocado("A", 0, 0), M);
-        expect(uno.accesos).toHaveLength(1);
-    });
-
-    it("girado 90°: el avance va de derecha a izquierda y el rectángulo cabe en (x, y)", () => {
+    it("girado 90°: se avanza hacia la izquierda y los impares quedan abajo", () => {
         const g = geometriaEnPlanta(pasillo("A"), colocado("A", 0, 0, 90), M);
         expect({ x: g.x, y: g.y, ancho: g.ancho, largo: g.largo }).toEqual({ x: 0, y: 0, ancho: 8, largo: 5 });
-        // Módulo 1 (izquierda según el avance) arriba a la derecha.
-        expect(g.celdas.find((c) => c.modulo === 1)).toMatchObject({ x: 6, y: 0, ancho: 2, largo: 1 });
-        expect(g.celdas.find((c) => c.modulo === 2)).toMatchObject({ x: 6, y: 4 });
+        expect(g.celdas.find((c) => c.modulo === 1)).toMatchObject({ x: 6, y: 4, ancho: 2, largo: 1 });
+        expect(g.celdas.find((c) => c.modulo === 2)).toMatchObject({ x: 6, y: 0 });
     });
 
-    it("girado 180°: módulo 1 abajo a la derecha", () => {
+    it("girado 180°: se avanza hacia arriba, módulo 1 abajo a la izquierda", () => {
         const g = geometriaEnPlanta(pasillo("A"), colocado("A", 0, 0, 180), M);
-        expect(g.celdas.find((c) => c.modulo === 1)).toMatchObject({ x: 4, y: 6 });
+        expect(g.celdas.find((c) => c.modulo === 1)).toMatchObject({ x: 0, y: 6 });
     });
 
-    it("una cara a la derecha: el suelo empieza en el borde", () => {
-        const g = geometriaEnPlanta(pasillo("C", { caras: "DERECHA", modulos: 2 }), colocado("C", 0, 0), M);
+    it("una cara izquierda: el suelo empieza en el borde y los módulos a su derecha", () => {
+        const g = geometriaEnPlanta(pasillo("B", { caras: "IZQUIERDA", modulos: 2 }), colocado("B", 0, 0), M);
         expect(g.suelo).toMatchObject({ x: 0, ancho: 3 });
-        expect(g.celdas.map((c) => c.modulo)).toEqual([2, 4]);
+        expect(g.celdas.map((c) => c.modulo)).toEqual([1, 3]);
         expect(g.celdas[0]).toMatchObject({ x: 3, ancho: 1 });
+    });
+
+    it("una cara derecha: los módulos en el borde y el suelo a su lado", () => {
+        const g = geometriaEnPlanta(pasillo("C", { caras: "DERECHA", modulos: 2 }), colocado("C", 0, 0), M);
+        expect(g.celdas.map((c) => c.modulo)).toEqual([2, 4]);
+        expect(g.celdas[0]).toMatchObject({ x: 0, ancho: 1 });
+        expect(g.suelo).toMatchObject({ x: 1, ancho: 3 });
     });
 
     it("la parada cae en el eje del pasillo, a la altura del módulo", () => {

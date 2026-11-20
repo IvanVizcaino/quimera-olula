@@ -23,7 +23,7 @@ export const capaMapa = (valor: string | null | undefined): CapaMapa =>
 
 // ─── Layout ───────────────────────────────────────────────────────────────
 
-/** Impares a la izquierda, pares a la derecha (como una calle). */
+/** Impares a la izquierda, pares a la derecha (como una calle), según el sentido de avance. */
 export const ladoDeModulo = (modulo: number): Lado => (modulo % 2 === 1 ? "IZQUIERDA" : "DERECHA");
 
 /** Posición a lo largo del pasillo (1..modulos): los módulos 2k-1 y 2k quedan enfrentados. */
@@ -58,7 +58,9 @@ export const geometriaPasillo = (p: PasilloMapa, indice: number): GeometriaPasil
         modulosDeLado(p, lado).map((modulo) => ({
             modulo,
             lado,
-            x: lado === "IZQUIERDA" ? x : x + MEDIDAS.fondo + MEDIDAS.pasillo,
+            // Visto desde arriba avanzando hacia abajo, la izquierda de quien avanza es la derecha
+            // de la pantalla.
+            x: lado === "IZQUIERDA" ? x + MEDIDAS.fondo + MEDIDAS.pasillo : x,
             y: MEDIDAS.cabecera + (posicionEnPasillo(modulo) - 1) * MEDIDAS.modulo,
             ancho: MEDIDAS.fondo,
             alto: MEDIDAS.modulo,
@@ -407,18 +409,31 @@ const transformarRect = (
     };
 };
 
+/**
+ * Dónde empieza el suelo en el pasillo sin girar. Avanzando hacia abajo y visto desde arriba, la
+ * cara izquierda (impares) queda a la derecha de la pantalla: la cara derecha va a x = 0, después el
+ * suelo y después la izquierda.
+ */
+const xSueloSinGirar = (p: Pick<PasilloMapa, "caras">, m: MedidasPlanta): number =>
+    p.caras === "IZQUIERDA" ? 0 : m.fondo;
+
+/** Se entra por el frente (módulo 1) salvo que sea solo por el fondo, y por el fondo salvo que sea solo por el frente. */
+export const entraPorFrente = (accesos: string): boolean => accesos !== "FONDO";
+
+export const entraPorFondo = (accesos: string): boolean => accesos !== "FRENTE" && accesos !== "UN_EXTREMO";
+
 /** Dónde cae cada módulo de un pasillo colocado, y su suelo, en metros de la nave. */
 export const geometriaEnPlanta = (
     p: PasilloMapa, colocacion: PasilloEnPlanta, medidasPlanta: MedidasPlanta,
 ): GeometriaPasilloPlanta => {
     const m = medidasEfectivas(medidasPlanta, colocacion.medidas);
     const t = tamanoSinGirar(p, m);
-    const xSuelo = p.caras === "DERECHA" ? 0 : m.fondo;
+    const xSuelo = xSueloSinGirar(p, m);
     const celdas = ladosDePasillo(p).flatMap((lado) =>
         modulosDeLado(p, lado).map((modulo) => ({
             modulo,
             ...transformarRect({
-                x: lado === "IZQUIERDA" ? 0 : xSuelo + m.anchoPasillo,
+                x: lado === "IZQUIERDA" ? xSuelo + m.anchoPasillo : 0,
                 y: (posicionEnPasillo(modulo) - 1) * m.largoModulo,
                 ancho: m.fondo,
                 largo: m.largoModulo,
@@ -438,8 +453,8 @@ export const geometriaEnPlanta = (
         celdas,
         suelo: transformarRect({ x: xSuelo, y: 0, ancho: m.anchoPasillo, largo: t.largo }, t, colocacion),
         accesos: [
-            flecha(0.2, tramo),
-            ...(p.accesos === "UN_EXTREMO" ? [] : [flecha(t.largo - 0.2, t.largo - tramo)]),
+            ...(entraPorFrente(p.accesos) ? [flecha(0.2, tramo)] : []),
+            ...(entraPorFondo(p.accesos) ? [flecha(t.largo - 0.2, t.largo - tramo)] : []),
         ],
     };
 };
@@ -450,7 +465,7 @@ export const puntoEnPlanta = (
 ): { x: number; y: number } => {
     const m = medidasEfectivas(medidasPlanta, colocacion.medidas);
     const t = tamanoSinGirar(p, m);
-    const xSuelo = p.caras === "DERECHA" ? 0 : m.fondo;
+    const xSuelo = xSueloSinGirar(p, m);
     return transformar(xSuelo + m.anchoPasillo / 2, (posicionEnPasillo(modulo) - 0.5) * m.largoModulo, t, colocacion);
 };
 

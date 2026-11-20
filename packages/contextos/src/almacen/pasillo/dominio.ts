@@ -16,11 +16,16 @@ export const carasPasillo: { valor: CarasPasillo; descripcion: string }[] = [
 
 export const accesosPasillo: { valor: AccesosPasillo; descripcion: string }[] = [
     { valor: "AMBOS_EXTREMOS", descripcion: "Ambos extremos" },
-    { valor: "UN_EXTREMO", descripcion: "Un extremo" },
+    { valor: "FRENTE", descripcion: "Solo por el frente (módulo 1)" },
+    { valor: "FONDO", descripcion: "Solo por el fondo (último módulo)" },
 ];
 
 export const descripcionCaras = (caras: string): string =>
     carasPasillo.find((c) => c.valor === caras)?.descripcion ?? caras;
+
+/** El antiguo UN_EXTREMO era el frente. */
+export const normalizarAccesos = (accesos: string): AccesosPasillo =>
+    accesos === "UN_EXTREMO" ? "FRENTE" : (accesos as AccesosPasillo);
 
 export const descripcionAccesos = (accesos: string): string =>
     accesosPasillo.find((a) => a.valor === accesos)?.descripcion ?? accesos;

@@ -35,6 +35,13 @@ describe("mapa · layout", () => {
         expect(modulosDeLado(pasillo("P"), "DERECHA")).toEqual([2, 4, 6, 8]);
     });
 
+    it("visto desde arriba avanzando hacia abajo, los impares (izquierda) quedan a la derecha", () => {
+        const g = geometriaPasillo(pasillo("P"), 0);
+        const x = (m: number) => g.celdas.find((c) => c.modulo === m)!.x;
+        expect(x(1)).toBeGreaterThan(g.xEje);
+        expect(x(2)).toBeLessThan(g.xEje);
+    });
+
     it("un pasillo de una cara solo tiene celdas de esa cara", () => {
         const g = geometriaPasillo(pasillo("P", { caras: "IZQUIERDA", modulos: 3 }), 0);
         expect(g.celdas.map((c) => c.modulo)).toEqual([1, 3, 5]);

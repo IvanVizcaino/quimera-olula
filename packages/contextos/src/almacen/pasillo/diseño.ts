@@ -1,7 +1,8 @@
 import { Entidad, Filtro, Modelo, Orden, Paginacion, RespuestaLista } from "@olula/lib/diseño.ts";
 
 export type CarasPasillo = "AMBAS" | "IZQUIERDA" | "DERECHA";
-export type AccesosPasillo = "AMBOS_EXTREMOS" | "UN_EXTREMO";
+/** Por dónde se entra: los dos extremos, solo el del módulo 1 (frente) o solo el del último (fondo). */
+export type AccesosPasillo = "AMBOS_EXTREMOS" | "FRENTE" | "FONDO";
 
 export interface Pasillo extends Entidad {
     id: string;
