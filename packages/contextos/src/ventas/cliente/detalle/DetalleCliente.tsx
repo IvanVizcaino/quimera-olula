@@ -11,6 +11,8 @@ import { puede, puedeAlguna } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
 import { useCallback, useEffect } from "react";
 import { useParams } from "react-router";
+import { TabPreciosArticulo } from "#/ventas/precio_articulo/detalle/TabPreciosArticulo.tsx";
+import { muestraPreciosArticulo } from "#/ventas/precio_articulo/dominio.ts";
 import { BorrarCliente } from "../borrar/BorrarCliente.tsx";
 import { BajaCliente } from "../dar_de_baja/BajaCliente.tsx";
 import { Cliente } from "../diseño.ts";
@@ -176,6 +178,17 @@ export const DetalleCliente = ({
                               terceroId={ctx.cliente.id}
                             />
                           </div>
+                        }
+                      />,
+                    ]
+                  : []),
+                ...(muestraPreciosArticulo()
+                  ? [
+                      <Tab
+                        key="tab-8"
+                        label="Precios por artículo"
+                        children={
+                          <TabPreciosArticulo clienteId={ctx.cliente.id} />
                         }
                       />,
                     ]

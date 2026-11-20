@@ -12,7 +12,9 @@ type WhoAmI = {
     permisos: Permiso[];
     plugins: Record<string, string>;
     usuario_id: string;
-    config?: Record<string, Record<string, boolean>>;
+    // Valores por contexto y clave: booleanos de configuración (`configuracion()`)
+    // u otros datos, como `ventas.precio_articulo` (`fuentesPrecioArticulo()`).
+    config?: Record<string, Record<string, unknown>>;
 };
 
 

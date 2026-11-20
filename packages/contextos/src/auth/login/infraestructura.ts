@@ -15,7 +15,9 @@ export interface RespuestaWhoAmI {
     plugins: Record<string, string>;
     usuario_id: string;
     empresas: { id: string; nombre: string }[];
-    config?: Record<string, Record<string, boolean>>;
+    // Valores por contexto y clave: booleanos de configuración (`configuracion()`)
+    // u otros datos, como `ventas.precio_articulo` (`fuentesPrecioArticulo()`).
+    config?: Record<string, Record<string, unknown>>;
 }
 
 type PeticionLogin = { id: string; password: string; };
