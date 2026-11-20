@@ -426,14 +426,21 @@ export const geometriaEnPlanta = (
         }))
     );
     const xEje = xSuelo + m.anchoPasillo / 2;
-    const inicio = transformar(xEje, 0.2, t, colocacion);
-    const fin = transformar(xEje, Math.min(t.largo * 0.5, 2.5), t, colocacion);
+    const tramo = Math.min(t.largo * 0.3, 2.5);
+    const flecha = (desde: number, hasta: number) => {
+        const a = transformar(xEje, desde, t, colocacion);
+        const b = transformar(xEje, hasta, t, colocacion);
+        return { x1: a.x, y1: a.y, x2: b.x, y2: b.y };
+    };
     return {
         pasilloId: p.pasilloId,
         ...transformarRect({ x: 0, y: 0, ...t }, t, colocacion),
         celdas,
         suelo: transformarRect({ x: xSuelo, y: 0, ancho: m.anchoPasillo, largo: t.largo }, t, colocacion),
-        flecha: { x1: inicio.x, y1: inicio.y, x2: fin.x, y2: fin.y },
+        accesos: [
+            flecha(0.2, tramo),
+            ...(p.accesos === "UN_EXTREMO" ? [] : [flecha(t.largo - 0.2, t.largo - tramo)]),
+        ],
     };
 };
 

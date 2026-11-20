@@ -116,8 +116,8 @@ export interface GeometriaPasilloPlanta extends Rect {
     celdas: CeldaPlanta[];
     /** Suelo por el que se camina. */
     suelo: Rect;
-    /** Flecha del sentido de avance: de la entrada hacia dentro. */
-    flecha: { x1: number; y1: number; x2: number; y2: number };
+    /** Una flecha hacia dentro por cada extremo por el que se entra (frente y, si tiene, fondo). */
+    accesos: { x1: number; y1: number; x2: number; y2: number }[];
 }
 
 export type VistaMapa = "ESQUEMA" | "PLANTA";

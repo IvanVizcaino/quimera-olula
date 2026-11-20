@@ -49,6 +49,16 @@ describe("geometría de la planta real", () => {
         expect(g.suelo).toEqual({ x: 11, y: 2, ancho: 3, largo: 8 });
     });
 
+    it("una flecha hacia dentro por cada extremo por el que se entra", () => {
+        const dos = geometriaEnPlanta(pasillo("A"), colocado("A", 0, 0), M);
+        expect(dos.accesos).toEqual([
+            { x1: 2.5, y1: 0.2, x2: 2.5, y2: 2.4 },
+            { x1: 2.5, y1: 7.8, x2: 2.5, y2: 5.6 },
+        ]);
+        const uno = geometriaEnPlanta(pasillo("A", { accesos: "UN_EXTREMO" }), colocado("A", 0, 0), M);
+        expect(uno.accesos).toHaveLength(1);
+    });
+
     it("girado 90°: el avance va de derecha a izquierda y el rectángulo cabe en (x, y)", () => {
         const g = geometriaEnPlanta(pasillo("A"), colocado("A", 0, 0, 90), M);
         expect({ x: g.x, y: g.y, ancho: g.ancho, largo: g.largo }).toEqual({ x: 0, y: 0, ancho: 8, largo: 5 });

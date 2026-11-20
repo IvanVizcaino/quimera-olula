@@ -239,15 +239,18 @@ export const PlantaReal = ({
                                     </g>
                                 );
                             })}
-                            <line
-                                className="mapa-pasillo-flecha"
-                                x1={g.flecha.x1}
-                                y1={g.flecha.y1}
-                                x2={g.flecha.x2}
-                                y2={g.flecha.y2}
-                                markerEnd="url(#mapa-flecha)"
-                                aria-hidden="true"
-                            />
+                            {g.accesos.map((f, i) => (
+                                <line
+                                    key={i}
+                                    className="mapa-pasillo-flecha"
+                                    x1={f.x1}
+                                    y1={f.y1}
+                                    x2={f.x2}
+                                    y2={f.y2}
+                                    markerEnd="url(#mapa-flecha)"
+                                    aria-hidden="true"
+                                />
+                            ))}
                             <text
                                 className="mapa-pasillo-rotulo"
                                 x={g.suelo.x + g.suelo.ancho / 2}
