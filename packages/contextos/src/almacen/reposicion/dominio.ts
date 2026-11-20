@@ -51,11 +51,11 @@ export interface ParteSituacion {
     cantidad: number;
 }
 
-/** Físico siempre; entrante y saliente solo si no son cero. */
+/** Físico, entrante y saliente, aunque sean cero. */
 export const situacion = (
     n: Pick<NecesidadReposicion, "fisico" | "entrante" | "saliente">
 ): ParteSituacion[] => [
     { tipo: "fisico" as const, cantidad: n.fisico },
-    ...(n.entrante ? [{ tipo: "entrante" as const, cantidad: n.entrante }] : []),
-    ...(n.saliente ? [{ tipo: "saliente" as const, cantidad: n.saliente }] : []),
+    { tipo: "entrante" as const, cantidad: n.entrante },
+    { tipo: "saliente" as const, cantidad: n.saliente },
 ];

@@ -37,14 +37,12 @@ describe("reposición", () => {
         expect(textoArticulo({ articuloId: "REF2", descripcion: "" })).toBe("REF2");
     });
 
-    it("la situación lleva el físico y solo los pendientes que no son cero", () => {
+    it("la situación lleva físico, entrante y saliente aunque sean cero", () => {
         expect(situacion(necesidad)).toEqual([
             { tipo: "fisico", cantidad: 22 },
+            { tipo: "entrante", cantidad: 0 },
             { tipo: "saliente", cantidad: 15 },
         ]);
-        expect(situacion({ fisico: 0, entrante: 0, saliente: 0 })).toEqual([{ tipo: "fisico", cantidad: 0 }]);
-        expect(situacion({ fisico: 3, entrante: 10, saliente: 2 }).map((p) => p.tipo))
-            .toEqual(["fisico", "entrante", "saliente"]);
     });
 
     it("suma y describe los orígenes", () => {
