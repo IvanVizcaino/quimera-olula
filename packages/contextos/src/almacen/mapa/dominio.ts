@@ -1,8 +1,9 @@
 import { ClaseAbc } from "#/almacen/slotting/diseño.ts";
 import { RecorridoOrden } from "#/almacen/orden/diseño.ts";
 import {
-    CapaMapa, CeldaModulo, EntradaLeyenda, GeometriaPasillo, Lado, MapaAlmacen, PasilloMapa,
-    PuntoRecorrido, Tono, UbicacionMapa,
+    CapaMapa, CeldaModulo, ElegidoPlanta, ElementoPlanta, EntradaLeyenda, GeometriaPasillo,
+    GeometriaPasilloPlanta, Giro, Lado, MapaAlmacen, MedidasPlanta, MedidasPropias, PasilloEnPlanta,
+    PasilloMapa, PlantaAlmacen, PuntoRecorrido, Rect, TipoElemento, Tono, UbicacionMapa,
 } from "./diseño.ts";
 
 export const capasMapa: { valor: CapaMapa; descripcion: string }[] = [
@@ -338,4 +339,313 @@ export const trazoRecorrido = (
     }
     if (pasilloActual !== null) trazo.push({ x: porPasillo.get(pasilloActual)!.xEje, y: yCabecera });
     return trazo;
+};
+
+// ─── Planta real (doc/especificaciones/sga_planta.md), en metros ─────────
+
+export const MEDIDAS_PLANTA_POR_DEFECTO: MedidasPlanta = { largoModulo: 2.7, fondo: 1.1, anchoPasillo: 3 };
+
+export const GIROS: Giro[] = [0, 90, 180, 270];
+
+export const tiposElemento: { valor: TipoElemento; descripcion: string }[] = [
+    { valor: "MUELLE", descripcion: "Muelle" },
+    { valor: "PUERTA", descripcion: "Puerta" },
+    { valor: "OFICINA", descripcion: "Oficina" },
+    { valor: "COLUMNA", descripcion: "Columna" },
+    { valor: "OTRO", descripcion: "Otro" },
+];
+
+/** Encaje de la rejilla al arrastrar. */
+export const PASO_PLANTA = 0.5;
+
+const redondear = (n: number) => Math.round(n * 100) / 100;
+
+export const ajustarARejilla = (n: number, paso = PASO_PLANTA): number => redondear(Math.round(n / paso) * paso);
+
+export const medidasEfectivas = (planta: MedidasPlanta, propias: MedidasPropias): MedidasPlanta => ({
+    largoModulo: propias.largoModulo ?? planta.largoModulo,
+    fondo: propias.fondo ?? planta.fondo,
+    anchoPasillo: propias.anchoPasillo ?? planta.anchoPasillo,
+});
+
+export const girar = (giro: Giro): Giro => GIROS[(GIROS.indexOf(giro) + 1) % GIROS.length];
+
+/** Ancho y largo del pasillo sin girar (sentido de avance hacia abajo). */
+const tamanoSinGirar = (p: Pick<PasilloMapa, "caras" | "modulos">, m: MedidasPlanta) => ({
+    ancho: m.fondo * (p.caras === "AMBAS" ? 2 : 1) + m.anchoPasillo,
+    largo: p.modulos * m.largoModulo,
+});
+
+export const tamanoPasillo = (
+    p: Pick<PasilloMapa, "caras" | "modulos">, m: MedidasPlanta, giro: Giro,
+): { ancho: number; largo: number } => {
+    const t = tamanoSinGirar(p, m);
+    return giro === 90 || giro === 270 ? { ancho: t.largo, largo: t.ancho } : t;
+};
+
+/** Un punto del pasillo sin girar (origen arriba a la izquierda) a coordenadas de la nave. */
+const transformar = (
+    px: number, py: number, t: { ancho: number; largo: number }, c: Pick<PasilloEnPlanta, "x" | "y" | "giro">,
+) => {
+    const [gx, gy] = {
+        0: [px, py],
+        90: [t.largo - py, px],
+        180: [t.ancho - px, t.largo - py],
+        270: [py, t.ancho - px],
+    }[c.giro];
+    return { x: c.x + gx, y: c.y + gy };
+};
+
+const transformarRect = (
+    r: Rect, t: { ancho: number; largo: number }, c: Pick<PasilloEnPlanta, "x" | "y" | "giro">,
+): Rect => {
+    const a = transformar(r.x, r.y, t, c);
+    const b = transformar(r.x + r.ancho, r.y + r.largo, t, c);
+    return {
+        x: Math.min(a.x, b.x), y: Math.min(a.y, b.y),
+        ancho: Math.abs(b.x - a.x), largo: Math.abs(b.y - a.y),
+    };
+};
+
+/** Dónde cae cada módulo de un pasillo colocado, y su suelo, en metros de la nave. */
+export const geometriaEnPlanta = (
+    p: PasilloMapa, colocacion: PasilloEnPlanta, medidasPlanta: MedidasPlanta,
+): GeometriaPasilloPlanta => {
+    const m = medidasEfectivas(medidasPlanta, colocacion.medidas);
+    const t = tamanoSinGirar(p, m);
+    const xSuelo = p.caras === "DERECHA" ? 0 : m.fondo;
+    const celdas = ladosDePasillo(p).flatMap((lado) =>
+        modulosDeLado(p, lado).map((modulo) => ({
+            modulo,
+            ...transformarRect({
+                x: lado === "IZQUIERDA" ? 0 : xSuelo + m.anchoPasillo,
+                y: (posicionEnPasillo(modulo) - 1) * m.largoModulo,
+                ancho: m.fondo,
+                largo: m.largoModulo,
+            }, t, colocacion),
+        }))
+    );
+    const xEje = xSuelo + m.anchoPasillo / 2;
+    const inicio = transformar(xEje, 0.2, t, colocacion);
+    const fin = transformar(xEje, Math.min(t.largo * 0.5, 2.5), t, colocacion);
+    return {
+        pasilloId: p.pasilloId,
+        ...transformarRect({ x: 0, y: 0, ...t }, t, colocacion),
+        celdas,
+        suelo: transformarRect({ x: xSuelo, y: 0, ancho: m.anchoPasillo, largo: t.largo }, t, colocacion),
+        flecha: { x1: inicio.x, y1: inicio.y, x2: fin.x, y2: fin.y },
+    };
+};
+
+/** Centro del módulo sobre el eje del pasillo (donde para el operario), en metros de la nave. */
+export const puntoEnPlanta = (
+    p: PasilloMapa, colocacion: PasilloEnPlanta, medidasPlanta: MedidasPlanta, modulo: number,
+): { x: number; y: number } => {
+    const m = medidasEfectivas(medidasPlanta, colocacion.medidas);
+    const t = tamanoSinGirar(p, m);
+    const xSuelo = p.caras === "DERECHA" ? 0 : m.fondo;
+    return transformar(xSuelo + m.anchoPasillo / 2, (posicionEnPasillo(modulo) - 0.5) * m.largoModulo, t, colocacion);
+};
+
+export const todosLosPasillos = (mapa: Pick<MapaAlmacen, "zonas">): PasilloMapa[] =>
+    mapa.zonas.flatMap((z) => z.pasillos);
+
+/** Código «ZONA-PASILLO» con el que se rotula un pasillo en la planta. */
+export const rotuloPasillo = (mapa: Pick<MapaAlmacen, "zonas">, pasilloId: string): string => {
+    const zona = mapa.zonas.find((z) => z.pasillos.some((p) => p.pasilloId === pasilloId));
+    const pasillo = zona?.pasillos.find((p) => p.pasilloId === pasilloId);
+    return zona && pasillo ? `${zona.zona}-${pasillo.pasillo}` : pasilloId;
+};
+
+export const pasillosSinColocar = (mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen): PasilloMapa[] => {
+    const colocados = new Set(planta.pasillos.map((c) => c.pasilloId));
+    return todosLosPasillos(mapa).filter((p) => !colocados.has(p.pasilloId));
+};
+
+/** Rectángulo de un pasillo colocado (null si ya no existe en el layout). */
+export const rectPasillo = (
+    mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen, c: PasilloEnPlanta,
+): Rect | null => {
+    const p = todosLosPasillos(mapa).find((x) => x.pasilloId === c.pasilloId);
+    if (!p) return null;
+    return { x: c.x, y: c.y, ...tamanoPasillo(p, medidasEfectivas(planta.medidas, c.medidas), c.giro) };
+};
+
+const TOLERANCIA = 1e-6;
+
+const solapan = (a: Rect, b: Rect): boolean =>
+    a.x < b.x + b.ancho - TOLERANCIA && b.x < a.x + a.ancho - TOLERANCIA &&
+    a.y < b.y + b.largo - TOLERANCIA && b.y < a.y + a.largo - TOLERANCIA;
+
+export const cabeEnNave = (planta: Pick<PlantaAlmacen, "ancho" | "largo">, r: Rect): boolean =>
+    r.x >= -TOLERANCIA && r.y >= -TOLERANCIA &&
+    r.x + r.ancho <= planta.ancho + TOLERANCIA && r.y + r.largo <= planta.largo + TOLERANCIA;
+
+/** Mueve el rectángulo lo justo para que quede dentro de la nave (si cabe). */
+export const dentroDeNave = (planta: Pick<PlantaAlmacen, "ancho" | "largo">, r: Rect): { x: number; y: number } => ({
+    x: redondear(Math.min(Math.max(r.x, 0), Math.max(planta.ancho - r.ancho, 0))),
+    y: redondear(Math.min(Math.max(r.y, 0), Math.max(planta.largo - r.largo, 0))),
+});
+
+interface PiezaPlanta {
+    nombre: string;
+    rect: Rect;
+}
+
+const piezas = (mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen): PiezaPlanta[] => [
+    ...planta.pasillos.flatMap((c) => {
+        const rect = rectPasillo(mapa, planta, c);
+        return rect ? [{ nombre: `Pasillo ${rotuloPasillo(mapa, c.pasilloId)}`, rect }] : [];
+    }),
+    ...planta.elementos.map((e) => ({ nombre: e.nombre, rect: e })),
+];
+
+/** Avisos del editor: solapes y piezas fuera de la nave (el servidor rechaza estas últimas). */
+export const avisosPlanta = (mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen): string[] => {
+    const todas = piezas(mapa, planta);
+    const fuera = todas.filter((p) => !cabeEnNave(planta, p.rect)).map((p) => `${p.nombre} se sale de la nave`);
+    const solapes = todas.flatMap((a, i) =>
+        todas.slice(i + 1).filter((b) => solapan(a.rect, b.rect)).map((b) => `${a.nombre} se solapa con ${b.nombre}`)
+    );
+    return [...fuera, ...solapes];
+};
+
+/** Primer hueco libre de la nave (barrido por filas cada metro) para un rectángulo; si no hay, el origen. */
+export const huecoLibre = (
+    mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen, tamano: { ancho: number; largo: number },
+): { x: number; y: number } => {
+    const ocupado = piezas(mapa, planta).map((p) => p.rect);
+    for (let y = 0; y + tamano.largo <= planta.largo + TOLERANCIA; y += 1) {
+        for (let x = 0; x + tamano.ancho <= planta.ancho + TOLERANCIA; x += 1) {
+            const r = { x, y, ...tamano };
+            if (!ocupado.some((o) => solapan(o, r))) return { x, y };
+        }
+    }
+    return { x: 0, y: 0 };
+};
+
+const SEPARACION_INICIAL = 2;
+
+/**
+ * Planta que se propone al crearla: los pasillos de cada zona en fila por su orden, una zona tras
+ * otra, con las medidas por defecto; la nave los abarca con un margen.
+ */
+export const plantaInicial = (mapa: Pick<MapaAlmacen, "zonas">): PlantaAlmacen => {
+    const medidas = MEDIDAS_PLANTA_POR_DEFECTO;
+    let x = SEPARACION_INICIAL;
+    let largo = 0;
+    const pasillos: PasilloEnPlanta[] = [];
+    for (const z of mapa.zonas) {
+        if (z.pasillos.length === 0) continue;
+        for (const p of z.pasillos) {
+            const t = tamanoPasillo(p, medidas, 0);
+            pasillos.push({ pasilloId: p.pasilloId, x: redondear(x), y: SEPARACION_INICIAL, giro: 0, medidas: {} });
+            x += t.ancho + 1;
+            largo = Math.max(largo, t.largo);
+        }
+        x += SEPARACION_INICIAL - 1;
+    }
+    return {
+        // x ya lleva la separación tras la última zona: es el margen derecho.
+        ancho: Math.max(10, Math.ceil(x)),
+        largo: Math.max(10, Math.ceil(largo + SEPARACION_INICIAL * 2)),
+        medidas,
+        pasillos,
+        elementos: [],
+    };
+};
+
+export const colocarPasillo = (
+    mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen, pasillo: PasilloMapa,
+): PlantaAlmacen => {
+    const { x, y } = huecoLibre(mapa, planta, tamanoPasillo(pasillo, planta.medidas, 0));
+    return { ...planta, pasillos: [...planta.pasillos, { pasilloId: pasillo.pasilloId, x, y, giro: 0, medidas: {} }] };
+};
+
+export const cambiarPasilloEnPlanta = (
+    planta: PlantaAlmacen, pasilloId: string, cambios: Partial<PasilloEnPlanta>,
+): PlantaAlmacen => ({
+    ...planta,
+    pasillos: planta.pasillos.map((c) => (c.pasilloId === pasilloId ? { ...c, ...cambios } : c)),
+});
+
+export const quitarPasilloDePlanta = (planta: PlantaAlmacen, pasilloId: string): PlantaAlmacen => ({
+    ...planta,
+    pasillos: planta.pasillos.filter((c) => c.pasilloId !== pasilloId),
+});
+
+/** Gira 90° el pasillo sobre su centro, dentro de la nave. */
+export const girarPasillo = (
+    mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen, pasilloId: string,
+): PlantaAlmacen => {
+    const c = planta.pasillos.find((x) => x.pasilloId === pasilloId);
+    const antes = c && rectPasillo(mapa, planta, c);
+    if (!c || !antes) return planta;
+    const giro = girar(c.giro);
+    const despues = { ...antes, ancho: antes.largo, largo: antes.ancho };
+    const centrado = {
+        ...despues,
+        x: ajustarARejilla(antes.x + (antes.ancho - despues.ancho) / 2),
+        y: ajustarARejilla(antes.y + (antes.largo - despues.largo) / 2),
+    };
+    return cambiarPasilloEnPlanta(planta, pasilloId, { giro, ...dentroDeNave(planta, centrado) });
+};
+
+export const nuevoElemento = (planta: PlantaAlmacen, tipo: TipoElemento = "MUELLE"): PlantaAlmacen => {
+    const numero = planta.elementos.filter((e) => e.tipo === tipo).length + 1;
+    const descripcion = tiposElemento.find((t) => t.valor === tipo)?.descripcion ?? tipo;
+    const tamano = { ancho: 4, largo: 3 };
+    return {
+        ...planta,
+        elementos: [...planta.elementos, { tipo, nombre: `${descripcion} ${numero}`, ...dentroDeNave(planta, { x: 0, y: 0, ...tamano }), ...tamano }],
+    };
+};
+
+export const cambiarElemento = (
+    planta: PlantaAlmacen, indice: number, cambios: Partial<ElementoPlanta>,
+): PlantaAlmacen => ({
+    ...planta,
+    elementos: planta.elementos.map((e, i) => (i === indice ? { ...e, ...cambios } : e)),
+});
+
+export const quitarElemento = (planta: PlantaAlmacen, indice: number): PlantaAlmacen => ({
+    ...planta,
+    elementos: planta.elementos.filter((_, i) => i !== indice),
+});
+
+/** Lleva una pieza a (x, y) encajada a la rejilla y sin salirse de la nave. */
+export const moverPieza = (
+    mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen, elegido: ElegidoPlanta, x: number, y: number,
+): PlantaAlmacen => {
+    if (elegido.tipo === "PASILLO") {
+        const c = planta.pasillos.find((p) => p.pasilloId === elegido.pasilloId);
+        const r = c && rectPasillo(mapa, planta, c);
+        if (!r) return planta;
+        return cambiarPasilloEnPlanta(planta, elegido.pasilloId,
+            dentroDeNave(planta, { ...r, x: ajustarARejilla(x), y: ajustarARejilla(y) }));
+    }
+    const e = planta.elementos[elegido.indice];
+    if (!e) return planta;
+    return cambiarElemento(planta, elegido.indice, dentroDeNave(planta, { ...e, x: ajustarARejilla(x), y: ajustarARejilla(y) }));
+};
+
+/** Desplaza una pieza (dx, dy) metros desde donde está ahora en la planta. */
+export const desplazarPieza = (
+    mapa: Pick<MapaAlmacen, "zonas">, planta: PlantaAlmacen, elegido: ElegidoPlanta, dx: number, dy: number,
+): PlantaAlmacen => {
+    const origen = elegido.tipo === "PASILLO"
+        ? planta.pasillos.find((p) => p.pasilloId === elegido.pasilloId)
+        : planta.elementos[elegido.indice];
+    return origen ? moverPieza(mapa, planta, elegido, origen.x + dx, origen.y + dy) : planta;
+};
+
+/** Número de un campo del editor: positivo, o null si no lo es. */
+export const metrosPositivos = (valor: string): number | null => {
+    const n = Number(String(valor).replace(",", "."));
+    return Number.isFinite(n) && n > 0 ? redondear(n) : null;
+};
+
+export const metrosNoNegativos = (valor: string): number | null => {
+    const n = Number(String(valor).replace(",", "."));
+    return Number.isFinite(n) && n >= 0 ? redondear(n) : null;
 };

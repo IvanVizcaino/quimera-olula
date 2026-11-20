@@ -5,18 +5,23 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/index.js";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
+import { puede } from "@olula/lib/dominio.ts";
 import { AlzadoPasillo } from "./alzado/AlzadoPasillo.tsx";
 import { DetalleUbicacionMapa } from "./detalle/DetalleUbicacionMapa.tsx";
+import { ElegidoPlanta, PlantaAlmacen, UbicacionMapa } from "./diseño.ts";
 import {
-    capasMapa, leyenda, paletaClases, paradasSinPasillo, puntosRecorrido,
+    capasMapa, leyenda, paletaClases, paradasSinPasillo, puntosRecorrido, resumenUbicacion,
+    tonoUbicacion,
 } from "./dominio.ts";
-import { contextoMapaInicial, getMaquina } from "./maquina.ts";
+import { contextoMapaInicial, desplazarEnBorrador, getMaquina } from "./maquina.ts";
 import { PlantaZona } from "./planta/PlantaZona.tsx";
+import { EditorPlanta } from "./planta_real/EditorPlanta.tsx";
+import { PlantaReal } from "./planta_real/PlantaReal.tsx";
 import "#/comun/estilos/pagina_proceso.css";
 import "./MapaAlmacen.css";
 
 export const MapaAlmacen = () => {
-    const { ctx, emitir } = useMaquina(getMaquina, contextoMapaInicial);
+    const { ctx, emitir, setCtx } = useMaquina(getMaquina, contextoMapaInicial);
     const { mapa, capa } = ctx;
     const paleta = mapa ? paletaClases(mapa) : new Map<string, number>();
     const zonas = mapa ? mapa.zonas.filter((z) => !ctx.zonaId || z.zonaId === ctx.zonaId) : [];
@@ -24,6 +29,13 @@ export const MapaAlmacen = () => {
     const ubicacion = mapa?.ubicaciones.find((u) => u.ubicacionId === ctx.ubicacionId) ?? null;
     const puntos = mapa && ctx.recorrido ? puntosRecorrido(ctx.recorrido, mapa) : [];
     const sinPasillo = mapa && ctx.recorrido ? paradasSinPasillo(ctx.recorrido, mapa) : [];
+    const editando = ctx.estado === "EDITANDO" && ctx.borrador !== null;
+    const planta: PlantaAlmacen | null = editando ? ctx.borrador : mapa?.planta ?? null;
+    const enPlanta = (editando || ctx.vista === "PLANTA") && planta !== null;
+    const puedeEditar = puede("almacen.pasillo");
+    const sueltas = mapa
+        ? mapa.ubicaciones.filter((u) => u.pasilloId === null && (!ctx.zonaId || u.zonaId === ctx.zonaId))
+        : [];
 
     return (
         <div className="MapaAlmacen PaginaProceso">
@@ -54,9 +66,28 @@ export const MapaAlmacen = () => {
                     opciones={capasMapa}
                     onChange={(opcion) => emitir("capa_cambiada", opcion?.valor ?? "")}
                 />
+                <QSelect
+                    label="Vista"
+                    nombre="vista"
+                    valor={enPlanta ? "PLANTA" : "ESQUEMA"}
+                    opciones={[
+                        { valor: "ESQUEMA", descripcion: "Esquema por zonas" },
+                        ...(mapa?.planta ? [{ valor: "PLANTA", descripcion: "Planta real" }] : []),
+                    ]}
+                    deshabilitado={!mapa?.planta || editando}
+                    onChange={(opcion) => emitir("vista_cambiada", opcion?.valor ?? "")}
+                />
             </quimera-formulario>
 
-            <div className="mapa-barra">
+            {mapa && puedeEditar && !editando && (
+                <div className="botones mapa-botones-planta">
+                    <QBoton variante="borde" onClick={() => emitir("edicion_solicitada")}>
+                        {mapa.planta ? "Editar planta" : "Crear planta"}
+                    </QBoton>
+                </div>
+            )}
+
+            <div className="mapa-barra" hidden={editando}>
                 <div className="mapa-barra-campos">
                     <quimera-formulario>
                         <QSelect
@@ -79,7 +110,7 @@ export const MapaAlmacen = () => {
                 </div>
             </div>
 
-            <div className="mapa-barra">
+            <div className="mapa-barra" hidden={editando}>
                 <div className="mapa-barra-campos">
                     <quimera-formulario>
                         <QInput
@@ -147,6 +178,53 @@ export const MapaAlmacen = () => {
             {mapa && mapa.zonas.length === 0 && <p>El almacén no tiene zonas.</p>}
 
             <div className="mapa-vistas">
+                {enPlanta && mapa && planta && (
+                    <div className="mapa-zonas mapa-zonas-planta">
+                        <section className="mapa-zona mapa-zona-planta">
+                            <PlantaReal
+                                mapa={mapa}
+                                planta={planta}
+                                capa={capa}
+                                paleta={paleta}
+                                zonaId={ctx.zonaId}
+                                pasilloId={ctx.pasilloId}
+                                ubicacionId={ctx.ubicacionId}
+                                recorrido={editando ? [] : puntos}
+                                onPasillo={(id) => emitir("pasillo_seleccionado", id)}
+                                edicion={editando
+                                    ? {
+                                        elegido: ctx.elegido,
+                                        onElegir: (e: ElegidoPlanta | null) => emitir("pieza_elegida", e),
+                                        onDesplazar: (e: ElegidoPlanta, dx: number, dy: number) =>
+                                            setCtx((c) => desplazarEnBorrador(c, e, dx, dy)),
+                                    }
+                                    : undefined}
+                            />
+                            {!editando && sueltas.length > 0 && (
+                                <FichasSueltas
+                                    ubicaciones={sueltas}
+                                    capa={capa}
+                                    paleta={paleta}
+                                    ubicacionId={ctx.ubicacionId}
+                                    onUbicacion={(id) => emitir("ubicacion_seleccionada", id)}
+                                />
+                            )}
+                        </section>
+                    </div>
+                )}
+
+                {editando && mapa && planta && (
+                    <EditorPlanta
+                        mapa={mapa}
+                        planta={planta}
+                        elegido={ctx.elegido}
+                        onCambiar={(p, e) => emitir("borrador_cambiado", { planta: p, elegido: e })}
+                        onGuardar={() => emitir("guardado_solicitado")}
+                        onCancelar={() => emitir("edicion_cancelada")}
+                    />
+                )}
+
+                {!enPlanta && (
                 <div className="mapa-zonas" aria-label="Zonas del almacén" role="group">
                     {zonas.map((z) => (
                         <PlantaZona
@@ -163,8 +241,9 @@ export const MapaAlmacen = () => {
                         />
                     ))}
                 </div>
+                )}
 
-                {mapa && pasillo && (
+                {mapa && pasillo && !editando && (
                     <section className="mapa-panel mapa-panel-alzado">
                         <div className="mapa-panel-cabecera">
                             <h3>Pasillo {pasillo.pasillo}</h3>
@@ -184,7 +263,7 @@ export const MapaAlmacen = () => {
                 )}
             </div>
 
-            {ubicacion && (
+            {ubicacion && !editando && (
                 <DetalleUbicacionMapa
                     ubicacion={ubicacion}
                     onCerrar={() => emitir("ubicacion_seleccionada", null)}
@@ -193,3 +272,26 @@ export const MapaAlmacen = () => {
         </div>
     );
 };
+
+/** Ubicaciones sin pasillo (playas, muelles, migración) bajo la planta real. */
+const FichasSueltas = ({ ubicaciones, capa, paleta, ubicacionId, onUbicacion }: {
+    ubicaciones: UbicacionMapa[];
+    capa: Parameters<typeof tonoUbicacion>[1];
+    paleta: Map<string, number>;
+    ubicacionId: string | null;
+    onUbicacion: (id: string) => void;
+}) => (
+    <div className="mapa-sueltas" aria-label="Ubicaciones fuera de pasillo" role="group">
+        {ubicaciones.map((u) => (
+            <button
+                key={u.ubicacionId}
+                type="button"
+                className={`mapa-ficha tono-${tonoUbicacion(u, capa, paleta)}${u.ubicacionId === ubicacionId ? " seleccionada" : ""}`}
+                title={resumenUbicacion(u)}
+                onClick={() => onUbicacion(u.ubicacionId)}
+            >
+                {u.ubicacion}
+            </button>
+        ))}
+    </div>
+);

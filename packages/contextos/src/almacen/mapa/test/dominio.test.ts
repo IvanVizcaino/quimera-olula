@@ -21,6 +21,7 @@ const ubi = (id: string, extra: Partial<UbicacionMapa> = {}): UbicacionMapa => (
 const mapa = (ubicaciones: UbicacionMapa[]): MapaAlmacen => ({
     zonas: [{ zonaId: "Z", zona: "PIC", funcion: "PICKING", pasillos: [pasillo("P1"), pasillo("P2")] }],
     ubicaciones,
+    planta: null,
 });
 
 const SIN = new Map<string, number>();

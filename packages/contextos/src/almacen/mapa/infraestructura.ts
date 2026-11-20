@@ -1,7 +1,10 @@
 import { ClaseAbc } from "#/almacen/slotting/diseño.ts";
 import { construirQuery } from "#/almacen/slotting/dominio.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
-import { CarasPasillo, GetMapa, MapaAlmacen, UbicacionMapa, ZonaMapa } from "./diseño.ts";
+import {
+    CarasPasillo, ElementoPlanta, GetMapa, Giro, GuardarPlanta, MapaAlmacen, MedidasPlanta, MedidasPropias,
+    PlantaAlmacen, UbicacionMapa, ZonaMapa,
+} from "./diseño.ts";
 
 const baseUrl = `/almacen/mapa`;
 
@@ -41,10 +44,66 @@ interface UbicacionMapaApi {
     picking_fijo: { articulo_id: string; minimo: number; maximo: number } | null;
 }
 
+interface MedidasApi {
+    largo_modulo: number | null;
+    fondo: number | null;
+    ancho_pasillo: number | null;
+}
+
+interface PlantaApi {
+    ancho: number;
+    largo: number;
+    medidas: MedidasApi;
+    pasillos: { pasillo_id: string; x: number; y: number; giro: number; medidas: MedidasApi }[];
+    elementos: ElementoPlanta[];
+}
+
 interface MapaAlmacenApi {
     zonas: ZonaMapaApi[];
     ubicaciones: UbicacionMapaApi[];
+    planta?: PlantaApi | null;
 }
+
+const propiasDesdeApi = (m: MedidasApi | null | undefined): MedidasPropias => ({
+    ...(m?.largo_modulo != null ? { largoModulo: m.largo_modulo } : {}),
+    ...(m?.fondo != null ? { fondo: m.fondo } : {}),
+    ...(m?.ancho_pasillo != null ? { anchoPasillo: m.ancho_pasillo } : {}),
+});
+
+const medidasDesdeApi = (m: MedidasApi): MedidasPlanta => ({
+    largoModulo: m.largo_modulo ?? 0,
+    fondo: m.fondo ?? 0,
+    anchoPasillo: m.ancho_pasillo ?? 0,
+});
+
+const giroDesdeApi = (g: number): Giro => ([0, 90, 180, 270].includes(g) ? g : 0) as Giro;
+
+export const plantaDesdeApi = (p: PlantaApi | null | undefined): PlantaAlmacen | null =>
+    p
+        ? {
+            ancho: p.ancho,
+            largo: p.largo,
+            medidas: medidasDesdeApi(p.medidas),
+            pasillos: p.pasillos.map((c) => ({
+                pasilloId: c.pasillo_id, x: c.x, y: c.y, giro: giroDesdeApi(c.giro), medidas: propiasDesdeApi(c.medidas),
+            })),
+            elementos: p.elementos.map((e) => ({ ...e })),
+        }
+        : null;
+
+const medidasAApi = (m: MedidasPropias): MedidasApi => ({
+    largo_modulo: m.largoModulo ?? null,
+    fondo: m.fondo ?? null,
+    ancho_pasillo: m.anchoPasillo ?? null,
+});
+
+export const plantaAApi = (p: PlantaAlmacen): PlantaApi => ({
+    ancho: p.ancho,
+    largo: p.largo,
+    medidas: medidasAApi(p.medidas),
+    pasillos: p.pasillos.map((c) => ({ pasillo_id: c.pasilloId, x: c.x, y: c.y, giro: c.giro, medidas: medidasAApi(c.medidas) })),
+    elementos: p.elementos,
+});
 
 const zonaDesdeApi = (z: ZonaMapaApi): ZonaMapa => ({
     zonaId: z.zona_id,
@@ -85,6 +144,7 @@ const ubicacionDesdeApi = (u: UbicacionMapaApi): UbicacionMapa => ({
 export const mapaDesdeApi = (m: MapaAlmacenApi): MapaAlmacen => ({
     zonas: m.zonas.map(zonaDesdeApi),
     ubicaciones: m.ubicaciones.map(ubicacionDesdeApi),
+    planta: plantaDesdeApi(m.planta),
 });
 
 export const getMapa: GetMapa = async (almacenId, dias, origen) => {
@@ -92,4 +152,8 @@ export const getMapa: GetMapa = async (almacenId, dias, origen) => {
         baseUrl + construirQuery({ almacen_id: almacenId, dias, origen })
     );
     return mapaDesdeApi(respuesta.datos);
+};
+
+export const guardarPlanta: GuardarPlanta = async (almacenId, planta) => {
+    await RestAPI.put(`/almacen/planta/${encodeURIComponent(almacenId)}`, plantaAApi(planta), "Error al guardar la planta");
 };

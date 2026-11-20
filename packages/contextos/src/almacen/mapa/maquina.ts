@@ -3,11 +3,12 @@ import { RecorridoOrden } from "#/almacen/orden/diseño.ts";
 import { OrigenRotacion } from "#/almacen/slotting/diseño.ts";
 import { DIAS_POR_DEFECTO, enteroPositivo, ORIGEN_POR_DEFECTO, origenRotacion } from "#/almacen/slotting/dominio.ts";
 import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
-import { CapaMapa, MapaAlmacen } from "./diseño.ts";
-import { CAPA_POR_DEFECTO, capaMapa } from "./dominio.ts";
-import { getMapa } from "./infraestructura.ts";
+import { CapaMapa, ElegidoPlanta, MapaAlmacen, PlantaAlmacen, VistaMapa } from "./diseño.ts";
+import { CAPA_POR_DEFECTO, capaMapa, desplazarPieza, plantaInicial } from "./dominio.ts";
+import { getMapa, guardarPlanta } from "./infraestructura.ts";
 
-export type EstadoMapa = "INICIAL" | "CARGADO";
+/** EDITANDO: el editor de la planta real, con su borrador. */
+export type EstadoMapa = "INICIAL" | "CARGADO" | "EDITANDO";
 
 export type ContextoMapa = {
     estado: EstadoMapa;
@@ -23,6 +24,10 @@ export type ContextoMapa = {
     ubicacionId: string | null;
     ordenId: string;
     recorrido: RecorridoOrden | null;
+    vista: VistaMapa;
+    /** La planta que se está editando (solo en EDITANDO). */
+    borrador: PlantaAlmacen | null;
+    elegido: ElegidoPlanta | null;
 };
 
 export const contextoMapaInicial: ContextoMapa = {
@@ -37,6 +42,9 @@ export const contextoMapaInicial: ContextoMapa = {
     ubicacionId: null,
     ordenId: "",
     recorrido: null,
+    vista: "ESQUEMA",
+    borrador: null,
+    elegido: null,
 };
 
 type ProcesarMapa = ProcesarContexto<EstadoMapa, ContextoMapa>;
@@ -44,7 +52,8 @@ type ProcesarMapa = ProcesarContexto<EstadoMapa, ContextoMapa>;
 const cargar: ProcesarMapa = async (ctx) => {
     if (!ctx.almacenId) return { ...ctx, estado: "INICIAL", mapa: null };
     const mapa = await getMapa(ctx.almacenId, enteroPositivo(ctx.dias, DIAS_POR_DEFECTO), ctx.origen);
-    return { ...ctx, estado: "CARGADO", mapa };
+    // Sin planta solo hay esquema.
+    return { ...ctx, estado: "CARGADO", mapa, vista: mapa.planta ? ctx.vista : "ESQUEMA" };
 };
 
 const cambiarAlmacen: ProcesarMapa = async (ctx, payload) => cargar({
@@ -89,6 +98,58 @@ const verRecorrido: ProcesarMapa = async (ctx) => {
 
 const quitarRecorrido: ProcesarMapa = async (ctx) => ({ ...ctx, recorrido: null });
 
+const cambiarVista: ProcesarMapa = async (ctx, payload) => ({
+    ...ctx,
+    vista: payload === "PLANTA" && ctx.mapa?.planta ? "PLANTA" : "ESQUEMA",
+});
+
+/** Edita la planta del almacén o, si no tiene, una propuesta con todos sus pasillos. */
+const editar: ProcesarMapa = async (ctx) => {
+    if (!ctx.mapa) return ctx;
+    return {
+        ...ctx,
+        estado: "EDITANDO",
+        vista: "PLANTA",
+        borrador: ctx.mapa.planta ?? plantaInicial(ctx.mapa),
+        elegido: null,
+        pasilloId: null,
+        ubicacionId: null,
+    };
+};
+
+/** `elegido`: lo que queda elegido tras el cambio (sin él, se mantiene). Un solo evento por acción. */
+const cambiarBorrador: ProcesarMapa = async (ctx, payload) => {
+    const { planta, elegido } = payload as { planta: PlantaAlmacen; elegido?: ElegidoPlanta | null };
+    return { ...ctx, borrador: planta, elegido: elegido === undefined ? ctx.elegido : elegido };
+};
+
+/**
+ * Mover una pieza no pasa por `emitir`, que parte del contexto del último render: dos flechas
+ * seguidas se pisarían. Se aplica con `setCtx(c => desplazarEnBorrador(c, ...))` sobre el vigente.
+ */
+export const desplazarEnBorrador = (
+    ctx: ContextoMapa, elegido: ElegidoPlanta, dx: number, dy: number,
+): ContextoMapa =>
+    ctx.estado === "EDITANDO" && ctx.mapa && ctx.borrador
+        ? { ...ctx, borrador: desplazarPieza(ctx.mapa, ctx.borrador, elegido, dx, dy), elegido }
+        : ctx;
+
+const elegir: ProcesarMapa = async (ctx, payload) => ({ ...ctx, elegido: (payload as ElegidoPlanta | null) ?? null });
+
+const cancelarEdicion: ProcesarMapa = async (ctx) => ({
+    ...ctx,
+    estado: "CARGADO",
+    borrador: null,
+    elegido: null,
+    vista: ctx.mapa?.planta ? "PLANTA" : "ESQUEMA",
+});
+
+const guardar: ProcesarMapa = async (ctx) => {
+    if (!ctx.borrador) return ctx;
+    await guardarPlanta(ctx.almacenId, ctx.borrador);
+    return cargar({ ...ctx, borrador: null, elegido: null, vista: "PLANTA" });
+};
+
 export const getMaquina: () => Maquina<EstadoMapa, ContextoMapa> = () => ({
     INICIAL: {
         almacen_cambiado: cambiarAlmacen,
@@ -108,5 +169,14 @@ export const getMaquina: () => Maquina<EstadoMapa, ContextoMapa> = () => ({
         orden_cambiada: cambiarOrden,
         recorrido_solicitado: verRecorrido,
         recorrido_quitado: quitarRecorrido,
+        vista_cambiada: cambiarVista,
+        edicion_solicitada: editar,
+    },
+    EDITANDO: {
+        capa_cambiada: cambiarCapa,
+        borrador_cambiado: cambiarBorrador,
+        pieza_elegida: elegir,
+        edicion_cancelada: cancelarEdicion,
+        guardado_solicitado: guardar,
     },
 });
