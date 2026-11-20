@@ -1019,7 +1019,7 @@
     color: var(--color-texto-secundario);
 }
 
-/* Puntos de salida y de entrada: borde continuo y marcado */
+/* Puntos de salida y de entrada: borde más oscuro y grueso (intermitente si es transitable) */
 .MapaAlmacen .mapa-planta-real {
     /* Puntos de salida y de entrada: trazo más oscuro y grueso; la línea sigue intermitente si es
        transitable (y la segunda línea del texto dice «salida»/«entrada») */
