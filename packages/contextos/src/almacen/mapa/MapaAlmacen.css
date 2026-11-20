@@ -792,6 +792,22 @@
     }
 }
 
+/* Sin el contorno de foco del navegador: abarca todo el grupo SVG (rótulo, flecha) y sale un
+   recuadro redondeado más ancho que el pasillo. La selección y el foco se marcan con el trazo. */
+.MapaAlmacen .mapa-planta-real {
+    .mapa-pasillo-real:focus,
+    .mapa-elemento:focus,
+    .mapa-celda:focus {
+        outline: none;
+    }
+
+    /* Pasillo seleccionado (su alzado abierto): recuadro azul en su contorno */
+    .mapa-pasillo-real.seleccionado .mapa-pasillo-contorno {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
+    }
+}
+
 /* Edición: las piezas se arrastran; la elegida se marca */
 .MapaAlmacen .mapa-planta-real.editando {
     /* Solo al editar: en lectura el dedo debe poder desplazar la página */
@@ -831,16 +847,11 @@
         stroke-width: 2;
     }
 
-    .mapa-pasillo-real:focus-visible,
-    .mapa-elemento:focus-visible {
-        outline: none;
-    }
-
-    /* Foco más grueso que "elegido" para distinguir ambos estados */
+    /* Con teclado, el foco se marca en el contorno de la pieza (como "elegido", sin recuadro aparte) */
     .mapa-pasillo-real:focus-visible .mapa-pasillo-contorno,
     .mapa-elemento:focus-visible rect {
-        stroke: var(--color-borde-focus, var(--color-primario));
-        stroke-width: 4;
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
         stroke-dasharray: none;
     }
 }
