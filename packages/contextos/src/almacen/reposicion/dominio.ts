@@ -39,3 +39,23 @@ export const marcarNecesidad = (seleccion: string[], id: string, marcada: boolea
 /** Se puede generar el traspaso si hay alguna necesidad marcada con origen. */
 export const puedeGenerarSeleccion = (r: Reposicion, seleccion: string[]): boolean =>
     r.ordenId === null && r.necesidades.some((n) => seleccion.includes(n.pickingFijoId) && necesidadSeleccionable(n));
+
+/** "REF - Descripción", o solo la referencia si no hay descripción. */
+export const textoArticulo = (n: Pick<NecesidadReposicion, "articuloId" | "descripcion">): string =>
+    n.descripcion ? `${n.articuloId} - ${n.descripcion}` : n.articuloId;
+
+export type TipoSituacion = "fisico" | "entrante" | "saliente";
+
+export interface ParteSituacion {
+    tipo: TipoSituacion;
+    cantidad: number;
+}
+
+/** Físico siempre; entrante y saliente solo si no son cero. */
+export const situacion = (
+    n: Pick<NecesidadReposicion, "fisico" | "entrante" | "saliente">
+): ParteSituacion[] => [
+    { tipo: "fisico" as const, cantidad: n.fisico },
+    ...(n.entrante ? [{ tipo: "entrante" as const, cantidad: n.entrante }] : []),
+    ...(n.saliente ? [{ tipo: "saliente" as const, cantidad: n.saliente }] : []),
+];

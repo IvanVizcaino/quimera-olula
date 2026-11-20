@@ -7,6 +7,7 @@ export interface OrigenReposicion {
 export interface NecesidadReposicion {
     pickingFijoId: string;
     articuloId: string;
+    descripcion: string;
     ubicacionId: string;
     ubicacion: string;
     minimo: number;

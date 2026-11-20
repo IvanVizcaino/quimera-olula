@@ -6,7 +6,8 @@ import { Entidad } from "@olula/lib/diseño.ts";
 import { Link } from "react-router";
 import { NecesidadReposicion } from "./diseño.ts";
 import {
-    necesidadSeleccionable, puedeGenerarSeleccion, puedeGenerarTraspaso, textoOrigenes, todasSeleccionadas,
+    necesidadSeleccionable, ParteSituacion, puedeGenerarSeleccion, puedeGenerarTraspaso, situacion,
+    textoArticulo, textoOrigenes, todasSeleccionadas,
 } from "./dominio.ts";
 import { contextoReposicionInicial, getMaquina } from "./maquina.ts";
 import "#/comun/estilos/pagina_proceso.css";
@@ -89,12 +90,41 @@ export const ReposicionPicking = () => {
 
 type FilaNecesidad = Entidad & NecesidadReposicion;
 
+const flechaSituacion: Record<ParteSituacion["tipo"], string> = { fisico: "", entrante: "↓", saliente: "↑" };
+const nombreSituacion: Record<ParteSituacion["tipo"], string> = {
+    fisico: "Físico", entrante: "Entrante", saliente: "Saliente",
+};
+
+const Situacion = ({ necesidad }: { necesidad: NecesidadReposicion }) => (
+    <span className="situacion">
+        {situacion(necesidad).map((p, i) => (
+            <span key={p.tipo} className={`situacion-${p.tipo}`} title={nombreSituacion[p.tipo]}>
+                {i > 0 && <span className="situacion-separador" aria-hidden="true"> / </span>}
+                {flechaSituacion[p.tipo] && <span aria-hidden="true">{flechaSituacion[p.tipo]} </span>}
+                <span className="sr-only">{nombreSituacion[p.tipo]} </span>
+                {p.cantidad.toLocaleString("es-ES")}
+            </span>
+        ))}
+    </span>
+);
+
 const columnasNecesidades: MetaTabla<FilaNecesidad> = [
-    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    {
+        id: "articuloId",
+        cabecera: "Artículo",
+        estilo: "destacado",
+        render: (n) => (
+            <Link to={`/almacen/articulo?id=${encodeURIComponent(n.articuloId)}`} onClick={(e) => e.stopPropagation()}>
+                {textoArticulo(n)}
+            </Link>
+        ),
+    },
     { id: "ubicacion", cabecera: "Ubicación de picking" },
-    { id: "fisico", cabecera: "Físico", tipo: "numero" },
-    { id: "entrante", cabecera: "Entrante", tipo: "numero" },
-    { id: "saliente", cabecera: "Saliente", tipo: "numero" },
+    {
+        id: "situacion",
+        cabecera: "Situación",
+        render: (n) => <Situacion necesidad={n} />,
+    },
     { id: "disponible", cabecera: "Disponible", tipo: "numero", estilo: "destacado" },
     { id: "minimo", cabecera: "Mínimo", tipo: "numero" },
     { id: "maximo", cabecera: "Máximo", tipo: "numero" },

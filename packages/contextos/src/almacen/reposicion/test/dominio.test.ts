@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 import { NecesidadReposicion, Reposicion } from "../diseño.ts";
 import {
     calcularDisponible, marcarNecesidad, puedeGenerarSeleccion, puedeGenerarTraspaso, seleccionInicial,
-    textoOrigenes, todasSeleccionadas, totalOrigenes,
+    situacion, textoArticulo, textoOrigenes, todasSeleccionadas, totalOrigenes,
 } from "../dominio.ts";
 
 const necesidad: NecesidadReposicion = {
     pickingFijoId: "1",
     articuloId: "REF1",
+    descripcion: "Tornillo",
     ubicacionId: "17",
     ubicacion: "PIC-A-03-1-1",
     minimo: 10,
@@ -29,6 +30,21 @@ describe("reposición", () => {
     it("calcula el disponible", () => {
         expect(calcularDisponible(necesidad)).toBe(7);
         expect(calcularDisponible({ fisico: 5, entrante: 10, saliente: 0 })).toBe(15);
+    });
+
+    it("describe el artículo con referencia y descripción", () => {
+        expect(textoArticulo(necesidad)).toBe("REF1 - Tornillo");
+        expect(textoArticulo({ articuloId: "REF2", descripcion: "" })).toBe("REF2");
+    });
+
+    it("la situación lleva el físico y solo los pendientes que no son cero", () => {
+        expect(situacion(necesidad)).toEqual([
+            { tipo: "fisico", cantidad: 22 },
+            { tipo: "saliente", cantidad: 15 },
+        ]);
+        expect(situacion({ fisico: 0, entrante: 0, saliente: 0 })).toEqual([{ tipo: "fisico", cantidad: 0 }]);
+        expect(situacion({ fisico: 3, entrante: 10, saliente: 2 }).map((p) => p.tipo))
+            .toEqual(["fisico", "entrante", "saliente"]);
     });
 
     it("suma y describe los orígenes", () => {
