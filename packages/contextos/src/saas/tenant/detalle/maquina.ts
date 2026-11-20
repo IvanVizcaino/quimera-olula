@@ -29,6 +29,15 @@ export const getMaquina: () => Maquina<EstadoDetalleTenant, ContextoDetalleTenan
             acceso_usuario_cambiado: detalle.bloquearUsuario,
             grupo_usuario_cambiado: detalle.cambiarGrupoUsuario,
             contrasena_usuario_solicitada: detalle.solicitarContrasena,
+
+            cambiar_plan_solicitado: "CAMBIANDO_PLAN",
+            estado_suscripcion_solicitado: detalle.cambiarEstadoSuscripcion,
+            condiciones_guardadas: detalle.guardarCondiciones,
+            datos_fiscales_guardados: detalle.guardarDatosFiscales,
+            estado_factura_solicitado: detalle.cambiarEstadoFactura,
+            alta_excepcion_solicitada: [detalle.seleccionarExcepcion, "EDITANDO_EXCEPCION"],
+            editar_excepcion_solicitada: [detalle.seleccionarExcepcion, "EDITANDO_EXCEPCION"],
+            quitar_excepcion_solicitada: [detalle.seleccionarExcepcion, "QUITANDO_EXCEPCION"],
         },
 
         DANDO_DE_BAJA: {
@@ -39,6 +48,21 @@ export const getMaquina: () => Maquina<EstadoDetalleTenant, ContextoDetalleTenan
         ELIMINANDO_BD: {
             bd_eliminada: [detalle.refrescarTenant, "ABIERTO"],
             eliminacion_bd_cancelada: "ABIERTO",
+        },
+
+        CAMBIANDO_PLAN: {
+            plan_de_empresa_cambiado: detalle.suscripcionCambiada,
+            cambio_de_plan_cancelado: "ABIERTO",
+        },
+
+        EDITANDO_EXCEPCION: {
+            excepcion_guardada: detalle.suscripcionCambiada,
+            edicion_de_excepcion_cancelada: "ABIERTO",
+        },
+
+        QUITANDO_EXCEPCION: {
+            excepcion_quitada: detalle.suscripcionCambiada,
+            quitar_excepcion_cancelado: "ABIERTO",
         },
 
         CAMBIANDO_CONTRASENA: {

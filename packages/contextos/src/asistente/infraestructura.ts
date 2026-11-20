@@ -1,5 +1,6 @@
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { tokenAcceso } from "@olula/lib/api/token_acceso.ts";
+import { analizarErrorLimite } from "@olula/lib/errores_limite.ts";
 import {
     eventoStreamDesdeApi, hiloDesdeApi, mensajesHiloDesdeApi, normalizarRespuestaIa, pantallaAApi,
 } from "#/asistente/dominio.ts";
@@ -61,7 +62,9 @@ export async function* consultarIaStream(
     });
 
     if (!res.ok) {
-        throw new Error(`Error del servidor: ${res.status}`);
+        // Los límites del plan (409 `[limite:...]`, 402 `[solo_lectura]`...) llegan como texto.
+        const texto = typeof res.text === "function" ? await res.text().catch(() => "") : "";
+        throw new Error(analizarErrorLimite(texto) ? texto : `Error del servidor: ${res.status}`);
     }
 
     const reader = res.body!.getReader();

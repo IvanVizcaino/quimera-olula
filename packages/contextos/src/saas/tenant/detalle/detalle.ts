@@ -7,6 +7,10 @@ import {
     getExportacion, getTenant, getUsuariosSoporte, migrarTenant, patchAccesoUsuario,
     patchGrupoUsuario, patchTenant, reactivarTenant, suspenderTenant,
 } from "../infraestructura.js";
+import { CambiosSuscripcion, ExcepcionLimite } from "../suscripcion/diseño.js";
+import {
+    getSuscripcionTenant, patchSuscripcionTenant, postEstadoFactura, postEstadoSuscripcion, putDatosFiscales,
+} from "../suscripcion/infraestructura.js";
 import { ContextoDetalleTenant, EstadoDetalleTenant } from "./diseño.js";
 
 type ProcesarDetalle = ProcesarContexto<EstadoDetalleTenant, ContextoDetalleTenant>;
@@ -29,6 +33,9 @@ export const contextoDetalleTenantInicial: ContextoDetalleTenant = {
     grupos: [],
     accesos: [],
     usuarioContrasena: null,
+    suscripcion: null,
+    suscripcionError: '',
+    excepcion: null,
 };
 
 /** Refresca la cabecera y propaga el cambio al maestro. */
@@ -62,6 +69,19 @@ export const refrescarAccesos: ProcesarDetalle = async (contexto) => {
     }
 };
 
+/**
+ * Carga la suscripción. Si falla (p. ej. la empresa se está provisionando o falta permiso)
+ * no tumba la ficha: la pestaña muestra el motivo.
+ */
+export const refrescarSuscripcion: ProcesarDetalle = async (contexto) => {
+    try {
+        return { ...contexto, suscripcion: await getSuscripcionTenant(contexto.tenant.id), suscripcionError: '' };
+    } catch (error) {
+        const e = error as { descripcion?: string; message?: string };
+        return { ...contexto, suscripcion: null, suscripcionError: e?.descripcion ?? e?.message ?? 'No se pudo cargar la suscripción' };
+    }
+};
+
 export const guardarTenant = async (contexto: ContextoDetalleTenant, tenant: Tenant): Promise<void> => {
     const actual = contexto.tenant;
     if (tenant.nombre !== actual.nombre ||
@@ -82,6 +102,7 @@ export const cargarTenant: (_: string) => ProcesarDetalle =
             async (ctx) => ({ ...ctx, tenant }),
             refrescarUsuarios,
             refrescarAccesos,
+            refrescarSuscripcion,
             'ABIERTO',
         ]);
     };
@@ -165,3 +186,41 @@ export const contrasenaCambiada: ProcesarDetalle = async (contexto) =>
         refrescarAccesos,
         'ABIERTO',
     ]);
+
+// Suscripción
+
+/** Tras cualquier cambio de la suscripción se relee ella y la ficha (el origen de los módulos puede cambiar). */
+const trasSuscripcion = (
+    accion: (idTenant: string, payload: unknown) => Promise<unknown>
+): ProcesarDetalle => async (contexto, payload) => {
+    await accion(contexto.tenant.id, payload);
+    return pipeTenant(contexto, [refrescarSuscripcion, refrescarTenant], payload);
+};
+
+export const cambiarEstadoSuscripcion = trasSuscripcion(
+    (id, payload) => postEstadoSuscripcion(id, payload as 'solo_lectura' | 'activa')
+);
+
+export const guardarCondiciones = trasSuscripcion(
+    (id, payload) => patchSuscripcionTenant(id, payload as CambiosSuscripcion)
+);
+
+export const guardarDatosFiscales = trasSuscripcion(
+    (id, payload) => putDatosFiscales(id, payload as string)
+);
+
+export const cambiarEstadoFactura = trasSuscripcion(
+    (_, payload) => {
+        const { id, estado } = payload as { id: string; estado: 'pagada' | 'devuelta' | 'anulada' };
+        return postEstadoFactura(id, estado);
+    }
+);
+
+/** `payload` null = alta de excepción. */
+export const seleccionarExcepcion: ProcesarDetalle = async (contexto, payload) => ({
+    ...contexto,
+    excepcion: (payload as ExcepcionLimite | null) ?? null,
+});
+
+export const suscripcionCambiada: ProcesarDetalle = async (contexto) =>
+    pipeTenant(contexto, [refrescarSuscripcion, refrescarTenant, async (ctx) => ({ ...ctx, excepcion: null }), 'ABIERTO']);

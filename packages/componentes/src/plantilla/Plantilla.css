@@ -16,6 +16,16 @@
         }
     }
 
+    /* Banda de aviso de la app (Componentes.banda_aviso): ocupa el sitio bajo la cabecera
+       fija y la sección principal deja de reservarlo. */
+    &>.banda-aviso-app {
+        margin-top: var(--alto-header);
+    }
+
+    &>.banda-aviso-app+section[role=main] {
+        margin-top: 0;
+    }
+
     &>section[role=main] {
         display: flex;
         flex-grow: 1;
