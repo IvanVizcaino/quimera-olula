@@ -139,14 +139,16 @@ export const PlantaReal = ({
 
                 {planta.elementos.map((el, indice) => {
                     const pieza: ElegidoPlanta = { tipo: "ELEMENTO", indice };
+                    const elegidoEl = mismo(edicion?.elegido ?? null, pieza);
                     return (
                         <g
                             key={indice}
-                            className={`mapa-elemento mapa-elemento-${el.tipo.toLowerCase()}${mismo(edicion?.elegido ?? null, pieza) ? " elegido" : ""}`}
+                            className={`mapa-elemento mapa-elemento-${el.tipo.toLowerCase()}${elegidoEl ? " elegido" : ""}`}
                             transform={desplazamiento(pieza)}
                             {...(edicion
                                 ? {
                                     role: "button",
+                                    "aria-pressed": elegidoEl,
                                     tabIndex: 0,
                                     "aria-label": `${el.nombre}. Flechas para moverlo`,
                                     onPointerDown: empezar(pieza),
@@ -177,6 +179,7 @@ export const PlantaReal = ({
                             {...(edicion
                                 ? {
                                     role: "button",
+                                    "aria-pressed": elegido,
                                     tabIndex: 0,
                                     "aria-label": `Pasillo ${rotulo}. Flechas para moverlo`,
                                     onPointerDown: empezar(pieza),
@@ -265,7 +268,7 @@ export const PlantaReal = ({
                 )}
                 {puntos.map((r) => (
                     <g key={r.secuencia} className={`mapa-parada mapa-parada-${r.accion.toLowerCase()}`}>
-                        <circle cx={r.x} cy={r.y} r={0.55} />
+                        <circle cx={r.x} cy={r.y} r={0.65} />
                         <text x={r.x} y={r.y}>{r.secuencia}</text>
                         <title>{`${r.secuencia}. ${textoAccionParada[r.accion]} en ${r.ubicacion}`}</title>
                     </g>

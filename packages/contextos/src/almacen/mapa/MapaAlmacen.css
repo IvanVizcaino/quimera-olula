@@ -85,6 +85,13 @@
     }
 }
 
+@media (max-width: 1024px) {
+    /* Cuatro selects de span 3 quedan demasiado estrechos: dos por fila */
+    .MapaAlmacen > quimera-formulario [nombre] {
+        grid-column: span 6;
+    }
+}
+
 @media (max-width: 768px) {
     .MapaAlmacen > quimera-formulario [nombre] {
         grid-column: 1 / -1;
@@ -195,12 +202,26 @@
         position: sticky;
         top: var(--espaciado-m);
     }
+
+    /* Editor más alto que la ventana: se desplaza dentro para no perder Guardar */
+    > .mapa-editor-planta {
+        max-height: calc(100vh - 2 * var(--espaciado-m));
+        overflow-y: auto;
+    }
 }
 
 @media (max-width: 1024px) {
     .MapaAlmacen .mapa-vistas {
         flex-direction: column;
         align-items: stretch;
+
+        > .mapa-panel-alzado,
+        > .mapa-editor-planta {
+            min-width: 0;
+            position: static;
+            max-height: none;
+            overflow-y: visible;
+        }
 
         > .mapa-panel-alzado {
             max-width: none;
@@ -600,7 +621,14 @@
     width: 100%;
     height: auto;
     min-width: 20rem;
-    touch-action: none;
+
+    /* Textos en metros: halo del color de la nave para que se lean sobre celdas y elementos */
+    text {
+        paint-order: stroke;
+        stroke: var(--color-superficie);
+        stroke-width: 0.15px;
+        stroke-linejoin: round;
+    }
 
     rect, line, polyline, circle {
         vector-effect: non-scaling-stroke;
@@ -639,7 +667,7 @@
     }
 
     .mapa-elemento text {
-        font-size: 0.7px;
+        font-size: 0.8px;
         text-anchor: middle;
         dominant-baseline: central;
         fill: var(--mapa-texto);
@@ -675,7 +703,7 @@
     }
 
     .mapa-pasillo-rotulo {
-        font-size: 0.8px;
+        font-size: 0.9px;
         font-weight: 700;
         text-anchor: middle;
         dominant-baseline: central;
@@ -722,7 +750,7 @@
     }
 
     .mapa-celda-letra {
-        font-size: 0.6px;
+        font-size: 0.7px;
         font-weight: 700;
         text-anchor: middle;
         dominant-baseline: central;
@@ -754,9 +782,10 @@
     }
 
     .mapa-parada text {
-        font-size: 0.6px;
+        font-size: 0.8px;
         font-weight: 700;
         fill: var(--color-superficie);
+        stroke: none;
         text-anchor: middle;
         dominant-baseline: central;
         pointer-events: none;
@@ -765,6 +794,9 @@
 
 /* Edición: las piezas se arrastran; la elegida se marca */
 .MapaAlmacen .mapa-planta-real.editando {
+    /* Solo al editar: en lectura el dedo debe poder desplazar la página */
+    touch-action: none;
+
     .mapa-pasillo-real,
     .mapa-elemento {
         cursor: grab;
@@ -793,15 +825,30 @@
         stroke-dasharray: none;
     }
 
+    .mapa-pasillo-real:hover .mapa-pasillo-contorno,
+    .mapa-elemento:hover rect {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 2;
+    }
+
     .mapa-pasillo-real:focus-visible,
     .mapa-elemento:focus-visible {
         outline: none;
     }
 
+    /* Foco más grueso que "elegido" para distinguir ambos estados */
     .mapa-pasillo-real:focus-visible .mapa-pasillo-contorno,
     .mapa-elemento:focus-visible rect {
         stroke: var(--color-borde-focus, var(--color-primario));
-        stroke-width: 3;
+        stroke-width: 4;
+        stroke-dasharray: none;
+    }
+}
+
+@media (max-width: 768px) {
+    /* En móvil se desplaza en horizontal antes que encoger los textos hasta lo ilegible */
+    .MapaAlmacen .mapa-planta-real {
+        min-width: 40rem;
     }
 }
 
@@ -813,6 +860,7 @@
     max-width: 100%;
 
     fieldset {
+        min-width: 0;
         margin: 0;
         padding: var(--espaciado-s) var(--espaciado-m) 0;
         border: 1px solid var(--mapa-borde-sutil);
@@ -832,12 +880,17 @@
             grid-column: span 6;
         }
 
-        [nombre="elementoNombre"] {
+        /* Etiquetas largas ("Fondo de estantería (m)"): una por fila; X/Y y ancho/largo, por parejas */
+        [nombre="elementoNombre"],
+        [nombre="elementoTipo"],
+        [nombre^="planta-"],
+        [nombre^="pasillo-"] {
             grid-column: 1 / -1;
         }
     }
 
     .botones {
+        flex-wrap: wrap;
         margin: 0;
         padding-bottom: var(--espaciado-s);
     }
@@ -873,7 +926,15 @@
         padding-bottom: var(--espaciado-s);
     }
 
+    .mapa-editor-avisos {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+    }
+
     .mapa-editor-avisos li {
+        padding-left: var(--espaciado-s);
+        border-left: 3px solid var(--color-advertencia);
         color: var(--color-advertencia-oscuro);
         font-size: var(--tamaño-letra-s);
     }
@@ -888,6 +949,12 @@
     .MapaAlmacen .mapa-vistas > .mapa-editor-planta {
         width: auto;
         max-width: none;
+    }
+
+    /* Con el panel a todo el ancho caben las medidas por parejas */
+    .MapaAlmacen .mapa-editor-planta quimera-formulario [nombre^="planta-"],
+    .MapaAlmacen .mapa-editor-planta quimera-formulario [nombre^="pasillo-"] {
+        grid-column: span 6;
     }
 }
 
