@@ -52,4 +52,12 @@ export const ContenidoConEnlace = ({ children, href, etiqueta }: {
   children: ReactNode;
   href: string | null | undefined;
   etiqueta: string;
-}) => (href ? <>{children}<EnlaceFicha href={href} etiqueta={etiqueta} /></> : <>{children}</>);
+}) => (href
+  ? (
+    // Si la celda recorta el texto («…»), se recorta el valor y la flecha queda siempre visible.
+    <span className="contenido-con-enlace">
+      <span className="contenido-con-enlace-valor">{children}</span>
+      <EnlaceFicha href={href} etiqueta={etiqueta} />
+    </span>
+  )
+  : <>{children}</>);

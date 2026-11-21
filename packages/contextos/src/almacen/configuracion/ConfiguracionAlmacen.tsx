@@ -28,8 +28,9 @@ export const ConfiguracionAlmacen = () => {
     };
 
     return (
-        <div className="ConfiguracionAlmacen">
-            <h2>Configuración del almacén</h2>
+        // Sin h2 propio: cada pestaña ya trae el suyo (el del maestro) y repetiría el título tres veces.
+        // El nombre de la página queda como región para lectores de pantalla.
+        <section className="ConfiguracionAlmacen" aria-label="Configuración del almacén">
             <Tabs
                 tabInicial={inicial}
                 onCambio={cambiar}
@@ -39,6 +40,6 @@ export const ConfiguracionAlmacen = () => {
                     </Tab>
                 ))}
             />
-        </div>
+        </section>
     );
 };

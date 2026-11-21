@@ -1,4 +1,4 @@
-import { EnlaceFicha } from "./qenlace_ficha.tsx";
+import { ContenidoConEnlace } from "./qenlace_ficha.tsx";
 import { etiquetaEnlace } from "./url_enlace.ts";
 import { Entidad, Orden, Paginacion } from "@olula/lib/diseño.ts";
 import {
@@ -113,13 +113,9 @@ const fila = <T extends Entidad>(entidad: Entidad, metaTabla: MetaTabla<T>) => {
         data-estilo={estilo}
         style={ancho ? { width: ancho } : undefined}
       >
-        {datos as string}
-        {href && (
-          <EnlaceFicha
-            href={href}
-            etiqueta={etiquetaEnlace(titulo, datos)}
-          />
-        )}
+        <ContenidoConEnlace href={href} etiqueta={etiquetaEnlace(titulo, datos)}>
+          {datos as string}
+        </ContenidoConEnlace>
       </td>
     );
   };

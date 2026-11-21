@@ -23,7 +23,8 @@ quimera-autocompletar {
         .autocompletar-enlace {
             position: absolute;
             right: var(--espaciado-xxs);
-            bottom: var(--espaciado-xxs);
+            /* Centrado en la altura del control (icono de 16 px), no pegado al borde inferior */
+            bottom: calc((var(--altura-control) - 16px) / 2);
             margin-left: 0;
         }
     }
