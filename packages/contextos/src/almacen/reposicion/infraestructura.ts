@@ -12,6 +12,7 @@ interface OrigenReposicionApi {
 interface NecesidadReposicionApi {
     picking_fijo_id: string;
     articulo_id: string;
+    descripcion?: string;
     ubicacion_id: string;
     ubicacion: string;
     minimo: number;
@@ -46,6 +47,7 @@ const origenDesdeApi = (o: OrigenReposicionApi): OrigenReposicion => ({
 const necesidadDesdeApi = (n: NecesidadReposicionApi): NecesidadReposicion => ({
     pickingFijoId: n.picking_fijo_id,
     articuloId: n.articulo_id,
+    descripcion: n.descripcion ?? "",
     ubicacionId: n.ubicacion_id,
     ubicacion: n.ubicacion,
     minimo: n.minimo,

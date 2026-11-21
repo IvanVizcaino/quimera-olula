@@ -13,6 +13,7 @@ import {
     PostPasillo,
     ResultadoGenerarUbicaciones,
 } from "./diseño.ts";
+import { normalizarAccesos } from "./dominio.ts";
 
 const baseUrl = `/almacen/pasillo`;
 
@@ -46,7 +47,7 @@ export const pasilloDesdeApi = (api: PasilloApi): Pasillo => ({
     orden: api.orden,
     caras: api.caras,
     modulos: api.modulos,
-    accesos: api.accesos,
+    accesos: normalizarAccesos(api.accesos),
 });
 
 const cambiosPasilloAApi = (p: Partial<NuevoPasillo>): CambiosPasilloApi => {

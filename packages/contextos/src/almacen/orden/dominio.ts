@@ -7,6 +7,7 @@ import {
     DiferenciaPedidoOrden,
     ItemOrdenAlmacen,
     LineaOrdenAlmacen,
+    MotivoRecorridoFormula,
     NuevoEnvioAgencia,
     OrdenAlmacen,
 } from "./diseño.ts";
@@ -304,6 +305,31 @@ export const nuevoEnvioAgenciaInicial = (
 const plural = (n: number, singular: string, plural: string) => `${n} ${n === 1 ? singular : plural}`;
 
 /** Texto resumen del recorrido: módulos recorridos y pasillos cruzados. */
-export const resumenRecorrido = (r: { modulosRecorridos: number; pasillosCruzados: number }): string =>
-    `${plural(r.modulosRecorridos, "módulo recorrido", "módulos recorridos")}, ` +
-    plural(r.pasillosCruzados, "pasillo cruzado", "pasillos cruzados");
+/** Por qué un recorrido no tiene paradas. */
+export const motivoRecorridoVacio = (r: { ordenId: string; estado: string }): string =>
+    r.estado === "TERMINADA"
+        ? `La orden ${r.ordenId} está terminada: no queda nada por recoger ni dejar.`
+        : `La orden ${r.ordenId} no tiene nada pendiente en ubicaciones${r.estado ? ` (${r.estado.toLowerCase()})` : ""}.`;
+
+export const textoAccionParada = { RECOGER: "Recoger", DEJAR: "Dejar" } as const;
+
+const textoMotivoRecorrido: Record<MotivoRecorridoFormula, string> = {
+    SIN_PLANTA: "el almacén no tiene planta",
+    PARADAS_SIN_POSICION: "hay paradas en pasillos sin colocar en la planta",
+    SIN_CAMINO: "no hay camino a pie entre alguna de las paradas",
+};
+
+export const resumenRecorrido = (r: {
+    modulosRecorridos: number;
+    pasillosCruzados: number;
+    calculo?: "DISTANCIA" | "FORMULA";
+    motivo?: MotivoRecorridoFormula | null;
+    metros?: number | null;
+}): string => {
+    if (r.calculo === "DISTANCIA" && r.metros != null) {
+        return `${Math.round(r.metros).toLocaleString("es-ES")} m a pie, ordenado por la planta`;
+    }
+    const estimado = `${plural(r.modulosRecorridos, "módulo recorrido", "módulos recorridos")}, ` +
+        plural(r.pasillosCruzados, "pasillo cruzado", "pasillos cruzados");
+    return r.motivo && r.motivo !== "SIN_PLANTA" ? `${estimado} (estimado: ${textoMotivoRecorrido[r.motivo]})` : estimado;
+};
