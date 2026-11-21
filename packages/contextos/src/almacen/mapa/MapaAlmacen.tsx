@@ -1,3 +1,4 @@
+import { OrdenAbierta } from "#/almacen/comun/componentes/OrdenAbierta.tsx";
 import { urlFicha, urlListado } from "#/almacen/comun/fichas.ts";
 import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { useEffect } from "react";
@@ -129,10 +130,13 @@ export const MapaAlmacen = () => {
             <div className="mapa-barra" hidden={editando}>
                 <div className="mapa-barra-campos">
                     <quimera-formulario>
-                        <QInput
-                            label="Recorrido de la orden" nombre="ordenId" valor={ctx.ordenId}
+                        <OrdenAbierta
+                            label="Recorrido de la orden"
+                            nombre="ordenId"
+                            almacenId={ctx.almacenId}
+                            valor={ctx.ordenId}
                             deshabilitado={!mapa}
-                            onChange={(v: string) => emitir("orden_cambiada", v)}
+                            onChange={(ordenId) => emitir("orden_cambiada", ordenId)}
                         />
                     </quimera-formulario>
                 </div>

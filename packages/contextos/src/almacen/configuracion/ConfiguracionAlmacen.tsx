@@ -1,0 +1,44 @@
+import { preferenciasPantalla } from "#/almacen/comun/preferencias.ts";
+import { Tab, Tabs } from "@olula/componentes/index.js";
+import { puede } from "@olula/lib/dominio.ts";
+import { useState } from "react";
+import { MaestroConDetalleClaseAlmacenamiento } from "../clase_almacenamiento/maestro/MaestroConDetalleClaseAlmacenamiento.tsx";
+import { MaestroConDetalleTipoCaja } from "../tipo_caja/vistas/maestro/MaestroConDetalleTipoCaja.tsx";
+import { MaestroConDetalleTipoUbicacion } from "../tipo_ubicacion/maestro/MaestroConDetalleTipoUbicacion.tsx";
+
+const preferencias = preferenciasPantalla("configuracion", { pestana: 0 });
+
+/**
+ * Almacén/Configuración (doc sga_ergonomia.md, punto 2): las tablas que se configuran una vez, en
+ * pestañas como «CRM/Otros». Las rutas de cada una siguen existiendo para los enlaces a ficha.
+ */
+export const ConfiguracionAlmacen = () => {
+    const pestanas = [
+        { label: "Tipos de ubicación", regla: "almacen.tipo_ubicacion", Maestro: MaestroConDetalleTipoUbicacion },
+        { label: "Tipos de caja", regla: "almacen.tipo_caja", Maestro: MaestroConDetalleTipoCaja },
+        { label: "Clases de almacenamiento", regla: "almacen.clase_almacenamiento", Maestro: MaestroConDetalleClaseAlmacenamiento },
+    ].filter((p) => puede(p.regla));
+    const [inicial] = useState(() => Math.min(preferencias.obtener().pestana, Math.max(pestanas.length - 1, 0)));
+
+    // Cada listado guarda su ficha abierta en la URL (?id=): al cambiar de pestaña se limpia para
+    // que la nueva no intente abrir un id de otra tabla.
+    const cambiar = (indice: number) => {
+        preferencias.guardar({ pestana: indice });
+        window.history.replaceState(window.history.state, "", window.location.pathname);
+    };
+
+    return (
+        <div className="ConfiguracionAlmacen">
+            <h2>Configuración del almacén</h2>
+            <Tabs
+                tabInicial={inicial}
+                onCambio={cambiar}
+                children={pestanas.map(({ label, Maestro }) => (
+                    <Tab key={label} label={label}>
+                        <Maestro />
+                    </Tab>
+                ))}
+            />
+        </div>
+    );
+};

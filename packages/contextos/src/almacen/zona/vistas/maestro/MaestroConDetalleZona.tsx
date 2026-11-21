@@ -1,3 +1,5 @@
+import { NombreAlmacen } from "#/almacen/comun/componentes/NombreAlmacen.tsx";
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { filtroAlmacen } from "#/almacen/comun/componentes/FiltroAlmacen.tsx";
 import { criteriaInicialSga } from "#/almacen/comun/preferencias.ts";
 import { getMetaFiltroDefecto, MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
@@ -18,7 +20,11 @@ import { getMaquina } from "./maquina.js";
 
 const metaTablaZona: MetaTabla<Zona> = [
     { id: "codigo", cabecera: "Código" },
-    { id: "almacenId", cabecera: "Almacén" },
+    {
+        id: "almacenId", cabecera: "Almacén",
+        render: (z) => <NombreAlmacen id={z.almacenId} />,
+        enlace: (z) => urlFicha.almacen(z.almacenId),
+    },
     { id: "funcion", cabecera: "Función", render: (z) => descripcionFuncionZona(z.funcion) },
     { id: "descripcion", cabecera: "Descripción" },
 ];
