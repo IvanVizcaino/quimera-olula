@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { Articulo } from "#/almacen/comun/componentes/Articulo.tsx";
 import { Ubicacion } from "#/almacen/comun/componentes/Ubicacion.tsx";
@@ -18,7 +19,7 @@ import {
 } from "./dominio.ts";
 import "#/comun/estilos/pagina_proceso.css";
 import "./Slotting.css";
-import { contextoSlottingInicial, getMaquina } from "./maquina.ts";
+import { contextoSlottingDeEntrada, preferenciasSlotting, getMaquina } from "./maquina.ts";
 
 const varianteClase = { A: "exito", B: "advertencia", C: "error" } as const;
 
@@ -27,8 +28,15 @@ export const InsigniaClase = ({ clase }: { clase: ClaseAbc }) => (
 );
 
 export const Slotting = () => {
-    const { ctx, emitir } = useMaquina(getMaquina, contextoSlottingInicial);
+    const { ctx, emitir } = useMaquina(getMaquina, contextoSlottingDeEntrada());
     const { almacenId } = ctx;
+    const [pestana] = useState(() => preferenciasSlotting.obtener().pestana);
+
+    // Con almacén de trabajo o un enlace, el ABC se calcula de entrada.
+    useEffect(() => {
+        if (almacenId) emitir("abc_solicitado");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="Slotting PaginaProceso">
@@ -51,6 +59,8 @@ export const Slotting = () => {
             </quimera-formulario>
 
             <Tabs
+                tabInicial={pestana}
+                onCambio={(indice) => preferenciasSlotting.guardar({ pestana: indice })}
                 children={[
                     <Tab key="abc" label="ABC">
                         <div className="slotting-explicacion">

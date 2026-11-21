@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { MetaTabla, QTabla } from "@olula/componentes/atomos/qtabla.tsx";
@@ -9,12 +10,18 @@ import {
     necesidadSeleccionable, ParteSituacion, puedeGenerarSeleccion, puedeGenerarTraspaso, situacion,
     textoArticulo, textoOrigenes, todasSeleccionadas,
 } from "./dominio.ts";
-import { contextoReposicionInicial, getMaquina } from "./maquina.ts";
+import { contextoReposicionDeEntrada, getMaquina } from "./maquina.ts";
 import "#/comun/estilos/pagina_proceso.css";
 import "./ReposicionPicking.css";
 
 export const ReposicionPicking = () => {
-    const { ctx, emitir } = useMaquina(getMaquina, contextoReposicionInicial);
+    const { ctx, emitir } = useMaquina(getMaquina, contextoReposicionDeEntrada());
+
+    // Con almacén de trabajo o un enlace, se calcula de entrada (es una simulación: no crea nada).
+    useEffect(() => {
+        if (ctx.almacenId) emitir("calculo_solicitado");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const { estado, almacenId, reposicion, seleccion } = ctx;
 
     return (

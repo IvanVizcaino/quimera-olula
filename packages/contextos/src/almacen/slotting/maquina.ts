@@ -1,3 +1,4 @@
+import { almacenDeTrabajo, parametroUrl, parametrosAbc, preferenciasPantalla } from "#/almacen/comun/preferencias.ts";
 import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { postPickingFijo } from "#/almacen/picking_fijo/infraestructura.ts";
 import { ArticuloAbc, FilaPickingFijo, ClasesPicking, OrigenRotacion, PropuestaUbicacion, Recolocacion, ResultadoMigracion } from "./diseño.ts";
@@ -58,33 +59,62 @@ export const contextoSlottingInicial: ContextoSlotting = {
     resultadoMigracion: null,
 };
 
+/** La pestaña abierta, recordada en el navegador. */
+export const preferenciasSlotting = preferenciasPantalla("slotting", { pestana: 0 });
+
+/** Con el almacén del enlace o el de trabajo y los parámetros del ABC compartidos con el mapa. */
+export const contextoSlottingDeEntrada = (): ContextoSlotting => {
+    const abc = parametrosAbc.obtener();
+    return {
+        ...contextoSlottingInicial,
+        almacenId: parametroUrl("almacen_id") ?? almacenDeTrabajo.obtener() ?? "",
+        origen: abc.origen,
+        diasAbc: abc.dias,
+        diasRecolocacion: abc.dias,
+        diasPicking: abc.dias,
+    };
+};
+
 type ProcesarSlotting = ProcesarContexto<EstadoSlotting, ContextoSlotting>;
 
-const cambiarAlmacen: ProcesarSlotting = async (ctx, payload) => ({
-    ...ctx,
-    almacenId: (payload as string) ?? "",
-    abc: null,
-    propuesta: null,
-    recolocaciones: null,
-    filasPicking: null,
-    resumenPicking: null,
-    resultadoMigracion: null,
-});
+const cambiarAlmacen: ProcesarSlotting = async (ctx, payload) => {
+    almacenDeTrabajo.fijar(payload as string);
+    return {
+        ...ctx,
+        almacenId: (payload as string) ?? "",
+        abc: null,
+        propuesta: null,
+        recolocaciones: null,
+        filasPicking: null,
+        resumenPicking: null,
+        resultadoMigracion: null,
+    };
+};
 
-const cambiarOrigen: ProcesarSlotting = async (ctx, payload) => ({
-    ...ctx,
-    origen: origenRotacion(payload as string),
-    abc: null,
-    propuesta: null,
-    recolocaciones: null,
-    filasPicking: null,
-    resumenPicking: null,
-});
+const cambiarOrigen: ProcesarSlotting = async (ctx, payload) => {
+    parametrosAbc.guardar({ origen: origenRotacion(payload as string) });
+    return {
+        ...ctx,
+        origen: origenRotacion(payload as string),
+        abc: null,
+        propuesta: null,
+        recolocaciones: null,
+        filasPicking: null,
+        resumenPicking: null,
+    };
+};
 
 const cambiarCampo = (campo: keyof ContextoSlotting): ProcesarSlotting => async (ctx, payload) => ({
     ...ctx,
     [campo]: (payload as string) ?? "",
 });
+
+/** Los «Días» de cualquier pestaña son los del ABC compartidos con el mapa. */
+const recordarDias = (procesar: ProcesarSlotting): ProcesarSlotting => async (ctx, payload) => {
+    const dias = (payload as string) ?? "";
+    if (enteroPositivo(dias, 0) > 0) parametrosAbc.guardar({ dias });
+    return procesar(ctx, payload);
+};
 
 const limpiarPicking = (ctx: ContextoSlotting): ContextoSlotting => ({ ...ctx, filasPicking: null, resumenPicking: null });
 
@@ -185,15 +215,15 @@ export const getMaquina: () => Maquina<EstadoSlotting, ContextoSlotting> = () =>
         migracion_simulada: migrar(true),
         migracion_solicitada: migrar(false),
         origen_cambiado: cambiarOrigen,
-        dias_abc_cambiados: cambiarCampo("diasAbc"),
+        dias_abc_cambiados: recordarDias(cambiarCampo("diasAbc")),
         abc_solicitado: calcularAbc,
         articulo_cambiado: async (ctx, payload) => ({ ...ctx, articuloId: (payload as string) ?? "", propuesta: null }),
         limite_propuesta_cambiado: cambiarCampo("limitePropuesta"),
         propuesta_solicitada: proponer,
-        dias_recolocacion_cambiados: cambiarCampo("diasRecolocacion"),
+        dias_recolocacion_cambiados: recordarDias(cambiarCampo("diasRecolocacion")),
         limite_recolocacion_cambiado: cambiarCampo("limiteRecolocacion"),
         recolocacion_solicitada: calcularRecolocacion,
-        dias_picking_cambiados: cambiarParametroPicking("diasPicking"),
+        dias_picking_cambiados: recordarDias(cambiarParametroPicking("diasPicking")),
         clases_picking_cambiadas: cambiarClasesPicking,
         cobertura_picking_cambiada: cambiarParametroPicking("coberturaPicking"),
         reposicion_picking_cambiada: cambiarParametroPicking("reposicionPicking"),

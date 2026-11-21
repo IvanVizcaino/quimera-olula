@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { motivoRecorridoVacio, textoAccionParada } from "#/almacen/orden/dominio.ts";
 import { DIAS_POR_DEFECTO, enteroPositivo, origenesRotacion } from "#/almacen/slotting/dominio.ts";
@@ -13,7 +14,7 @@ import {
     avisosAccesibilidad, capasMapa, leyenda, paletaClases, paradasEnElementos, paradasSinPasillo,
     puntosRecorrido, resumenUbicacion, textoCalculo, tonoUbicacion, vinculadas,
 } from "./dominio.ts";
-import { contextoMapaInicial, desplazarEnBorrador, getMaquina } from "./maquina.ts";
+import { contextoMapaDeEntrada, desplazarEnBorrador, getMaquina } from "./maquina.ts";
 import { PlantaZona } from "./planta/PlantaZona.tsx";
 import { EditorPlanta } from "./planta_real/EditorPlanta.tsx";
 import { PlantaReal } from "./planta_real/PlantaReal.tsx";
@@ -21,7 +22,13 @@ import "#/comun/estilos/pagina_proceso.css";
 import "./MapaAlmacen.css";
 
 export const MapaAlmacen = () => {
-    const { ctx, emitir, setCtx } = useMaquina(getMaquina, contextoMapaInicial);
+    const { ctx, emitir, setCtx } = useMaquina(getMaquina, contextoMapaDeEntrada());
+
+    // Con almacén de trabajo o un enlace, carga directamente.
+    useEffect(() => {
+        emitir("entrada");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const { mapa, capa } = ctx;
     const paleta = mapa ? paletaClases(mapa) : new Map<string, number>();
     const zonas = mapa ? mapa.zonas.filter((z) => !ctx.zonaId || z.zonaId === ctx.zonaId) : [];

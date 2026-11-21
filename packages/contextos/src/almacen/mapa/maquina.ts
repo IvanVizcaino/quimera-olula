@@ -2,6 +2,7 @@ import { getRecorridoOrden } from "#/almacen/orden/infraestructura.ts";
 import { RecorridoOrden } from "#/almacen/orden/diseño.ts";
 import { OrigenRotacion } from "#/almacen/slotting/diseño.ts";
 import { DIAS_POR_DEFECTO, enteroPositivo, ORIGEN_POR_DEFECTO, origenRotacion } from "#/almacen/slotting/dominio.ts";
+import { almacenDeTrabajo, parametroUrl, parametrosAbc, preferenciasPantalla } from "#/almacen/comun/preferencias.ts";
 import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { CapaMapa, ElegidoPlanta, MapaAlmacen, PlantaAlmacen, TrazadoRecorrido, VistaMapa } from "./diseño.ts";
 import { CAPA_POR_DEFECTO, capaMapa, desplazarPieza, plantaInicial } from "./dominio.ts";
@@ -32,6 +33,11 @@ export type ContextoMapa = {
     elegido: ElegidoPlanta | null;
 };
 
+/** Lo que el mapa recuerda en el navegador (doc sga_ergonomia.md). */
+export const preferenciasMapa = preferenciasPantalla("mapa", {
+    capa: CAPA_POR_DEFECTO as CapaMapa, vista: "ESQUEMA" as VistaMapa, zonaId: "",
+});
+
 export const contextoMapaInicial: ContextoMapa = {
     estado: "INICIAL",
     almacenId: "",
@@ -50,6 +56,29 @@ export const contextoMapaInicial: ContextoMapa = {
     elegido: null,
 };
 
+/**
+ * Con lo que trae la URL (un enlace: almacén, zona, ubicación u orden) y, si no, lo recordado: el
+ * almacén de trabajo, los parámetros del ABC y la capa, la vista y la zona del mapa.
+ */
+export const contextoMapaDeEntrada = (): ContextoMapa => {
+    const abc = parametrosAbc.obtener();
+    const pantalla = preferenciasMapa.obtener();
+    const almacenUrl = parametroUrl("almacen_id");
+    const almacenId = almacenUrl ?? almacenDeTrabajo.obtener() ?? "";
+    return {
+        ...contextoMapaInicial,
+        almacenId,
+        origen: abc.origen,
+        dias: abc.dias,
+        capa: capaMapa(pantalla.capa),
+        vista: pantalla.vista === "PLANTA" ? "PLANTA" : "ESQUEMA",
+        // La zona recordada solo vale para el almacén de trabajo.
+        zonaId: parametroUrl("zona_id") ?? (almacenUrl ? "" : pantalla.zonaId),
+        ubicacionId: parametroUrl("ubicacion_id"),
+        ordenId: parametroUrl("orden_id") ?? "",
+    };
+};
+
 type ProcesarMapa = ProcesarContexto<EstadoMapa, ContextoMapa>;
 
 const cargar: ProcesarMapa = async (ctx) => {
@@ -59,7 +88,23 @@ const cargar: ProcesarMapa = async (ctx) => {
     return { ...ctx, estado: "CARGADO", mapa, vista: mapa.planta ? ctx.vista : "ESQUEMA" };
 };
 
-const cambiarAlmacen: ProcesarMapa = async (ctx, payload) => cargar({
+/** Al entrar: si hay almacén, se carga y se aplica el foco del enlace (ubicación, orden). */
+const entrar: ProcesarMapa = async (ctx) => {
+    if (!ctx.almacenId) return ctx;
+    const cargado = await cargar(ctx) as ContextoMapa;
+    const ubicacion = cargado.mapa?.ubicaciones.find((u) => u.ubicacionId === ctx.ubicacionId);
+    const conFoco: ContextoMapa = {
+        ...cargado,
+        ubicacionId: ubicacion ? ubicacion.ubicacionId : null,
+        pasilloId: ubicacion?.pasilloId ?? null,
+        zonaId: cargado.mapa?.zonas.some((z) => z.zonaId === ctx.zonaId) ? ctx.zonaId : "",
+    };
+    return ctx.ordenId.trim() ? verRecorrido(conFoco) : conFoco;
+};
+
+const cambiarAlmacen: ProcesarMapa = async (ctx, payload) => {
+    almacenDeTrabajo.fijar(payload as string);
+    return cargar({
     ...ctx,
     almacenId: (payload as string) ?? "",
     zonaId: "",
@@ -67,19 +112,33 @@ const cambiarAlmacen: ProcesarMapa = async (ctx, payload) => cargar({
     ubicacionId: null,
     recorrido: null,
     trazado: null,
-});
+    });
+};
 
 /** La rotación cambia las capas ABC y slotting: con el mapa ya cargado, se recalcula. */
 const cambiarOrigen: ProcesarMapa = async (ctx, payload) => {
     const nuevo = { ...ctx, origen: origenRotacion(payload as string) };
+    parametrosAbc.guardar({ origen: nuevo.origen });
     return ctx.mapa && nuevo.origen !== ctx.origen ? cargar(nuevo) : nuevo;
 };
 
-const cambiarDias: ProcesarMapa = async (ctx, payload) => ({ ...ctx, dias: (payload as string) ?? "" });
+const cambiarDias: ProcesarMapa = async (ctx, payload) => {
+    const dias = (payload as string) ?? "";
+    if (enteroPositivo(dias, 0) > 0) parametrosAbc.guardar({ dias });
+    return { ...ctx, dias };
+};
 
-const cambiarCapa: ProcesarMapa = async (ctx, payload) => ({ ...ctx, capa: capaMapa(payload as string) });
+const cambiarCapa: ProcesarMapa = async (ctx, payload) => {
+    const capa = capaMapa(payload as string);
+    preferenciasMapa.guardar({ capa });
+    return { ...ctx, capa };
+};
 
-const cambiarZona: ProcesarMapa = async (ctx, payload) => ({ ...ctx, zonaId: (payload as string) ?? "" });
+const cambiarZona: ProcesarMapa = async (ctx, payload) => {
+    const zonaId = (payload as string) ?? "";
+    preferenciasMapa.guardar({ zonaId });
+    return { ...ctx, zonaId };
+};
 
 const seleccionarPasillo: ProcesarMapa = async (ctx, payload) => ({
     ...ctx,
@@ -115,10 +174,11 @@ const verRecorrido: ProcesarMapa = async (ctx) => {
 
 const quitarRecorrido: ProcesarMapa = async (ctx) => ({ ...ctx, recorrido: null, trazado: null });
 
-const cambiarVista: ProcesarMapa = async (ctx, payload) => ({
-    ...ctx,
-    vista: payload === "PLANTA" && ctx.mapa?.planta ? "PLANTA" : "ESQUEMA",
-});
+const cambiarVista: ProcesarMapa = async (ctx, payload) => {
+    const vista: VistaMapa = payload === "PLANTA" && ctx.mapa?.planta ? "PLANTA" : "ESQUEMA";
+    preferenciasMapa.guardar({ vista });
+    return { ...ctx, vista };
+};
 
 /** Edita la planta del almacén o, si no tiene, una propuesta con todos sus pasillos. */
 const editar: ProcesarMapa = async (ctx) => {
@@ -171,6 +231,7 @@ const guardar: ProcesarMapa = async (ctx) => {
 
 export const getMaquina: () => Maquina<EstadoMapa, ContextoMapa> = () => ({
     INICIAL: {
+        entrada: entrar,
         almacen_cambiado: cambiarAlmacen,
         origen_cambiado: cambiarOrigen,
         dias_cambiados: cambiarDias,

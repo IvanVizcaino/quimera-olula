@@ -1,3 +1,6 @@
+import { filtroAlmacen } from "#/almacen/comun/componentes/FiltroAlmacen.tsx";
+import { criteriaInicialSga } from "#/almacen/comun/preferencias.ts";
+import { getMetaFiltroDefecto, MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
@@ -20,11 +23,15 @@ const metaTablaZona: MetaTabla<Zona> = [
     { id: "descripcion", cabecera: "Descripción" },
 ];
 
+// El almacén con su selector (el de por defecto filtraría por el texto de la columna).
+const { almacenId: _sinFiltroTexto, ...filtrosZona } = getMetaFiltroDefecto(metaTablaZona);
+const metaFiltroZona: MetaFiltro = { almacen: filtroAlmacen(), ...filtrosZona };
+
 export const MaestroConDetalleZona = () => {
     const criteriaBase = useMemo(() => criteriaDefecto, []);
 
     const { id, criteria } = getUrlParams();
-    const criteriaInicial = criteria.filtro.length > 0 ? criteria : criteriaBase;
+    const criteriaInicial = criteriaInicialSga(criteria, criteriaBase);
 
     const { ctx, emitir } = useMaquina(getMaquina, {
         estado: "INICIAL",
@@ -48,6 +55,7 @@ export const MaestroConDetalleZona = () => {
                         <h2>Zonas</h2>
                         <Listado<Zona>
                             metaTabla={metaTablaZona}
+                            metaFiltro={metaFiltroZona}
                             criteria={zonas.criteria}
                             modoInicial="tarjetas"
                             tarjeta={TarjetaZona}
