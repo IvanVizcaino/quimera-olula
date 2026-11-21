@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { ListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
 import { StockItem } from "../diseño.ts";
@@ -16,8 +17,9 @@ export const metaTablaStock: MetaTabla<StockItem> = [
         id: "articulo",
         cabecera: "Artículo",
         render: (s) => [s.articulo, s.articuloId].filter(Boolean).join(" - "),
+        enlace: (s) => urlFicha.articulo(s.articuloId),
     },
-    { id: "almacen", cabecera: "Almacén" },
+    { id: "almacen", cabecera: "Almacén", enlace: (s) => urlFicha.almacen(s.almacenId) },
     {
         id: "cantidad_fisica",
         cabecera: "Cantidad física",

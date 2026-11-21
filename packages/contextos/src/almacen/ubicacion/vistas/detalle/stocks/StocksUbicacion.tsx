@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
@@ -10,7 +11,7 @@ const ExpansionMovimientos = ({ entidad }: { entidad: StockUbicacionItem }) => (
 
 const metaTablaStocks: MetaTabla<StockUbicacionItem> = {
     cols: [
-        { id: "articulo", cabecera: "Artículo" },
+        { id: "articulo", cabecera: "Artículo", enlace: (s) => urlFicha.articulo(s.articuloId) },
         { id: "cantidadFisica", cabecera: "Cantidad física", tipo: "numero" },
     ],
     expansion: ExpansionMovimientos,

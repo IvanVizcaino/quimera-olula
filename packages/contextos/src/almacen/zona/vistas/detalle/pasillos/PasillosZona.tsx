@@ -1,3 +1,4 @@
+import { urlListado } from "#/almacen/comun/fichas.ts";
 import { BorrarPasillo } from "#/almacen/pasillo/borrar_pasillo/BorrarPasillo.tsx";
 import { CambiarPasillo } from "#/almacen/pasillo/cambiar_pasillo/CambiarPasillo.tsx";
 import { CrearPasillo } from "#/almacen/pasillo/crear_pasillo/CrearPasillo.tsx";
@@ -16,7 +17,8 @@ import "./PasillosZona.css";
 
 const metaTablaPasillos: MetaTabla<Pasillo> = [
     { id: "orden", cabecera: "Orden" },
-    { id: "codigo", cabecera: "Código" },
+    // Lleva a las ubicaciones del pasillo.
+    { id: "codigo", cabecera: "Código", enlace: (p) => urlListado.ubicacionesDePasillo(p.id) },
     { id: "caras", cabecera: "Caras", render: (p) => descripcionCaras(p.caras) },
     { id: "modulos", cabecera: "Módulos/cara" },
     { id: "accesos", cabecera: "Accesos", render: (p) => descripcionAccesos(p.accesos) },

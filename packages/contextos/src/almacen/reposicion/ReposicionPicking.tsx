@@ -1,3 +1,5 @@
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { useEffect } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
@@ -8,7 +10,7 @@ import { Link } from "react-router";
 import { NecesidadReposicion } from "./diseño.ts";
 import {
     necesidadSeleccionable, ParteSituacion, puedeGenerarSeleccion, puedeGenerarTraspaso, situacion,
-    textoArticulo, textoOrigenes, todasSeleccionadas,
+    textoArticulo, todasSeleccionadas,
 } from "./dominio.ts";
 import { contextoReposicionDeEntrada, getMaquina } from "./maquina.ts";
 import "#/comun/estilos/pagina_proceso.css";
@@ -120,13 +122,10 @@ const columnasNecesidades: MetaTabla<FilaNecesidad> = [
         id: "articuloId",
         cabecera: "Artículo",
         estilo: "destacado",
-        render: (n) => (
-            <Link to={`/almacen/articulo?id=${encodeURIComponent(n.articuloId)}`} onClick={(e) => e.stopPropagation()}>
-                {textoArticulo(n)}
-            </Link>
-        ),
+        render: (n) => textoArticulo(n),
+        enlace: (n) => urlFicha.articulo(n.articuloId),
     },
-    { id: "ubicacion", cabecera: "Ubicación de picking" },
+    { id: "ubicacion", cabecera: "Ubicación de picking", enlace: (n) => urlFicha.pickingFijo(n.pickingFijoId) },
     {
         id: "situacion",
         cabecera: "Situación",
@@ -141,7 +140,16 @@ const columnasNecesidades: MetaTabla<FilaNecesidad> = [
         id: "origenes",
         cabecera: "Orígenes",
         ancho: "25%",
-        render: (n) => (n.origenes.length ? textoOrigenes(n) : "Sin stock en reserva"),
+        render: (n) => (n.origenes.length
+            ? n.origenes.map((o, i) => (
+                <span key={o.ubicacionId}>
+                    {i > 0 && ", "}
+                    <ValorConEnlace href={urlFicha.ubicacion(o.ubicacionId)} etiqueta={`Abrir ubicación ${o.ubicacion}`}>
+                        {o.ubicacion} ({o.cantidad.toLocaleString("es-ES")})
+                    </ValorConEnlace>
+                </span>
+            ))
+            : "Sin stock en reserva"),
     },
 ];
 

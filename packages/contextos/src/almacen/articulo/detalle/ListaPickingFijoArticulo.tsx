@@ -1,3 +1,5 @@
+import { urlFicha, urlListado } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { useEffect, useState } from "react";
 import { PickingFijo } from "../../picking_fijo/diseño.ts";
@@ -21,7 +23,11 @@ export const ListaPickingFijoArticulo = ({ articuloId }: { articuloId: string })
 
   return (
     <div className="ListaPickingFijoArticulo">
-      <h4>Picking fijo</h4>
+      <h4>
+        <ValorConEnlace href={urlListado.pickingFijoDeArticulo(articuloId)} etiqueta={`Ver el picking fijo de ${articuloId}`}>
+          Picking fijo
+        </ValorConEnlace>
+      </h4>
       <table>
         <thead>
           <tr>
@@ -35,11 +41,19 @@ export const ListaPickingFijoArticulo = ({ articuloId }: { articuloId: string })
         <tbody>
           {huecos.map((h) => (
             <tr key={h.id}>
-              <td>{h.ubicacion}</td>
+              <td>
+                <ValorConEnlace href={urlFicha.ubicacion(h.ubicacionId)} etiqueta={`Abrir ubicación ${h.ubicacion}`}>
+                  {h.ubicacion}
+                </ValorConEnlace>
+              </td>
               <td>{h.minimo}</td>
               <td>{h.maximo}</td>
               <td>{h.unidadReposicion}</td>
-              <td>{h.stock}</td>
+              <td>
+                <ValorConEnlace href={urlListado.stockDeArticulo(articuloId)} etiqueta={`Ver el stock de ${articuloId}`}>
+                  {h.stock}
+                </ValorConEnlace>
+              </td>
             </tr>
           ))}
         </tbody>

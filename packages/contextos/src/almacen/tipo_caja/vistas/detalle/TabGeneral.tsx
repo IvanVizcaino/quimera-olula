@@ -1,3 +1,5 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.js";
@@ -34,7 +36,11 @@ export const TabGeneral = ({
             <div className="tipo-caja-sku-seccion">
                 <dl>
                     <dt>SKU</dt>
-                    <dd>{tipoCaja.sku ?? "—"}</dd>
+                    <dd>
+                        <ValorConEnlace href={urlFicha.articulo(tipoCaja.sku)} etiqueta={`Abrir artículo ${tipoCaja.sku ?? ""}`}>
+                            {tipoCaja.sku ?? "—"}
+                        </ValorConEnlace>
+                    </dd>
                     <dt>Capacidad</dt>
                     <dd>{tipoCaja.capacidad !== null ? tipoCaja.capacidad : "—"}</dd>
                 </dl>

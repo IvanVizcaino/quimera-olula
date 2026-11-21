@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { ListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
 import { Caja } from "../diseño.ts";
@@ -11,5 +12,5 @@ export type ContextoMaestroCaja = {
 
 export const metaTablaCaja: MetaTabla<Caja> = [
     { id: "lpn", cabecera: "Código" },
-    { id: "ubicacion", cabecera: "Ubicación" },
+    { id: "ubicacion", cabecera: "Ubicación", enlace: (c) => urlFicha.ubicacion(c.idUbicacion) },
 ];

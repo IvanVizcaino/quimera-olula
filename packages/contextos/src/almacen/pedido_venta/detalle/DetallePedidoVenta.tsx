@@ -1,3 +1,5 @@
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
+import { urlListado } from "#/almacen/comun/fichas.ts";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
@@ -62,6 +64,9 @@ export const DetallePedidoVenta = ({
         >
             <div className="DetallePedidoVenta">
                 {acciones.length > 0 && <QuimeraAcciones acciones={acciones} vertical />}
+                <div className="maestro-botones">
+                    <QBoton variante="borde" enlace={urlListado.ordenesDePedidoVenta(ctx.pedido.id)}>Ver órdenes</QBoton>
+                </div>
                 <quimera-formulario>
                     <QInput label="Código" nombre="codigo" valor={ctx.pedido.codigo} soloLectura />
                     <QInput label="Fecha" nombre="fecha" valor={formatearFechaDate(ctx.pedido.fecha)} soloLectura />

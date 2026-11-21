@@ -1,3 +1,5 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { CajaContenido, ComponenteCaja, MaterialCaja, MovimientoCaja } from "../diseño.ts";
 import { esMaterial, esSubcaja } from "./dominio.ts";
 
@@ -21,7 +23,11 @@ const NodoMovimiento = ({ movimiento }: { movimiento: MovimientoCaja }) => {
         <div className="arbol-movimiento">
             <span className="arbol-movimiento-cantidad">{movimiento.cantidad}</span>
             <span className="arbol-movimiento-concepto">{movimiento.concepto}</span>
-            <span className="arbol-movimiento-ubicacion">{movimiento.ubicacion}</span>
+            <span className="arbol-movimiento-ubicacion">
+                <ValorConEnlace href={urlFicha.ubicacion(movimiento.idUbicacion)} etiqueta={`Abrir ubicación ${movimiento.ubicacion}`}>
+                    {movimiento.ubicacion}
+                </ValorConEnlace>
+            </span>
             <span className="arbol-movimiento-fecha">
                 <span className="arbol-movimiento-fecha-dia">{fecha}</span>
                 <span className="arbol-movimiento-fecha-sep">·</span>
@@ -36,7 +42,11 @@ const NodoMaterial = ({ material }: { material: MaterialCaja }) => (
         <summary>
             <span className="arbol-material-indicador" aria-hidden="true" />
             <span className="arbol-material-principal">
-                <span className="arbol-material-sku">{material.sku}</span>
+                <span className="arbol-material-sku">
+                    <ValorConEnlace href={urlFicha.articulo(material.sku)} etiqueta={`Abrir artículo ${material.sku}`}>
+                        {material.sku}
+                    </ValorConEnlace>
+                </span>
                 <span className="arbol-material-descripcion">{material.descripcion}</span>
             </span>
             <span className="arbol-material-cantidad">
@@ -58,7 +68,9 @@ const NodoMaterial = ({ material }: { material: MaterialCaja }) => (
 
 const NodoSubcaja = ({ subcaja }: { subcaja: CajaContenido }) => (
     <details className="arbol-nodo arbol-subcaja" open>
-        <summary className="arbol-subcaja-id">{subcaja.lpn}</summary>
+        <summary className="arbol-subcaja-id">
+            <ValorConEnlace href={urlFicha.caja(subcaja.id)} etiqueta={`Abrir caja ${subcaja.lpn}`}>{subcaja.lpn}</ValorConEnlace>
+        </summary>
         <div className="arbol-subcaja-contenido">
             {subcaja.contenido.map((comp) => (
                 <NodoComponente key={comp.id} componente={comp} />

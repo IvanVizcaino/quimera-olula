@@ -1,3 +1,5 @@
+import { urlFicha, urlListado } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { useEffect } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { motivoRecorridoVacio, textoAccionParada } from "#/almacen/orden/dominio.ts";
@@ -163,7 +165,10 @@ export const MapaAlmacen = () => {
                         <>
                             <li>
                                 <span className="mapa-muestra mapa-muestra-recorrido" aria-hidden="true" />
-                                Recorrido {ctx.recorrido.ordenId}: {ctx.recorrido.paradas.length} paradas,{" "}
+                                Recorrido{" "}
+                                <ValorConEnlace href={urlFicha.orden(ctx.recorrido.ordenId)} etiqueta={`Abrir orden ${ctx.recorrido.ordenId}`}>
+                                    {ctx.recorrido.ordenId}
+                                </ValorConEnlace>: {ctx.recorrido.paradas.length} paradas,{" "}
                                 {ctx.recorrido.calculo === "DISTANCIA" && ctx.recorrido.metros != null
                                     ? `${Math.round(ctx.recorrido.metros).toLocaleString("es-ES")} m a pie, ordenado por la planta`
                                     : enPlanta && ctx.trazado?.metros != null
@@ -274,7 +279,11 @@ export const MapaAlmacen = () => {
                 {mapa && pasillo && !editando && (
                     <section className="mapa-panel mapa-panel-alzado">
                         <div className="mapa-panel-cabecera">
-                            <h3>Pasillo {pasillo.pasillo}</h3>
+                            <h3>
+                                <ValorConEnlace href={urlListado.ubicacionesDePasillo(pasillo.pasilloId)} etiqueta={`Ver las ubicaciones del pasillo ${pasillo.pasillo}`}>
+                                    Pasillo {pasillo.pasillo}
+                                </ValorConEnlace>
+                            </h3>
                             <QBoton variante="texto" onClick={() => emitir("pasillo_seleccionado", null)}>
                                 Cerrar
                             </QBoton>

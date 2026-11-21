@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
@@ -6,7 +7,7 @@ import "./TabLineas.css";
 
 const metaTablaLineas: MetaTabla<LineaPedidoCompra> = {
     cols: [
-        { id: "sku", cabecera: "SKU" },
+        { id: "sku", cabecera: "SKU", enlace: (l) => urlFicha.articulo(l.sku) },
         { id: "descripcion", cabecera: "Descripción", tipo: "texto" },
         { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
         { id: "cantidadRecibida", cabecera: "Recibida", tipo: "numero" },

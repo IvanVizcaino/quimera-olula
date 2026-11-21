@@ -1,3 +1,4 @@
+import { PLANTILLA_FICHA, urlFicha } from "#/almacen/comun/fichas.ts";
 import { MovimientosStockUbicacion } from "#/almacen/comun/componentes/MovimientosStockUbicacion.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
@@ -26,7 +27,7 @@ const ExpansionMovimientos = ({ entidad }: { entidad: StockUbicacion }) => (
 
 const metaTablaUbicaciones: MetaTabla<StockUbicacion> = {
     cols: [
-        { id: "ubicacion", cabecera: "Ubicación" },
+        { id: "ubicacion", cabecera: "Ubicación", enlace: (u) => urlFicha.ubicacion(u.idUbicacion) },
         { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
     ],
     expansion: ExpansionMovimientos,
@@ -84,8 +85,8 @@ export const DetalleStock = ({
             <div className="DetalleStock">
                 <quimera-formulario>
                     <QInput label="Artículo"     nombre="articulo"    valor={stock.articulo ?? ""}               soloLectura />
-                    <QInput label="Referencia"   nombre="articulo_id" valor={String(stock.articuloId ?? "")}     soloLectura />
-                    <QInput label="Almacén"      nombre="almacen_id"  valor={stock.almacenId ?? ""}              soloLectura />
+                    <QInput label="Referencia"   nombre="articulo_id" valor={String(stock.articuloId ?? "")}     soloLectura enlace={PLANTILLA_FICHA.articulo} />
+                    <QInput label="Almacén"      nombre="almacen_id"  valor={stock.almacenId ?? ""}              soloLectura enlace={PLANTILLA_FICHA.almacen} />
                     <QInput label="N. Almacén"   nombre="almacen"     valor={stock.almacen ?? ""}                soloLectura />
                     <QInput label="Cantidad física"     nombre="cantidadFisica"     valor={numero(stock.cantidadFisica)}     soloLectura />
                     <QInput label="Disponible"          nombre="cantidadDisponible" valor={numero(stock.cantidadDisponible)} soloLectura />

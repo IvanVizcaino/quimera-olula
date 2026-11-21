@@ -50,6 +50,8 @@ export const urlListado = {
     ubicacionesDePasillo: (pasilloId: string) => `/almacen/ubicaciones?${igual("pasillo_id", pasilloId)}`,
     ubicacionesDeZona: (zonaId: string) => `/almacen/ubicaciones?${igual("zona_id", zonaId)}`,
     ubicacionesDeTipo: (tipoId: string) => `/almacen/ubicaciones?${igual("tipo_ubicacion_id", tipoId)}`,
+    ordenesDePedidoCompra: (pedidoId: string) => `/almacen/ordenes?${igual("pedido_compra_id", pedidoId)}`,
+    ordenesDePedidoVenta: (pedidoId: string) => `/almacen/ordenes?${igual("pedido_venta_id", pedidoId)}`,
 };
 
 export interface FocoMapa {

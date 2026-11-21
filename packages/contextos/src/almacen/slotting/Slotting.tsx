@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { useEffect, useState } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { Articulo } from "#/almacen/comun/componentes/Articulo.tsx";
@@ -242,7 +243,7 @@ const conId = <T,>(filas: T[], id: (f: T, i: number) => string): Fila<T>[] =>
     filas.map((f, i) => ({ ...f, id: id(f, i) }) as Fila<T>);
 
 const metaTablaAbc: MetaTabla<Fila<ArticuloAbc>> = [
-    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    { id: "articuloId", cabecera: "Artículo", estilo: "destacado", enlace: (a) => urlFicha.articulo(a.articuloId) },
     { id: "descripcion", cabecera: "Descripción", ancho: "40%" },
     { id: "lineas", cabecera: "Líneas", tipo: "numero" },
     { id: "unidades", cabecera: "Unidades", tipo: "numero" },
@@ -262,7 +263,7 @@ const TablaAbc = ({ abc }: { abc: ArticuloAbc[] }) => (
 type UbicacionPropuestaFila = PropuestaUbicacion["ubicaciones"][number];
 
 const metaTablaPropuesta: MetaTabla<Fila<UbicacionPropuestaFila>> = [
-    { id: "ubicacion", cabecera: "Ubicación", estilo: "destacado" },
+    { id: "ubicacion", cabecera: "Ubicación", estilo: "destacado", enlace: (u) => urlFicha.ubicacion(u.ubicacionId) },
     { id: "zona", cabecera: "Zona" },
     { id: "accesibilidad", cabecera: "Accesibilidad", tipo: "numero" },
     { id: "claseUbicacion", cabecera: "Clase", render: (u) => <InsigniaClase clase={u.claseUbicacion} /> },
@@ -285,7 +286,7 @@ const ResultadoPropuesta = ({ propuesta }: { propuesta: PropuestaUbicacion }) =>
 );
 
 const metaTablaRecolocacion: MetaTabla<Fila<Recolocacion>> = [
-    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    { id: "articuloId", cabecera: "Artículo", estilo: "destacado", enlace: (r) => urlFicha.articulo(r.articuloId) },
     { id: "clase", cabecera: "Clase", render: (r) => <InsigniaClase clase={r.clase} /> },
     { id: "ubicacion", cabecera: "Ubicación actual" },
     { id: "claseUbicacion", cabecera: "Clase ubicación", render: (r) => <InsigniaClase clase={r.claseUbicacion} /> },
@@ -336,13 +337,14 @@ const TablaPickingFijo = ({ filas, onCambio }: {
                 />
             ),
         },
-        { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+        { id: "articuloId", cabecera: "Artículo", estilo: "destacado", enlace: (f) => urlFicha.articulo(f.articuloId) },
         { id: "descripcion", cabecera: "Descripción", ancho: "25%" },
         { id: "clase", cabecera: "Clase", render: (f) => <InsigniaClase clase={f.clase} /> },
         { id: "lineas", cabecera: "Líneas", tipo: "numero" },
         {
             id: "ubicacion", cabecera: "Ubicación",
             render: (f) => f.ubicacion ?? <span className="slotting-sin-hueco">Sin hueco libre</span>,
+            enlace: (f) => urlFicha.ubicacion(f.ubicacionId),
         },
         { id: "zona", cabecera: "Zona", render: (f) => f.zona ?? "" },
         ...(["minimo", "maximo", "unidadReposicion"] as const).map((campo) => ({
@@ -368,7 +370,7 @@ const TablaPickingFijo = ({ filas, onCambio }: {
 };
 
 const metaTablaMigracion: MetaTabla<Fila<AjusteMigracion>> = [
-    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
+    { id: "articuloId", cabecera: "Artículo", estilo: "destacado", enlace: (a) => urlFicha.articulo(a.articuloId) },
     { id: "loteId", cabecera: "Lote", render: (a) => a.loteId ?? "" },
     { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
     { id: "accion", cabecera: "", render: (a) => (a.cantidad > 0 ? "Ubicar" : "Retirar") },

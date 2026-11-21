@@ -1,3 +1,5 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { QuimeraAcciones } from "@olula/componentes/index.js";
@@ -64,11 +66,21 @@ export const DetalleCaja = ({
         >
             <div className="DetalleCaja">
                 <QuimeraAcciones acciones={accionesCaja} />
+                <p className="DetalleCaja-ubicacion">
+                    En{" "}
+                    <ValorConEnlace href={urlFicha.ubicacion(caja.idUbicacion)} etiqueta={`Abrir ubicación ${caja.ubicacion}`}>
+                        {caja.ubicacion}
+                    </ValorConEnlace>
+                </p>
                 {esCajaMonoproducto(caja)
                     ? (
                         <>
                             <div className="DetalleCaja-monoproducto-info">
-                                <span className="DetalleCaja-monoproducto-sku">{caja.sku ?? "—"}</span>
+                                <span className="DetalleCaja-monoproducto-sku">
+                                    <ValorConEnlace href={urlFicha.articulo(caja.sku)} etiqueta={`Abrir artículo ${caja.sku ?? ""}`}>
+                                        {caja.sku ?? "—"}
+                                    </ValorConEnlace>
+                                </span>
                                 <span className="DetalleCaja-monoproducto-cantidad">{caja.cantidad} ud.</span>
                                 {caja.idLote && (
                                     <span className="DetalleCaja-monoproducto-lote">Lote: {caja.idLote}</span>

@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { filtroAlmacen } from "#/almacen/comun/componentes/FiltroAlmacen.tsx";
 import { criteriaInicialSga } from "#/almacen/comun/preferencias.ts";
 import { getMetaFiltroDefecto, MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
@@ -16,8 +17,8 @@ import { PickingFijo } from "../diseño.ts";
 import { getMaquina } from "./maquina.ts";
 
 const metaTablaPickingFijo: MetaTabla<PickingFijo> = [
-    { id: "articulo", cabecera: "Artículo", render: (p) => `${p.articuloId} - ${p.articulo}` },
-    { id: "ubicacion", cabecera: "Ubicación" },
+    { id: "articulo", cabecera: "Artículo", render: (p) => `${p.articuloId} - ${p.articulo}`, enlace: (p) => urlFicha.articulo(p.articuloId) },
+    { id: "ubicacion", cabecera: "Ubicación", enlace: (p) => urlFicha.ubicacion(p.ubicacionId) },
     { id: "minimo", cabecera: "Mínimo", tipo: "numero" },
     { id: "maximo", cabecera: "Máximo", tipo: "numero" },
     { id: "unidadReposicion", cabecera: "Unidad", tipo: "numero" },
