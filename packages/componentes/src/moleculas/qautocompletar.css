@@ -19,18 +19,12 @@ quimera-autocompletar {
             }
         }
 
+        /* Solo la posición: el aspecto es el de `.enlace-ficha` (qenlace_ficha.css) */
         .autocompletar-enlace {
             position: absolute;
             right: var(--espaciado-xxs);
             bottom: var(--espaciado-xxs);
-            display: inline-flex;
-            align-items: center;
-            color: var(--color-texto-secundario);
-            line-height: 1;
-
-            &:hover {
-                color: var(--color-texto-primario);
-            }
+            margin-left: 0;
         }
     }
 }

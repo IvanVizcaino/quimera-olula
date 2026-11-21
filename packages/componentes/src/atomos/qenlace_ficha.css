@@ -1,0 +1,28 @@
+/*
+ * Enlace a la ficha de otra entidad: el icono ↗ detrás del valor. Es el único sitio del estilo de
+ * estos enlaces en campos, tablas y paneles (doc sga_ergonomia.md, punto 0).
+ */
+.enlace-ficha {
+    display: inline-flex;
+    align-items: center;
+    margin-left: var(--espaciado-xxs);
+    color: var(--color-texto-secundario);
+    line-height: 1;
+    vertical-align: middle;
+    pointer-events: auto;
+    border-radius: var(--redondeo-borde-xs);
+
+    &:hover {
+        color: var(--color-texto-primario);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-borde-focus, var(--color-primario));
+        outline-offset: 1px;
+    }
+}
+
+/* Valor con su enlace, sin partir la línea entre los dos */
+.valor-con-enlace {
+    white-space: nowrap;
+}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useInRouterContext } from "react-router";
 import { Etiqueta, FormFieldProps } from "../atomos/_forminput.tsx";
-import { QIcono } from "../atomos/qicono.tsx";
+import { EnlaceFicha } from "../atomos/qenlace_ficha.tsx";
+import { urlEnlace } from "../atomos/url_enlace.ts";
 import { QInput } from "../atomos/qinput.tsx";
 import { getIdUnico } from "../helpers.ts";
 import "./../atomos/_forminput.css";
@@ -38,30 +38,6 @@ export type QAutocompletarProps<T extends OpcionBase = OpcionBase> = Omit<
   evaluarCambio?: () => void;
 };
 
-const EnlaceFicha = ({
-  href,
-  className,
-  etiqueta,
-  tabIndex,
-}: {
-  href: string;
-  className: string;
-  etiqueta: string;
-  tabIndex?: number;
-}) => {
-  const enRouter = useInRouterContext();
-  const contenido = <QIcono nombre="arriba_derecha" tamaño="sm" />;
-
-  return enRouter ? (
-    <Link to={href} className={className} aria-label={etiqueta} tabIndex={tabIndex}>
-      {contenido}
-    </Link>
-  ) : (
-    <a href={href} className={className} aria-label={etiqueta} tabIndex={tabIndex}>
-      {contenido}
-    </a>
-  );
-};
 
 export const QAutocompletar = <T extends OpcionBase = OpcionBase>({
   nombre,
@@ -222,11 +198,7 @@ export const QAutocompletar = <T extends OpcionBase = OpcionBase>({
     }
   };
 
-  const enlaceHref = enlace && valor
-    ? enlace.includes("{id}")
-      ? enlace.replace("{id}", encodeURIComponent(valor))
-      : `${enlace.replace(/\/$/, "")}/${valor}`
-    : null;
+  const enlaceHref = urlEnlace(enlace, valor);
 
   if (soloLectura) {
     return (

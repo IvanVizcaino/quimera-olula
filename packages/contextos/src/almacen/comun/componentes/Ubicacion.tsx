@@ -1,3 +1,4 @@
+import { PLANTILLA_FICHA } from "#/almacen/comun/fichas.ts";
 import { QAutocompletar } from "@olula/componentes/moleculas/qautocompletar.tsx";
 import { RestAPI } from "@olula/lib/api/rest_api.js";
 import { Criteria } from "@olula/lib/diseño.ts";
@@ -5,6 +6,8 @@ import { criteriaDefecto } from "@olula/lib/dominio.js";
 
 
 interface UbicacionProps {
+  /** Plantilla de la URL de su ficha (↗); "" para no enlazar. */
+  enlace?: string;
   descripcion?: string;
   valor: string;
   nombre?: string;
@@ -15,6 +18,7 @@ interface UbicacionProps {
 }
 
 export const Ubicacion = ({
+  enlace = PLANTILLA_FICHA.ubicacion,
   descripcion = "",
   valor,
   nombre = "ubicacion_id2",
@@ -44,6 +48,7 @@ export const Ubicacion = ({
         <QAutocompletar
             label={`${label} ${valor}`}
             nombre={nombre}
+      enlace={enlace}
             onChange={onChange}
             valor={valor}
             obtenerOpciones={obtenerOpciones}

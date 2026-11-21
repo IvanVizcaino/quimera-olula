@@ -1,3 +1,5 @@
+import { ContenidoConEnlace } from "./qenlace_ficha.tsx";
+import { etiquetaEnlace } from "./url_enlace.ts";
 import { Entidad, Orden, Paginacion } from "@olula/lib/diseño.ts";
 import {
   calcularPaginacionSimplificada,
@@ -31,6 +33,8 @@ export type MetaColumna<T extends Entidad> = {
   /** Énfasis visual: `destacado` en negrita (cliente, total), `secundario` en gris (código). */
   estilo?: "destacado" | "secundario";
   render?: (entidad: T) => string | ReactNode;
+  /** La celda lleva a la ficha de otra entidad (ver `MetaColumna` de qtabla.tsx). */
+  enlace?: (entidad: T) => string | null | undefined;
 };
 
 export type MetaTabla2<T extends Entidad> = {
@@ -133,11 +137,13 @@ const fila = <T extends Entidad>(
 ) => {
   const renderColumna = ({
     id,
+    cabecera: titulo,
     render,
     tipo,
     divisa,
     ancho,
     estilo,
+    enlace,
   }: MetaColumna<T>) => {
     const valorCelda =
       cargando && typeof entidad[id] == "string"
@@ -156,7 +162,12 @@ const fila = <T extends Entidad>(
         data-estilo={estilo}
         style={ancho ? { width: ancho } : undefined}
       >
-        {valorCelda}
+        <ContenidoConEnlace
+          href={cargando ? null : enlace?.(entidad as T)}
+          etiqueta={etiquetaEnlace(titulo, valorCelda)}
+        >
+          {valorCelda}
+        </ContenidoConEnlace>
       </td>
     );
   };

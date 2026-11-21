@@ -1,3 +1,4 @@
+import { PLANTILLA_FICHA } from "#/almacen/comun/fichas.ts";
 import { TagArticulo } from "#/ventas/articulo/diseño.ts";
 import {
   getArticulo,
@@ -8,6 +9,8 @@ import { Filtro, Orden } from "@olula/lib/diseño.ts";
 import { useEffect, useState } from "react";
 
 interface ArticuloProps {
+  /** Plantilla de la URL de su ficha (↗); "" para no enlazar. */
+  enlace?: string;
   descripcion?: string;
   valor: string;
   nombre?: string;
@@ -21,6 +24,7 @@ interface ArticuloProps {
 }
 
 export const Articulo = ({
+  enlace = PLANTILLA_FICHA.articulo,
   descripcion = "",
   valor,
   nombre = "referencia",
@@ -72,6 +76,7 @@ export const Articulo = ({
     <QAutocompletar
       label={`${label} ${valor}`}
       nombre={nombre}
+      enlace={enlace}
       onChange={onChange}
       valor={valor}
       obtenerOpciones={obtenerOpciones}

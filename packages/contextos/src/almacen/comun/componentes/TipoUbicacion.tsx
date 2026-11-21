@@ -1,3 +1,4 @@
+import { PLANTILLA_FICHA } from "#/almacen/comun/fichas.ts";
 import { QSelect } from "@olula/componentes/index.js";
 import { QAutocompletarProps } from "@olula/componentes/moleculas/qautocompletar.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
@@ -11,6 +12,7 @@ type OpcionTipo = { valor: string; descripcion: string };
 const SIN_TIPO: OpcionTipo = { valor: "", descripcion: "(sin tipo)" };
 
 export const TipoUbicacion = ({
+  enlace = PLANTILLA_FICHA.tipoUbicacion,
     valor,
     nombre = "tipo_ubicacion_id",
     label = "Tipo de ubicación",
@@ -32,6 +34,7 @@ export const TipoUbicacion = ({
         <QSelect
             label={label}
             nombre={nombre}
+      enlace={enlace}
             valor={valor}
             onChange={onChange}
             opciones={opciones}
