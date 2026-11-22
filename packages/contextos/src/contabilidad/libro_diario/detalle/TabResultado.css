@@ -1,0 +1,29 @@
+/* Libro diario agrupado: mes, asiento (fecha y número) y debajo sus partidas. */
+.TabResultado .tabla-libro-diario {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: var(--espaciado-xxs) var(--espaciado-xs);
+        border-bottom: 1px solid var(--color-borde-sutil);
+        vertical-align: top;
+    }
+
+    td.importe {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    tr.fila-mes td {
+        font-weight: var(--grosor-letra-7);
+        background-color: var(--gris-2);
+    }
+
+    tr.fila-asiento td,
+    tr.fila-total_mes td,
+    tr.fila-total td {
+        font-weight: var(--grosor-letra-7);
+        background-color: var(--gris-1);
+    }
+}

@@ -14,7 +14,10 @@ import {
     PostUbicacion,
     StockUbicacion,
     StockUbicacionItem,
+    NuevaUbicacion,
     Ubicacion,
+    EstadoActividadUbicacion,
+    CaraUbicacion,
 } from "./diseño.ts";
 
 export interface StockUbicacionItemApi {
@@ -23,7 +26,8 @@ export interface StockUbicacionItemApi {
     ubicacion_id: string;
     ubicacion: string;
     articulo: string;
-    articulo_id: string;
+    /** Referencia del artículo. */
+    sku: string;
     cantidad_fisica: number;
 }
 
@@ -50,12 +54,26 @@ export interface UbicacionAPI extends Entidad {
     codigo: string;
     zona_id: string;
     zona: string;
+    pasillo_id?: string | null;
+    pasillo?: string | null;
+    modulo?: number | null;
+    cara?: CaraUbicacion | null;
+    nivel?: number | null;
+    hueco?: number | null;
+    tipo_ubicacion_id?: string | null;
+    tipo_ubicacion?: string | null;
+    estado?: EstadoActividadUbicacion;
 }
 
-export interface CambiosUbicacionAPI extends Entidad {
-    id: string;
+export interface CambiosUbicacionAPI {
     codigo: string;
     zona_id: string;
+    pasillo_id: string | null;
+    modulo: number | null;
+    nivel: number | null;
+    hueco: number | null;
+    tipo_ubicacion_id: string | null;
+    estado: EstadoActividadUbicacion;
 }
 
 export const ubicacionFromApi = (ubicacionApi: UbicacionAPI): Ubicacion => ({
@@ -63,13 +81,36 @@ export const ubicacionFromApi = (ubicacionApi: UbicacionAPI): Ubicacion => ({
     codigo: ubicacionApi.codigo,
     idZona: ubicacionApi.zona_id,
     zona: ubicacionApi.zona,
+    pasilloId: ubicacionApi.pasillo_id ?? null,
+    pasillo: ubicacionApi.pasillo ?? null,
+    modulo: ubicacionApi.modulo ?? null,
+    cara: ubicacionApi.cara ?? null,
+    nivel: ubicacionApi.nivel ?? null,
+    hueco: ubicacionApi.hueco ?? null,
+    tipoUbicacionId: ubicacionApi.tipo_ubicacion_id ?? null,
+    tipoUbicacion: ubicacionApi.tipo_ubicacion ?? null,
+    estado: ubicacionApi.estado ?? "ACTIVA",
 });
 
 export const ubicacionToApi = (ubicacion: Ubicacion): CambiosUbicacionAPI => ({
-    id: ubicacion.id,
     codigo: ubicacion.codigo,
     zona_id: ubicacion.idZona,
-    zona: ubicacion.zona,
+    pasillo_id: ubicacion.pasilloId || null,
+    modulo: ubicacion.modulo,
+    nivel: ubicacion.nivel,
+    hueco: ubicacion.hueco,
+    tipo_ubicacion_id: ubicacion.tipoUbicacionId || null,
+    estado: ubicacion.estado,
+});
+
+export const nuevaUbicacionToApi = (u: NuevaUbicacion) => ({
+    ...(u.codigo ? { codigo: u.codigo } : {}),
+    zona_id: u.zonaId,
+    pasillo_id: u.pasilloId || null,
+    modulo: u.modulo,
+    nivel: u.nivel,
+    hueco: u.hueco,
+    tipo_ubicacion_id: u.tipoUbicacionId || null,
 });
 
 export const obtenerUbicaciones = async (filtro: Filtro, orden: Orden): Promise<Ubicacion[]> => {
@@ -94,10 +135,7 @@ export const getUbicaciones: GetUbicaciones = async (
 };
 
 export const postUbicacion: PostUbicacion = async (ubicacion) => {
-    const apiUbicacion = {
-        codigo: ubicacion.codigo,
-        zona_id: ubicacion.zonaId,
-    };
+    const apiUbicacion = nuevaUbicacionToApi(ubicacion);
     return await RestAPI.post(baseUrlUbicacion, apiUbicacion, "Error al guardar Ubicación").then(
         (respuesta) => respuesta.id
     );
@@ -105,10 +143,7 @@ export const postUbicacion: PostUbicacion = async (ubicacion) => {
 
 export const patchUbicacion: PatchUbicacion = async (id, ubicacion) => {
     const apiUbicacion = ubicacionToApi(ubicacion as Ubicacion);
-    const ubicacionSinNulls = Object.fromEntries(
-        Object.entries(apiUbicacion).map(([k, v]) => [k, v === null ? "" : v])
-    );
-    await RestAPI.patch(`${baseUrlUbicacion}/${id}`, ubicacionSinNulls, "Error al guardar Ubicación");
+    await RestAPI.patch(`${baseUrlUbicacion}/${id}`, apiUbicacion, "Error al guardar Ubicación");
 };
 
 export const deleteUbicacion: DeleteUbicacion = async (id) => {
@@ -123,7 +158,7 @@ const stockUbicacionItemFromApi = (api: StockUbicacionItemApi): StockUbicacionIt
     ubicacionId: api.ubicacion_id,
     ubicacion: api.ubicacion,
     articulo: api.articulo,
-    articuloId: api.articulo_id,
+    articuloId: api.sku,
     cantidadFisica: api.cantidad_fisica,
 });
 

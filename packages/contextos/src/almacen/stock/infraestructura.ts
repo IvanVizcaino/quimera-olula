@@ -16,6 +16,12 @@ export const stockItemFromApi = (stockApi: StockAPI): StockItem => ({
     cantidadDisponible: stockApi.cantidad_disponible,
     cantidadReservada: stockApi.cantidad_reservada,
     cantidadPendiente: stockApi.cantidad_pendiente,
+    necesidad: stockApi.necesidad ?? null,
+    stockMinimo: stockApi.stock_minimo ?? null,
+    stockMaximo: stockApi.stock_maximo ?? null,
+    fechaUltimaRegularizacion: stockApi.fecha_ultima_regularizacion ?? null,
+    horaUltimaRegularizacion: stockApi.hora_ultima_regularizacion ?? null,
+    cantidadUltimaRegularizacion: stockApi.cantidad_ultima_regularizacion ?? null,
 });
 
 const stockUbicacionFromApi = (api: StockUbicacionItemApi): StockUbicacion => ({
@@ -25,16 +31,27 @@ const stockUbicacionFromApi = (api: StockUbicacionItemApi): StockUbicacion => ({
     cantidad: api.cantidad_fisica,
 });
 
-export const getStock: GetStock = async (id) => {
-    const [stockApi, ubicacionesApi] = await Promise.all([
-        RestAPI.get<{ datos: StockAPI }>(`${baseUrlStock}/${id}`),
-        RestAPI.get<{ datos: StockUbicacionItemApi[] }>(
+// Las ubicaciones son del SGA: sin él (BD de Eneboo sin SGA) la petición
+// puede fallar, y la ficha de stock debe mostrarse igualmente sin ubicaciones.
+const getUbicacionesStock = async (id: string): Promise<StockUbicacion[]> => {
+    try {
+        const respuesta = await RestAPI.get<{ datos: StockUbicacionItemApi[] }>(
             baseUrlStockUbicacion + criteriaQuery([["stock_id", "==", id]] as Filtro, [])
-        ),
+        );
+        return respuesta.datos.map(stockUbicacionFromApi);
+    } catch {
+        return [];
+    }
+};
+
+export const getStock: GetStock = async (id) => {
+    const [stockApi, ubicaciones] = await Promise.all([
+        RestAPI.get<{ datos: StockAPI }>(`${baseUrlStock}/${id}`),
+        getUbicacionesStock(id),
     ]);
     return {
         ...stockItemFromApi(stockApi.datos),
-        ubicaciones: ubicacionesApi.datos.map(stockUbicacionFromApi),
+        ubicaciones,
     };
 };
 

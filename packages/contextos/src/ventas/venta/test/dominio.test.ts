@@ -1,5 +1,6 @@
 import { LineaVenta } from "#/ventas/venta/diseño.ts";
 import {
+    datosClaveDocumentoVenta,
     DIVISA_EMPRESA,
     enDivisaExtranjera,
     formatearTasaConversion,
@@ -211,5 +212,68 @@ describe("payloadCambioCliente bifurca según haya cliente de maestro o de paso"
 
         expect(payload).not.toHaveProperty("nombre_cliente");
         expect(payload).toHaveProperty("nombre", "Paso");
+    });
+});
+
+describe("datosClaveDocumentoVenta: Fecha, Cliente, CIF/NIF, Grupo IVA negocio y Serie", () => {
+    const conIvaNav = (valor: string) =>
+        localStorage.setItem("whoami", JSON.stringify({ plugins: { iva_nav: valor } }));
+
+    afterEach(() => localStorage.removeItem("whoami"));
+
+    const documento = {
+        fecha: new Date(2026, 10, 5),
+        cliente: { nombre_cliente: "Construcciones López", id_fiscal: "B12345678" },
+        grupo_iva_negocio_id: "NACIONAL",
+        serie_id: "A",
+        nombre_agente: "Ana",
+        total: 121,
+    };
+
+    const valores = (datos: { etiqueta: string; valor: unknown }[]) =>
+        Object.fromEntries(datos.map(({ etiqueta, valor }) => [etiqueta, valor]));
+
+    test("muestra las cinco etiquetas en orden, sin Agente ni Total", () => {
+        expect(datosClaveDocumentoVenta(documento).map((d) => d.etiqueta)).toEqual([
+            "Fecha", "Cliente", "CIF/NIF", "Grupo IVA negocio", "Serie",
+        ]);
+    });
+
+    test("cliente, CIF/NIF y serie salen del documento", () => {
+        const datos = valores(datosClaveDocumentoVenta(documento));
+        expect(datos["Cliente"]).toBe("Construcciones López");
+        expect(datos["CIF/NIF"]).toBe("B12345678");
+        expect(datos["Serie"]).toBe("A");
+        expect(datos["Fecha"]).toBeTruthy();
+    });
+
+    test("el grupo de IVA se muestra con su descripción si se conoce", () => {
+        const datos = valores(datosClaveDocumentoVenta(documento, (id) => id === "NACIONAL" ? "Nacional" : undefined));
+        expect(datos["Grupo IVA negocio"]).toBe("Nacional");
+    });
+
+    test("sin descripción conocida el grupo de IVA se muestra con el código", () => {
+        const datos = valores(datosClaveDocumentoVenta(documento, () => undefined));
+        expect(datos["Grupo IVA negocio"]).toBe("NACIONAL");
+    });
+
+    test("cliente no registrado: nombre y CIF del documento; vacíos se muestran como guion", () => {
+        const datos = valores(datosClaveDocumentoVenta({
+            fecha: documento.fecha,
+            cliente: { nombre_cliente: "  ", id_fiscal: "" },
+            grupo_iva_negocio_id: "",
+            serie_id: "",
+        }));
+        expect(datos["Cliente"]).toBe("—");
+        expect(datos["CIF/NIF"]).toBe("—");
+        expect(datos["Grupo IVA negocio"]).toBe("—");
+        expect(datos["Serie"]).toBe("—");
+    });
+
+    test("con iva_nav legacy el documento no lleva grupo y no se muestra", () => {
+        conIvaNav("legacy");
+        expect(datosClaveDocumentoVenta(documento).map((d) => d.etiqueta)).toEqual([
+            "Fecha", "Cliente", "CIF/NIF", "Serie",
+        ]);
     });
 });

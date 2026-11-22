@@ -1,0 +1,150 @@
+.login {
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+    overflow-y: auto;
+
+    section {
+        display: grid;
+    }
+
+    quimera-formulario {
+        form {
+            grid-column: span 12;
+        }
+
+        quimera-boton {
+            grid-column: span 12;
+            width: 100%;
+
+            button {
+                margin: var(--espaciado-m) auto;
+                display: block;
+            }
+        }
+    }
+
+    h1 {
+        background: var(--color-texto-primario);
+        padding: var(--espaciado-m);
+        color: var(--blanco);
+        text-align: center;
+    }
+}
+
+.loginForm {
+    background: var(--color-superficie);
+    padding: var(--espaciado-m);
+
+    & p {
+        margin-bottom: var(--espaciado-m);
+    }
+}
+
+.forgetPassword {
+    margin: var(--espaciado-m) auto;
+    display: block;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    color: var(--color-texto-primario);
+}
+.planes {
+    border: none;
+    padding: 0;
+    margin: 0 0 var(--espaciado-m);
+    grid-column: span 12;
+
+    legend {
+        font-weight: bold;
+        margin-bottom: var(--espaciado-s);
+    }
+}
+
+.periodicidad {
+    display: flex;
+    gap: var(--espaciado-s);
+    margin-bottom: var(--espaciado-s);
+
+    button {
+        flex: 1;
+        padding: var(--espaciado-xs) var(--espaciado-s);
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-xs);
+        background: var(--color-superficie);
+        color: var(--color-texto-primario);
+        cursor: pointer;
+    }
+
+    button.activo {
+        border-color: var(--color-primario);
+        background: var(--color-primario-claro);
+        font-weight: bold;
+    }
+}
+
+.listaPlanes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+}
+
+.plan {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--espaciado-s);
+    padding: var(--espaciado-s);
+    border: 1px solid var(--color-borde-sutil);
+    border-radius: var(--redondeo-borde-xs);
+    background: var(--color-superficie);
+    color: var(--color-texto-primario);
+    cursor: pointer;
+    text-align: left;
+}
+
+.plan.activo {
+    border: 2px solid var(--color-primario);
+    background: var(--color-primario-claro);
+}
+
+.planNombre {
+    font-weight: bold;
+}
+
+.detallePlan {
+    margin-top: var(--espaciado-s);
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+
+    p {
+        margin-bottom: var(--espaciado-xs);
+    }
+}
+
+.formulario {
+    quimera-formulario {
+        form {
+            grid-column: span 12;
+        }
+
+        quimera-boton {
+            grid-column: span 12;
+            width: 100%;
+
+            button {
+                margin: var(--espaciado-m) auto;
+                display: block;
+            }
+        }
+    }
+}
+
+.avisoTitulo {
+    font-size: var(--tamaño-letra-l);
+    margin-bottom: var(--espaciado-s);
+}
+
+.error {
+    color: var(--color-error-texto);
+    grid-column: span 12;
+}

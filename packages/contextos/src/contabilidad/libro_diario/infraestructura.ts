@@ -4,6 +4,7 @@ import {
     CambiosLibroDiario,
     CriterioOrden,
     DeleteLibroDiario,
+    FilaLibroDiario,
     GetLibroDiario,
     GetListaLibroDiario,
     GetReportLibroDiario,
@@ -16,6 +17,7 @@ import {
     PostLibroDiario,
     ResultadoLibroDiario,
     SentidoOrden,
+    TipoFilaLibroDiario,
 } from "./diseño.ts";
 import { ASCENDENTE, NO_ORDENAR } from "./dominio.ts";
 
@@ -133,7 +135,27 @@ interface PeriodoResumenMensualApi {
     acumulado_haber: number;
 }
 
+export interface FilaLibroDiarioApi {
+    tipo: TipoFilaLibroDiario;
+    nivel: number;
+    titulo: string;
+    fecha?: string;
+    asiento_numero?: number;
+    documento?: string;
+    codigo_subcuenta?: string;
+    descripcion_subcuenta?: string;
+    debe?: number;
+    haber?: number;
+    descuadre?: number;
+    codigo_serie?: string | null;
+    factura?: number | null;
+    base_imponible?: number;
+    iva?: number;
+    recargo?: number;
+}
+
 export interface ResultadoLibroDiarioApi {
+    filas?: FilaLibroDiarioApi[];
     datos: LineaLibroDiarioApi[];
     total: number;
     totales?: { debe: number; haber: number; descuadre: number };
@@ -190,9 +212,31 @@ const periodoDesdeApi = (
     acumuladoHaber: api.acumulado_haber,
 });
 
+export const filaLibroDiarioDesdeApi = (
+    api: FilaLibroDiarioApi
+): FilaLibroDiario => ({
+    tipo: api.tipo,
+    nivel: api.nivel,
+    titulo: api.titulo ?? "",
+    fecha: api.fecha ? fechaDesdeApi(api.fecha) : null,
+    asientoNumero: api.asiento_numero ?? null,
+    documento: api.documento ?? "",
+    codigoSubcuenta: api.codigo_subcuenta ?? "",
+    descripcionSubcuenta: api.descripcion_subcuenta ?? "",
+    debe: opcional(api.debe),
+    haber: opcional(api.haber),
+    descuadre: opcional(api.descuadre),
+    codigoSerie: api.codigo_serie ?? null,
+    factura: api.factura ?? null,
+    baseImponible: opcional(api.base_imponible),
+    iva: opcional(api.iva),
+    recargo: opcional(api.recargo),
+});
+
 export const resultadoDesdeApi = (
     api: ResultadoLibroDiarioApi
 ): ResultadoLibroDiario => ({
+    filas: api.filas ? api.filas.map(filaLibroDiarioDesdeApi) : null,
     datos: api.datos.map(lineaLibroDiarioDesdeApi),
     total: api.total,
     totales: api.totales ?? null,
@@ -253,7 +297,11 @@ export const nuevoLibroDiarioAApi = (nuevo: NuevoLibroDiario) => ({
     datos_iva: nuevo.datosIva,
     agrupar_meses: nuevo.agruparMeses,
     resumen_mensual: nuevo.resumenMensual,
-    ordenes: ordenesAApi([[nuevo.orden1, nuevo.tipoOrden1]]),
+    ordenes: ordenesAApi([
+        [nuevo.orden1, nuevo.tipoOrden1],
+        [nuevo.orden2, nuevo.tipoOrden2],
+        [nuevo.orden3, nuevo.tipoOrden3],
+    ]),
 });
 
 const TIENE_RANGO_ASIENTOS: (keyof CambiosLibroDiario)[] = [

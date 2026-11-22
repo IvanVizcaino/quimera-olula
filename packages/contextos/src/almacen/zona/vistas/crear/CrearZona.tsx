@@ -1,3 +1,4 @@
+import { FuncionZona } from "#/almacen/comun/componentes/FuncionZona.tsx";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -42,6 +43,7 @@ export const CrearZona = ({
                 <quimera-formulario>
                     <QInput label="Código" {...uiProps("codigo")} ref={focus} />
                     <Almacen {...uiProps("almacenId")} />
+                    <FuncionZona {...uiProps("funcion")} />
                     <QInput label="Descripción" {...uiProps("descripcion")} />
                 </quimera-formulario>
 

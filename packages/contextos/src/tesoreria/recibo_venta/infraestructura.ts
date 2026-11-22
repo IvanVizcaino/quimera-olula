@@ -11,9 +11,15 @@ export interface MovimientoReciboApi {
     estado: boolean;
     cuenta_pago_id?: string | null;
     nombre_cuenta_pago?: string | null;
+    pasarela?: string | null;
+    modo_pasarela?: "test" | "live" | null;
+    url_panel?: string | null;
+    incidencia_pasarela?: string | null;
 }
 
 export interface ReciboVentaApi {
+    cuenta_domiciliacion_id?: string | null;
+    nombre_cuenta_domiciliacion?: string;
     id: string;
     factura_id: string | null;
     grupo_id: string | null;
@@ -40,9 +46,15 @@ const movimientoReciboDesdeApi = (api: MovimientoReciboApi): MovimientoRecibo =>
     estado: api.estado,
     cuentaPagoId: api.cuenta_pago_id ?? "",
     nombreCuentaPago: api.nombre_cuenta_pago ?? "",
+    pasarela: api.pasarela ?? null,
+    modoPasarela: api.modo_pasarela ?? null,
+    urlPanel: api.url_panel ?? null,
+    incidenciaPasarela: api.incidencia_pasarela ?? null,
 });
 
 export const reciboVentaDesdeApi = (api: ReciboVentaApi): ReciboVenta => ({
+    cuentaDomiciliacionId: api.cuenta_domiciliacion_id ?? null,
+    nombreCuentaDomiciliacion: api.nombre_cuenta_domiciliacion ?? "",
     id: api.id,
     facturaId: api.factura_id ?? "",
     grupoId: api.grupo_id ?? "",
@@ -118,6 +130,7 @@ export const patchDevolverReciboVenta: PatchDevolverReciboVenta = async (id, dev
             ...(devolucion.tasaConversion !== undefined && {
                 tasa_conversion: String(devolucion.tasaConversion),
             }),
+            ...(devolucion.reembolsarEnPasarela && { reembolsar_en_pasarela: true }),
         },
         "Error al devolver el recibo de cobro"
     );
@@ -144,3 +157,28 @@ export const desagruparReciboVenta: DesagruparReciboVenta = async (id) => {
 };
 
 export const getTrazaReciboVenta = (id: string): Promise<unknown> => getTraza(`${baseUrl}/${id}`);
+
+/** TES-06: vencimiento, cuenta de domiciliación e importe (si baja, el recibo se divide). */
+export const patchCambiarReciboVenta = async (
+    id: string,
+    cambios: { fechaVencimiento: string; cuentaDomiciliacionId: string; importe?: number },
+): Promise<void> => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}`,
+        {
+            fecha_vencimiento: cambios.fechaVencimiento,
+            cuenta_domiciliacion_id: cambios.cuentaDomiciliacionId,
+            ...(cambios.importe !== undefined && { importe: String(cambios.importe) }),
+        },
+        "Error al guardar el recibo"
+    );
+};
+
+/** TES-06: borra el último pago o devolución del recibo y su asiento. */
+export const patchAnularPagoReciboVenta = async (id: string): Promise<void> => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}/anular_pago`,
+        {},
+        "Error al anular el último pago del recibo"
+    );
+};

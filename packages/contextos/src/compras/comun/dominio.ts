@@ -1,5 +1,5 @@
 import { ConfigWidgets } from "@olula/componentes/index.js";
-import { formatearFechaDate, formatearMoneda } from "@olula/lib/dominio.ts";
+import { formatearFechaDate } from "@olula/lib/dominio.ts";
 import { ArticuloDeLinea, ArticuloDeLineaConTipo, TipoArticuloLinea } from "./diseño.ts";
 
 export const getTipoArticulo = (linea: ArticuloDeLinea): TipoArticuloLinea =>
@@ -20,17 +20,37 @@ export const articuloDeLineaValido = (linea: ArticuloDeLineaConTipo): boolean =>
     }
 };
 
-/** Franja de datos clave del detalle de un documento de compra. */
-export const datosClaveDocumentoCompra = (documento: {
+/** Documento de compra tal y como lo necesita la franja de datos clave. */
+export type DocumentoCompraDatosClave = {
     fecha: Date;
-    nombreFormaPago: string | null;
-    total: number;
-    divisaId: string;
-}) => [
-    { etiqueta: "Fecha", valor: documento.fecha ? formatearFechaDate(new Date(documento.fecha)) : "—" },
-    { etiqueta: "Forma de pago", valor: documento.nombreFormaPago || "—" },
-    { etiqueta: "Total", valor: formatearMoneda(documento.total ?? 0, documento.divisaId || "EUR") },
-];
+    nombreProveedor?: string | null;
+    idFiscal?: string | null;
+    grupoIvaNegocioId?: string | null;
+};
+
+/**
+ * Franja de datos clave del detalle de un documento de compra (pedido, albarán y
+ * factura): Fecha · Proveedor · CIF/NIF · Grupo IVA negocio.
+ *
+ * Nombre y CIF/NIF son los del documento (también para proveedores no
+ * registrados). El grupo de IVA se muestra con su descripción si
+ * `descripcionGrupoIvaNegocio` la conoce (si no, con el código). A diferencia de
+ * ventas, se muestra siempre: en compras el grupo llega también con
+ * `iva_nav=legacy` (de la ficha del proveedor), igual que en la pestaña Datos.
+ */
+export const datosClaveDocumentoCompra = (
+    documento: DocumentoCompraDatosClave,
+    descripcionGrupoIvaNegocio: (id: string) => string | undefined = () => undefined,
+) => {
+    const grupo = documento.grupoIvaNegocioId ?? "";
+
+    return [
+        { etiqueta: "Fecha", valor: documento.fecha ? formatearFechaDate(new Date(documento.fecha)) : "—" },
+        { etiqueta: "Proveedor", valor: documento.nombreProveedor?.trim() || "—" },
+        { etiqueta: "CIF/NIF", valor: documento.idFiscal?.trim() || "—" },
+        { etiqueta: "Grupo IVA negocio", valor: (grupo && descripcionGrupoIvaNegocio(grupo)) || grupo || "—" },
+    ];
+};
 
 /** Medidas de un documento de compra que se ofrecen al personalizar widgets. */
 const camposWidgetsCompra: ConfigWidgets["campos"] = [
@@ -55,4 +75,14 @@ export const widgetsDocumentoCompra = (
         { id: "neto", titulo: "Base imponible", operacion: "suma", campo: "neto", formato: "moneda", pie: "Suma de la base" },
         { id: "medio", titulo: textos.medio, operacion: "promedio", campo: "total", formato: "moneda", pie: "Media del total" },
     ],
+});
+
+/**
+ * Al cambiar el artículo de una línea nueva, el servidor vuelve a calcular el coste y, si se
+ * ha elegido un artículo, el impuesto: la línea toma el del artículo aunque llevase el I.V.A.
+ * por defecto o el de otro artículo (como lineas*prov.qs al cambiar la referencia).
+ */
+export const reinicioAlCambiarArticulo = (cambios: { referencia?: string | null }) => ({
+    ...(cambios.referencia !== undefined ? { pvpUnitario: null } : {}),
+    ...(cambios.referencia ? { grupoIvaProductoId: null } : {}),
 });

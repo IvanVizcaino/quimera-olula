@@ -14,9 +14,19 @@ export interface ArticuloItem extends Entidad {
     tipoCodBarras: TipoCodBarras | "";
     familiaId: string;
     descripcionFamilia: string;
+    /** Unidad de peso o medida ("" si no tiene). Solo con el plugin pesos_medidas. */
+    unidadId: string;
     noStock: boolean;
     seCompra: boolean;
     seVende: boolean;
+    /** Id de la clase de almacenamiento ("" si no tiene). */
+    claseAlmacenamientoId: string;
+    /** Código de la clase de almacenamiento ("" si no tiene). */
+    claseAlmacenamiento: string;
+    /** Dimensiones de la unidad de stock, en metros. */
+    largo: number | null;
+    ancho: number | null;
+    alto: number | null;
 };
 
 export interface CajaProveedorArticulo extends Entidad {
@@ -59,9 +69,14 @@ export type CambiosArticulo = Partial<
         | "codbarras"
         | "tipoCodBarras"
         | "familiaId"
+        | "unidadId"
         | "noStock"
         | "seCompra"
         | "seVende"
+        | "claseAlmacenamientoId"
+        | "largo"
+        | "ancho"
+        | "alto"
     >
 >;
 
@@ -79,6 +94,9 @@ export type GetArticulos = (
 ) => RespuestaLista<ArticuloItem>;
 export type LeerCodBarras = (codigo: string) => Promise<SkuLote>;
 
-export type PostArticulo = (Articulo: Partial<Articulo>) => Promise<string>;
+/** Alta de artículo: la descripción y, opcional, el impuesto (grupo de IVA de producto). */
+export type NuevoArticulo = Partial<Articulo> & { grupoIvaProductoId?: string };
+
+export type PostArticulo = (Articulo: NuevoArticulo) => Promise<string>;
 export type PatchArticulo = (id: string, cambios: CambiosArticulo) => Promise<void>;
 export type DeleteArticulo = (id: string) => Promise<void>;

@@ -170,9 +170,106 @@ export type PatchLineaOrden = (id: string, lineaId: string, cambios: CambiosLine
 export type DeleteLineasOrden = (id: string, lineaIds: string[]) => Promise<void>;
 export type PostEntradaDesdePedido = (nueva: NuevaEntradaDesdePedido) => Promise<string>;
 export type TerminarOrden = (id: string) => Promise<void>;
-export type AlbaranGenerado = { id: string; codigo: string };
+export type AlbaranGenerado = {
+    id: string;
+    codigo: string;
+    /** Agencia y nº de envío, solo si el albarán ya tiene envío por agencia. */
+    agenciaEnvio?: string;
+    numeroTracking?: string;
+};
 /** Genera los albaranes de una SALIDA PREPARADA y la termina; devuelve los albaranes generados. */
 export type AlbaranarOrden = (id: string) => Promise<AlbaranGenerado[]>;
+
+/** Línea de pedido que no cuadra con lo recogido en la salida (aviso al albaranar).
+ * FALTA: el pedido pide más de lo que sale; SOBRA: la orden saca más de lo pendiente. */
+export interface DiferenciaPedidoOrden {
+    tipo: "FALTA" | "SOBRA";
+    pedidoId: string;
+    pedido: string;
+    lineaPedidoId: string;
+    sku: string;
+    descripcion: string;
+    pendientePedido: number;
+    enOrden: number;
+    enOtrasSalidas: number;
+    diferencia: number;
+}
+export type GetDiferenciasPedidoOrden = (id: string) => Promise<DiferenciaPedidoOrden[]>;
 export type AdquirirOrden = (id: string) => Promise<void>;
 export type PostColocacion = (id: string) => Promise<string>;
 export type GetReportEtiquetasOrden = (id: string) => Promise<Blob>;
+
+/** Agencia de transporte activa en la app (plugins transporte_*). */
+export interface ServicioAgenciaEnvio {
+    codigo: string;
+    descripcion: string;
+}
+
+export interface AgenciaEnvio {
+    codigo: string;
+    nombre: string;
+    servicios: ServicioAgenciaEnvio[];
+}
+
+export interface NuevoEnvioAgencia extends Modelo {
+    albaranId: string;
+    agenciaId: string;
+    servicio: string;
+    bultos: number;
+    kilos: number;
+    fechaRecogida: Date;
+    observaciones: string;
+}
+
+export type EnvioAgenciaGenerado = { albaranId: string; agenciaId: string; numeroTracking: string };
+
+export type GetAgenciasEnvio = () => Promise<AgenciaEnvio[]>;
+/** Pide a la agencia el envío de un albarán de una SALIDA terminada. */
+export type PostEnvioAgencia = (ordenId: string, envio: NuevoEnvioAgencia) => Promise<EnvioAgenciaGenerado>;
+/** PDF con las etiquetas del envío de un albarán. */
+export type GetEtiquetaEnvio = (albaranId: string) => Promise<Blob>;
+
+export interface LineaParadaRecorrido {
+    lineaId: string;
+    sku: string;
+    pendiente: number;
+}
+
+/** En una parada se recoge (origen) o se deja (destino). */
+export type AccionParada = "RECOGER" | "DEJAR";
+
+export interface ParadaRecorrido {
+    secuencia: number;
+    ubicacionId: string;
+    ubicacion: string;
+    zona: string | null;
+    pasillo: string | null;
+    modulo: number | null;
+    nivel: number | null;
+    hueco: number | null;
+    accion: AccionParada;
+    lineas: LineaParadaRecorrido[];
+}
+
+/** Por qué el recorrido no se ordena por la distancia real (doc sga_recorrido_real.md). */
+export type MotivoRecorridoFormula = "SIN_PLANTA" | "PARADAS_SIN_POSICION" | "SIN_CAMINO";
+
+export interface RecorridoOrden {
+    ordenId: string;
+    /** Estado de la orden: terminada, sin paradas. */
+    estado: string;
+    /** DISTANCIA: ordenado por la distancia a pie sobre la planta; FORMULA: la S estimada. */
+    calculo: "DISTANCIA" | "FORMULA";
+    motivo: MotivoRecorridoFormula | null;
+    /** Metros a pie del inicio al fin (solo con DISTANCIA). */
+    metros: number | null;
+    /** Ubicación del punto de inicio y de fin (muelle de salida o de recepción). */
+    inicioUbicacionId: string | null;
+    finUbicacionId: string | null;
+    modulosRecorridos: number;
+    pasillosCruzados: number;
+    paradas: ParadaRecorrido[];
+}
+
+/** Recorrido estimado para preparar (o colocar) la orden. */
+export type GetRecorridoOrden = (id: string) => Promise<RecorridoOrden>;

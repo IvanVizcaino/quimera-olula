@@ -1,0 +1,17 @@
+.TarjetaPasarela {
+    border: 1px solid var(--color-borde, #e0e0e0);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+
+    .pasarela-cabecera { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .pasarela-cabecera h3 { margin: 0; }
+    .pasarela-prueba, .pasarela-mensaje { margin: 8px 0; font-size: 0.9em; }
+    .pasarela-ayuda { font-size: 0.8em; opacity: 0.7; grid-column: span 12; }
+
+    quimera-checkbox[nombre="activa"] { grid-column: span 4; }
+    quimera-checkbox[nombre="porDefecto"] { grid-column: span 4; }
+    quimera-select[nombre="modo"] { grid-column: span 4; }
+    quimera-select[nombre="credencialId"] { grid-column: span 12; }
+    quimera-input { grid-column: span 12; }
+}

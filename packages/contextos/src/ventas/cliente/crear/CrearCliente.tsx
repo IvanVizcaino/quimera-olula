@@ -1,4 +1,6 @@
 import { TipoIdFiscal } from "#/comun/componentes/tipoIdFiscal.tsx";
+import { conEmpresaActual } from "#/valores/empresaActual.ts";
+import { QAviso } from "@olula/componentes/atomos/qaviso.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
@@ -20,7 +22,10 @@ export const CrearCliente = ({
   publicar = async () => {},
   onCancelar = () => {},
 }: CrearClienteProps) => {
-  const nuevoCliente = useModelo(metaNuevoCliente, nuevoClienteVacio);
+  /* Lazy initializer: referencia estable para useModelo y empresa ya puesta en el
+     primer render. */
+  const [inicial] = useState(() => conEmpresaActual(nuevoClienteVacio));
+  const nuevoCliente = useModelo(metaNuevoCliente, inicial);
   const [mostrarDireccion, setMostrarDireccion] = useState(false);
   const [mostrarErrorNombreVia, setMostrarErrorNombreVia] = useState(false);
   const [mostrarErrorCiudad, setMostrarErrorCiudad] = useState(false);
@@ -37,7 +42,7 @@ export const CrearCliente = ({
 
   const guardar_ = useCallback(async () => {
     const id = await postCliente(nuevoCliente.modelo);
-    nuevoCliente.init(nuevoClienteVacio);
+    nuevoCliente.init(conEmpresaActual(nuevoClienteVacio));
     const clienteCreado = await getCliente(id);
     publicar("cliente_creado", clienteCreado);
     onCancelar();
@@ -66,6 +71,11 @@ export const CrearCliente = ({
 
           <QInput label="ID Fiscal" {...nuevoCliente.uiProps("id_fiscal")} />
         </quimera-formulario>
+        {!nuevoCliente.modelo.empresa_id && (
+          <QAviso>
+            Sin empresa activa. Selecciónala en la cabecera para poder guardar.
+          </QAviso>
+        )}
 
         {!mostrarDireccion ? (
           <QBoton
@@ -95,7 +105,7 @@ export const CrearCliente = ({
           <QBoton
             variante="texto"
             onClick={() => {
-              const { direccion, ...clienteSinDireccion } = nuevoCliente.modelo;
+              const { direccion: _direccion, ...clienteSinDireccion } = nuevoCliente.modelo;
               nuevoCliente.set(clienteSinDireccion);
               setMostrarDireccion(false);
             }}

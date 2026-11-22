@@ -55,9 +55,15 @@ interface ArticuloItemApi {
     tipo_barcode: string | null;
     familia_id: string | null;
     descripcion_familia: string | null;
+    unidad_id?: string | null;
     sin_stock: boolean;
     se_compra: boolean;
     se_vende: boolean;
+    clase_almacenamiento_id?: string | null;
+    clase_almacenamiento?: string | null;
+    largo?: number | null;
+    ancho?: number | null;
+    alto?: number | null;
 }
 
 interface ArticuloApi extends ArticuloItemApi {
@@ -72,9 +78,15 @@ const articuloItemDesdeApi = (api: ArticuloItemApi): ArticuloItem => ({
     tipoCodBarras: tipoCodBarrasDesdeApi(api.tipo_barcode),
     familiaId: api.familia_id ?? "",
     descripcionFamilia: api.descripcion_familia ?? "",
+    unidadId: api.unidad_id ?? "",
     noStock: api.sin_stock,
     seCompra: api.se_compra,
     seVende: api.se_vende,
+    claseAlmacenamientoId: api.clase_almacenamiento_id ?? "",
+    claseAlmacenamiento: api.clase_almacenamiento ?? "",
+    largo: api.largo ?? null,
+    ancho: api.ancho ?? null,
+    alto: api.alto ?? null,
 });
 
 const articuloDesdeApi = (api: ArticuloApi): Articulo => ({
@@ -103,9 +115,14 @@ const cambiosArticuloAApi = (cambios: CambiosArticulo): Record<string, unknown> 
     if (cambios.codbarras !== undefined) api.barcode = oNulo(cambios.codbarras);
     if (cambios.tipoCodBarras !== undefined) api.tipo_barcode = oNulo(cambios.tipoCodBarras);
     if (cambios.familiaId !== undefined) api.familia_id = oNulo(cambios.familiaId);
+    if (cambios.unidadId !== undefined) api.unidad_id = oNulo(cambios.unidadId);
     if (cambios.noStock !== undefined) api.sin_stock = cambios.noStock;
     if (cambios.seCompra !== undefined) api.se_compra = cambios.seCompra;
     if (cambios.seVende !== undefined) api.se_vende = cambios.seVende;
+    if (cambios.claseAlmacenamientoId !== undefined) api.clase_almacenamiento_id = oNulo(cambios.claseAlmacenamientoId);
+    if (cambios.largo !== undefined) api.largo = cambios.largo;
+    if (cambios.ancho !== undefined) api.ancho = cambios.ancho;
+    if (cambios.alto !== undefined) api.alto = cambios.alto;
 
     return api;
 };
@@ -128,7 +145,11 @@ export const getArticulos: GetArticulos = async (
 export const postArticulo: PostArticulo = async (Articulo) => {
     return await RestAPI.post(
         baseUrlArticulo,
-        { descripcion: Articulo.descripcion ?? "" },
+        {
+            id: (Articulo.id ?? "").trim(),
+            descripcion: Articulo.descripcion ?? "",
+            ...(Articulo.grupoIvaProductoId ? { grupo_iva_producto_id: Articulo.grupoIvaProductoId } : {}),
+        },
         "Error al guardar Articulo"
     ).then((respuesta) => respuesta.id);
 };

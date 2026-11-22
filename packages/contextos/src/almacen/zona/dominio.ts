@@ -1,11 +1,29 @@
 import { MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
-import { Zona } from "./diseño.ts";
+import { FuncionZona, Zona } from "./diseño.ts";
+
+export const FUNCION_ZONA_POR_DEFECTO: FuncionZona = "RESERVA";
+
+export const funcionesZona: { valor: FuncionZona; descripcion: string }[] = [
+    { valor: "RECEPCION", descripcion: "Recepción" },
+    { valor: "CUARENTENA", descripcion: "Cuarentena" },
+    { valor: "RESERVA", descripcion: "Reserva" },
+    { valor: "PICKING", descripcion: "Picking" },
+    { valor: "PREPARACION", descripcion: "Preparación" },
+    { valor: "EXPEDICION", descripcion: "Expedición" },
+    { valor: "TRANSITO", descripcion: "Tránsito" },
+];
+
+export const descripcionFuncionZona = (funcion: string): string =>
+    funcionesZona.find((f) => f.valor === funcion)?.descripcion ?? funcion;
 
 export const zonaVacia = (): Zona => ({
     id: "",
     codigo: "",
     almacenId: "",
     descripcion: null,
+    funcion: FUNCION_ZONA_POR_DEFECTO,
+    clasesAdmitidas: [],
+    admiteSinClase: true,
 });
 
 export const metaZona: MetaModelo<Zona> = {
@@ -13,5 +31,8 @@ export const metaZona: MetaModelo<Zona> = {
         codigo: { requerido: true, validacion: (m: Zona) => stringNoVacio(m.codigo) },
         almacenId: { requerido: true, validacion: (m: Zona) => stringNoVacio(m.almacenId) },
         descripcion: { requerido: false },
+        funcion: { requerido: true, validacion: (m: Zona) => stringNoVacio(m.funcion) },
+        clasesAdmitidas: { requerido: false },
+        admiteSinClase: { tipo: "checkbox" },
     },
 };

@@ -8,8 +8,14 @@ import {
     CambiosOrdenAlmacen,
     DeleteLineasOrden,
     DeleteOrden,
+    DiferenciaPedidoOrden,
+    GetDiferenciasPedidoOrden,
     GetOrden,
     GetOrdenes,
+    AccionParada,
+    GetRecorridoOrden,
+    MotivoRecorridoFormula,
+    RecorridoOrden,
     ItemOrdenAlmacen,
     LecturaCajaOrden,
     LecturaLineaOrden,
@@ -29,6 +35,11 @@ import {
     TerminarOrden,
     PostColocacion,
     GetReportEtiquetasOrden,
+    AgenciaEnvio,
+    GetAgenciasEnvio,
+    GetEtiquetaEnvio,
+    NuevoEnvioAgencia,
+    PostEnvioAgencia,
 } from "./diseño.ts";
 
 
@@ -65,7 +76,14 @@ interface OrdenAlmacenApi {
     pasos_drop: string | null;
     lineas: LineaOrdenAlmacenApi[];
     lecturas_caja: LecturaCajaOrdenApi[];
-    albaranes?: { id: string | number; codigo: string }[];
+    albaranes?: AlbaranOrdenApi[];
+}
+
+interface AlbaranOrdenApi {
+    id: string | number;
+    codigo: string;
+    agencia_envio?: string | null;
+    numero_tracking?: string | null;
 }
 
 interface LecturaLineaOrdenApi {
@@ -155,6 +173,14 @@ export const lecturaCajaOrdenDesdeApi = (api: LecturaCajaOrdenApi): LecturaCajaO
     fechaHora: new Date(api.fecha_hora),
 });
 
+const albaranOrdenDesdeApi = (api: AlbaranOrdenApi) => ({
+    id: String(api.id),
+    codigo: api.codigo,
+    ...(api.numero_tracking
+        ? { agenciaEnvio: api.agencia_envio ?? "", numeroTracking: api.numero_tracking }
+        : {}),
+});
+
 export const ordenDesdeApi = (api: OrdenAlmacenApi): OrdenAlmacen => ({
     id: api.id,
     fecha: api.fecha,
@@ -174,7 +200,7 @@ export const ordenDesdeApi = (api: OrdenAlmacenApi): OrdenAlmacen => ({
     pasosDrop: api.pasos_drop,
     lineas: api.lineas.map(lineaOrdenDesdeApi),
     lecturasCaja: (api.lecturas_caja ?? []).map(lecturaCajaOrdenDesdeApi),
-    albaranes: (api.albaranes ?? []).map((a) => ({ id: String(a.id), codigo: a.codigo })),
+    albaranes: (api.albaranes ?? []).map(albaranOrdenDesdeApi),
 });
 
 export const lecturaLineaOrdenDesdeApi = (api: LecturaLineaOrdenApi): LecturaLineaOrden => ({
@@ -488,6 +514,39 @@ export const albaranarOrden: AlbaranarOrden = async (id) => {
     return (respuesta?.albaranes ?? []).map((a) => ({ id: String(a.id), codigo: a.codigo }));
 };
 
+interface DiferenciaPedidoOrdenApi {
+    tipo: "FALTA" | "SOBRA";
+    pedido_id: string;
+    pedido: string;
+    linea_pedido_id: string;
+    sku: string;
+    descripcion: string;
+    pendiente_pedido: number;
+    en_orden: number;
+    en_otras_salidas: number;
+    diferencia: number;
+}
+
+export const diferenciaPedidoDesdeApi = (api: DiferenciaPedidoOrdenApi): DiferenciaPedidoOrden => ({
+    tipo: api.tipo,
+    pedidoId: String(api.pedido_id),
+    pedido: api.pedido,
+    lineaPedidoId: String(api.linea_pedido_id),
+    sku: api.sku,
+    descripcion: api.descripcion,
+    pendientePedido: Number(api.pendiente_pedido),
+    enOrden: Number(api.en_orden),
+    enOtrasSalidas: Number(api.en_otras_salidas),
+    diferencia: Number(api.diferencia),
+});
+
+export const getDiferenciasPedidoOrden: GetDiferenciasPedidoOrden = async (id) => {
+    const respuesta = await RestAPI.get<{ datos: DiferenciaPedidoOrdenApi[] }>(
+        `${baseUrl}/${id}/diferencias_pedido`,
+    );
+    return respuesta.datos.map(diferenciaPedidoDesdeApi);
+};
+
 export const getReportEtiquetasOrden: GetReportEtiquetasOrden = async (id) =>
     RestAPI.blob(`/almacen/caja/report-por-orden-origen/${id}`, "Error al obtener el report de etiquetas");
 
@@ -586,4 +645,102 @@ export const getLotesDeArticuloEnCaja = async (
     return desglose
         .filter((item) => item.cajaId === cajaId && item.loteId !== null && item.cantidad > 0)
         .map((item) => item.loteId as string);
+};
+// Envío por agencia
+
+const urlEnvioAgencia = "/almacen/envio_agencia";
+
+/** Fecha local (no UTC) en ISO, para que el día no cambie según la zona horaria. */
+const fechaLocalIso = (fecha: Date): string => {
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0");
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    return `${fecha.getFullYear()}-${mes}-${dia}`;
+};
+
+export const envioAgenciaAApi = (envio: NuevoEnvioAgencia) => ({
+    albaran_id: envio.albaranId,
+    agencia_id: envio.agenciaId,
+    servicio: envio.servicio,
+    bultos: Number(envio.bultos),
+    kilos: Number(envio.kilos),
+    fecha_recogida: fechaLocalIso(new Date(envio.fechaRecogida)),
+    observaciones: envio.observaciones || null,
+});
+
+export const getAgenciasEnvio: GetAgenciasEnvio = async () => {
+    const respuesta = await RestAPI.get<{ datos: AgenciaEnvio[] }>(`${urlEnvioAgencia}/agencias`);
+    return respuesta.datos;
+};
+
+export const postEnvioAgencia: PostEnvioAgencia = async (ordenId, envio) => {
+    const respuesta = await RestAPI.post(
+        `${baseUrl}/${ordenId}/envio_agencia`,
+        envioAgenciaAApi(envio),
+        "Error al generar el envío por agencia",
+    ) as unknown as { albaran_id: string; agencia_id: string; numero_tracking: string };
+    return {
+        albaranId: String(respuesta.albaran_id),
+        agenciaId: respuesta.agencia_id,
+        numeroTracking: respuesta.numero_tracking,
+    };
+};
+
+export const getEtiquetaEnvio: GetEtiquetaEnvio = async (albaranId) =>
+    RestAPI.blob(`${urlEnvioAgencia}/${albaranId}/etiqueta`, "Error al obtener la etiqueta del envío");
+
+export interface RecorridoOrdenApi {
+    orden_id: string;
+    estado?: string;
+    calculo?: "DISTANCIA" | "FORMULA";
+    motivo?: MotivoRecorridoFormula | null;
+    metros?: number | null;
+    inicio_ubicacion_id?: string | null;
+    fin_ubicacion_id?: string | null;
+    modulos_recorridos: number;
+    pasillos_cruzados: number;
+    paradas: {
+        secuencia: number;
+        ubicacion_id: string;
+        ubicacion: string;
+        zona?: string | null;
+        pasillo?: string | null;
+        modulo?: number | null;
+        nivel?: number | null;
+        hueco?: number | null;
+        accion?: AccionParada;
+        lineas: { linea_id: string; sku: string; pendiente: number }[];
+    }[];
+}
+
+export const recorridoOrdenDesdeApi = (r: RecorridoOrdenApi): RecorridoOrden => ({
+    ordenId: r.orden_id,
+    estado: r.estado ?? "",
+    calculo: r.calculo ?? "FORMULA",
+    motivo: r.motivo ?? null,
+    metros: r.metros ?? null,
+    inicioUbicacionId: r.inicio_ubicacion_id ?? null,
+    finUbicacionId: r.fin_ubicacion_id ?? null,
+    modulosRecorridos: r.modulos_recorridos,
+    pasillosCruzados: r.pasillos_cruzados,
+    paradas: r.paradas.map((p) => ({
+        secuencia: p.secuencia,
+        ubicacionId: p.ubicacion_id,
+        ubicacion: p.ubicacion,
+        zona: p.zona ?? null,
+        pasillo: p.pasillo ?? null,
+        modulo: p.modulo ?? null,
+        nivel: p.nivel ?? null,
+        hueco: p.hueco ?? null,
+        accion: p.accion ?? "RECOGER",
+        lineas: p.lineas.map((l) => ({
+            lineaId: String(l.linea_id),
+            sku: l.sku,
+            pendiente: l.pendiente,
+        })),
+    })),
+});
+
+export const getRecorridoOrden: GetRecorridoOrden = async (id) => {
+    const respuesta = await RestAPI.get<{ datos: RecorridoOrdenApi }>(`${baseUrl}/${id}/recorrido`);
+    return recorridoOrdenDesdeApi(respuesta.datos);
 };

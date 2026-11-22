@@ -1,0 +1,7 @@
+.GenerarFicheroRemesa {
+    .avisos-domiciliacion {
+        max-height: 40vh;
+        overflow-y: auto;
+        padding-inline-start: var(--espaciado-m);
+    }
+}

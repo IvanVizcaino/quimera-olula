@@ -1,3 +1,5 @@
+import { useAplicarImpuestoDefecto } from "#/almacen/config/useImpuestoDefecto.ts";
+import { GrupoIvaProducto } from "#/ventas/comun/componentes/grupo_iva_producto.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QModal } from "@olula/componentes/index.js";
@@ -12,10 +14,9 @@ import { metaNuevoArticulo, nuevoArticuloInicial } from "./crear.ts";
 export const CrearArticulo = ({ publicar }: { publicar: EmitirEvento }) => {
   const inicial = useMemo(nuevoArticuloInicial, []);
 
-  const { modelo: articulo, uiProps, valido } = useModelo(
-    metaNuevoArticulo,
-    inicial
-  );
+  const formulario = useModelo(metaNuevoArticulo, inicial);
+  const { modelo: articulo, uiProps, valido } = formulario;
+  useAplicarImpuestoDefecto(formulario, "grupoIvaProductoId", "articulo");
 
   const crear_ = useCallback(async () => {
     const id = await postArticulo(articulo);
@@ -39,7 +40,9 @@ export const CrearArticulo = ({ publicar }: { publicar: EmitirEvento }) => {
     >
       <div className="CrearArticulo">
         <quimera-formulario>
-          <QInput label="Descripción" {...uiProps("descripcion")} ref={focus} />
+          <QInput label="Referencia" {...uiProps("id")} ref={focus} />
+          <QInput label="Descripción" {...uiProps("descripcion")} />
+          <GrupoIvaProducto {...uiProps("grupoIvaProductoId")} />
         </quimera-formulario>
         <div className="botones maestro-botones">
           <QBoton onClick={crear} deshabilitado={!valido}>

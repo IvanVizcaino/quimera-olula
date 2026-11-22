@@ -77,7 +77,7 @@ export const MaestroConDetalleUsuario = () => {
               metaTabla={metaTablaUsuario}
               criteriaInicial={criteriaBaseUsuarios}
               criteria={criteriaActual}
-              modo="tarjetas"
+              modoInicial="tabla"
               entidades={ctx.usuarios.lista}
               totalEntidades={ctx.usuarios.total}
               seleccionada={ctx.usuarios.activo?.id}

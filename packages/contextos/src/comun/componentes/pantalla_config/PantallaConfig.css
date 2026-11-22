@@ -1,0 +1,33 @@
+.PantallaConfig {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-l);
+    max-width: 48rem;
+    padding: var(--espaciado-l);
+
+    h2,
+    h3,
+    p {
+        margin: 0;
+    }
+
+    .descripcion-config,
+    .sin-opciones {
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+    }
+
+    .grupo-config {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-m);
+        padding: var(--espaciado-m);
+        border: var(--tamaño-borde-s) solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-xs);
+    }
+
+    .botones {
+        display: flex;
+        justify-content: flex-end;
+    }
+}

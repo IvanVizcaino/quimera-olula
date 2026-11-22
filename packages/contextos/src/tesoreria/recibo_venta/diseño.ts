@@ -7,9 +7,18 @@ export interface MovimientoRecibo extends Entidad {
     estado: boolean;
     cuentaPagoId: string;
     nombreCuentaPago: string;
+    /** Pasarela (Stripe) por la que pasó el pago o su reembolso; null si no. */
+    pasarela: string | null;
+    modoPasarela: "test" | "live" | null;
+    /** El pago en el panel de la pasarela. */
+    urlPanel: string | null;
+    incidenciaPasarela: string | null;
 }
 
 export interface ReciboVenta extends Entidad {
+    /** Cuenta bancaria del titular en la que se domicilia (TES-06). */
+    cuentaDomiciliacionId: string | null;
+    nombreCuentaDomiciliacion: string;
     id: string;
     facturaId: string;
     grupoId: string;
@@ -48,6 +57,8 @@ export type DevolucionReciboVenta = {
     cuentaPagoId: string;
     fecha: string;
     tasaConversion?: number;
+    /** Devolver también el dinero en Stripe (recibo cobrado con tarjeta). */
+    reembolsarEnPasarela?: boolean;
 };
 
 export type PatchDevolverReciboVenta = (id: string, devolucion: DevolucionReciboVenta) => Promise<void>;

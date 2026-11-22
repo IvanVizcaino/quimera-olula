@@ -846,8 +846,50 @@ export const calcularPaginacionSimplificada = (
 export const puedeAlguna = (regla: string | string[]): boolean =>
     Array.isArray(regla) ? regla.some(puede) : puede(regla);
 
+/**
+ * SaaS: prefijos de regla de los módulos que la empresa no tiene contratados
+ * (`whoami.saas.modulos_bloqueados`, ver olula_servidor/apps/olula_saas). Fuera del
+ * SaaS whoami no trae `saas` y no se bloquea nada.
+ */
+export const moduloBloqueado = (regla: string): boolean => {
+    const raw = localStorage.getItem("whoami");
+    if (!raw) return false;
+    try {
+        const whoAmI = JSON.parse(raw) as { saas?: { modulos_bloqueados?: string[] } | null };
+        const bloqueados = whoAmI.saas?.modulos_bloqueados ?? [];
+        return bloqueados.some((prefijo) => regla === prefijo || regla.startsWith(`${prefijo}.`));
+    } catch {
+        return false;
+    }
+};
+
+/**
+ * SaaS: la URL de una pantalla pertenece a un módulo no contratado. Se mira cada
+ * tramo de la ruta (`/crm/contacto`, `/dashboard/crm`) frente a los prefijos de
+ * regla bloqueados de un solo nivel (`crm`, `tpv`...). Sirve para las entradas
+ * de menú sin regla, como los resúmenes de cada área.
+ */
+export const moduloBloqueadoEnUrl = (url: string): boolean => {
+    const raw = localStorage.getItem("whoami");
+    if (!raw) return false;
+    try {
+        const whoAmI = JSON.parse(raw) as { saas?: { modulos_bloqueados?: string[] } | null };
+        const bloqueados = (whoAmI.saas?.modulos_bloqueados ?? []).filter((p) => !p.includes("."));
+        if (!bloqueados.length) return false;
+        const tramos = url.split("?")[0].split("/").filter(Boolean);
+        return tramos.some((tramo) => bloqueados.includes(tramo));
+    } catch {
+        return false;
+    }
+};
+
+/** Regla del asistente IA (chat, panel lateral, modo voz y pregunta de la búsqueda
+ *  rápida). El servidor protege con ella las consultas del chat. */
+export const REGLA_ASISTENTE = "comun.ia";
+
 export const puede = (regla: string): boolean => {
     if (regla === "Dashboard:visit" || regla === 'Home:visit') return true;
+    if (moduloBloqueado(regla)) return false;
 
     // if (!regla) return true;
     // Busca el permiso exacto
@@ -905,11 +947,31 @@ export const configuracion = (ruta: string): boolean => {
 
     try {
         const whoAmI = JSON.parse(raw) as {
-            config?: Record<string, Record<string, boolean>>;
+            config?: Record<string, Record<string, unknown>>;
         };
         return whoAmI.config?.[contexto]?.[clave] === true;
     } catch {
         return false;
+    }
+};
+
+/**
+ * Fuentes con las que el servidor calcula el precio y el descuento por
+ * defecto de las líneas de venta, en orden (plugin `precio_articulo`). Por
+ * ejemplo `["precios_articulos", "tarifa_grupo", "ficha_articulo"]`.
+ */
+export const fuentesPrecioArticulo = (): string[] => {
+    const raw = localStorage.getItem("whoami");
+    if (!raw) return [];
+
+    try {
+        const whoAmI = JSON.parse(raw) as {
+            config?: { ventas?: { precio_articulo?: unknown } };
+        };
+        const fuentes = whoAmI.config?.ventas?.precio_articulo;
+        return Array.isArray(fuentes) ? fuentes.filter((f): f is string => typeof f === "string") : [];
+    } catch {
+        return [];
     }
 };
 

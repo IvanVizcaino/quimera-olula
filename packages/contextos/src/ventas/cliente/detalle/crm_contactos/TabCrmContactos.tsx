@@ -1,4 +1,5 @@
 import { ContactoSelector } from "#/ventas/comun/componentes/contacto.tsx";
+import { ApiAgenda } from "#/comun/agenda/infraestructura.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { QModal } from "@olula/componentes/moleculas/qmodal.tsx";
@@ -9,19 +10,21 @@ import { EdicionCrmContactos } from "./EdicionCrmContactos.tsx";
 import { TabCrmContactosLista } from "./TabCrmContactosLista.tsx";
 import { getMaquina } from "./maquina.ts";
 
-export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
+/** Agenda de contactos de un cliente o un proveedor: `api` dice contra qué rutas trabaja. */
+export const TabCrmContactos = ({ entidadId, api }: { entidadId: string; api: ApiAgenda }) => {
   const { ctx, emitir } = useMaquina(getMaquina, {
     estado: "lista",
     contactos: [],
     contactoActivo: null,
     cargando: true,
-    clienteId,
+    entidadId,
+    api,
   });
 
   useEffect(() => {
-    if (clienteId) emitir("cargar_contactos", clienteId, true);
+    if (entidadId) emitir("cargar_contactos", entidadId, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clienteId]);
+  }, [entidadId]);
 
   const estado = ctx.estado;
   const [contactoSeleccionado, setContactoSeleccionado] = useState<{
@@ -31,11 +34,11 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
 
   const acciones = [
     {
-      texto: "Asociar Contacto",
+      texto: "Añadir contacto existente",
       onClick: () => emitir("asociar_solicitado"),
     },
     {
-      texto: "Eliminar asociación",
+      texto: "Quitar de la agenda",
       onClick: () => emitir("eliminar_asociacion"),
       deshabilitado: !ctx.contactoActivo,
     },
@@ -64,7 +67,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="confirmacionBorrarContacto"
         abierto={estado === "confirmar_borrado"}
         titulo="Confirmar borrar"
-        mensaje="¿Está seguro de que desea borrar este contacto?"
+        mensaje="¿Borrar este contacto? Se quitará también de todas las agendas de clientes y proveedores en las que esté."
         onCerrar={() => emitir("borrado_cancelado")}
         onAceptar={() => emitir("borrado_confirmado")}
       />
@@ -72,8 +75,8 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
       <QModalConfirmacion
         nombre="confirmacionEliminarAsociacion"
         abierto={estado === "confirmar_eliminar_asociacion"}
-        titulo="Confirmar eliminación de asociación"
-        mensaje="¿Está seguro de que desea eliminar la asociación de este contacto?"
+        titulo="Quitar de la agenda"
+        mensaje="¿Quitar este contacto de la agenda? El contacto no se borra."
         onCerrar={() => emitir("eliminacion_cancelada")}
         onAceptar={() => emitir("eliminacion_solicitada")}
       />
@@ -82,7 +85,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="altaCrmContacto"
         abierto={estado === "alta"}
         onCerrar={() => emitir("alta_cancelada")}
-        titulo="Nuevo Contacto CRM"
+        titulo="Nuevo contacto"
       >
         {estado === "alta" && <CrearCrmContactos emitir={emitir} />}
       </QModal>
@@ -91,7 +94,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="edicionCrmContacto"
         abierto={estado === "edicion"}
         onCerrar={() => emitir("edicion_cancelada")}
-        titulo="Editar Contacto CRM"
+        titulo="Editar contacto"
       >
         {estado === "edicion" && ctx.contactoActivo && (
           <EdicionCrmContactos contacto={ctx.contactoActivo} emitir={emitir} />
@@ -102,7 +105,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
         nombre="asociarCrmContacto"
         abierto={estado === "asociar"}
         onCerrar={() => emitir("asociacion_cancelada")}
-        titulo="Asociar Contacto"
+        titulo="Añadir contacto existente"
       >
         <ContactoSelector
           valor={contactoSeleccionado?.valor || ""}
@@ -110,6 +113,7 @@ export const TabCrmContactos = ({ clienteId }: { clienteId: string }) => {
           nombre="cliente/contacto_id"
           label="Seleccionar contacto"
           excluir={ctx.contactos.map((contacto) => contacto.id)}
+          obtenerContactos={api.buscar}
           onChange={(contacto) => setContactoSeleccionado(contacto)}
         />
         <div className="botones">

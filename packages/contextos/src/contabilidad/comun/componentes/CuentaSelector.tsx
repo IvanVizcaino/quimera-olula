@@ -1,8 +1,6 @@
 import { QAutocompletar } from "@olula/componentes/moleculas/qautocompletar.tsx";
-import { Criteria, Filtro } from "@olula/lib/diseño.ts";
-import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { Cuenta } from "#/contabilidad/cuenta/diseño.ts";
-import { getCuenta, getCuentas } from "#/contabilidad/cuenta/infraestructura.ts";
+import { buscarCuentas, codigoYNombre, cuentaPorCodigo } from "../busqueda_plan_contable.ts";
 
 /** El valor de la opción es el CÓDIGO de la cuenta, no su id: es lo que pide
  * el alta de subcuenta (`codigo_cuenta`). */
@@ -26,7 +24,7 @@ interface CuentaSelectorProps {
 const opcionDesdeCuenta = (c: Cuenta): OpcionCuenta => ({
     valor: c.codigo,
     descripcion: c.codigo,
-    descripcionOpcion: c.nombre ? `${c.codigo} — ${c.nombre}` : c.codigo,
+    descripcionOpcion: codigoYNombre(c.codigo, c.nombre),
 });
 
 export const CuentaSelector = ({
@@ -40,42 +38,14 @@ export const CuentaSelector = ({
     ...props
 }: CuentaSelectorProps) => {
     const obtenerOpciones = async (texto: string, id?: string) => {
+        // El valor es el código: se resuelve dentro del ejercicio (la ruta
+        // /cuenta/{id} espera el idcuenta, no el código).
         if (id) {
-            try {
-                const cuenta = await getCuenta(id);
-                return [opcionDesdeCuenta(cuenta)];
-            } catch {
-                return [];
-            }
+            const cuenta = await cuentaPorCodigo(ejercicioId, id).catch(() => null);
+            return cuenta ? [opcionDesdeCuenta(cuenta)] : [];
         }
 
-        if (!ejercicioId) {
-            return [];
-        }
-
-        const filtro: Filtro = texto.trim().length
-            ? {
-                  and: [
-                      ["ejercicio_id", ejercicioId],
-                      {
-                          or: [
-                              ["codigo", "~", texto],
-                              ["nombre", "~", texto],
-                          ],
-                      },
-                  ],
-              }
-            : [["ejercicio_id", ejercicioId]];
-
-        const criteria: Criteria = {
-            ...criteriaDefecto,
-            filtro,
-            orden: ["codigo", "ASC"],
-            paginacion: { pagina: 1, limite: 50 },
-        };
-
-        const { datos } = await getCuentas(criteria);
-        return datos.map(opcionDesdeCuenta);
+        return (await buscarCuentas(ejercicioId, texto)).map(opcionDesdeCuenta);
     };
 
     return (

@@ -99,7 +99,11 @@ export const getTagsArticulo: GetTagsArticulo = async (filtro, orden) => {
 export const postArticulo: PostArticulo = async (articulo) =>
     await RestAPI.post(
         baseUrl,
-        { descripcion: articulo.descripcion ?? "" },
+        {
+            id: (articulo.id ?? "").trim(),
+            descripcion: articulo.descripcion ?? "",
+            ...(articulo.grupoIvaProductoId ? { grupo_iva_producto_id: articulo.grupoIvaProductoId } : {}),
+        },
         "Error al crear el artículo"
     ).then((respuesta) => String(respuesta.id));
 

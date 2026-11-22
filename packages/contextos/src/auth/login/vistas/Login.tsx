@@ -3,7 +3,7 @@ import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { FactoryCtx } from "@olula/lib/factory_ctx.js";
 import { useContext, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { BotonLoginPasskey } from "../../passkey/vistas/BotonLoginPasskey.tsx";
 import { EnlaceMagicoPasskey } from "../../passkey/vistas/EnlaceMagicoPasskey.tsx";
 import { login } from "../dominio.ts";
@@ -36,6 +36,10 @@ export const Login = () => {
     return null;
   }
   // El formato de login se define en la factory de cada proyecto, y puede ser "email" o "texto". Esto permite adaptar el formulario de login a las necesidades de cada proyecto sin modificar el componente Login.
+
+  const enlaceRegistro = app.Auth.enlace_registro as
+    | { pregunta?: string; texto: string; url: string }
+    | undefined;
 
   const label_login = app.Auth.formato_login === "email" ? "Email" : "Usuario";
 
@@ -87,6 +91,12 @@ export const Login = () => {
         <div style={{ marginTop: "1rem" }}>
           <EnlaceMagicoPasskey />
         </div>
+        {enlaceRegistro && (
+          <p style={{ marginTop: "1rem", textAlign: "center" }}>
+            {enlaceRegistro.pregunta ? `${enlaceRegistro.pregunta} ` : ""}
+            <Link to={enlaceRegistro.url}>{enlaceRegistro.texto}</Link>
+          </p>
+        )}
       </div>
     </section>
   );

@@ -33,7 +33,9 @@ export type EstadoOrdenAlmacen =
     | 'LEYENDO_PICK'
     | 'LEYENDO_DROP'
     | 'COLOCANDO'
-    | 'ALBARANANDO';
+    | 'ALBARANANDO'
+    | 'GENERANDO_ENVIO'
+    | 'VIENDO_RECORRIDO';
 
 export type ContextoOrdenAlmacen = {
     estado: EstadoOrdenAlmacen;
@@ -69,6 +71,8 @@ export const getMaquina: () => Maquina<EstadoOrdenAlmacen, ContextoOrdenAlmacen>
             lectura_drop_solicitada: "LEYENDO_DROP",
             colocacion_solicitada: "COLOCANDO",
             albaranado_solicitado: "ALBARANANDO",
+            envio_solicitado: "GENERANDO_ENVIO",
+            recorrido_solicitado: "VIENDO_RECORRIDO",
             devolucion_sobrante_solicitada: [Lineas.activar, "DEVOLVIENDO_SOBRANTE"],
         },
 
@@ -158,6 +162,15 @@ export const getMaquina: () => Maquina<EstadoOrdenAlmacen, ContextoOrdenAlmacen>
         ALBARANANDO: {
             orden_albaranada: [refrescarOrden, "ABIERTA"],
             albaranado_cancelado: "ABIERTA",
+        },
+
+        VIENDO_RECORRIDO: {
+            recorrido_cerrado: "ABIERTA",
+        },
+
+        GENERANDO_ENVIO: {
+            envio_generado: [refrescarOrden, "ABIERTA"],
+            envio_cancelado: "ABIERTA",
         },
     };
 };

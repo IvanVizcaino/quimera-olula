@@ -79,7 +79,7 @@ export const DetalleCuentasAnuales = ({
                             children={
                                 <TabCriterios
                                     form={formModelo}
-                                    informe={informe}
+                                    informe={formModelo.modelo}
                                 />
                             }
                         />,

@@ -2,6 +2,8 @@ import {
     ArticuloLinea,
     CamposArticuloLinea,
 } from "#/compras/comun/componentes/articulo_linea/ArticuloLinea.tsx";
+import { useAplicarImpuestoDefecto } from "#/almacen/config/useImpuestoDefecto.ts";
+import { reinicioAlCambiarArticulo } from "#/compras/comun/dominio.ts";
 import { GrupoIvaProducto } from "#/ventas/comun/componentes/grupo_iva_producto.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -46,13 +48,14 @@ export const CrearLineaFactura = ({
         inicial,
         onModeloListo
     );
+    useAplicarImpuestoDefecto({ modelo, set }, "grupoIvaProductoId", "linea");
 
     const onArticuloCambiado = useCallback(
         (cambios: Partial<CamposArticuloLinea>) => {
             set({
                 ...modelo,
                 ...cambios,
-                ...(cambios.referencia !== undefined ? { pvpUnitario: null } : {}),
+                ...reinicioAlCambiarArticulo(cambios),
             });
         },
         [modelo, set]

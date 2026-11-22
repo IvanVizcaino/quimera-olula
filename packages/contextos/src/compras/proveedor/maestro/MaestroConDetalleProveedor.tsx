@@ -52,7 +52,7 @@ export const MaestroConDetalleProveedor = () => {
                         <Listado<Proveedor>
                             metaTabla={metaTablaProveedor}
                             criteria={proveedores.criteria}
-                            modoInicial="tarjetas"
+                            modoInicial="tabla"
                             tarjeta={TarjetaProveedor}
                             entidades={proveedores.lista}
                             totalEntidades={proveedores.total}
@@ -72,7 +72,6 @@ export const MaestroConDetalleProveedor = () => {
                 }
                 Detalle={<DetalleProveedor id={proveedores.activo} publicar={emitir} />}
                 seleccionada={proveedores.activo}
-                modoDisposicion="maestro-50"
             />
 
             {estado === "CREANDO" && <CrearProveedor publicar={emitir} />}

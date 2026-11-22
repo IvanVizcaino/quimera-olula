@@ -5,6 +5,7 @@ import { NuevaFamilia } from "./diseño";
 export const nuevaFamiliaVacia: NuevaFamilia = {
     id: "",
     descripcion: "",
+    unidadId: "",
 };
 
 export const metaNuevaFamilia: MetaModelo<NuevaFamilia> = {

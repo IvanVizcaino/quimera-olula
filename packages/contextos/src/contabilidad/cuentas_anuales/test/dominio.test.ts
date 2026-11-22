@@ -1,14 +1,17 @@
 import { describe, expect, test } from "vitest";
 import { LineaCuentasAnuales, SubtotalCuentasAnuales } from "../diseño.ts";
+import { metaCuentasAnuales } from "../detalle/detalle.ts";
 import {
     admiteDesglose,
     admiteOmitirEpigrafes,
     conceptoLinea,
+    cuentasAnualesVacias,
     desgloseSegunFormato,
     etiquetaCuentasAnuales,
     nivelLinea,
     nombreFicheroCuentasAnuales,
     nuevaCuentasAnualesInicial,
+    omitirEpigrafesSegunTipo,
     subtotalesTrasLinea,
 } from "../dominio.ts";
 
@@ -159,5 +162,39 @@ describe("nombres", () => {
         expect(nombreFicheroCuentasAnuales(informe, "xlsx")).toBe(
             "balance-situacion-2026.xlsx"
         );
+    });
+});
+
+describe("omitir epígrafes sin saldo", () => {
+    test("se edita como casilla en la ficha", () => {
+        expect(metaCuentasAnuales.campos?.omitirEpigrafesSinSaldo?.tipo).toBe(
+            "checkbox"
+        );
+    });
+
+    test("al marcarla queda como booleano", () => {
+        const resultado = metaCuentasAnuales.onChange?.(
+            {
+                ...cuentasAnualesVacias(),
+                tipo: "Situacion",
+                omitirEpigrafesSinSaldo: "true" as unknown as boolean,
+            },
+            "omitirEpigrafesSinSaldo",
+            false
+        );
+        expect(resultado?.omitirEpigrafesSinSaldo).toBe(true);
+    });
+
+    test("fuera del balance de situación se apaga (habilitarPorTipo)", () => {
+        const informe = {
+            ...cuentasAnualesVacias(),
+            tipo: "Perdidas y ganancias" as const,
+            omitirEpigrafesSinSaldo: true,
+        };
+        expect(omitirEpigrafesSegunTipo(informe).omitirEpigrafesSinSaldo).toBe(
+            false
+        );
+        const situacion = { ...informe, tipo: "Situacion" as const };
+        expect(omitirEpigrafesSegunTipo(situacion)).toBe(situacion);
     });
 });

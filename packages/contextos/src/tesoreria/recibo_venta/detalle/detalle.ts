@@ -2,7 +2,15 @@ import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { ejecutarListaProcesos, MetaModelo } from "@olula/lib/dominio.ts";
 import { ReciboVenta } from "../diseño.js";
 import { enDivisaExtranjera } from "../dominio.js";
-import { desagruparReciboVenta, getReciboVenta, patchDevolverReciboVenta, patchPagarReciboVenta } from "../infraestructura.js";
+import { CambiosRecibo, fechaApi } from "../../comun/recibo.ts";
+import {
+    desagruparReciboVenta,
+    getReciboVenta,
+    patchAnularPagoReciboVenta,
+    patchCambiarReciboVenta,
+    patchDevolverReciboVenta,
+    patchPagarReciboVenta,
+} from "../infraestructura.js";
 import { ContextoDetalleReciboVenta, EstadoDetalleReciboVenta } from "./diseño.js";
 import { DevolucionRecibo } from "./devolver/diseño.js";
 import { PagoRecibo } from "./pagar/diseño.js";
@@ -22,6 +30,7 @@ export const metaReciboVenta: MetaModelo<ReciboVenta> = {
         nombreCliente: { tipo: "texto" },
         idFiscal: { tipo: "texto" },
         facturaId: { tipo: "texto" },
+        nombreCuentaDomiciliacion: { tipo: "texto" },
     },
     editable: () => false,
 };
@@ -42,6 +51,8 @@ export const reciboVentaInicial = (): ReciboVenta => ({
     divisaEmpresaId: null,
     pagos: [],
     recibosAgrupados: [],
+    cuentaDomiciliacionId: null,
+    nombreCuentaDomiciliacion: '',
 });
 
 export const contextoDetalleReciboVentaInicial: ContextoDetalleReciboVenta = {
@@ -89,6 +100,7 @@ export const devolverRecibo: ProcesarDetalle = async (contexto, payload) => {
         cuentaPagoId: devolucion.cuenta_pago_id,
         fecha: devolucion.fecha.toISOString().slice(0, 10),
         ...(enDivisaExtranjera(contexto.recibo) && { tasaConversion: devolucion.tasa_conversion }),
+        reembolsarEnPasarela: devolucion.reembolsar_en_pasarela ?? false,
     });
     const recibo = await getReciboVenta(contexto.recibo.id);
 
@@ -106,4 +118,30 @@ export const desagruparRecibo: ProcesarDetalle = async (contexto) => {
         { ...contexto, estado: 'INICIAL', recibo: reciboVentaInicial() },
         [["recibo_desagrupado", idGrupo]],
     ];
+};
+
+const recargarYPublicar: ProcesarDetalle = async (contexto) => {
+    const recibo = await getReciboVenta(contexto.recibo.id);
+
+    return [
+        { ...contexto, estado: 'ABIERTO', recibo },
+        [["recibo_cambiado", recibo]],
+    ];
+};
+
+/** TES-06: borra el último pago o devolución y su asiento. */
+export const anularUltimoPago: ProcesarDetalle = async (contexto) => {
+    await patchAnularPagoReciboVenta(contexto.recibo.id);
+    return recargarYPublicar(contexto);
+};
+
+/** TES-06: si baja el importe, el servidor crea otro recibo con la diferencia. */
+export const cambiarRecibo: ProcesarDetalle = async (contexto, payload) => {
+    const cambios = payload as CambiosRecibo;
+    await patchCambiarReciboVenta(contexto.recibo.id, {
+        fechaVencimiento: fechaApi(cambios.fecha_vencimiento),
+        cuentaDomiciliacionId: cambios.cuenta_domiciliacion_id,
+        ...(cambios.importe !== contexto.recibo.importe && { importe: cambios.importe }),
+    });
+    return recargarYPublicar(contexto);
 };

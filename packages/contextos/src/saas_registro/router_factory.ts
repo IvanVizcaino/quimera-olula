@@ -1,0 +1,16 @@
+import { Landing } from "./landing/Landing.tsx";
+import { RUTA_LANDING } from "./landing/dominio.ts";
+import { Registro } from "./registro/Registro.tsx";
+import { VerificarRegistro } from "./verificar/VerificarRegistro.tsx";
+
+/**
+ * Rutas públicas de la landing y el registro. No van dentro del layout autenticado: la app las
+ * monta como rutas de primer nivel (ver apps/olula_saas/src/main.tsx).
+ */
+export const rutasRegistroSaas = [
+    { path: RUTA_LANDING, Component: Landing },
+    { path: "/registro", Component: Registro },
+    { path: "/registro/verificar", Component: VerificarRegistro },
+];
+
+export const RUTAS_PUBLICAS_REGISTRO = [RUTA_LANDING, "/registro", "/registro/verificar"];

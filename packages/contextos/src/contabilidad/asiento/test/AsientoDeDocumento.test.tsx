@@ -102,6 +102,44 @@ describe("AsientoDeDocumento — el asiento de una factura", () => {
         expect(document.querySelector(".totales-asiento-item--descuadre")).toBeNull();
     });
 
+    test("sin cabecera pinta solo la tabla de partidas", async () => {
+        getAsiento.mockResolvedValue(asientoDeFactura());
+
+        render(<AsientoDeDocumento asientoId="128" conCabecera={false} />);
+
+        expect(await screen.findByText("6000000")).toBeInTheDocument();
+        expect(document.querySelector(".CabeceraAsiento")).toBeNull();
+        expect(document.querySelector(".PartidasAsientoLista")).not.toBeNull();
+    });
+
+    test("en una factura la cabecera no lleva tipo de documento, documento ni concepto", async () => {
+        getAsiento.mockResolvedValue(asientoDeFactura());
+
+        render(<AsientoDeDocumento asientoId="128" sinDatosDocumento />);
+
+        expect(await screen.findByText("6000000")).toBeInTheDocument();
+        const campo = (nombre: string) => document.querySelector(`.CabeceraAsiento [nombre="${nombre}"]`);
+        expect(campo("numero")).not.toBeNull();
+        expect(campo("tipoDocumento")).toBeNull();
+        expect(campo("documento")).toBeNull();
+        expect(campo("concepto")).toBeNull();
+        // Sin título «Partidas» y siempre en tabla, sin el cambio tabla/tarjetas.
+        expect(screen.queryByText("Partidas")).toBeNull();
+        expect(document.querySelector(".PartidasAsientoLista table")).not.toBeNull();
+        expect(screen.queryByText("Tarjetas")).toBeNull();
+        // Ni el recuadro de totales Debe/Haber.
+        expect(document.querySelector(".totales-asiento")).toBeNull();
+    });
+
+    test("con título lo pinta con el número y la fecha del asiento", async () => {
+        getAsiento.mockResolvedValue(asientoDeFactura());
+
+        render(<AsientoDeDocumento asientoId="128" conCabecera={false} titulo="Asiento de cierre" />);
+
+        expect(await screen.findByText("Asiento de cierre · Nº 45 · 01/03/2026")).toBeInTheDocument();
+        expect(document.querySelector(".CabeceraAsiento")).toBeNull();
+    });
+
     test("avisa si el asiento no se puede cargar", async () => {
         getAsiento.mockRejectedValue(new Error("404"));
 

@@ -108,6 +108,7 @@ export const CrearAlbaran = ({
               <Cliente
                 {...albaranRegistrado.uiProps("cliente_id", "nombre")}
                 nombre="albaran_cliente_id"
+                avisarObservaciones
                 ref={focus}
               />
               <DirCliente

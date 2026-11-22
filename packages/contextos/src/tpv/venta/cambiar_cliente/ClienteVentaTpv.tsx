@@ -5,9 +5,11 @@ import {
   metaModeloClienteFacturaRegistrado,
 } from "#/ventas/factura/cliente_factura/cliente_factura.ts";
 import { ClienteFacturaRegistrado } from "#/ventas/factura/cliente_factura/ClienteFacturaRegistrado.tsx";
+import { QAviso } from "@olula/componentes/atomos/qaviso.tsx";
 import { QBoton, QModal } from "@olula/componentes/index.js";
 import { useModelo } from "@olula/lib/useModelo.js";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { avisoClienteSinDireccion, clienteTieneDireccionFacturacion } from "./cambiar_cliente.ts";
 
 export const ClienteVentaTpv = ({
   venta,
@@ -48,7 +50,29 @@ export const ClienteVentaTpv = ({
     setTipoCliente(esRegistrado ? "simplificada" : "registrado");
   };
 
-  const valido = esRegistrado ? registrado.valido : true;
+  const idCliente = registrado.modelo.idCliente;
+
+  // null: sin cliente o comprobación en curso
+  const [conDireccion, setConDireccion] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setConDireccion(null);
+    if (!idCliente) return;
+
+    let vigente = true;
+    clienteTieneDireccionFacturacion(idCliente)
+      .then((tiene) => vigente && setConDireccion(tiene))
+      // Si no se puede comprobar, no bloqueamos: el servidor valida al guardar
+      .catch(() => vigente && setConDireccion(true));
+
+    return () => {
+      vigente = false;
+    };
+  }, [idCliente]);
+
+  const sinDireccion = esRegistrado && conDireccion === false;
+
+  const valido = esRegistrado ? registrado.valido && conDireccion === true : true;
 
   return (
     <QModal
@@ -70,6 +94,10 @@ export const ClienteVentaTpv = ({
           "Factura simplificada"
         )}
       </quimera-formulario>
+
+      {sinDireccion && (
+        <QAviso variante="advertencia">{avisoClienteSinDireccion}</QAviso>
+      )}
 
       <div className="botones maestro-botones ">
         <QBoton texto="Cancelar" onClick={cancelar} />

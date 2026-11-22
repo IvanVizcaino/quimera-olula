@@ -13,7 +13,7 @@ import {
 import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
-import { useLayout } from "@olula/lib/useLayout.js";
+import { Layout, useLayout } from "@olula/lib/useLayout.js";
 import { useCallback, useEffect, useMemo } from "react";
 import { CrearVentaTpv as CrearVentaTpvBase } from "../crear/CrearVentaTpv.tsx";
 import { DetalleVentaTpv } from "../detalle/DetalleVentaTpv.tsx";
@@ -31,7 +31,8 @@ export const MaestroConDetalleVentaTpv = () => {
     };
   }, []);
 
-  const { layout, cambiarLayout } = useLayout("TARJETA");
+  const layoutInicial = (FactoryObj.app.TPV?.venta_layoutInicial as Layout | undefined) ?? "TARJETA";
+  const { layout, cambiarLayout } = useLayout(layoutInicial);
 
   const { id, criteria } = getUrlParams();
   const criteriaInicial =
@@ -69,8 +70,10 @@ export const MaestroConDetalleVentaTpv = () => {
                 onClick={cambiarLayout}
               />
             </div>
-            <PuntoVentaTpvActual onChange={handle_punto_venta_cambiado} />
-            <AgenteTpvActual />
+            <div className="tpv-puesto">
+              <PuntoVentaTpvActual onChange={handle_punto_venta_cambiado} />
+              <AgenteTpvActual />
+            </div>
             <Listado<VentaTpv>
               metaTabla={metaTablaFactura}
               criteria={ctx.ventas.criteria}

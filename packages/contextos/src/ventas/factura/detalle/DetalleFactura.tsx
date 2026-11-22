@@ -9,7 +9,14 @@ import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { puede } from "@olula/lib/dominio.ts";
 import { imprimir_blob } from "@olula/lib/impresion.ts";
 import { useModelo } from "@olula/lib/useModelo.js";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { CobrosOnline } from "#/tesoreria/cobro_online/componentes/CobrosOnline.tsx";
+import { EnlacePagoTarjeta } from "#/tesoreria/cobro_online/componentes/EnlacePagoTarjeta.tsx";
+import { pasarelaPagoActiva } from "#/tesoreria/cobro_online/dominio.ts";
+import {
+  getCobrosOnlineFactura,
+  postEnlacePagoFactura,
+} from "#/tesoreria/cobro_online/infraestructura.ts";
 import { useParams } from "react-router";
 import { CambiarAgente } from "../../comun/componentes/moleculas/CambiarAgente/CambiarAgente.tsx";
 import { CambiarDescuento } from "../../comun/componentes/moleculas/CambiarDescuento/CambiarDescuento.tsx";
@@ -22,10 +29,8 @@ import { etiquetaEstadoFactura, facturaEmitible } from "../dominio.ts";
 import { IndicadorGuardado } from "../../comun/componentes/IndicadorGuardado.tsx";
 import "../../comun/estilos/campos.css";
 import "../../comun/estilos/detalle_documento.css";
-import {
-  datosClaveDocumentoVenta,
-  tituloDocumentoVenta,
-} from "../../venta/dominio.ts";
+import { tituloDocumentoVenta } from "../../venta/dominio.ts";
+import { useDatosClaveDocumentoVenta } from "../../venta/vistas/useDatosClaveDocumentoVenta.ts";
 import { facturaVacia } from "../dominio.ts";
 import { getReportFactura, getTrazaFactura } from "../infraestructura.ts";
 import "./DetalleFactura.css";
@@ -66,6 +71,8 @@ export const DetalleFactura = ({
   );
 
   const factura = useModelo(metaFactura, ctx.factura, autoGuardar);
+  // Se incrementa al cerrar el enlace con tarjeta para releer sus cobros.
+  const [recargaCobros, setRecargaCobros] = useState(0);
 
   useEffect(() => {
     emitir("factura_id_cambiado", facturaId, true);
@@ -81,7 +88,7 @@ export const DetalleFactura = ({
     <EtiquetaEstado {...etiquetaEstadoFactura(factura)} />
   );
 
-  const datosClave = datosClaveDocumentoVenta;
+  const datosClave = useDatosClaveDocumentoVenta();
 
   const imprimir = useCallback(async () => {
     const blob = await getReportFactura(ctx.factura.id);
@@ -91,6 +98,9 @@ export const DetalleFactura = ({
   if (!ctx.factura.id) return;
 
   const esEditable = editable(ctx.factura);
+  const pasarelaHabilitada = pasarelaPagoActiva();
+  // Solo una factura emitida tiene recibos que cobrar.
+  const cobrableConTarjeta = ctx.factura.estadoExpedicion !== "BORRADOR";
 
   const acciones = [
     {
@@ -102,6 +112,15 @@ export const DetalleFactura = ({
       texto: "Imprimir",
       onClick: imprimir,
     },
+    ...(pasarelaHabilitada
+      ? [
+          {
+            texto: "Enlace de pago con tarjeta",
+            onClick: () => emitir("enlace_tarjeta_solicitado"),
+            deshabilitado: !cobrableConTarjeta,
+          },
+        ]
+      : []),
     {
       texto: "Documentos relacionados",
       onClick: () => emitir("traza_solicitada"),
@@ -158,11 +177,18 @@ export const DetalleFactura = ({
 
         <Tab label="Recibos">
           <TabRecibos facturaId={ctx.factura.id} />
+          {pasarelaHabilitada && (
+            <CobrosOnline
+              key={ctx.factura.id}
+              getCobros={() => getCobrosOnlineFactura(ctx.factura.id)}
+              recarga={recargaCobros}
+            />
+          )}
         </Tab>
 
         {puede("contabilidad.asiento") && (
           <Tab label="Contabilidad">
-            <AsientoDeDocumento asientoId={ctx.factura.asiento_id ?? null} />
+            <AsientoDeDocumento asientoId={ctx.factura.asiento_id ?? null} sinDatosDocumento />
           </Tab>
         )}
       </Tabs>
@@ -196,6 +222,18 @@ export const DetalleFactura = ({
 
       {estado === "BORRANDO_FACTURA" && (
         <BorrarFactura factura={ctx.factura} publicar={emitir} />
+      )}
+
+      {estado === "ENLACE_TARJETA" && (
+        <EnlacePagoTarjeta
+          titulo={`Pago con tarjeta de la factura ${ctx.factura.codigo}`}
+          descripcion={`la factura ${ctx.factura.codigo}`}
+          generar={(email) => postEnlacePagoFactura(ctx.factura.id, email)}
+          onCerrar={() => {
+            setRecargaCobros((n) => n + 1);
+            emitir("enlace_tarjeta_cerrado");
+          }}
+        />
       )}
 
       {estado === "VIENDO_TRAZA" && (

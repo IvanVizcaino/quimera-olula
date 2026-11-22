@@ -8,6 +8,8 @@ class Ventas_Urls {
     readonly ARTICULO = `/ventas/articulo`;
     readonly TARIFA = `/ventas/tarifa`;
     readonly ARTICULO_TARIFA = `/ventas/articulo_tarifa`;
+    readonly PRECIO_ARTICULO = `/ventas/precio_articulo`;
+    readonly CONFIG = `/ventas/config`;
 }
 
 export default Ventas_Urls;

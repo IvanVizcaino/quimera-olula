@@ -1,0 +1,243 @@
+.PaginaSuscripcion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+    padding: var(--espaciado-m);
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+
+    .susc-seccion {
+        background: var(--color-superficie);
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-xs);
+        padding: var(--espaciado-m);
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+    }
+
+    .susc-secundario {
+        color: var(--color-texto-secundario);
+        font-size: var(--tamaño-letra-s);
+    }
+
+    .susc-importe {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .susc-acciones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s);
+    }
+
+    /* Resumen */
+    .susc-plan-actual {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--espaciado-s);
+    }
+
+    .susc-plan-nombre {
+        font-size: 1.4rem;
+    }
+
+    .susc-desglose table,
+    .susc-desglose-tabla {
+        width: 100%;
+        max-width: 520px;
+        border-collapse: collapse;
+    }
+
+    .susc-desglose td,
+    .susc-desglose-tabla td {
+        padding: var(--espaciado-xs) 0;
+    }
+
+    .susc-total td {
+        border-top: 1px solid var(--color-borde-sutil);
+        font-weight: bold;
+    }
+
+    .susc-usos {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--espaciado-m);
+    }
+
+    .susc-uso-cabecera {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+        flex-wrap: wrap;
+    }
+
+    .susc-barra {
+        height: 8px;
+        border-radius: 4px;
+        background: var(--color-superficie-sunken);
+        overflow: hidden;
+        margin-top: var(--espaciado-xs);
+
+        & > div {
+            height: 100%;
+            background: var(--color-primario);
+        }
+
+        &.alto > div {
+            background: var(--color-advertencia);
+        }
+
+        &.excedido > div {
+            background: var(--color-error);
+        }
+    }
+
+    /* Comparador */
+    .susc-periodicidad {
+        display: flex;
+        gap: var(--espaciado-s);
+    }
+
+    .susc-planes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: var(--espaciado-m);
+    }
+
+    .susc-plan {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: var(--redondeo-borde-xs);
+        padding: var(--espaciado-m);
+
+        &.destacado {
+            border-color: var(--color-primario);
+        }
+
+        &.elegido {
+            border-width: 2px;
+            border-color: var(--color-primario);
+            background: var(--color-primario-claro);
+        }
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--espaciado-s);
+        }
+
+        quimera-boton {
+            margin-top: auto;
+        }
+    }
+
+    .susc-precio {
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+
+    .susc-incluye {
+        padding-left: 1.2rem;
+        margin: 0;
+        font-size: var(--tamaño-letra-s);
+    }
+
+    .susc-complementos ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+    }
+
+    .susc-extra {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--espaciado-m);
+    }
+
+    .susc-cantidad {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+
+        output {
+            min-width: 2ch;
+            text-align: center;
+        }
+    }
+
+    .susc-presupuesto {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+        border-top: 1px solid var(--color-borde-sutil);
+        padding-top: var(--espaciado-m);
+    }
+
+    .susc-cuotas {
+        font-size: 1.15rem;
+    }
+
+    .susc-cuota-actual {
+        text-decoration: line-through;
+        color: var(--color-texto-secundario);
+    }
+
+    .susc-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    /* Facturas */
+    .susc-tabla-wrap {
+        overflow-x: auto;
+    }
+
+    .susc-tabla {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+            padding: var(--espaciado-s);
+            text-align: left;
+            border-bottom: 1px solid var(--color-borde-sutil);
+        }
+
+        th.susc-importe,
+        td.susc-importe {
+            text-align: right;
+        }
+    }
+
+    .susc-mandato-datos {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: var(--espaciado-xs) var(--espaciado-m);
+        margin: 0;
+
+        dt {
+            color: var(--color-texto-secundario);
+        }
+
+        dd {
+            margin: 0;
+        }
+    }
+}

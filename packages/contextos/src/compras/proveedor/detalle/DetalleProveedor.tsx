@@ -1,9 +1,12 @@
+import { mostrarPestanaContabilidad } from "#/contabilidad/subcuentas_tercero/dominio.ts";
+import { TabContabilidad } from "#/contabilidad/subcuentas_tercero/detalle/TabContabilidad.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { QuimeraAcciones } from "@olula/componentes/moleculas/qacciones.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
+import { puede, puedeAlguna } from "@olula/lib/dominio.ts";
 import { useCallback, useEffect } from "react";
 import { BorrarProveedor } from "../borrar/BorrarProveedor.tsx";
 import { Proveedor } from "../diseño.ts";
@@ -16,6 +19,10 @@ import {
 } from "./detalle.ts";
 import "./DetalleProveedor.css";
 import { DireccionesProveedor } from "./direcciones/DireccionesProveedor.tsx";
+import { documentosProveedor } from "./documentos/documentos.ts";
+import { TabDocumentos } from "./documentos/TabDocumentos.tsx";
+import { TabCrmContactos } from "#/ventas/cliente/detalle/crm_contactos/TabCrmContactos.tsx";
+import { apiAgendaProveedor } from "../infraestructura.ts";
 import { getMaquina } from "./maquina.ts";
 import { TabComercial } from "./TabComercial.tsx";
 import { TabGeneral } from "./TabGeneral.tsx";
@@ -121,6 +128,43 @@ export const DetalleProveedor = ({
                 />
               }
             />,
+            ...(puede("compras.contacto")
+              ? [
+                  <Tab
+                    key="tab-agenda"
+                    label="Agenda"
+                    children={
+                      <div className="detalle-cliente-tab-contenido">
+                        <TabCrmContactos entidadId={proveedor.id} api={apiAgendaProveedor} />
+                      </div>
+                    }
+                  />,
+                ]
+              : []),
+            ...(puedeAlguna(documentosProveedor.map((d) => d.regla))
+              ? [
+                  <Tab
+                    key="tab-documentos"
+                    label="Documentos"
+                    children={<TabDocumentos proveedorId={proveedor.id} />}
+                  />,
+                ]
+              : []),
+            ...(mostrarPestanaContabilidad()
+              ? [
+                  <Tab
+                    key="tab-contabilidad"
+                    label="Contabilidad"
+                    children={
+                      <TabContabilidad
+                        tipo="proveedor"
+                        terceroId={proveedor.id}
+                        codigoSubcuenta={proveedor.subcuentaCodigo}
+                      />
+                    }
+                  />,
+                ]
+              : []),
           ]}
         />
       </div>

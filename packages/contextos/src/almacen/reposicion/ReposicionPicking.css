@@ -1,0 +1,38 @@
+.ReposicionPicking {
+    quimera-select[nombre="almacenId"] {
+        grid-column: span 6;
+    }
+
+    .botones {
+        margin-block: 0 var(--espaciado-m);
+    }
+
+    .mensaje {
+        margin-block: var(--espaciado-s) var(--espaciado-m);
+    }
+}
+
+.ReposicionPicking .situacion {
+    white-space: nowrap;
+
+    .situacion-entrante {
+        color: var(--color-exito-oscuro);
+    }
+
+    .situacion-saliente {
+        color: var(--color-error-texto);
+    }
+
+    .situacion-separador {
+        color: var(--color-texto-secundario);
+    }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+}

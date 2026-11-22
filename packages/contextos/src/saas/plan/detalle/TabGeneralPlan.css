@@ -1,0 +1,11 @@
+.TabGeneralPlan {
+    quimera-input[nombre="id"] { grid-column: span 4; }
+    quimera-input[nombre="nombre"] { grid-column: span 8; }
+    quimera-textarea[nombre="descripcion"] { grid-column: span 12; }
+    quimera-input[nombre="precioMensual"] { grid-column: span 3; }
+    quimera-input[nombre="precioAnual"] { grid-column: span 3; }
+    quimera-input[nombre="diasPrueba"] { grid-column: span 3; }
+    quimera-input[nombre="orden"] { grid-column: span 3; }
+    quimera-checkbox[nombre="publico"] { grid-column: span 6; }
+    quimera-checkbox[nombre="destacado"] { grid-column: span 6; }
+}

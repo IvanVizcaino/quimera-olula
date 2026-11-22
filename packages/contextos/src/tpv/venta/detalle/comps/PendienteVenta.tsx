@@ -1,6 +1,8 @@
 import { QBoton } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { formatearMoneda } from "@olula/lib/dominio.ts";
+import { FactoryObj } from "@olula/lib/factory_ctx.tsx";
+import { pasarelaPagoActiva } from "#/tesoreria/cobro_online/dominio.ts";
 import { VentaTpv } from "../../diseño.ts";
 import "./PendienteVenta.css";
 
@@ -19,6 +21,7 @@ export const PendienteVenta = ({
   const divisa = venta.divisa_id || "EUR";
 
   const pendiente = total - pagado;
+  const pagoConQr = (FactoryObj.app.TPV?.venta_pagoConQr as boolean | undefined) ?? true;
 
   return (
     <div className="pendientes-venta">
@@ -44,6 +47,13 @@ export const PendienteVenta = ({
             <QBoton onClick={() => publicar("pago_vale_solicitado")}>
               P. Vale 
             </QBoton>
+
+            {/* Cobro con QR (Stripe): solo para cobrar, no para devolver. */}
+            {pagoConQr && pasarelaPagoActiva() && pendiente > 0 && (
+              <QBoton onClick={() => publicar("pago_qr_solicitado")}>
+                P. QR
+              </QBoton>
+            )}
           {/* </> */}
         {/* )} */}
 

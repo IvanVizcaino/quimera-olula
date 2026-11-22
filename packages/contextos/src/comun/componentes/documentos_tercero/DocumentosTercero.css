@@ -1,0 +1,29 @@
+.DocumentosTercero maestro-detalle[tipo] .Maestro {
+    max-width: 100%;
+    max-height: none;
+}
+
+.DocumentosTercero-controles {
+    display: flex;
+    padding: var(--espaciado-xs, 0.25rem) 0;
+}
+
+.DocumentosTercero-controles > * {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+.TarjetaRecibo {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem 1rem;
+}
+
+.TarjetaRecibo-codigo {
+    font-weight: 600;
+}
+
+.TarjetaRecibo-importe,
+.TarjetaRecibo-estado {
+    text-align: right;
+}

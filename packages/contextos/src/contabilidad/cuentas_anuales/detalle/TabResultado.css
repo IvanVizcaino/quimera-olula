@@ -1,0 +1,30 @@
+/* Cuentas anuales: la negrita la decide el servidor por nivel (clase `negrita`)
+ * y se aplica igual al concepto y a los importes, como en el PDF. */
+.TabResultado .tabla-cuentas-anuales {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: var(--espaciado-xxs) var(--espaciado-xs);
+        border-bottom: 1px solid var(--color-borde-sutil);
+    }
+
+    td.importe {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    tr.negrita td {
+        font-weight: var(--grosor-letra-7);
+    }
+
+    tr.fila-desglose td {
+        font-style: italic;
+    }
+
+    tr.fila-subtotal td,
+    tr.fila-total td {
+        background-color: var(--gris-1);
+    }
+}

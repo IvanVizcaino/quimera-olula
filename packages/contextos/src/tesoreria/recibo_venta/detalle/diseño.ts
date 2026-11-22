@@ -5,8 +5,11 @@ export type EstadoDetalleReciboVenta =
     | 'ABIERTO' | 'VIENDO_TRAZA'
     | 'PAGANDO'
     | 'ENLACE_COBRO'
+    | 'ENLACE_TARJETA'
     | 'DESAGRUPANDO'
-    | 'DEVOLVIENDO';
+    | 'DEVOLVIENDO'
+    | 'ANULANDO_PAGO'
+    | 'CAMBIANDO';
 
 export type ContextoDetalleReciboVenta = {
     estado: EstadoDetalleReciboVenta;

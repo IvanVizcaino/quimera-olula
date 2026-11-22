@@ -33,6 +33,7 @@ export interface NuevoProveedor extends Modelo {
     nombre: string;
     idFiscal: string;
     tipoIdFiscal: TipoIdFiscal;
+    empresaId: string;
     direccion?: NuevaDireccionProveedor;
 }
 

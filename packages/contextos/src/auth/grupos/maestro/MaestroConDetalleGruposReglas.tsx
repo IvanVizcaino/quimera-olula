@@ -65,7 +65,7 @@ export const MaestroConDetalleGruposReglas = () => {
               metaTabla={metaTablaGrupos}
               criteria={ctx.grupos.criteria}
               criteriaInicial={criteriaInicial}
-              modo="tarjetas"
+              modoInicial="tabla"
               entidades={ctx.grupos.lista}
               totalEntidades={ctx.grupos.total}
               seleccionada={ctx.grupos.activo}

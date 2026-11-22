@@ -1,12 +1,8 @@
+import { metaFormularioLibroIva } from "#/contabilidad/comun/librosIva.ts";
 import { MetaModelo } from "@olula/lib/dominio.js";
 import { NuevoLibroFacturasEmitidas } from "../diseño.ts";
 
 export const metaNuevoLibroFacturasEmitidas: MetaModelo<NuevoLibroFacturasEmitidas> =
-    {
-        campos: {
-            descripcion: { requerido: true },
-            ejercicioId: { requerido: true },
-        },
-    };
+    metaFormularioLibroIva<NuevoLibroFacturasEmitidas>();
 
 export { nuevoLibroFacturasEmitidasInicial } from "../dominio.ts";

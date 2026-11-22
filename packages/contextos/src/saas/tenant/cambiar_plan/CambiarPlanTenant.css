@@ -1,0 +1,9 @@
+.CambiarPlanTenant {
+    quimera-select[nombre="planId"] { grid-column: span 6; }
+    quimera-select[nombre="periodicidad"] { grid-column: span 3; }
+    quimera-checkbox[nombre="conPrueba"] { grid-column: span 3; }
+    h4 { grid-column: span 12; margin: 8px 0 0; }
+    quimera-checkbox { grid-column: span 6; }
+    quimera-input { grid-column: span 6; }
+    .ayuda { grid-column: span 12; font-size: 0.85em; opacity: 0.75; }
+}

@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.ts";
 import { publicar } from "@olula/lib/dominio.ts";
-import { cargarContexto, desagruparRecibo, devolverRecibo, pagarRecibo } from "./detalle.js";
+import { anularUltimoPago, cambiarRecibo, cargarContexto, desagruparRecibo, devolverRecibo, pagarRecibo } from "./detalle.js";
 import { ContextoDetalleReciboVenta, EstadoDetalleReciboVenta } from "./diseño.js";
 
 export const getMaquina: () => Maquina<EstadoDetalleReciboVenta, ContextoDetalleReciboVenta> = () => {
@@ -27,7 +27,13 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboVenta, ContextoDetalle
 
             enlace_cobro_solicitado: 'ENLACE_COBRO',
 
+            enlace_tarjeta_solicitado: 'ENLACE_TARJETA',
+
             devolucion_solicitada: 'DEVOLVIENDO',
+
+            cambio_recibo_solicitado: 'CAMBIANDO',
+
+            anulacion_pago_solicitada: 'ANULANDO_PAGO',
 
             desagrupado_solicitado: 'DESAGRUPANDO',
         },
@@ -42,6 +48,10 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboVenta, ContextoDetalle
             enlace_cobro_cerrado: 'ABIERTO',
         },
 
+        ENLACE_TARJETA: {
+            enlace_tarjeta_cerrado: 'ABIERTO',
+        },
+
         DEVOLVIENDO: {
             devolucion_confirmada: [devolverRecibo],
 
@@ -52,6 +62,18 @@ export const getMaquina: () => Maquina<EstadoDetalleReciboVenta, ContextoDetalle
             desagrupado_confirmado: [desagruparRecibo],
 
             desagrupado_cancelado: 'ABIERTO',
+        },
+
+        CAMBIANDO: {
+            cambio_recibo_confirmado: [cambiarRecibo],
+
+            cambio_recibo_cancelado: 'ABIERTO',
+        },
+
+        ANULANDO_PAGO: {
+            anulacion_pago_confirmada: [anularUltimoPago],
+
+            anulacion_pago_cancelada: 'ABIERTO',
         },
 
         VIENDO_TRAZA: {

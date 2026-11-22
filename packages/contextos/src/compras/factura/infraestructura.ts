@@ -81,6 +81,8 @@ export interface FacturaApi {
     editable: boolean;
     servicios: boolean;
     no_generar_asiento: boolean;
+    /** Plugin contauto_isp: factura con inversión del sujeto pasivo (false sin el plugin). */
+    inversion_sujeto_pasivo?: boolean;
     asiento_id: string | null;
     observaciones: string | null;
     // Sin tipar como EstadoExpedicion a propósito: lo que llega es texto y lo
@@ -161,6 +163,7 @@ interface CambiosFacturaApi {
     de_abono?: boolean;
     servicios?: boolean;
     no_generar_asiento?: boolean;
+    inversion_sujeto_pasivo?: boolean;
 }
 
 interface CambiosLineaFacturaApi {
@@ -213,6 +216,7 @@ export const facturaDesdeApi = (api: FacturaApi): Factura => ({
     editable: api.editable,
     servicios: api.servicios,
     noGenerarAsiento: api.no_generar_asiento,
+    inversionSujetoPasivo: api.inversion_sujeto_pasivo ?? false,
     asientoId: api.asiento_id,
     observaciones: api.observaciones,
     estadoExpedicion: estadoExpedicionDesdeApi(api.estado_expedicion),
@@ -280,9 +284,10 @@ const cambiosFacturaAApi = (f: CambiosFactura): CambiosFacturaApi => {
     if (f.formaPagoId) cambios.forma_pago_id = f.formaPagoId;
     if (f.almacenId !== undefined) cambios.almacen_id = f.almacenId;
     if (f.observaciones !== undefined) cambios.observaciones = f.observaciones;
-    if (f.deAbono !== undefined) cambios.de_abono = f.deAbono;
-    if (f.servicios !== undefined) cambios.servicios = f.servicios;
-    if (f.noGenerarAsiento !== undefined) cambios.no_generar_asiento = f.noGenerarAsiento;
+    if (f.deAbono !== undefined) cambios.de_abono = aBooleano(f.deAbono);
+    if (f.servicios !== undefined) cambios.servicios = aBooleano(f.servicios);
+    if (f.noGenerarAsiento !== undefined) cambios.no_generar_asiento = aBooleano(f.noGenerarAsiento);
+    if (f.inversionSujetoPasivo !== undefined) cambios.inversion_sujeto_pasivo = aBooleano(f.inversionSujetoPasivo);
     return cambios;
 };
 
@@ -762,3 +767,6 @@ export const crearArticuloConProveedor = async (
     );
     return respuesta.id;
 };
+
+/** Las casillas del formulario dejan el valor como texto ("true"/"false"). */
+const aBooleano = (valor: unknown): boolean => valor === true || valor === "true";

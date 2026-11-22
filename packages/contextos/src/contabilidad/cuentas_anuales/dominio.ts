@@ -46,6 +46,17 @@ export const desgloseSegunFormato = (
 export const admiteOmitirEpigrafes = (tipo: TipoCuentasAnuales): boolean =>
     tipo === "Situacion";
 
+/** `habilitarPorTipo` de `co_i_cuentasanuales.qs`: fuera del balance de
+ * situación la casilla se apaga y se deshabilita. */
+export const omitirEpigrafesSegunTipo = <
+    T extends Pick<CuentasAnuales, "tipo" | "omitirEpigrafesSinSaldo">,
+>(
+    informe: T
+): T =>
+    !admiteOmitirEpigrafes(informe.tipo) && informe.omitirEpigrafesSinSaldo
+        ? { ...informe, omitirEpigrafesSinSaldo: false }
+        : informe;
+
 export const nuevaCuentasAnualesInicial = (
     ejercicioId: string
 ): NuevaCuentasAnuales => ({

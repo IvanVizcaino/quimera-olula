@@ -6,6 +6,7 @@ import { useCallback, useContext, useMemo, useState } from "react";
 import {
     BalanceCuentasAnuales,
     CuentasAnuales,
+    FilaInformeCuentasAnuales,
     FormatoHoja,
     LineaCuentasAnuales,
 } from "../diseño.ts";
@@ -18,17 +19,15 @@ import {
 import {
     getHojaCuentasAnuales,
     getReportCuentasAnuales,
+    NEGRITA_POR_TIPO,
 } from "../infraestructura.ts";
+import "./TabResultado.css";
 
-type TipoFila = "cabecera" | "detalle" | "desglose" | "subtotal" | "total";
+type Fila = FilaInformeCuentasAnuales;
 
-interface Fila {
-    tipo: TipoFila;
-    nivel: number;
-    concepto: string;
-    saldoActual: number | null;
-    saldoAnterior: number | null;
-}
+const conNegritaPorTipo = (
+    fila: Omit<Fila, "negrita">
+): Fila => ({ ...fila, negrita: NEGRITA_POR_TIPO.includes(fila.tipo) });
 
 const importe = (valor: number | null): string =>
     valor === null
@@ -44,7 +43,7 @@ const importe = (valor: number | null): string =>
  * tras el último epígrafe al que están anclados.
  */
 const filasDelBalance = (balance: BalanceCuentasAnuales): Fila[] => {
-    const filas: Fila[] = [];
+    const filas: Omit<Fila, "negrita">[] = [];
     const previas = ["", "", "", ""];
 
     balance.datos.forEach((linea: LineaCuentasAnuales, indice) => {
@@ -114,7 +113,7 @@ const filasDelBalance = (balance: BalanceCuentasAnuales): Fila[] => {
         })
     );
 
-    return filas;
+    return filas.map(conNegritaPorTipo);
 };
 
 export const TabResultado = ({
@@ -131,7 +130,7 @@ export const TabResultado = ({
     const [descargando, setDescargando] = useState(false);
 
     const filas = useMemo(
-        () => (balance ? filasDelBalance(balance) : []),
+        () => (balance ? balance.filas ?? filasDelBalance(balance) : []),
         [balance]
     );
 
@@ -223,7 +222,10 @@ export const TabResultado = ({
                     </thead>
                     <tbody>
                         {filas.map((fila, indice) => (
-                            <tr key={indice} className={`fila-${fila.tipo}`}>
+                            <tr
+                                key={indice}
+                                className={`fila-${fila.tipo}${fila.negrita ? " negrita" : ""}`}
+                            >
                                 <td style={{ paddingLeft: `${fila.nivel}rem` }}>
                                     {fila.concepto}
                                 </td>

@@ -1,0 +1,14 @@
+.DetallePesoMedida {
+    quimera-input[nombre="id"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 8;
+    }
+
+    quimera-select[nombre="magnitud"],
+    quimera-input[nombre="factorConversion"] {
+        grid-column: span 6;
+    }
+}
