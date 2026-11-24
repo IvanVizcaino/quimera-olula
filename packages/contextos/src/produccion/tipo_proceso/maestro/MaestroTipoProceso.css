@@ -1,0 +1,73 @@
+.FormTipoProceso {
+    quimera-input[nombre="id"],
+    quimera-select[nombre="unidad"],
+    quimera-select[nombre="tipoProduccion"],
+    quimera-input[nombre="tiempoMedio"],
+    quimera-input[nombre="tiempoUnidad"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 8;
+    }
+
+    quimera-checkbox {
+        grid-column: span 4;
+        align-self: end;
+    }
+
+    quimera-checkbox[nombre="generarTodas"] {
+        grid-column: span 8;
+    }
+
+    .aviso-incompleto {
+        margin-bottom: var(--espacio-s, 0.5rem);
+    }
+
+    .aviso-incompleto ul {
+        margin: var(--espacio-xs, 0.25rem) 0 0;
+        padding-left: 1.25rem;
+    }
+
+    .nota-secuencial,
+    .motivo-secuencia {
+        color: var(--color-texto-secundario, #666);
+        font-size: 0.9em;
+    }
+
+    .cabecera-rejilla {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .TareasTipoProceso,
+    .SecuenciasTipoProceso {
+        margin-top: var(--espacio-m, 1rem);
+    }
+
+    .anadir-secuencia {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--espacio-s, 0.5rem);
+        align-items: end;
+        margin-bottom: var(--espacio-s, 0.5rem);
+
+        quimera-select {
+            flex: 1;
+            min-width: 12rem;
+        }
+    }
+}
+
+.ModalTareaProceso {
+    quimera-select[nombre="tipoTareaId"],
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 12;
+    }
+
+    quimera-input[nombre="orden"],
+    quimera-checkbox {
+        grid-column: span 4;
+    }
+}

@@ -39,6 +39,12 @@ export const menuProduccion = {
         regla: "produccion.tipo_tarea",
         plugin: "produccion",
     },
+    "Producción/Tipos de proceso": {
+        alias: ["procesos", "secuencias de tareas"],
+        url: "/produccion/tipos_proceso",
+        regla: "produccion.tipo_proceso",
+        plugin: "produccion",
+    },
     "Producción/Configuración": {
         alias: ["control de tiempo", "tramos"],
         url: "/produccion/config",
