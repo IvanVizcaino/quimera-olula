@@ -7,6 +7,12 @@ export const menuProduccion = {
         regla: "produccion.seccion",
         plugin: "produccion",
     },
+    "Producción/Trabajadores": {
+        alias: ["operarios"],
+        url: "/produccion/trabajadores",
+        regla: "produccion.trabajador",
+        plugin: "produccion",
+    },
     "Producción/Tipos de centro de coste": {
         url: "/produccion/tipos_centro_coste",
         regla: "produccion.tipo_centro_coste",
