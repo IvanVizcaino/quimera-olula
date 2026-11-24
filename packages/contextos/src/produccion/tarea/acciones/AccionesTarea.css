@@ -1,0 +1,16 @@
+.AccionesTarea {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--espacio-xs, 0.25rem);
+    white-space: nowrap;
+}
+
+.descripcion-tarea {
+    display: inline-flex;
+    flex-direction: column;
+
+    .inicial-final {
+        font-weight: normal;
+        color: var(--color-texto-secundario, #666);
+    }
+}
