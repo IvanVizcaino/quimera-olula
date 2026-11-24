@@ -16,7 +16,8 @@ export type ContextoMaestroSimple<T extends Entidad> = {
 /**
  * Máquina común de los maestros sencillos de producción (la de `almacen/peso_medida` con
  * nombres de evento genéricos). Eventos que publica el detalle: `entidad_cambiada`,
- * `entidad_borrada`, `entidad_deseleccionada`; el alta: `entidad_creada` y `alta_cancelada`.
+ * `entidad_borrada`, `entidad_deseleccionada` y `entidad_creada` (una copia); el alta:
+ * `entidad_creada` y `alta_cancelada`.
  */
 export const getMaquinaMaestroSimple = <T extends Entidad>(consultas: ConsultasMaestro<T>) => {
     type Ctx = ContextoMaestroSimple<T>;
@@ -56,6 +57,7 @@ export const getMaquinaMaestroSimple = <T extends Entidad>(consultas: ConsultasM
             recarga_solicitada: recargar,
             criteria_cambiado: [Entidades.filtrar, recargar],
             siguiente_pagina: [Entidades.filtrar, ampliar],
+            entidad_creada: incluirCreada,
             crear_solicitado: "CREANDO",
         },
         CREANDO: {

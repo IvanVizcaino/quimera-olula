@@ -63,3 +63,15 @@ export const comoBooleano = (valor: unknown): boolean => valor === true || valor
 
 /** Todas las filas de un maestro, ordenadas por código (los maestros de planta son cortos). */
 export const criteriaTodos: Criteria = { ...criteriaDefecto, orden: ["id", "ASC"], paginacion: { limite: 1000, pagina: 1 } };
+
+/** Motivo por el que un número opcional no es válido (no numérico o negativo) o `null` si lo es. */
+export const motivoNumeroNoValido = (valor: unknown, etiqueta: string, minimo = 0): string | null => {
+    if (valor === null || valor === undefined || valor === "") return null;
+    const numero = Number(valor);
+    if (Number.isNaN(numero)) return `${etiqueta} ha de ser un número`;
+    if (numero < minimo) return `${etiqueta} no puede ser menor que ${minimo}`;
+    return null;
+};
+
+/** Texto de un booleano para las tablas: "Sí" o vacío. */
+export const siONada = (valor: unknown): string => (comoBooleano(valor) ? "Sí" : "");

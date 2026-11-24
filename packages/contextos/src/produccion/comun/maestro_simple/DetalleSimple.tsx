@@ -14,6 +14,8 @@ export type PropsCamposDetalle<T extends Entidad> = {
     entidad: T;
     /** Vuelve a leer la entidad (tras cambiarla por otra vía que no sea el formulario). */
     recargar: () => Promise<void>;
+    /** Publica al maestro (p. ej. `entidad_creada` con el id de una copia). */
+    publicar: EmitirEvento;
 };
 
 export type PropsDetalleSimple<T extends Entidad> = {
@@ -28,12 +30,13 @@ export type PropsDetalleSimple<T extends Entidad> = {
     meta: MetaModelo<T>;
     titulo: (entidad: T) => string;
     campos: (props: PropsCamposDetalle<T>) => ReactNode;
-    tituloBorrar: string;
-    mensajeBorrar: (entidad: T) => string;
-    borrar: (id: string) => Promise<void>;
+    /** Sin `borrar`, no hay botón Borrar. */
+    tituloBorrar?: string;
+    mensajeBorrar?: (entidad: T) => string;
+    borrar?: (id: string) => Promise<void>;
 };
 
-/** Detalle de un maestro sencillo de producción: formulario con autoguardado y botón Borrar. */
+/** Detalle de un maestro sencillo de producción: formulario con autoguardado y botón Borrar (si hay `borrar`). */
 export const DetalleSimple = <T extends Entidad>({
     id,
     publicar = async () => {},
@@ -81,17 +84,19 @@ export const DetalleSimple = <T extends Entidad>({
             cerrarDetalle={() => emitir("entidad_deseleccionada", null, true)}
         >
             <div className={clase}>
-                <div className="maestro-botones">
-                    <QBoton onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
-                </div>
-                {campos({ modelo, entidad: ctx.entidad, recargar: () => emitir("entidad_guardada") })}
+                {borrar && (
+                    <div className="maestro-botones">
+                        <QBoton onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
+                    </div>
+                )}
+                {campos({ modelo, entidad: ctx.entidad, recargar: () => emitir("entidad_guardada"), publicar })}
             </div>
 
-            {ctx.estado === "BORRANDO" && (
+            {ctx.estado === "BORRANDO" && borrar && (
                 <BorrarSimple
                     publicar={emitir}
-                    titulo={tituloBorrar}
-                    mensaje={mensajeBorrar(ctx.entidad)}
+                    titulo={tituloBorrar ?? "Borrar"}
+                    mensaje={mensajeBorrar?.(ctx.entidad) ?? "¿Está seguro de que desea borrarlo?"}
                     borrar={() => borrar(ctx.entidad.id)}
                 />
             )}

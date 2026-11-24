@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     comoBooleano,
+    motivoNumeroNoValido,
     fechaDdMmAaaa,
     horaAApi,
     horaCorta,
@@ -53,6 +54,14 @@ describe("validaciones de texto", () => {
         expect(motivoTextoNoValido("", "La nota", 10, false)).toBeNull();
         expect(primerError(null, "uno", "dos")).toBe("uno");
         expect(primerError(null)).toBe(true);
+    });
+
+    it("números opcionales no negativos", () => {
+        expect(motivoNumeroNoValido(null, "El tiempo")).toBeNull();
+        expect(motivoNumeroNoValido("", "El tiempo")).toBeNull();
+        expect(motivoNumeroNoValido(3, "El tiempo")).toBeNull();
+        expect(motivoNumeroNoValido(-1, "El tiempo")).not.toBeNull();
+        expect(motivoNumeroNoValido("abc", "El tiempo")).not.toBeNull();
     });
 
     it("checkbox como booleano", () => {

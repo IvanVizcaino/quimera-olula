@@ -15,12 +15,13 @@ export type PropsMaestroSimple<T extends Entidad> = {
     /** Clase CSS del contenedor. */
     clase: string;
     titulo: string;
-    textoNuevo: string;
+    /** Sin `crear`, no hay botón de alta. */
+    textoNuevo?: string;
     metaTabla: MetaTabla<T>;
     consultas: ConsultasMaestro<T>;
     tarjeta: (entidad: T) => ReactNode;
-    /** Modal de alta; publica `entidad_creada` (id) o `alta_cancelada`. */
-    crear: (publicar: EmitirEvento) => ReactNode;
+    /** Modal de alta; publica `entidad_creada` (id) o `alta_cancelada`. Sin él, no se dan altas. */
+    crear?: (publicar: EmitirEvento) => ReactNode;
     /** Detalle de la entidad activa; publica `entidad_cambiada`, `entidad_borrada` y `entidad_deseleccionada`. */
     detalle: (id: string | undefined, publicar: EmitirEvento) => ReactNode;
     /** Por defecto, por código ascendente. */
@@ -77,7 +78,7 @@ export const MaestroSimple = <T extends Entidad>({
                             entidades={entidades.lista}
                             totalEntidades={entidades.total}
                             seleccionada={entidades.activo}
-                            renderAcciones={() => (
+                            renderAcciones={() => crear && (
                                 <div className="maestro-botones">
                                     <QBoton onClick={() => emitir("crear_solicitado")}>{textoNuevo}</QBoton>
                                 </div>
@@ -93,7 +94,7 @@ export const MaestroSimple = <T extends Entidad>({
                 modoDisposicion="maestro-50"
             />
 
-            {estado === "CREANDO" && crear(emitir)}
+            {estado === "CREANDO" && crear?.(emitir)}
         </div>
     );
 };
