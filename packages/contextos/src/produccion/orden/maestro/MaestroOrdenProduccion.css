@@ -49,3 +49,9 @@
         }
     }
 }
+
+.estado-orden {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-xs, 0.25rem);
+}

@@ -16,9 +16,12 @@ import {
     PatchLoteOrden,
     PatchOrden,
     PostLoteOrden,
+    PostLanzarOrden,
     PostOrden,
-    TareaOrden,
+    PostSacarProcesoOrden,
+    PostTerminarOrden,
 } from "./diseño.ts";
+import { TareaApi, tareaDesdeApi } from "../tarea/infraestructura.ts";
 import { AGREGADO_ORDEN, cantidadDesdeTexto } from "./dominio.ts";
 
 const baseUrl = `/produccion/orden`;
@@ -41,6 +44,7 @@ export interface OrdenApi {
     fecha: string | null;
     fecha_entrega: string | null;
     estado: string | null;
+    lanzada?: boolean | null;
     descripcion: string | null;
     observaciones?: string | null;
     pedido_id: string | null;
@@ -49,7 +53,7 @@ export interface OrdenApi {
     total_lotes: number | null;
     total_uds: number | null;
     lotes?: LoteOrdenApi[];
-    tareas?: Record<string, unknown>[];
+    tareas?: TareaApi[];
 }
 
 const fecha = (valor: string | null | undefined): string => (valor ? valor.slice(0, 10) : "");
@@ -68,19 +72,12 @@ export const loteOrdenDesdeApi = (api: LoteOrdenApi): LoteOrden => ({
     lineaPedidoId: api.linea_pedido_id === null || api.linea_pedido_id === undefined ? "" : String(api.linea_pedido_id),
 });
 
-/** Las tareas aún no tienen forma (F5): se guarda lo que venga con `id`, `descripcion` y `estado` en texto. */
-export const tareaOrdenDesdeApi = (api: Record<string, unknown>, indice: number): TareaOrden => ({
-    ...api,
-    id: String(api.id ?? indice),
-    descripcion: String(api.descripcion ?? ""),
-    estado: String(api.estado ?? ""),
-});
-
 export const ordenDesdeApi = (api: OrdenApi): OrdenProduccion => ({
     id: api.id,
     fecha: fecha(api.fecha),
     fechaEntrega: fecha(api.fecha_entrega),
     estado: (api.estado || "PTE") as EstadoOrden,
+    lanzada: !!api.lanzada,
     descripcion: api.descripcion ?? "",
     observaciones: api.observaciones ?? "",
     pedidoId: api.pedido_id ?? "",
@@ -89,7 +86,7 @@ export const ordenDesdeApi = (api: OrdenApi): OrdenProduccion => ({
     totalLotes: numero(api.total_lotes),
     totalUds: numero(api.total_uds),
     lotes: (api.lotes ?? []).map(loteOrdenDesdeApi),
-    tareas: (api.tareas ?? []).map(tareaOrdenDesdeApi),
+    tareas: (api.tareas ?? []).map(tareaDesdeApi),
 });
 
 type CambiosOrdenApi = {
@@ -169,4 +166,20 @@ export const patchLoteOrden: PatchLoteOrden = async (id, loteId, cambios) => {
 
 export const deleteLoteOrden: DeleteLoteOrden = async (id, loteId) => {
     await RestAPI.delete(urlLote(id, loteId), "Error al quitar el lote");
+};
+
+export const postLanzarOrden: PostLanzarOrden = async (id) => {
+    await RestAPI.post(`${url(id)}/lanzar`, {}, "Error al lanzar la orden de producción");
+};
+
+/** Cuerpo de «Terminar orden»: el trabajador solo si se indica. */
+export const terminarOrdenAApi = (trabajadorId?: string): { trabajador_id?: string } =>
+    trabajadorId && trabajadorId.trim() ? { trabajador_id: trabajadorId.trim() } : {};
+
+export const postTerminarOrden: PostTerminarOrden = async (id, trabajadorId) => {
+    await RestAPI.post(`${url(id)}/terminar`, terminarOrdenAApi(trabajadorId), "Error al terminar la orden de producción");
+};
+
+export const postSacarProcesoOrden: PostSacarProcesoOrden = async (id) => {
+    await RestAPI.post(`${url(id)}/sacar_proceso`, {}, "Error al sacar el proceso de la orden");
 };

@@ -1,19 +1,23 @@
 import { QTabla } from "@olula/componentes/atomos/qtabla.tsx";
-import { MetaTabla } from "@olula/componentes/index.js";
-import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
-import { TareaOrden } from "../diseño.ts";
-import { etiquetaEstadoOrden } from "../dominio.ts";
+import { useMemo } from "react";
+import { columnasTareas } from "../../tarea/ColumnasTarea.tsx";
+import { TareaProduccion } from "../../tarea/diseño.ts";
+import { OrdenProduccion } from "../diseño.ts";
 
-const metaTabla: MetaTabla<TareaOrden> = [
-    { id: "id", cabecera: "Tarea", estilo: "secundario", ancho: "20%" },
-    { id: "descripcion", cabecera: "Descripción", estilo: "destacado" },
-    { id: "estado", cabecera: "Estado", render: (t) => t.estado ? <EtiquetaEstado {...etiquetaEstadoOrden(t.estado)} /> : "" },
-];
-
-/** Tareas de la orden: las generará el motor de procesos al lanzarla (F5). */
-export const TareasOrden = ({ tareas }: { tareas: TareaOrden[] }) =>
-    tareas.length === 0 ? (
-        <p className="nota-orden">La orden aún no tiene tareas: se generan al lanzarla a producción.</p>
-    ) : (
-        <QTabla<TareaOrden> metaTabla={metaTabla} datos={tareas} cargando={false} orden={[]} />
+/** Tareas del proceso de la orden con sus acciones; tras cada una se recarga la orden. */
+export const TareasOrden = ({ orden, recargar }: { orden: OrdenProduccion; recargar: () => Promise<void> }) => {
+    const metaTabla = useMemo(() => columnasTareas({ trasAccion: recargar }), [recargar]);
+    if (orden.tareas.length === 0)
+        return (
+            <p className="nota-orden">
+                {orden.lanzada
+                    ? "La orden está lanzada, pero su proceso no tiene tareas activas."
+                    : "La orden aún no tiene tareas: se generan al lanzarla a producción."}
+            </p>
+        );
+    return (
+        <div className="TareasOrden">
+            <QTabla<TareaProduccion> metaTabla={metaTabla} datos={orden.tareas} cargando={false} orden={[]} />
+        </div>
     );
+};

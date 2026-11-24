@@ -49,7 +49,8 @@ export const LoteOrdenProduccion = ({
     const { intentar } = useContext(ContextoError);
     const [edicion, setEdicion] = useState<Edicion | null>(null);
     const [quitando, setQuitando] = useState<LoteOrden | null>(null);
-    const pendiente = orden.estado === "PTE";
+    // Los lotes solo se tocan con la orden pendiente y sin lanzar.
+    const pendiente = orden.estado === "PTE" && !orden.lanzada;
     const lote = loteUnico(orden);
 
     const guardar = async (form: FormLoteOrden) => {
@@ -118,7 +119,7 @@ export const LoteOrdenProduccion = ({
                     </div>
                     {!cabeAccion(acciones, COMANDO.cambiarLote, pendiente) && (
                         <p className="nota-orden">
-                            {motivoAccion(acciones, COMANDO.cambiarLote) ?? "El lote solo se cambia con la orden pendiente."}
+                            {motivoAccion(acciones, COMANDO.cambiarLote) ?? "El lote solo se cambia con la orden pendiente y sin lanzar."}
                         </p>
                     )}
                     <quimera-formulario>

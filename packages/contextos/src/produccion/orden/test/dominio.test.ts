@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { AccionesCicloVida } from "../../comun/ciclo_vida.ts";
 import { LoteOrden, OrdenProduccion } from "../diseño.ts";
 import {
+    accionesMotorOrden,
     campoOrdenEditable,
     cambiosLote,
     cambiosOrden,
@@ -9,6 +10,7 @@ import {
     cantidadParaEditar,
     formDesdeLote,
     etiquetaEstadoOrden,
+    etiquetaLanzada,
     fechaFabricacionPorDefecto,
     filtroPedidosCliente,
     formatearCantidad,
@@ -147,6 +149,7 @@ describe("orden de producción: ciclo de vida y un lote por orden", () => {
         expect(puedeAnadirLote(orden(), acciones({ "produccion.orden.anadir_lote": false }))).toBe(false);
         expect(puedeAnadirLote(orden(), acciones({ "produccion.orden.anadir_lote": true }, false))).toBe(false);
         expect(puedeAnadirLote(orden({ estado: "EN CURSO" }), null)).toBe(false);
+        expect(puedeAnadirLote(orden({ lanzada: true }), null)).toBe(false);
     });
 
     it("lote único solo con exactamente uno (las antiguas con varios se listan)", () => {
@@ -161,5 +164,28 @@ describe("selector de pedido", () => {
         expect(filtroPedidosCliente("2026")).toEqual([["codigo", "~", "2026"]]);
         expect(filtroPedidosCliente("2026", "000001")).toEqual([["codigo", "~", "2026"], ["cliente_id", "=", "000001"]]);
         expect(filtroPedidosCliente("", undefined, "20260A000001")).toEqual([["codigo", "=", "20260A000001"]]);
+    });
+});
+
+describe("orden de producción: motor (F5)", () => {
+    it("indicador «Lanzada» solo lanzada y sin empezar", () => {
+        expect(etiquetaLanzada(orden({ lanzada: true }))).toEqual({ texto: "Lanzada", tono: "parcial" });
+        expect(etiquetaLanzada(orden())).toBeNull();
+        expect(etiquetaLanzada(orden({ lanzada: true, estado: "EN CURSO" }))).toBeNull();
+    });
+
+    it("sin acciones leídas: lanzar sin lanzar, sacar lanzada sin empezar, terminar lanzada o en curso", () => {
+        expect(accionesMotorOrden(orden(), null)).toEqual({ lanzar: true, terminar: false, sacarProceso: false });
+        expect(accionesMotorOrden(orden({ lanzada: true }), null)).toEqual({ lanzar: false, terminar: true, sacarProceso: true });
+        expect(accionesMotorOrden(orden({ lanzada: true, estado: "EN CURSO" }), null))
+            .toEqual({ lanzar: false, terminar: true, sacarProceso: false });
+        expect(accionesMotorOrden(orden({ estado: "TERMINADA" }), null)).toEqual({ lanzar: false, terminar: false, sacarProceso: false });
+    });
+
+    it("con acciones, manda el ciclo de vida (y el permiso)", () => {
+        const ciclo = acciones({ "produccion.orden.lanzar": false, "produccion.orden.terminar": true, "produccion.orden.sacar_proceso": true });
+        expect(accionesMotorOrden(orden(), ciclo)).toEqual({ lanzar: false, terminar: true, sacarProceso: true });
+        const sinPermiso = acciones({ "produccion.orden.lanzar": true }, false);
+        expect(accionesMotorOrden(orden(), sinPermiso).lanzar).toBe(false);
     });
 });

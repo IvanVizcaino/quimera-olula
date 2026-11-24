@@ -5,6 +5,7 @@ import {
     loteAApi,
     nuevaOrdenAApi,
     ordenDesdeApi,
+    terminarOrdenAApi,
 } from "../infraestructura.ts";
 
 describe("orden de producción: conversores", () => {
@@ -36,13 +37,26 @@ describe("orden de producción: conversores", () => {
         expect(lista).toMatchObject({ estado: "EN CURSO", fechaEntrega: "2026-12-01", pedidoId: "20260A000001", cliente: "", totalLotes: 0, totalUds: 0, lotes: [] });
     });
 
-    it("tareas: lo que venga, con id, descripción y estado en texto", () => {
+    it("lanzada y sus tareas (con la forma de la consulta de tareas)", () => {
         const orden = ordenDesdeApi({
-            id: "OP1", fecha: "2026-11-24", fecha_entrega: null, estado: "PTE", descripcion: null, pedido_id: null,
-            cliente_id: null, total_lotes: 0, total_uds: 0, tareas: [{ id: 5, descripcion: "Cortar", estado: "PTE", extra: 1 }, {}],
+            id: "OP1", fecha: "2026-11-24", fecha_entrega: null, estado: "PTE", lanzada: true, descripcion: null, pedido_id: null,
+            cliente_id: null, total_lotes: 1, total_uds: 10, tareas: [{
+                id: "TA000001", proceso_id: 7, orden_id: "OP1", estado: "PTE", codigo: "CORTE", descripcion: "Cortar",
+                tarea_proceso_id: 31, tipo_tarea_id: "CORTAR", tipo_proceso_id: "CAMISAS", orden: 1, inicial: true, final: false,
+                termina_en_un_paso: false, centro_id: null, realizada_por: null, trabajador: null, dia_inicio: null,
+                tiempo_inicio: null, dia_fin: null, tiempo_fin: null, intervalo: null, tiempo_invertido: null,
+            }],
         });
-        expect(orden.tareas[0]).toMatchObject({ id: "5", descripcion: "Cortar", estado: "PTE", extra: 1 });
-        expect(orden.tareas[1]).toMatchObject({ id: "1", descripcion: "", estado: "" });
+        expect(orden.lanzada).toBe(true);
+        expect(orden.tareas[0]).toMatchObject({ id: "TA000001", procesoId: "7", tareaProcesoId: "31", inicial: true, realizadaPor: "" });
+        expect(ordenDesdeApi({ id: "OP2", fecha: null, fecha_entrega: null, estado: null, descripcion: null,
+            pedido_id: null, cliente_id: null, total_lotes: null, total_uds: null }).lanzada).toBe(false);
+    });
+
+    it("terminar orden: el trabajador solo si se indica", () => {
+        expect(terminarOrdenAApi()).toEqual({});
+        expect(terminarOrdenAApi("  ")).toEqual({});
+        expect(terminarOrdenAApi(" T01 ")).toEqual({ trabajador_id: "T01" });
     });
 
     it("cambios de cabecera: solo los presentes; vacío es null salvo la fecha", () => {

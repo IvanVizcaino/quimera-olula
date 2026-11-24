@@ -21,6 +21,9 @@ export const COMANDO = {
     anadirLote: "produccion.orden.anadir_lote",
     cambiarLote: "produccion.orden.cambiar_lote",
     quitarLote: "produccion.orden.quitar_lote",
+    lanzar: "produccion.orden.lanzar",
+    terminar: "produccion.orden.terminar",
+    sacarProceso: "produccion.orden.sacar_proceso",
 } as const;
 
 /** Campos de la cabecera que se cambian en cualquier estado (`salvo_si_solo_cambia`). */
@@ -41,6 +44,26 @@ const etiquetasEstado: Record<EstadoOrden, EstadoEtiqueta> = {
 /** Píldora del estado de la orden (o de un lote, que usa los mismos estados). */
 export const etiquetaEstadoOrden = (estado: string | null | undefined): EstadoEtiqueta =>
     etiquetasEstado[(estado ?? "") as EstadoOrden] ?? { texto: estado || "—", tono: "borrador" };
+
+/** Indicador «Lanzada»: la orden tiene proceso y aún no ha empezado (sigue PTE). */
+export const etiquetaLanzada = (orden: Pick<OrdenProduccion, "estado" | "lanzada">): EstadoEtiqueta | null =>
+    orden.lanzada && orden.estado === "PTE" ? { texto: "Lanzada", tono: "parcial" } : null;
+
+/**
+ * Qué acciones del motor caben en la orden: por el ciclo de vida o, sin él, por su estado
+ * (lanzar solo PTE sin lanzar; sacar el proceso solo lanzada sin empezar; terminar lanzada o EN CURSO).
+ */
+export const accionesMotorOrden = (
+    orden: Pick<OrdenProduccion, "estado" | "lanzada">,
+    acciones: AccionesCicloVida | null,
+): { lanzar: boolean; terminar: boolean; sacarProceso: boolean } => {
+    const lanzadaSinEmpezar = orden.lanzada && orden.estado === "PTE";
+    return {
+        lanzar: cabeAccion(acciones, COMANDO.lanzar, orden.estado === "PTE" && !orden.lanzada),
+        terminar: cabeAccion(acciones, COMANDO.terminar, lanzadaSinEmpezar || orden.estado === "EN CURSO"),
+        sacarProceso: cabeAccion(acciones, COMANDO.sacarProceso, lanzadaSinEmpezar),
+    };
+};
 
 /** Cantidad en formato español con hasta 3 decimales: 1234.5 → "1234,5", 12345.678 → "12.345,678". */
 export const formatearCantidad = (valor: number | string | null | undefined): string => {
@@ -107,7 +130,7 @@ export const nuevaOrdenVacia = (hoy: Date = new Date()): NuevaOrden => ({
 export const fechaFabricacionPorDefecto = (hoy: Date = new Date()): string => sumarDias(fechaApi(hoy), 20);
 
 export const ordenVacia = (): OrdenProduccion => ({
-    id: "", fecha: "", fechaEntrega: "", estado: "PTE", descripcion: "", observaciones: "", pedidoId: "",
+    id: "", fecha: "", fechaEntrega: "", estado: "PTE", lanzada: false, descripcion: "", observaciones: "", pedidoId: "",
     clienteId: "", cliente: "", totalLotes: 0, totalUds: 0, lotes: [], tareas: [],
 });
 
@@ -199,8 +222,11 @@ export const nuevoLoteVacio = (): FormLoteOrden => ({ articuloId: "", cantidad: 
  * Una orden, un lote: «Añadir lote» solo si la orden no tiene ninguno y cabe en su estado. Las
  * órdenes antiguas con varios lotes se muestran en una lista de solo lectura.
  */
-export const puedeAnadirLote = (orden: Pick<OrdenProduccion, "lotes" | "estado">, acciones: AccionesCicloVida | null): boolean =>
-    orden.lotes.length === 0 && cabeAccion(acciones, COMANDO.anadirLote, orden.estado === "PTE");
+export const puedeAnadirLote = (
+    orden: Pick<OrdenProduccion, "lotes" | "estado" | "lanzada">,
+    acciones: AccionesCicloVida | null,
+): boolean =>
+    orden.lotes.length === 0 && cabeAccion(acciones, COMANDO.anadirLote, orden.estado === "PTE" && !orden.lanzada);
 
 /** El lote de la orden si tiene exactamente uno (se muestra como bloque de datos editable). */
 export const loteUnico = (orden: Pick<OrdenProduccion, "lotes">): LoteOrden | null =>

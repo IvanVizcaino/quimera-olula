@@ -1,4 +1,5 @@
 import { Criteria, Entidad, Modelo, RespuestaLista } from "@olula/lib/diseño.ts";
+import { TareaProduccion } from "../tarea/diseño.ts";
 
 /** Estados de la orden (`pr_ordenesproduccion.estado`); los cambia el motor de procesos (F5). */
 export type EstadoOrden = "PTE" | "EN CURSO" | "TERMINADA";
@@ -18,14 +19,6 @@ export interface LoteOrden extends Entidad {
     lineaPedidoId: string;
 }
 
-/** Tarea de la orden: la llenará el motor de procesos (F5); por ahora se muestra lo que venga. */
-export interface TareaOrden extends Entidad {
-    id: string;
-    descripcion: string;
-    estado: string;
-    [campo: string]: unknown;
-}
-
 /**
  * Orden de producción (`pr_ordenesproduccion`). Las fechas van en "AAAA-MM-DD" y los campos
  * opcionales vacíos son "" (como los dejan los campos del formulario).
@@ -35,6 +28,11 @@ export interface OrdenProduccion extends Entidad {
     fecha: string;
     fechaEntrega: string;
     estado: EstadoOrden;
+    /**
+     * Tiene un proceso que no está OFF. Una orden lanzada sigue PTE hasta que empieza su
+     * proceso (la situación LANZADA es del ciclo de vida).
+     */
+    lanzada: boolean;
     descripcion: string;
     observaciones: string;
     /** Código del pedido de cliente (`pedidoscli.codigo`). */
@@ -46,7 +44,8 @@ export interface OrdenProduccion extends Entidad {
     totalUds: number;
     /** Solo en el detalle. */
     lotes: LoteOrden[];
-    tareas: TareaOrden[];
+    /** Las tareas de sus procesos que no están OFF (solo en el detalle). */
+    tareas: TareaProduccion[];
 }
 
 /** Lo que se cambia de la cabecera (solo los campos que cambian: el ciclo de vida mira cuáles van). */
@@ -81,3 +80,7 @@ export type DeleteOrden = (id: string) => Promise<void>;
 export type PostLoteOrden = (id: string, lote: FormLoteOrden) => Promise<void>;
 export type PatchLoteOrden = (id: string, loteId: string, cambios: CambiosLoteOrden) => Promise<void>;
 export type DeleteLoteOrden = (id: string, loteId: string) => Promise<void>;
+export type PostLanzarOrden = (id: string) => Promise<void>;
+/** Termina en bloque las tareas de la orden; el trabajador es opcional. */
+export type PostTerminarOrden = (id: string, trabajadorId?: string) => Promise<void>;
+export type PostSacarProcesoOrden = (id: string) => Promise<void>;

@@ -1,4 +1,3 @@
-import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
 import { filtroCliente, filtroFechaDocumento } from "#/ventas/comun/filtros.tsx";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { filtroFechas, MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
@@ -9,16 +8,18 @@ import { MaestroSimple } from "../../comun/maestro_simple/MaestroSimple.tsx";
 import { CrearOrden } from "../crear/CrearOrden.tsx";
 import { DetalleOrden } from "../detalle/DetalleOrden.tsx";
 import { OrdenProduccion } from "../diseño.ts";
-import { ESTADOS_ORDEN, etiquetaEstadoOrden, formatearCantidad } from "../dominio.ts";
+import { EstadoOrden } from "../EstadoOrden.tsx";
+import { ESTADOS_ORDEN, formatearCantidad } from "../dominio.ts";
 import { getOrden, getOrdenes } from "../infraestructura.ts";
 import "./MaestroOrdenProduccion.css";
+
 
 // Los id de columna son los campos de la API: con ellos se ordena.
 const metaTabla: MetaTabla<OrdenProduccion> = [
     { id: "id", cabecera: "Código", estilo: "secundario", prioridad: "alta" },
     { id: "fecha", cabecera: "Fecha", render: (o) => fechaDdMmAaaa(o.fecha), prioridad: "alta" },
     { id: "fecha_entrega", cabecera: "Entrega", render: (o) => fechaDdMmAaaa(o.fechaEntrega) },
-    { id: "estado", cabecera: "Estado", render: (o) => <EtiquetaEstado {...etiquetaEstadoOrden(o.estado)} />, prioridad: "alta" },
+    { id: "estado", cabecera: "Estado", render: (o) => <EstadoOrden orden={o} />, prioridad: "alta" },
     { id: "descripcion", cabecera: "Descripción", estilo: "destacado" },
     { id: "cliente", cabecera: "Cliente", render: (o) => o.cliente || o.clienteId },
     { id: "total_lotes", cabecera: "Lotes", render: (o) => formatearCantidad(o.totalLotes), prioridad: "baja" },
@@ -76,7 +77,7 @@ export const MaestroOrdenProduccion = () => (
         criteriaBase={criteriaBase}
         tarjeta={(o) => (
             <div key={o.id}>
-                <div>{o.id} · {o.descripcion} <EtiquetaEstado {...etiquetaEstadoOrden(o.estado)} /></div>
+                <div>{o.id} · {o.descripcion} <EstadoOrden orden={o} /></div>
                 <div>{fechaDdMmAaaa(o.fecha)}{o.cliente ? ` · ${o.cliente}` : ""} · {formatearCantidad(o.totalUds)} uds</div>
             </div>
         )}
