@@ -1,9 +1,9 @@
 export const menuVentas = {
-    "Catálogo": { icono: "fichero" },
+    "Catálogo": { icono: "tienda" },
     "Catálogo/Categorías": { url: "/admin/catalogo/categorias", icono: "lista" },
     "Catálogo/Catálogo": { url: "/catalogo", icono: "fichero" },
 
-    "Área de clientes": { icono: "fichero" },
+    "Área de clientes": { icono: "usuario_circle" },
     "Área de clientes/Pedidos": {
         url: "/areaclientes/pedidos",
         regla: "AreaClientes:visit",

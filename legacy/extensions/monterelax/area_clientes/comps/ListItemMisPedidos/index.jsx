@@ -1,6 +1,6 @@
 import { Box, QListItemModel } from "@quimera/comps";
 import { makeStyles } from "@quimera/styles";
-import { Avatar, ListItemAvatar, ListItemText, Typography } from "@quimera/thirdparty";
+import { Avatar, Chip, ListItemAvatar, ListItemText, Typography } from "@quimera/thirdparty";
 import { util } from "quimera";
 import React from "react";
 
@@ -25,7 +25,30 @@ const useStyles = makeStyles(theme => ({
   anulado: {
     backgroundColor: "#b0b0b0 !important",
   },
+  estadoPte: {
+    backgroundColor: theme.palette.error.main + " !important",
+    color: theme.palette.error.contrastText + " !important",
+  },
+  estadoTerminado: {
+    backgroundColor: theme.palette.success.main + " !important",
+    color: theme.palette.success.contrastText + " !important",
+  },
+  estadoCargado: {
+    backgroundColor: theme.palette.info.main + " !important",
+    color: theme.palette.info.contrastText + " !important",
+  },
+  estadoProduccion: {
+    backgroundColor: theme.palette.warning.main + " !important",
+    color: theme.palette.warning.contrastText + " !important",
+  },
 }));
+
+const claseEstado = (estado, classes) =>
+  ({
+    PTE: classes.estadoPte,
+    TERMINADO: classes.estadoTerminado,
+    CARGADO: classes.estadoCargado,
+  })[estado] ?? classes.estadoProduccion;
 
 function ListItemMisPedidos({ renderAvatar, model, selected = false, funSecondaryLeft, avatar = "P", ...props }) {
   const pedido = model;
@@ -80,9 +103,9 @@ function ListItemMisPedidos({ renderAvatar, model, selected = false, funSecondar
           <React.Fragment>
             <Box width={1} display="flex" justifyContent="space-between">
               <Box display="inline">
-                <Typography component="span" variant="body2" color="textPrimary">
-                  {estadoServido[model.servido].titulo}
-                </Typography>
+                {pedido.estado && (
+                  <Chip size="small" label={pedido.estado} className={claseEstado(pedido.estado, classes)} />
+                )}
               </Box>
               <Box display="inline" mr={1}>
                 {" "}

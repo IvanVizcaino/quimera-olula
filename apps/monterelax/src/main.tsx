@@ -2,6 +2,7 @@ import { authMiddleware } from "#/auth/middlewares.ts";
 import { Vista } from "@olula/componentes/index.ts";
 import { FactoryObj, FactoryProvider } from "@olula/lib/factory_ctx.tsx";
 import { crearMenu, MenuContextFactory } from "@olula/lib/menu.ts";
+import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouteObject, RouterProvider } from "react-router";
 
@@ -25,14 +26,16 @@ const rutas = createBrowserRouter([
 const App = () => {
   useTimerRefresco();
 
-  FactoryObj.setMenu(
-    crearMenu(
-      new FactoryLegacy() as unknown as Record<string, MenuContextFactory>
-    )
-  );
-  FactoryObj.setApp(
-    new FactoryLegacy() as unknown as Record<string, Record<string, unknown>>
-  );
+  useEffect(() => {
+    FactoryObj.setMenu(
+      crearMenu(
+        new FactoryLegacy() as unknown as Record<string, MenuContextFactory>
+      )
+    );
+    FactoryObj.setApp(
+      new FactoryLegacy() as unknown as Record<string, Record<string, unknown>>
+    );
+  }, []);
 
   return <RouterProvider router={rutas} />;
 };

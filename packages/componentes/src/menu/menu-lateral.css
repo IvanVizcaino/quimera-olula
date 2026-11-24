@@ -9,6 +9,10 @@
     --color-menu-favorito: light-dark(#c98a12, #e0a93b);
 }
 
+menu-lateral[data-modo="oculto"] {
+    display: none;
+}
+
 /* Solo el menú principal (data-modo): el calendario usa otro <menu-lateral>. */
 menu-lateral[data-modo] {
     position: sticky;

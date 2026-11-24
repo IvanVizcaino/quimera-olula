@@ -4,6 +4,7 @@ export const menuErp = {
     "Gerencia/Dashboard Gerencia": { url: "/dashboardGerencia/gerencia", regla: "accesoglobal.gerencia" },
     "Producción": { icono: "grafico_barras" },
     "Producción/Producción": { url: "/dashboardGerencia/produccion", regla: "accesoglobal.produccion" },
+    "Producción/Familias Lectra": { url: "/produccion/familia_lectra", regla: "mx_lectra" },
     "Representantes": { icono: "usuarios" },
     "Representantes/Ventas": { url: "/dashboardRepresentantes", regla: "accesoglobal.representantes" },
     "Representantes/Cobros": { url: "/dashboardCobros", regla: "accesoglobal.representantes" },

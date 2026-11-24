@@ -1,7 +1,8 @@
 import { disponibleEnSaas, ElementoMenu, ElementoMenuHijo, pluginsActivos } from "@olula/lib/menu.ts";
 import { puedeAlguna } from "@olula/lib/dominio.ts";
 import { usePreferencia } from "@olula/lib/usePreferencia.ts";
-import { useEffect, useRef, useState } from "react";
+import { FactoryCtx } from "@olula/lib/factory_ctx.tsx";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { QIcono } from "../atomos/qicono.tsx";
 import { QInput } from "../atomos/qinput.tsx";
@@ -52,7 +53,9 @@ export const MenuLateral = () => {
   );
   const refCarril = useRef<HTMLElement>(null);
 
+  const { app } = useContext(FactoryCtx);
   const expandido = esMovil || control.lateralExpandido;
+  const ocultoAlPlegar = app.Componentes?.menu_lateral_plegado === "oculto";
   const q = normalizar(filtro.trim());
 
   // El desplegable del carril se cierra al navegar, al pulsar fuera o con Esc.
@@ -346,6 +349,10 @@ export const MenuLateral = () => {
       )}
     </nav>
   );
+
+  if (!expandido && ocultoAlPlegar) {
+    return <menu-lateral data-modo="oculto" />;
+  }
 
   return (
     <menu-lateral

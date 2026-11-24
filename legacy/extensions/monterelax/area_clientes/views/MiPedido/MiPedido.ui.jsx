@@ -1,4 +1,4 @@
-import { Box, QBox, QListModel, QModelBox, QTitleBox, Typography } from "@quimera/comps";
+import { Box, Field, QBox, QListModel, QModelBox, QTitleBox, Typography } from "@quimera/comps";
 // import { Direccion, MiLineaPedido, Totales } from "../../comps";
 import { Direccion, MiLineaPedido, Totales } from "@quimera-extension/base-area_clientes";
 import { DocAgente } from "@quimera-extension/base-ventas";
@@ -81,6 +81,11 @@ function MiPedido({ callbackChanged, idPedido, initPedido, useStyles }) {
                 <QTitleBox titulo="Dirección">
                   <Direccion documento={pedido.buffer} inline />
                 </QTitleBox>
+
+                <Box display="flex" gap={2}>
+                  <Field.Schema id="pedido.buffer/servido" schema={schema} fullWidth disabled />
+                  <Field.Schema id="pedido.buffer/estado" schema={schema} fullWidth disabled />
+                </Box>
 
                 <Box display="flex" justifyContent="space-between">
                   <QTitleBox titulo="Fecha">
