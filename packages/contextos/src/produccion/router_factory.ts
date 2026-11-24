@@ -1,4 +1,5 @@
 import { MaestroCentroCoste } from "./centro_coste/maestro/MaestroCentroCoste.tsx";
+import { MaestroHorario } from "./horario/maestro/MaestroHorario.tsx";
 import { MaestroSeccion } from "./seccion/maestro/MaestroSeccion.tsx";
 import { MaestroTipoCentroCoste } from "./tipo_centro_coste/maestro/MaestroTipoCentroCoste.tsx";
 import { MaestroTrabajador } from "./trabajador/maestro/MaestroTrabajador.tsx";
@@ -9,5 +10,6 @@ export class RouterFactoryProduccionOlula {
         "produccion/trabajadores": MaestroTrabajador,
         "produccion/tipos_centro_coste": MaestroTipoCentroCoste,
         "produccion/centros_coste": MaestroCentroCoste,
+        "produccion/horarios": MaestroHorario,
     };
 }

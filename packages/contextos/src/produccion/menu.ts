@@ -23,4 +23,9 @@ export const menuProduccion = {
         regla: "produccion.centro_coste",
         plugin: "produccion",
     },
+    "Producción/Horarios": {
+        url: "/produccion/horarios",
+        regla: "produccion.horario",
+        plugin: "produccion",
+    },
 };
