@@ -9,6 +9,7 @@ import { FactoryEmpresaOlula } from '#/empresa/factory.ts';
 import { FactoryFiscalOlula } from '#/fiscal/factory.ts';
 import { SelectorEmpresaActual } from '#/empresa/empresa/componentes/SelectorEmpresaActual.tsx';
 import { FactoryPrediccionesOlula } from '#/predicciones/factory.ts';
+import { FactoryProduccionOlula } from '#/produccion/factory.ts';
 import { FactoryProyectosOlula } from '#/proyectos/factory.ts';
 import { FactoryRrhhOlula } from '#/rrhh/factory.ts';
 import { FactoryTesoreriaOlula } from '#/tesoreria/factory.ts';
@@ -29,6 +30,7 @@ export class FactoryOlula {
     Inicio = { menu: { "Inicio": { url: "/", icono: "inicio" } } };
     Componentes = FactoryComponentesOlulaConAsistente;
     Almacen = FactoryAlmacenOlula;
+    Produccion = FactoryProduccionOlula;
     Crm = FactoryCrmOlula;
     Empresa = FactoryEmpresaOlula;
     Ventas = FactoryVentasOlula;
