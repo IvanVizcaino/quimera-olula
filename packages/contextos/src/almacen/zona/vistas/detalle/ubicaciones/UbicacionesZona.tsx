@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { MetaTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
 import { Criteria, EmitirEvento } from "@olula/lib/diseño.ts";
@@ -8,12 +9,12 @@ import { getStocksUbicacion } from "#/almacen/ubicacion/infraestructura.ts";
 import { StocksUbicacion } from "#/almacen/ubicacion/vistas/detalle/stocks/StocksUbicacion.tsx";
 
 const metaTablaUbicaciones: MetaTabla<Ubicacion> = [
-    { id: "codigo", cabecera: "Código" },
+    { id: "codigo", cabecera: "Código", enlace: (u) => urlFicha.ubicacion(u.id) },
     { id: "pasillo", cabecera: "Pasillo" },
     { id: "modulo", cabecera: "Módulo" },
     { id: "nivel", cabecera: "Nivel" },
     { id: "hueco", cabecera: "Hueco" },
-    { id: "tipoUbicacion", cabecera: "Tipo" },
+    { id: "tipoUbicacion", cabecera: "Tipo", enlace: (u) => urlFicha.tipoUbicacion(u.tipoUbicacionId) },
     { id: "estado", cabecera: "Estado", render: (u) => descripcionEstadoUbicacion(u.estado) },
 ];
 

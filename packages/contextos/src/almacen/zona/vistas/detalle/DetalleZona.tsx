@@ -1,3 +1,4 @@
+import { urlListado, urlMapa } from "#/almacen/comun/fichas.ts";
 import { FuncionZona } from "#/almacen/comun/componentes/FuncionZona.tsx";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
@@ -61,6 +62,10 @@ export const DetalleZona = ({
             <div className="DetalleZona">
                 <div className="maestro-botones">
                     <QBoton onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
+                    <QBoton variante="borde" enlace={urlListado.ubicacionesDeZona(ctx.zona.id)}>Ver ubicaciones</QBoton>
+                    <QBoton variante="borde" enlace={urlMapa({ almacenId: ctx.zona.almacenId, zonaId: ctx.zona.id })}>
+                        Ver en el mapa
+                    </QBoton>
                 </div>
                 <Tabs
                     children={[

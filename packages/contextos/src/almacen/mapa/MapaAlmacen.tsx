@@ -1,3 +1,7 @@
+import { OrdenAbierta } from "#/almacen/comun/componentes/OrdenAbierta.tsx";
+import { urlFicha, urlListado } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
+import { useEffect } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { motivoRecorridoVacio, textoAccionParada } from "#/almacen/orden/dominio.ts";
 import { DIAS_POR_DEFECTO, enteroPositivo, origenesRotacion } from "#/almacen/slotting/dominio.ts";
@@ -13,7 +17,7 @@ import {
     avisosAccesibilidad, capasMapa, leyenda, paletaClases, paradasEnElementos, paradasSinPasillo,
     puntosRecorrido, resumenUbicacion, textoCalculo, tonoUbicacion, vinculadas,
 } from "./dominio.ts";
-import { contextoMapaInicial, desplazarEnBorrador, getMaquina } from "./maquina.ts";
+import { contextoMapaDeEntrada, desplazarEnBorrador, getMaquina } from "./maquina.ts";
 import { PlantaZona } from "./planta/PlantaZona.tsx";
 import { EditorPlanta } from "./planta_real/EditorPlanta.tsx";
 import { PlantaReal } from "./planta_real/PlantaReal.tsx";
@@ -21,7 +25,13 @@ import "#/comun/estilos/pagina_proceso.css";
 import "./MapaAlmacen.css";
 
 export const MapaAlmacen = () => {
-    const { ctx, emitir, setCtx } = useMaquina(getMaquina, contextoMapaInicial);
+    const { ctx, emitir, setCtx } = useMaquina(getMaquina, contextoMapaDeEntrada());
+
+    // Con almacén de trabajo o un enlace, carga directamente.
+    useEffect(() => {
+        emitir("entrada");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const { mapa, capa } = ctx;
     const paleta = mapa ? paletaClases(mapa) : new Map<string, number>();
     const zonas = mapa ? mapa.zonas.filter((z) => !ctx.zonaId || z.zonaId === ctx.zonaId) : [];
@@ -120,10 +130,13 @@ export const MapaAlmacen = () => {
             <div className="mapa-barra" hidden={editando}>
                 <div className="mapa-barra-campos">
                     <quimera-formulario>
-                        <QInput
-                            label="Recorrido de la orden" nombre="ordenId" valor={ctx.ordenId}
+                        <OrdenAbierta
+                            label="Recorrido de la orden"
+                            nombre="ordenId"
+                            almacenId={ctx.almacenId}
+                            valor={ctx.ordenId}
                             deshabilitado={!mapa}
-                            onChange={(v: string) => emitir("orden_cambiada", v)}
+                            onChange={(ordenId) => emitir("orden_cambiada", ordenId)}
                         />
                     </quimera-formulario>
                 </div>
@@ -156,7 +169,10 @@ export const MapaAlmacen = () => {
                         <>
                             <li>
                                 <span className="mapa-muestra mapa-muestra-recorrido" aria-hidden="true" />
-                                Recorrido {ctx.recorrido.ordenId}: {ctx.recorrido.paradas.length} paradas,{" "}
+                                Recorrido{" "}
+                                <ValorConEnlace href={urlFicha.orden(ctx.recorrido.ordenId)} etiqueta={`Abrir orden ${ctx.recorrido.ordenId}`}>
+                                    {ctx.recorrido.ordenId}
+                                </ValorConEnlace>: {ctx.recorrido.paradas.length} paradas,{" "}
                                 {ctx.recorrido.calculo === "DISTANCIA" && ctx.recorrido.metros != null
                                     ? `${Math.round(ctx.recorrido.metros).toLocaleString("es-ES")} m a pie, ordenado por la planta`
                                     : enPlanta && ctx.trazado?.metros != null
@@ -267,7 +283,11 @@ export const MapaAlmacen = () => {
                 {mapa && pasillo && !editando && (
                     <section className="mapa-panel mapa-panel-alzado">
                         <div className="mapa-panel-cabecera">
-                            <h3>Pasillo {pasillo.pasillo}</h3>
+                            <h3>
+                                <ValorConEnlace href={urlListado.ubicacionesDePasillo(pasillo.pasilloId)} etiqueta={`Ver las ubicaciones del pasillo ${pasillo.pasillo}`}>
+                                    Pasillo {pasillo.pasillo}
+                                </ValorConEnlace>
+                            </h3>
                             <QBoton variante="texto" onClick={() => emitir("pasillo_seleccionado", null)}>
                                 Cerrar
                             </QBoton>

@@ -1,3 +1,4 @@
+import { ConfiguracionAlmacen } from "./configuracion/ConfiguracionAlmacen.tsx"
 import { MaestroAlmacen } from "./almacen/vistas/maestro/MaestroAlmacen.tsx"
 import { MaestroConDetalleArticulo } from "./articulo/maestro/MaestroConDetalleArticulo.tsx"
 import { MaestroConDetalleCaja } from "./caja/maestro/MaestroConDetalleCaja.tsx"
@@ -39,5 +40,6 @@ export class RouterFactoryAlmacenOlula {
                 "almacen/reposicion": ReposicionPicking,
                 "almacen/slotting": Slotting,
                 "almacen/mapa": MapaAlmacen,
+                "almacen/configuracion": ConfiguracionAlmacen,
         }
 }

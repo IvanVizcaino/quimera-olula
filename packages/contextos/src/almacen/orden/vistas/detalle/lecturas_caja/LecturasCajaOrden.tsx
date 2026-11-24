@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
@@ -46,9 +47,9 @@ const ExpansionLecturas = ({ entidad, orden }: { entidad: LecturaCajaOrden; orde
 
 const metaTablaLecturasCaja: MetaTabla<LecturaCajaOrden> = {
     cols: [
-        { id: "lpn", cabecera: "LPN" },
-        { id: "ubicacionDestino", cabecera: "Ubi.Destino" },
-        { id: "cajaDestino", cabecera: "Caja destino" },
+        { id: "lpn", cabecera: "LPN", enlace: (l) => urlFicha.caja(l.idCaja) },
+        { id: "ubicacionDestino", cabecera: "Ubi.Destino", enlace: (l) => urlFicha.ubicacion(l.idUbicacionDestino) },
+        { id: "cajaDestino", cabecera: "Caja destino", enlace: (l) => urlFicha.caja(l.idCajaDestino) },
         { id: "cajaCompleta", cabecera: "Caja completa" },
         {
             id: "fechaHora",

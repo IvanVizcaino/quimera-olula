@@ -1,3 +1,4 @@
+import { PLANTILLA_FICHA } from "#/almacen/comun/fichas.ts";
 import { QSelect } from "@olula/componentes/index.js";
 import { QAutocompletarProps } from "@olula/componentes/moleculas/qautocompletar.tsx";
 import { Filtro, Orden } from "@olula/lib/diseño.ts";
@@ -12,6 +13,7 @@ type OpcionAlmacen = {
 };
 
 export const Almacen = ({
+  enlace = PLANTILLA_FICHA.almacen,
   valor,
   nombre = "codalmacen",
   label = "Almacén",
@@ -31,6 +33,7 @@ export const Almacen = ({
     <QSelect
       label={label}
       nombre={nombre}
+      enlace={enlace}
       valor={valor}
       onChange={onChange}
       opciones={opciones}

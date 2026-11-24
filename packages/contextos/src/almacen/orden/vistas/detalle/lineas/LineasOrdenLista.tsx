@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
@@ -93,7 +94,7 @@ const PedidoLinea = ({ linea }: { linea: LineaOrdenAlmacen }) => {
     if (!linea.pedidoVentaId) return null;
     return (
         <Link
-            to={`/ventas/pedido?id=${linea.pedidoVentaId}`}
+            to={urlFicha.pedidoVenta(linea.pedidoVentaId) ?? ""}
             onClick={(e) => e.stopPropagation()}
             title={linea.cliente ?? undefined}
         >
@@ -239,7 +240,7 @@ const metaTablaLineasOrden = (orden: OrdenAlmacen, publicar: EmitirEvento): Meta
     const sgaActivo = plugin("sga") === "activo";
     return {
         cols: [
-            { id: "sku", cabecera: "SKU" },
+            { id: "sku", cabecera: "SKU", enlace: (l: LineaOrdenAlmacen) => urlFicha.articulo(l.sku) },
             { id: "articulo", cabecera: "Descripción", tipo: "texto" },
             { id: "loteId", cabecera: "Lote" },
             ...(conColumnaPedido(orden)
@@ -262,10 +263,22 @@ const metaTablaLineasOrden = (orden: OrdenAlmacen, publicar: EmitirEvento): Meta
                 tipo: 'numero' as const,
                 render: (linea: LineaOrdenAlmacen) => <CantidadLinea orden={orden} linea={linea} />,
             },
-            ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{ id: "ubicacionOrigen" as const, cabecera: "Ubi.Origen" }] : []),
-            ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{ id: "cajaOrigen" as const, cabecera: "LPN Origen" }] : []),
-            ...(sgaActivo && orden.tipo !== "SALIDA" ? [{ id: "ubicacionDestino" as const, cabecera: "Ubi.Destino" }] : []),
-            ...(sgaActivo && orden.tipo !== "SALIDA" ? [{ id: "cajaDestino" as const, cabecera: "LPN Destino" }] : []),
+            ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{
+                id: "ubicacionOrigen" as const, cabecera: "Ubi.Origen",
+                enlace: (l: LineaOrdenAlmacen) => urlFicha.ubicacion(l.idUbicacionOrigen),
+            }] : []),
+            ...(sgaActivo && orden.tipo !== "ENTRADA" ? [{
+                id: "cajaOrigen" as const, cabecera: "LPN Origen",
+                enlace: (l: LineaOrdenAlmacen) => urlFicha.caja(l.idCajaOrigen),
+            }] : []),
+            ...(sgaActivo && orden.tipo !== "SALIDA" ? [{
+                id: "ubicacionDestino" as const, cabecera: "Ubi.Destino",
+                enlace: (l: LineaOrdenAlmacen) => urlFicha.ubicacion(l.idUbicacionDestino),
+            }] : []),
+            ...(sgaActivo && orden.tipo !== "SALIDA" ? [{
+                id: "cajaDestino" as const, cabecera: "LPN Destino",
+                enlace: (l: LineaOrdenAlmacen) => urlFicha.caja(l.idCajaDestino),
+            }] : []),
             {
                 id: "acciones_sobrante",
                 cabecera: "",

@@ -1,3 +1,4 @@
+import { urlMapa } from "#/almacen/comun/fichas.ts";
 import { PasilloZona } from "#/almacen/comun/componentes/PasilloZona.tsx";
 import { TipoUbicacion } from "#/almacen/comun/componentes/TipoUbicacion.tsx";
 import { Zona } from "#/almacen/comun/componentes/Zona.tsx";
@@ -67,6 +68,7 @@ export const DetalleUbicacion = ({
             <div className="DetalleUbicacion">
                 <div className="maestro-botones">
                     <QBoton onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
+                    <QBoton variante="borde" enlace={urlMapa({ ubicacionId: ctx.ubicacion.id })}>Ver en el mapa</QBoton>
                 </div>
                     <quimera-formulario>
                         <QInput label="Código" {...modelo.uiProps("codigo")} />

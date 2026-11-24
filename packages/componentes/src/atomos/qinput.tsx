@@ -7,10 +7,14 @@ import {
   useEditando,
 } from "./_forminput.tsx";
 import { formatearMoneda, formatearNumero } from "@olula/lib/dominio.ts";
+import { EnlaceFicha } from "./qenlace_ficha.tsx";
+import { urlEnlace } from "./url_enlace.ts";
 
 export type QInputProps = FormInputProps & {
   modificado?: boolean;
   soloLectura?: boolean;
+  /** En solo lectura: plantilla de la URL de la ficha del valor (`{id}` = el valor). */
+  enlace?: string;
 };
 
 const formatearValorNumerico = (
@@ -39,6 +43,7 @@ export const QInput = ({
   tipo,
   modificado,
   soloLectura,
+  enlace,
   valor,
   divisa,
   decimales,
@@ -67,7 +72,16 @@ export const QInput = ({
           {tipo === "checkbox" ? (
             <input type="checkbox" checked={valor === "true"} disabled readOnly />
           ) : (
-            <span className="valor-solo-lectura">{valorMostrado}</span>
+            <span className="valor-solo-lectura">
+              {valorMostrado}
+              {urlEnlace(enlace, valor) && (
+                <EnlaceFicha
+                  href={urlEnlace(enlace, valor)!}
+                  className="enlace-solo-lectura"
+                  etiqueta={`Abrir ${label ?? "ficha"} ${valor}`}
+                />
+              )}
+            </span>
           )}
         </label>
       </quimera-input>

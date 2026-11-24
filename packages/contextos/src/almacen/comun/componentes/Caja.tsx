@@ -1,3 +1,4 @@
+import { PLANTILLA_FICHA } from "#/almacen/comun/fichas.ts";
 import { QAutocompletar } from "@olula/componentes/moleculas/qautocompletar.tsx";
 import { RestAPI } from "@olula/lib/api/rest_api.js";
 import { Criteria } from "@olula/lib/diseño.ts";
@@ -7,6 +8,8 @@ import { criteriaDefecto } from "@olula/lib/dominio.js";
 type TagCajaOpcion = { valor: string; descripcion: string } & TagCaja;
 
 interface CajaProps {
+  /** Plantilla de la URL de su ficha (↗); "" para no enlazar. */
+  enlace?: string;
   descripcion?: string;
   valor: string;
   nombre?: string;
@@ -17,6 +20,7 @@ interface CajaProps {
 }
 
 export const Caja = ({
+  enlace = PLANTILLA_FICHA.caja,
   descripcion = "",
   valor,
   nombre = "cajaId",
@@ -46,6 +50,7 @@ export const Caja = ({
         <QAutocompletar
             label={`${label} ${valor}`}
             nombre={nombre}
+      enlace={enlace}
             onChange={onChange}
             valor={valor}
             obtenerOpciones={obtenerOpciones}

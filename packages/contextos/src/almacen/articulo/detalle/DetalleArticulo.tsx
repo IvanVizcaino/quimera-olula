@@ -8,7 +8,8 @@ import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { plugin, puede } from "@olula/lib/dominio.ts";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useEffect } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import { urlListado } from "#/almacen/comun/fichas.ts";
 import { BorrarArticulo } from "../borrar/BorrarArticulo.tsx";
 import { BorrarCajaProveedor } from "../borrar_caja_proveedor/BorrarCajaProveedor.tsx";
 import { CambiarCajaProveedor } from "../cambiar_caja_proveedor/CambiarCajaProveedor.tsx";
@@ -57,11 +58,16 @@ export const DetalleArticulo = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [articuloId]);
 
+  const navigate = useNavigate();
   const { estado, articulo, cajaProveedorActiva } = ctx;
 
   if (!articulo.id) return null;
 
   const acciones = [
+    {
+      texto: "Ver stock",
+      onClick: () => navigate(urlListado.stockDeArticulo(articulo.id)),
+    },
     {
       texto: articulo.seVende ? "Quitar de venta" : "Habilitar para venta",
       onClick: () => emitir("venta_alternada_solicitada"),

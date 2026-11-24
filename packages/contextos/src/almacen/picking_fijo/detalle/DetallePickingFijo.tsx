@@ -1,3 +1,5 @@
+import { urlFicha, urlListado } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
@@ -66,11 +68,23 @@ export const DetallePickingFijo = ({
                 </div>
                 <dl>
                     <dt>Artículo</dt>
-                    <dd>{pickingFijo.articuloId} - {pickingFijo.articulo}</dd>
+                    <dd>
+                        <ValorConEnlace href={urlFicha.articulo(pickingFijo.articuloId)} etiqueta={`Abrir artículo ${pickingFijo.articuloId}`}>
+                            {pickingFijo.articuloId} - {pickingFijo.articulo}
+                        </ValorConEnlace>
+                    </dd>
                     <dt>Ubicación</dt>
-                    <dd>{pickingFijo.ubicacion}</dd>
+                    <dd>
+                        <ValorConEnlace href={urlFicha.ubicacion(pickingFijo.ubicacionId)} etiqueta={`Abrir ubicación ${pickingFijo.ubicacion}`}>
+                            {pickingFijo.ubicacion}
+                        </ValorConEnlace>
+                    </dd>
                     <dt>Stock</dt>
-                    <dd>{pickingFijo.stock}</dd>
+                    <dd>
+                        <ValorConEnlace href={urlListado.stockDeArticulo(pickingFijo.articuloId)} etiqueta={`Ver el stock de ${pickingFijo.articuloId}`}>
+                            {pickingFijo.stock}
+                        </ValorConEnlace>
+                    </dd>
                 </dl>
                 <quimera-formulario>
                     <QInput label="Mínimo" {...modelo.uiProps("minimo")} />

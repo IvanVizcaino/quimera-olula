@@ -1,3 +1,4 @@
+import { PLANTILLA_FICHA } from "#/almacen/comun/fichas.ts";
 import { QSelect, QSelectProps } from "@olula/componentes/atomos/qselect.tsx";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ type OpcionClase = { valor: string; descripcion: string };
 const SIN_CLASE: OpcionClase = { valor: "", descripcion: "(sin clase)" };
 
 export const ClaseAlmacenamiento = ({
+    enlace = PLANTILLA_FICHA.claseAlmacenamiento,
     valor,
     nombre = "clase_almacenamiento_id",
     label = "Clase de almacenamiento",
@@ -34,6 +36,7 @@ export const ClaseAlmacenamiento = ({
         <QSelect
             label={label}
             nombre={nombre}
+            enlace={enlace}
             valor={valor}
             onChange={onChange}
             opciones={opciones}

@@ -1,3 +1,5 @@
+import { filtroAlmacen } from "#/almacen/comun/componentes/FiltroAlmacen.tsx";
+import { criteriaInicialSga } from "#/almacen/comun/preferencias.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
@@ -36,6 +38,7 @@ const OPCIONES_TIPO = [
 ];
 
 const metaFiltroOrden: MetaFiltro = {
+    almacen: filtroAlmacen(),
     estado: {
         id: "estado",
         label: "Estado",
@@ -126,7 +129,7 @@ const criteriaOrdenesAbiertas = (): Criteria => ({
 export const MaestroOrden = () => {
     const criteriaBase = useMemo(criteriaOrdenesAbiertas, []);
     const { id, criteria } = getUrlParams();
-    const criteriaInicial = criteria.filtro.length > 0 ? criteria : criteriaBase;
+    const criteriaInicial = criteriaInicialSga(criteria, criteriaBase);
 
     const { ctx, emitir } = useMaquina(getMaquina, {
         estado: "INICIAL",

@@ -1,3 +1,5 @@
+import { urlFicha, urlListado } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { InsigniaClase } from "#/almacen/slotting/Slotting.tsx";
 import { StockUbicacionItem } from "#/almacen/ubicacion/diseño.ts";
 import { getStocksUbicacion } from "#/almacen/ubicacion/infraestructura.ts";
@@ -27,7 +29,9 @@ export const DetalleUbicacionMapa = ({ ubicacion, onCerrar }: { ubicacion: Ubica
         <section className="mapa-panel mapa-detalle-ubicacion">
             <div className="mapa-panel-cabecera">
                 <h3>
-                    Ubicación {ubicacion.ubicacion}
+                    <ValorConEnlace href={urlFicha.ubicacion(ubicacion.ubicacionId)} etiqueta={`Abrir ubicación ${ubicacion.ubicacion}`}>
+                        Ubicación {ubicacion.ubicacion}
+                    </ValorConEnlace>
                     {ubicacion.bloqueada && <> <QEtiqueta variante="error">Bloqueada</QEtiqueta></>}
                 </h3>
                 <QBoton variante="texto" onClick={onCerrar}>Cerrar</QBoton>
@@ -38,13 +42,19 @@ export const DetalleUbicacionMapa = ({ ubicacion, onCerrar }: { ubicacion: Ubica
                     : conStock.length === 0 ? <li>Vacía</li>
                         : conStock.map((s) => (
                             <li key={s.id}>
-                                <strong>{s.articuloId}</strong> {s.articulo}
+                                <ValorConEnlace href={urlFicha.articulo(s.articuloId)} etiqueta={`Abrir artículo ${s.articuloId}`}>
+                                    <strong>{s.articuloId}</strong>
+                                </ValorConEnlace>{" "}
+                                {s.articulo}
                                 <span className="mapa-detalle-stock">Stock: <strong>{fmt(s.cantidadFisica)}</strong></span>
                             </li>
                         ))}
                 {pf && (
                     <li>
-                        Picking fijo de <strong>{pf.articuloId}</strong> {descripcion(pf.articuloId) ?? ""}
+                        <ValorConEnlace href={urlListado.pickingFijoDeArticulo(pf.articuloId)} etiqueta={`Abrir el picking fijo de ${pf.articuloId}`}>
+                            Picking fijo de <strong>{pf.articuloId}</strong>
+                        </ValorConEnlace>{" "}
+                        {descripcion(pf.articuloId) ?? ""}
                         <span className="mapa-detalle-stock">
                             mín. {fmt(pf.minimo)} · máx. {fmt(pf.maximo)}
                         </span>

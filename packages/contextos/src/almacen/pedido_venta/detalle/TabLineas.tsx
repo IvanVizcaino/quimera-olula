@@ -1,3 +1,4 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
 import { QIcono } from "@olula/componentes/atomos/qicono.tsx";
 import { MetaTabla } from "@olula/componentes/atomos/qtablacontrolada.tsx";
 import { ListadoSemiControlado } from "@olula/componentes/maestro/ListadoSemiControlado.tsx";
@@ -47,7 +48,7 @@ const metaTablaLineas = (
                 render: (l: LineaPedidoVenta) => <BotonPrioridad linea={l} onCambiar={onCambiarPrioridad} />,
             }]
             : []),
-        { id: "referencia", cabecera: "Ref." },
+        { id: "referencia", cabecera: "Ref.", enlace: (l) => urlFicha.articulo(l.referencia) },
         { id: "descripcion", cabecera: "Descripción", tipo: "texto" },
         { id: "cantidad", cabecera: "Cantidad", tipo: "numero" },
         { id: "servida", cabecera: "Servida", tipo: "numero" },
