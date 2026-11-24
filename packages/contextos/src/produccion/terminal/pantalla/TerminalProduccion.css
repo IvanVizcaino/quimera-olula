@@ -1,0 +1,496 @@
+/* Terminal de planta: ocupa toda la ventana por encima de la plantilla (sin menú lateral). */
+.TerminalProduccion {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s, 0.5rem);
+    padding: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+    overflow: auto;
+    background: var(--color-fondo, #fff);
+    color: var(--color-texto-primario, #111);
+    font-size: 1.15rem;
+
+    h1, h2, h3 {
+        margin: 0;
+    }
+
+    .barra-terminal {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+        padding-bottom: var(--espaciado-xs, 0.25rem);
+        border-bottom: 1px solid var(--color-borde, #ccc);
+
+        h1 {
+            font-size: 1.4rem;
+        }
+
+        .puesto, .modo {
+            color: var(--color-texto-secundario, #555);
+        }
+
+        .botones-barra {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--espaciado-xs, 0.25rem);
+            margin-left: auto;
+        }
+    }
+
+    .puesto-terminal {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: var(--espaciado-s, 0.5rem);
+        max-width: 40rem;
+
+        quimera-select {
+            flex: 1 1 18rem;
+        }
+    }
+
+    .boton-terminal {
+        min-height: 3.25rem;
+        padding: 0 1.25rem;
+        border: 2px solid var(--color-borde-fuerte, #888);
+        border-radius: var(--redondeo-borde-m, 8px);
+        background: var(--color-superficie, #f6f6f6);
+        color: var(--color-texto-primario, #111);
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        &:focus-visible {
+            outline: 3px solid var(--color-primario, #2563eb);
+            outline-offset: 2px;
+        }
+
+        &.principal {
+            border-color: var(--color-primario, #2563eb);
+            background: var(--color-primario, #2563eb);
+            color: var(--color-primario-texto, #fff);
+        }
+
+        &.aviso {
+            border-color: var(--color-advertencia, #d97706);
+            background: var(--color-advertencia-claro, #fef3c7);
+            color: var(--color-advertencia-oscuro, #92400e);
+        }
+
+        &.peligro {
+            border-color: var(--color-error, #dc2626);
+            color: var(--color-error-oscuro, #991b1b);
+        }
+
+        &[aria-pressed="true"] {
+            border-color: var(--color-primario, #2563eb);
+        }
+
+        &.pequeno {
+            min-height: 2.5rem;
+            padding: 0 0.75rem;
+            font-size: 1rem;
+        }
+
+        &.enorme {
+            min-height: 5rem;
+            width: 100%;
+            font-size: 1.6rem;
+        }
+    }
+
+    .mensaje-terminal {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--espaciado-s, 0.5rem);
+        padding: 1rem 1.25rem;
+        border-radius: var(--redondeo-borde-m, 8px);
+        border: 2px solid;
+        font-size: 1.5rem;
+        font-weight: 600;
+        white-space: pre-line;
+
+        span {
+            flex: 1;
+        }
+
+        &.exito {
+            border-color: var(--color-exito, #16a34a);
+            background: var(--color-exito-claro, #dcfce7);
+            color: var(--color-exito-oscuro, #14532d);
+        }
+
+        &.error {
+            border-color: var(--color-error, #dc2626);
+            background: var(--color-error-claro, #fee2e2);
+            color: var(--color-error-oscuro, #7f1d1d);
+        }
+
+        &.aviso {
+            border-color: var(--color-advertencia, #d97706);
+            background: var(--color-advertencia-claro, #fef3c7);
+            color: var(--color-advertencia-oscuro, #78350f);
+        }
+
+        .cerrar-mensaje {
+            border: none;
+            background: none;
+            color: inherit;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+    }
+
+    .cuerpo-terminal {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--espaciado-m, 1rem);
+        align-items: start;
+
+        &.con-lista {
+            grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
+        }
+    }
+
+    .principal-terminal {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-m, 1rem);
+        min-width: 0;
+    }
+
+    .lectores {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s, 0.5rem);
+    }
+
+    .paso-operario {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+
+        .LectorCodigo {
+            flex: 1 1 24rem;
+        }
+    }
+
+    .operario-leido {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--espaciado-s, 0.5rem);
+        font-size: 1.5rem;
+
+        .etiqueta-paso {
+            color: var(--color-texto-secundario, #555);
+            font-size: 1rem;
+        }
+    }
+
+    .mantener, .LectorCodigo label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+    }
+
+    .casilla-terminal {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
+    .LectorCodigo {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .fila-lector {
+            display: flex;
+            gap: var(--espaciado-xs, 0.25rem);
+        }
+
+        .QEscanerCodigoBarras {
+            max-width: 28rem;
+        }
+    }
+
+    .campo-lector {
+        flex: 1;
+        min-width: 0;
+        min-height: 3.5rem;
+        padding: 0 1rem;
+        border: 2px solid var(--color-borde-fuerte, #888);
+        border-radius: var(--redondeo-borde-m, 8px);
+        background: var(--color-superficie-elevada, #fff);
+        color: inherit;
+        font-size: 1.75rem;
+        font-family: ui-monospace, monospace;
+        letter-spacing: 0.05em;
+
+        &:focus {
+            outline: 3px solid var(--color-primario, #2563eb);
+            border-color: var(--color-primario, #2563eb);
+        }
+
+        &[aria-invalid="true"] {
+            border-color: var(--color-error, #dc2626);
+        }
+    }
+
+    kbd {
+        padding: 0 0.3rem;
+        border: 1px solid var(--color-borde, #ccc);
+        border-radius: 4px;
+        font-family: ui-monospace, monospace;
+    }
+
+    .nota-consumos {
+        color: var(--color-texto-secundario, #555);
+        font-size: 0.95rem;
+    }
+
+    .error-campo {
+        color: var(--color-error-oscuro, #991b1b);
+        font-weight: 600;
+    }
+
+    .tarjeta-tarea {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s, 0.5rem);
+        padding: 1rem 1.25rem;
+        border: 2px solid var(--color-borde, #ccc);
+        border-radius: var(--redondeo-borde-m, 8px);
+        background: var(--color-superficie, #f6f6f6);
+
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--espaciado-s, 0.5rem);
+        }
+
+        .codigo-tarea {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: ui-monospace, monospace;
+        }
+
+        .descripcion-tarea {
+            font-size: 1.3rem;
+        }
+
+        dl {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+            gap: var(--espaciado-s, 0.5rem) var(--espaciado-m, 1rem);
+            margin: 0;
+
+            .ancho {
+                grid-column: span 2;
+            }
+        }
+
+        dt {
+            color: var(--color-texto-secundario, #555);
+            font-size: 0.95rem;
+        }
+
+        dd {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 600;
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th, td {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--color-borde-tabla, #ddd);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--color-texto-secundario, #555);
+            font-size: 0.95rem;
+        }
+
+        .numero {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    .TramosTarea {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs, 0.25rem);
+
+        .acciones-tramo {
+            display: flex;
+            gap: var(--espaciado-xs, 0.25rem);
+            justify-content: flex-end;
+        }
+    }
+
+    .ConsumosTramo {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-m, 1rem);
+
+        .datos-consumos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--espaciado-xs, 0.25rem) var(--espaciado-l, 1.5rem);
+            margin-top: 0.25rem;
+        }
+
+        .fila-cantidad {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--espaciado-s, 0.5rem);
+
+            label {
+                font-weight: 600;
+            }
+
+            .cantidad {
+                flex: 0 1 12rem;
+            }
+        }
+
+        .cantidad-linea {
+            width: 8rem;
+            min-height: 2.75rem;
+            padding: 0 0.5rem;
+            border: 2px solid var(--color-borde-fuerte, #888);
+            border-radius: var(--redondeo-borde-s, 6px);
+            background: var(--color-superficie-elevada, #fff);
+            color: inherit;
+            font-size: 1.2rem;
+            text-align: right;
+        }
+
+        .lotes-linea {
+            display: flex;
+            flex-direction: column;
+            gap: var(--espaciado-xs, 0.25rem);
+        }
+
+        .lote-leido {
+            display: flex;
+            align-items: center;
+            gap: var(--espaciado-xs, 0.25rem);
+
+            span {
+                min-width: 8rem;
+                font-family: ui-monospace, monospace;
+            }
+        }
+
+        .marca-lotes {
+            margin-left: 0.5rem;
+            padding: 0 0.4rem;
+            border-radius: 4px;
+            background: var(--color-primario-claro, #dbeafe);
+            font-size: 0.85rem;
+        }
+
+        tr.bajo-minimo td {
+            background: var(--color-advertencia-claro, #fef3c7);
+        }
+
+        .aviso-minimo {
+            color: var(--color-advertencia-oscuro, #92400e);
+            font-weight: 600;
+            white-space: pre-line;
+
+            &.bloque {
+                padding: 0.75rem 1rem;
+                border: 2px solid var(--color-advertencia, #d97706);
+                border-radius: var(--redondeo-borde-m, 8px);
+                background: var(--color-advertencia-claro, #fef3c7);
+            }
+        }
+
+        .botones-consumos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: var(--espaciado-s, 0.5rem);
+
+            .boton-terminal {
+                min-width: 10rem;
+                min-height: 4rem;
+                font-size: 1.35rem;
+            }
+        }
+    }
+
+    .ListaTareasTerminal {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs, 0.25rem);
+        max-height: calc(100vh - 8rem);
+        overflow: auto;
+
+        ul {
+            display: flex;
+            flex-direction: column;
+            gap: var(--espaciado-xs, 0.25rem);
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .tarea-lista {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.25rem 0.5rem;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-borde, #ccc);
+            border-radius: var(--redondeo-borde-s, 6px);
+            background: var(--color-superficie, #f6f6f6);
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+
+            &.actual {
+                border: 2px solid var(--color-primario, #2563eb);
+            }
+
+            .codigo-tarea {
+                font-weight: 700;
+                font-family: ui-monospace, monospace;
+            }
+
+            .descripcion-tarea {
+                flex-basis: 100%;
+            }
+        }
+    }
+
+    @media (max-width: 900px) {
+        .cuerpo-terminal.con-lista {
+            grid-template-columns: 1fr;
+        }
+    }
+}

@@ -7,6 +7,7 @@ import { MaestroOrdenProduccion } from "./orden/maestro/MaestroOrdenProduccion.t
 import { MaestroHorario } from "./horario/maestro/MaestroHorario.tsx";
 import { MaestroSeccion } from "./seccion/maestro/MaestroSeccion.tsx";
 import { MaestroTiempoTarea } from "./tiempo_tarea/maestro/MaestroTiempoTarea.tsx";
+import { TerminalProduccion } from "./terminal/pantalla/TerminalProduccion.tsx";
 import { MaestroTareaProduccion } from "./tarea/maestro/MaestroTareaProduccion.tsx";
 import { MaestroTipoProceso } from "./tipo_proceso/maestro/MaestroTipoProceso.tsx";
 import { MaestroTipoTarea } from "./tipo_tarea/maestro/MaestroTipoTarea.tsx";
@@ -18,6 +19,7 @@ export class RouterFactoryProduccionOlula {
         "produccion/ordenes": MaestroOrdenProduccion,
         "produccion/generar_ordenes": GenerarOrdenes,
         "produccion/tareas": MaestroTareaProduccion,
+        "produccion/terminal": TerminalProduccion,
         "produccion/secciones": MaestroSeccion,
         "produccion/trabajadores": MaestroTrabajador,
         "produccion/tipos_centro_coste": MaestroTipoCentroCoste,
