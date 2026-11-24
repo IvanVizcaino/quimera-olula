@@ -74,9 +74,9 @@
         }
 
         &.principal {
-            border-color: var(--color-primario, #2563eb);
-            background: var(--color-primario, #2563eb);
-            color: var(--color-primario-texto, #fff);
+            border-color: var(--color-boton, var(--color-primario, #2563eb));
+            background: var(--color-boton, var(--color-primario, #2563eb));
+            color: var(--blanco, #fff);
         }
 
         &.aviso {
@@ -312,6 +312,11 @@
             font-size: 1.35rem;
             font-weight: 600;
         }
+    }
+
+    .tabla-desplazable {
+        max-width: 100%;
+        overflow-x: auto;
     }
 
     table {

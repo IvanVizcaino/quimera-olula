@@ -169,7 +169,7 @@ describe("terminal: pantalla de consumos", () => {
             .toEqual({ ok: false, motivo: "El componente TINTE no se consume por lotes" });
         expect(cantidadPropuestaLote(0, 0)).toBe(0);
         expect(cantidadPropuestaLote(5, 0)).toBe(5);
-        expect(cantidadPropuestaLote(0, 7)).toBe(7);
+        expect(cantidadPropuestaLote(0, 7)).toBe(0);
     });
 
     it("cantidad a fabricar: decimales y máximo de la configuración", () => {

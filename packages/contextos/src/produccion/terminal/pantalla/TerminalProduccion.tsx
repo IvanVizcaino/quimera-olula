@@ -1,6 +1,7 @@
 import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
 import { MouseEvent, useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router";
 import { SelectorCentroCoste } from "../../centro_coste/SelectorCentroCoste.tsx";
 import { formatearCantidad } from "../../orden/dominio.ts";
@@ -186,7 +187,7 @@ export const TerminalProduccion = () => {
             return;
         }
         const texto = envio === "terminar"
-            ? `Tarea ${tarea.id} terminada (tramo de ${c})`
+            ? `Tarea ${tarea.id} terminada (${config.usarTramos ? "tramo de " : ""}${c})`
             : `Tramo de ${c} declarado. Tarea ${tarea.id} en pausa`;
         enviar({ tipo: "procesada", tarea: { id: tarea.id, descripcion: tarea.descripcion }, texto });
     };
@@ -244,7 +245,8 @@ export const TerminalProduccion = () => {
     const tarea = estado.tarea;
     const accion = tarea ? accionTerminal(tarea, config) : null;
 
-    return (
+    // En el `body` y no dentro de la plantilla: su contenedor limita los `position: fixed`.
+    return createPortal(
         <div className="TerminalProduccion" ref={refRaiz} onClick={pulsarFondo}>
             <header className="barra-terminal">
                 <h1>Terminal de producción</h1>
@@ -412,6 +414,7 @@ export const TerminalProduccion = () => {
                     onAceptar={deshacer}
                 />
             )}
-        </div>
+        </div>,
+        document.body,
     );
 };

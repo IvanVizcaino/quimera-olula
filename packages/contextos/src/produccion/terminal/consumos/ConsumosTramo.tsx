@@ -69,7 +69,6 @@ export const ConsumosTramo = ({
                     setCantidad(cantidadPropuestaTramo(c.cantidadPendiente, config));
                     setLineas(lineasIniciales(c.componentes));
                 }
-                setTimeout(() => refCantidad.current?.select(), 0);
             })
             .catch((e) => vigente && onError(textoError(e)));
         return () => {
@@ -78,6 +77,14 @@ export const ConsumosTramo = ({
         // Se carga una vez por tarea y tramo.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tarea.id, editando?.id]);
+
+    // Con los consumos cargados, el foco a la cantidad a fabricar (seleccionada para teclear encima).
+    const cargados = consumos !== null;
+    useEffect(() => {
+        if (!cargados) return;
+        refCantidad.current?.focus();
+        refCantidad.current?.select();
+    }, [cargados]);
 
     const numero = cantidadDesdeTexto(cantidad);
     const motivoCantidad = cantidad === "" ? null : motivoCantidadTramo(cantidad, config);
@@ -183,6 +190,7 @@ export const ConsumosTramo = ({
                 />
             )}
 
+            <div className="tabla-desplazable">
             <table className="tabla-consumos">
                 <thead>
                     <tr>
@@ -274,6 +282,7 @@ export const ConsumosTramo = ({
                     )}
                 </tbody>
             </table>
+            </div>
 
             {avisoMinimo && <div className="aviso-minimo bloque" role="status">{avisoMinimo}</div>}
 

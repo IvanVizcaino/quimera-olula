@@ -63,6 +63,7 @@ export const TramosTarea = ({
             ) : tramos.length === 0 ? (
                 <p className="nota-consumos">Sin tramos declarados</p>
             ) : (
+                <div className="tabla-desplazable">
                 <table className="tabla-tramos">
                     <thead>
                         <tr>
@@ -92,6 +93,7 @@ export const TramosTarea = ({
                         ))}
                     </tbody>
                 </table>
+                </div>
             )}
 
             {borrando && (

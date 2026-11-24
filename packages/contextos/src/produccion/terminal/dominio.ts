@@ -221,11 +221,11 @@ export const faltaLinea = (linea: LineaConsumo, cantidadTramo: number | null): n
 
 /**
  * Cantidad que se propone al leer un lote: lo que falta del tramo, sin pasar de lo disponible
- * del lote si tiene; si no falta nada, lo disponible (o vacío para teclearla).
+ * del lote si tiene; si no falta nada, 0 (el campo queda vacío para teclearla).
  */
 export const cantidadPropuestaLote = (falta: number, disponible: number): number => {
-    if (falta > 0) return disponible > 0 ? Math.min(falta, disponible) : falta;
-    return disponible > 0 ? disponible : 0;
+    if (falta <= 0) return 0;
+    return disponible > 0 ? Math.min(falta, disponible) : falta;
 };
 
 export type ResultadoLoteLeido =
