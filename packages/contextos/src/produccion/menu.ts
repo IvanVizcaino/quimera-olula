@@ -1,7 +1,13 @@
-// Producción (F2: maestros de planta; F3: maestros de procesos). Las tablas pr_* solo existen donde está la producción de
+// Producción (F2: maestros de planta; F3: maestros de procesos; F4: órdenes de producción). Las tablas pr_* solo existen donde está la producción de
 // Eneboo (hispanicfiber): además de la regla de cada maestro, el plugin `produccion` activo.
 export const menuProduccion = {
     "Producción": { icono: "menu_produccion", area: "Operaciones", plugin: "produccion" },
+    "Producción/Órdenes de producción": {
+        alias: ["órdenes de fabricación", "OP", "lotes de fabricación"],
+        url: "/produccion/ordenes",
+        regla: "produccion.orden",
+        plugin: "produccion",
+    },
     "Producción/Secciones": {
         url: "/produccion/secciones",
         regla: "produccion.seccion",
