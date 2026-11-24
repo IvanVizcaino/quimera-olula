@@ -2,6 +2,7 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
+import { MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
 import { Criteria, EmitirEvento, Entidad } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
@@ -18,6 +19,8 @@ export type PropsMaestroSimple<T extends Entidad> = {
     /** Sin `crear`, no hay botón de alta. */
     textoNuevo?: string;
     metaTabla: MetaTabla<T>;
+    /** Filtros del listado; sin ellos, los de las columnas. */
+    metaFiltro?: MetaFiltro;
     consultas: ConsultasMaestro<T>;
     tarjeta: (entidad: T) => ReactNode;
     /** Modal de alta; publica `entidad_creada` (id) o `alta_cancelada`. Sin él, no se dan altas. */
@@ -39,6 +42,7 @@ export const MaestroSimple = <T extends Entidad>({
     titulo,
     textoNuevo,
     metaTabla,
+    metaFiltro,
     consultas,
     tarjeta,
     crear,
@@ -72,6 +76,7 @@ export const MaestroSimple = <T extends Entidad>({
                         <h2>{titulo}</h2>
                         <Listado<T>
                             metaTabla={metaTabla}
+                            metaFiltro={metaFiltro}
                             criteria={entidades.criteria}
                             modoInicial="tabla"
                             tarjeta={tarjeta}
