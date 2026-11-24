@@ -34,4 +34,10 @@ export const menuProduccion = {
         regla: "produccion.calendario",
         plugin: "produccion",
     },
+    "Producción/Configuración": {
+        alias: ["control de tiempo", "tramos"],
+        url: "/produccion/config",
+        regla: "produccion.config",
+        plugin: "produccion",
+    },
 };
