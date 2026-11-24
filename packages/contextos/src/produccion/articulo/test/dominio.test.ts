@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { componentesSinTarea, fabricacionVacia, validarFabricacion } from "../dominio.ts";
+import { componentesSinTarea, criteriaArticulosFabricados, fabricacionVacia, validarFabricacion } from "../dominio.ts";
 import { cambiosFabricacionAApi, fabricacionDesdeApi } from "../infraestructura.ts";
 
 describe("fabricación del artículo", () => {
@@ -34,5 +34,13 @@ describe("fabricación del artículo", () => {
     it("manda fabricado como booleano y el tipo vacío como null", () => {
         expect(cambiosFabricacionAApi({ fabricado: "false", tipoProcesoId: "" })).toEqual({ fabricado: false, tipo_proceso_id: null });
         expect(cambiosFabricacionAApi({ fabricado: "true", tipoProcesoId: "P" })).toEqual({ fabricado: true, tipo_proceso_id: "P" });
+    });
+});
+
+describe("selector de artículos fabricados", () => {
+    it("busca por código o descripción entre los fabricados; con id, ese artículo", () => {
+        expect(criteriaArticulosFabricados("cam").filtro).toEqual(
+            { and: [["fabricado", "=", "true"], { or: [["id", "~", "cam"], ["descripcion", "~", "cam"]] }] });
+        expect(criteriaArticulosFabricados("", "CAMISA").filtro).toEqual([["id", "=", "CAMISA"]]);
     });
 });
