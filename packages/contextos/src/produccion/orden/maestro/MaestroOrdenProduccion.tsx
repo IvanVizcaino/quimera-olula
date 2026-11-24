@@ -1,8 +1,10 @@
 import { filtroCliente, filtroFechaDocumento } from "#/ventas/comun/filtros.tsx";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { filtroFechas, MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
+import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Criteria } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
+import { useNavigate } from "react-router";
 import { fechaDdMmAaaa } from "../../comun/dominio.ts";
 import { MaestroSimple } from "../../comun/maestro_simple/MaestroSimple.tsx";
 import { CrearOrden } from "../crear/CrearOrden.tsx";
@@ -66,7 +68,9 @@ const criteriaBase: Criteria = { ...criteriaDefecto, orden: ["id", "DESC"] };
 const consultas = { getUno: getOrden, getLista: getOrdenes };
 
 /** Producción > Órdenes de producción (`pr_ordenesproduccion` con su lote). */
-export const MaestroOrdenProduccion = () => (
+export const MaestroOrdenProduccion = () => {
+    const navegar = useNavigate();
+    return (
     <MaestroSimple<OrdenProduccion>
         clase="MaestroOrdenProduccion"
         titulo="Órdenes de producción"
@@ -75,6 +79,9 @@ export const MaestroOrdenProduccion = () => (
         metaFiltro={metaFiltro}
         consultas={consultas}
         criteriaBase={criteriaBase}
+        accionesExtra={
+            <QBoton variante="borde" onClick={() => navegar("/produccion/generar_ordenes")}>Generar órdenes</QBoton>
+        }
         tarjeta={(o) => (
             <div key={o.id}>
                 <div>{o.id} · {o.descripcion} <EstadoOrden orden={o} /></div>
@@ -84,4 +91,5 @@ export const MaestroOrdenProduccion = () => (
         crear={(publicar) => <CrearOrden publicar={publicar} />}
         detalle={(id, publicar) => <DetalleOrden id={id} publicar={publicar} />}
     />
-);
+    );
+};

@@ -30,6 +30,8 @@ export type PropsMaestroSimple<T extends Entidad> = {
     detalle: (id: string | undefined, publicar: EmitirEvento, recargar: () => Promise<void>) => ReactNode;
     /** Por defecto, por código ascendente. */
     criteriaBase?: Criteria;
+    /** Botones de más junto al de alta (p. ej. «Generar órdenes»). */
+    accionesExtra?: ReactNode;
 };
 
 const porCodigo: Criteria = { ...criteriaDefecto, orden: ["id", "ASC"] };
@@ -49,6 +51,7 @@ export const MaestroSimple = <T extends Entidad>({
     crear,
     detalle,
     criteriaBase = porCodigo,
+    accionesExtra,
 }: PropsMaestroSimple<T>) => {
     const getMaquina = useMemo(() => getMaquinaMaestroSimple(consultas), [consultas]);
 
@@ -90,9 +93,10 @@ export const MaestroSimple = <T extends Entidad>({
                             entidades={entidades.lista}
                             totalEntidades={entidades.total}
                             seleccionada={entidades.activo}
-                            renderAcciones={() => crear && (
+                            renderAcciones={() => (crear || accionesExtra) && (
                                 <div className="maestro-botones">
-                                    <QBoton onClick={() => emitir("crear_solicitado")}>{textoNuevo}</QBoton>
+                                    {crear && <QBoton onClick={() => emitir("crear_solicitado")}>{textoNuevo}</QBoton>}
+                                    {accionesExtra}
                                 </div>
                             )}
                             onSeleccion={(payload) => emitir("entidad_seleccionada", payload)}
