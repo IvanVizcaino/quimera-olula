@@ -1,0 +1,11 @@
+.MaestroTareaProduccion {
+    .DetalleTareaProduccion {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espacio-s, 0.5rem);
+
+        quimera-input {
+            grid-column: span 6;
+        }
+    }
+}

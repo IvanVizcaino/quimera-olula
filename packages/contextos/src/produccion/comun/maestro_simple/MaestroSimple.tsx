@@ -8,7 +8,7 @@ import { Criteria, EmitirEvento, Entidad } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useCallback, useEffect, useMemo } from "react";
 import { ConsultasMaestro } from "./diseño.ts";
 import { getMaquinaMaestroSimple } from "./maquina.ts";
 
@@ -18,7 +18,8 @@ export type PropsMaestroSimple<T extends Entidad> = {
     titulo: string;
     /** Sin `crear`, no hay botón de alta. */
     textoNuevo?: string;
-    metaTabla: MetaTabla<T>;
+    /** Columnas; como función, reciben `recargar` (p. ej. para acciones por fila). */
+    metaTabla: MetaTabla<T> | ((recargar: () => Promise<void>) => MetaTabla<T>);
     /** Filtros del listado; sin ellos, los de las columnas. */
     metaFiltro?: MetaFiltro;
     consultas: ConsultasMaestro<T>;
@@ -26,7 +27,7 @@ export type PropsMaestroSimple<T extends Entidad> = {
     /** Modal de alta; publica `entidad_creada` (id) o `alta_cancelada`. Sin él, no se dan altas. */
     crear?: (publicar: EmitirEvento) => ReactNode;
     /** Detalle de la entidad activa; publica `entidad_cambiada`, `entidad_borrada` y `entidad_deseleccionada`. */
-    detalle: (id: string | undefined, publicar: EmitirEvento) => ReactNode;
+    detalle: (id: string | undefined, publicar: EmitirEvento, recargar: () => Promise<void>) => ReactNode;
     /** Por defecto, por código ascendente. */
     criteriaBase?: Criteria;
 };
@@ -63,6 +64,12 @@ export const MaestroSimple = <T extends Entidad>({
 
     useUrlParams(entidades.activo, entidades.criteria);
 
+    // Vuelve a leer la lista desde la primera página con los filtros y el orden actuales.
+    const recargar = useCallback(async () => {
+        const { criteria } = entidades;
+        await emitir("recarga_solicitada", { ...criteria, paginacion: { ...criteria.paginacion, pagina: 1 } });
+    }, [emitir, entidades]);
+
     useEffect(() => {
         emitir("recarga_solicitada", entidades.criteria);
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,7 +82,7 @@ export const MaestroSimple = <T extends Entidad>({
                     <>
                         <h2>{titulo}</h2>
                         <Listado<T>
-                            metaTabla={metaTabla}
+                            metaTabla={typeof metaTabla === "function" ? metaTabla(recargar) : metaTabla}
                             metaFiltro={metaFiltro}
                             criteria={entidades.criteria}
                             modoInicial="tabla"
@@ -94,7 +101,7 @@ export const MaestroSimple = <T extends Entidad>({
                         />
                     </>
                 }
-                Detalle={detalle(entidades.activo, emitir)}
+                Detalle={detalle(entidades.activo, emitir, recargar)}
                 seleccionada={entidades.activo}
                 modoDisposicion="maestro-50"
             />
