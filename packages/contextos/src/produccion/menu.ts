@@ -28,4 +28,10 @@ export const menuProduccion = {
         regla: "produccion.horario",
         plugin: "produccion",
     },
+    "Producción/Calendario laboral": {
+        alias: ["calendario", "festivos"],
+        url: "/produccion/calendario",
+        regla: "produccion.calendario",
+        plugin: "produccion",
+    },
 };
