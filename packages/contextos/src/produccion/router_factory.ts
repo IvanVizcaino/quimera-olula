@@ -3,6 +3,7 @@ import { MaestroCentroCoste } from "./centro_coste/maestro/MaestroCentroCoste.ts
 import { ConfigProduccion } from "./config/maestro/ConfigProduccion.tsx";
 import { MaestroHorario } from "./horario/maestro/MaestroHorario.tsx";
 import { MaestroSeccion } from "./seccion/maestro/MaestroSeccion.tsx";
+import { MaestroTiempoTarea } from "./tiempo_tarea/maestro/MaestroTiempoTarea.tsx";
 import { MaestroTipoProceso } from "./tipo_proceso/maestro/MaestroTipoProceso.tsx";
 import { MaestroTipoTarea } from "./tipo_tarea/maestro/MaestroTipoTarea.tsx";
 import { MaestroTipoCentroCoste } from "./tipo_centro_coste/maestro/MaestroTipoCentroCoste.tsx";
@@ -18,6 +19,7 @@ export class RouterFactoryProduccionOlula {
         "produccion/calendario": CalendarioProduccion,
         "produccion/tipos_tarea": MaestroTipoTarea,
         "produccion/tipos_proceso": MaestroTipoProceso,
+        "produccion/tiempos_tarea": MaestroTiempoTarea,
         "produccion/config": ConfigProduccion,
     };
 }

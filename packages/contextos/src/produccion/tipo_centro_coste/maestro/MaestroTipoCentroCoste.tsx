@@ -1,5 +1,8 @@
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
+import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
 import { MetaTabla } from "@olula/componentes/index.js";
+import { puede } from "@olula/lib/dominio.ts";
+import { TiemposTipoCentro } from "../../tiempo_tarea/TiemposTipoCentro.tsx";
 import { CrearSimple } from "../../comun/maestro_simple/CrearSimple.tsx";
 import { DetalleSimple } from "../../comun/maestro_simple/DetalleSimple.tsx";
 import { MaestroSimple } from "../../comun/maestro_simple/MaestroSimple.tsx";
@@ -67,12 +70,23 @@ export const MaestroTipoCentroCoste = () => (
                 tituloBorrar="Borrar tipo de centro de coste"
                 mensajeBorrar={(s) => `¿Está seguro de que desea borrar el tipo de centro de coste "${s.id}"?`}
                 borrar={deleteTipoCentroCoste}
-                campos={({ modelo, entidad }) => (
-                    <quimera-formulario>
-                        <QInput label="Código" nombre="id" valor={entidad.id} soloLectura />
-                        <QInput label="Descripción" {...modelo.uiProps("descripcion")} maxLength={LONGITUD_DESCRIPCION_TIPO_CENTRO} />
-                    </quimera-formulario>
-                )}
+                campos={({ modelo, entidad }) => {
+                    const formulario = (
+                        <quimera-formulario>
+                            <QInput label="Código" nombre="id" valor={entidad.id} soloLectura />
+                            <QInput label="Descripción" {...modelo.uiProps("descripcion")} maxLength={LONGITUD_DESCRIPCION_TIPO_CENTRO} />
+                        </quimera-formulario>
+                    );
+                    if (!puede("produccion.tiempo_tarea")) return formulario;
+                    return (
+                        <Tabs
+                            children={[
+                                <Tab key="general" label="General" children={formulario} />,
+                                <Tab key="tiempos" label="Tiempos" children={<TiemposTipoCentro tipoCentroId={entidad.id} />} />,
+                            ]}
+                        />
+                    );
+                }}
             />
         )}
     />
