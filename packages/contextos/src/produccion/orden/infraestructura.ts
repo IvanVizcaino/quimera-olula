@@ -20,11 +20,18 @@ import {
     PostOrden,
     PostSacarProcesoOrden,
     PostTerminarOrden,
+    ReservaLote,
 } from "./diseño.ts";
 import { TareaApi, tareaDesdeApi } from "../tarea/infraestructura.ts";
 import { AGREGADO_ORDEN, cantidadDesdeTexto } from "./dominio.ts";
 
 const baseUrl = `/produccion/orden`;
+
+export interface ReservaLoteApi {
+    linea_pedido_id: string | number;
+    pedido_id?: string | null;
+    cantidad: number | null;
+}
 
 export interface LoteOrdenApi {
     id: string;
@@ -37,6 +44,7 @@ export interface LoteOrdenApi {
     fecha_fabricacion: string | null;
     cliente_id: string | null;
     linea_pedido_id: string | number | null;
+    reservas?: ReservaLoteApi[];
 }
 
 export interface OrdenApi {
@@ -59,6 +67,12 @@ export interface OrdenApi {
 const fecha = (valor: string | null | undefined): string => (valor ? valor.slice(0, 10) : "");
 const numero = (valor: number | string | null | undefined): number => Number(valor ?? 0) || 0;
 
+export const reservaLoteDesdeApi = (api: ReservaLoteApi): ReservaLote => ({
+    lineaPedidoId: String(api.linea_pedido_id),
+    pedidoId: api.pedido_id ?? "",
+    cantidad: numero(api.cantidad),
+});
+
 export const loteOrdenDesdeApi = (api: LoteOrdenApi): LoteOrden => ({
     id: api.id,
     articuloId: api.articulo_id,
@@ -70,6 +84,7 @@ export const loteOrdenDesdeApi = (api: LoteOrdenApi): LoteOrden => ({
     fechaFabricacion: fecha(api.fecha_fabricacion),
     clienteId: api.cliente_id ?? "",
     lineaPedidoId: api.linea_pedido_id === null || api.linea_pedido_id === undefined ? "" : String(api.linea_pedido_id),
+    reservas: (api.reservas ?? []).map(reservaLoteDesdeApi),
 });
 
 export const ordenDesdeApi = (api: OrdenApi): OrdenProduccion => ({

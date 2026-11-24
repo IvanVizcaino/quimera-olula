@@ -26,7 +26,7 @@ import {
 
 const lote = (id: string, cantidad = 10): LoteOrden => ({
     id, articuloId: "CAMISA", descripcion: "Camisa", cantidad, cantidadProgramada: cantidad, cantidadTotal: 0,
-    estado: "PTE", fechaFabricacion: "2026-12-14", clienteId: "", lineaPedidoId: "",
+    estado: "PTE", fechaFabricacion: "2026-12-14", clienteId: "", lineaPedidoId: "", reservas: [],
 });
 
 const orden = (cambios: Partial<OrdenProduccion> = {}): OrdenProduccion => ({

@@ -16,6 +16,7 @@ describe("orden de producción: conversores", () => {
             lotes: [{
                 id: "LS00000001", articulo_id: "CAMISA", descripcion: "Camisa", cantidad: 12.5, cantidad_programada: 12.5,
                 cantidad_total: 0, estado: "PTE", fecha_fabricacion: "2026-12-14", cliente_id: null, linea_pedido_id: 7,
+                reservas: [{ linea_pedido_id: 7, pedido_id: "P0001", cantidad: 10 }, { linea_pedido_id: "9", cantidad: 2.5 }],
             }],
             tareas: [],
         });
@@ -26,6 +27,10 @@ describe("orden de producción: conversores", () => {
         expect(orden.lotes[0]).toEqual({
             id: "LS00000001", articuloId: "CAMISA", descripcion: "Camisa", cantidad: 12.5, cantidadProgramada: 12.5,
             cantidadTotal: 0, estado: "PTE", fechaFabricacion: "2026-12-14", clienteId: "", lineaPedidoId: "7",
+            reservas: [
+                { lineaPedidoId: "7", pedidoId: "P0001", cantidad: 10 },
+                { lineaPedidoId: "9", pedidoId: "", cantidad: 2.5 },
+            ],
         });
     });
 

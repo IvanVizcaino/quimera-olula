@@ -4,6 +4,14 @@ import { TareaProduccion } from "../tarea/diseño.ts";
 /** Estados de la orden (`pr_ordenesproduccion.estado`); los cambia el motor de procesos (F5). */
 export type EstadoOrden = "PTE" | "EN CURSO" | "TERMINADA";
 
+/** Línea de pedido de cliente que cubre el lote (`pr_reservaslotepedido`, F6). */
+export interface ReservaLote {
+    lineaPedidoId: string;
+    /** Código del pedido (`pedidoscli.codigo`); vacío si la línea ya no existe. */
+    pedidoId: string;
+    cantidad: number;
+}
+
 /** Lote de la orden (fila de `lotes` con `codordenproduccion`). Fechas "AAAA-MM-DD" o vacías. */
 export interface LoteOrden extends Entidad {
     id: string;
@@ -17,6 +25,8 @@ export interface LoteOrden extends Entidad {
     fechaFabricacion: string;
     clienteId: string;
     lineaPedidoId: string;
+    /** Las líneas de pedido que cubre (las pone el asistente «Generar órdenes»). */
+    reservas: ReservaLote[];
 }
 
 /**

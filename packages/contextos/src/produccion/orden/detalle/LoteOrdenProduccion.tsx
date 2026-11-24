@@ -5,10 +5,11 @@ import { QTabla } from "@olula/componentes/atomos/qtabla.tsx";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
 import { ContextoError } from "@olula/lib/contexto.ts";
+import { Entidad } from "@olula/lib/diseño.ts";
 import { useContext, useState } from "react";
 import { AccionesCicloVida, cabeAccion, motivoAccion } from "../../comun/ciclo_vida.ts";
 import { fechaDdMmAaaa } from "../../comun/dominio.ts";
-import { FormLoteOrden, LoteOrden, OrdenProduccion } from "../diseño.ts";
+import { FormLoteOrden, LoteOrden, OrdenProduccion, ReservaLote } from "../diseño.ts";
 import {
     cambiosLote,
     COMANDO,
@@ -30,6 +31,28 @@ const metaTablaLotes: MetaTabla<LoteOrden> = [
     { id: "fechaFabricacion", cabecera: "Fabricación", render: (l) => fechaDdMmAaaa(l.fechaFabricacion) },
     { id: "estado", cabecera: "Estado", render: (l) => <EtiquetaEstado {...etiquetaEstadoOrden(l.estado)} /> },
 ];
+
+type FilaReserva = Entidad & ReservaLote & { id: string };
+
+const metaTablaReservas: MetaTabla<FilaReserva> = [
+    { id: "pedidoId", cabecera: "Pedido", render: (r) => r.pedidoId || "—" },
+    { id: "lineaPedidoId", cabecera: "Línea", estilo: "secundario" },
+    { id: "cantidad", cabecera: "Cantidad", render: (r) => formatearCantidad(r.cantidad) },
+];
+
+/** Las líneas de pedido que cubre el lote (`pr_reservaslotepedido`), si tiene. */
+const ReservasLote = ({ lote }: { lote: LoteOrden }) =>
+    lote.reservas.length === 0 ? null : (
+        <div className="ReservasLote">
+            <h4 className="subtitulo-lote">Reservas de pedidos{lote.id ? ` del lote ${lote.id}` : ""}</h4>
+            <QTabla<FilaReserva>
+                metaTabla={metaTablaReservas}
+                datos={lote.reservas.map((r) => ({ ...r, id: r.lineaPedidoId }))}
+                cargando={false}
+                orden={[]}
+            />
+        </div>
+    );
 
 type Edicion = { titulo: string; lote: LoteOrden | null; inicial: FormLoteOrden };
 
@@ -136,6 +159,7 @@ export const LoteOrdenProduccion = ({
                             <EtiquetaEstado {...etiquetaEstadoOrden(lote.estado)} />
                         </div>
                     </quimera-formulario>
+                    <ReservasLote lote={lote} />
                 </>
             )}
 
@@ -145,6 +169,7 @@ export const LoteOrdenProduccion = ({
                         Orden con varios lotes (anterior a la regla de un lote por orden): se consultan, pero no se cambian aquí.
                     </p>
                     <QTabla<LoteOrden> metaTabla={metaTablaLotes} datos={orden.lotes} cargando={false} orden={[]} />
+                    {orden.lotes.map((l) => <ReservasLote key={l.id} lote={l} />)}
                 </>
             )}
 
