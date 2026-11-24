@@ -1,4 +1,5 @@
 import { PanelComprasArticulo } from "#/compras/articulo/detalle/PanelComprasArticulo.tsx";
+import { TabFabricacionArticulo } from "#/produccion/articulo/detalle/TabFabricacionArticulo.tsx";
 import { PanelVentasArticulo } from "#/ventas/articulo/detalle/PanelVentasArticulo.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
@@ -116,6 +117,13 @@ export const DetalleArticulo = ({
                 key="tab-compras"
                 label="Compras"
                 children={<PanelComprasArticulo articuloId={articulo.id} />}
+              />
+            ),
+            plugin("produccion") === "activo" && puede("produccion.articulo") && (
+              <Tab
+                key="tab-fabricacion"
+                label="Fabricación"
+                children={<TabFabricacionArticulo articuloId={articulo.id} />}
               />
             ),
           ]}

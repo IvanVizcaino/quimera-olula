@@ -1,3 +1,4 @@
+import { MaestroFabricacionArticulo } from "./articulo/maestro/MaestroFabricacionArticulo.tsx";
 import { CalendarioProduccion } from "./calendario/maestro/CalendarioProduccion.tsx";
 import { MaestroCentroCoste } from "./centro_coste/maestro/MaestroCentroCoste.tsx";
 import { ConfigProduccion } from "./config/maestro/ConfigProduccion.tsx";
@@ -20,6 +21,7 @@ export class RouterFactoryProduccionOlula {
         "produccion/tipos_tarea": MaestroTipoTarea,
         "produccion/tipos_proceso": MaestroTipoProceso,
         "produccion/tiempos_tarea": MaestroTiempoTarea,
+        "produccion/articulos": MaestroFabricacionArticulo,
         "produccion/config": ConfigProduccion,
     };
 }
