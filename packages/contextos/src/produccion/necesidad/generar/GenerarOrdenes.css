@@ -26,7 +26,21 @@
     .opciones-generar {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--espacio-m, 1rem);
+        gap: var(--espacio-xs, 0.25rem) var(--espacio-l, 1.5rem);
+
+        quimera-checkbox {
+            flex: 0 0 auto;
+            width: auto;
+            margin: 0;
+        }
+    }
+
+    .cabecera-necesidades quimera-select {
+        flex: 0 1 14rem;
+    }
+
+    .cabecera-necesidades .nota-generar {
+        flex: 1 1 auto;
     }
 
     .maestro-botones,
@@ -44,8 +58,16 @@
         justify-content: space-between;
     }
 
-    .crear-linea quimera-autocompletar {
-        min-width: 22rem;
+    .crear-linea,
+    .acciones-generar {
+        quimera-autocompletar {
+            flex: 0 1 26rem;
+        }
+
+        quimera-input,
+        quimera-date {
+            flex: 0 1 14rem;
+        }
     }
 
     .nota-generar {

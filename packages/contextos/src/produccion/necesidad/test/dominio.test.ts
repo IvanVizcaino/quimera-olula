@@ -142,6 +142,8 @@ describe("generar órdenes: resumen", () => {
 
     it("ignora cantidades no válidas y sin selección no hay órdenes", () => {
         expect(ordenesPropuestas([fila(necesidad("a"), true, "x")])).toEqual([]);
+        expect(ordenesPropuestas([fila(necesidad("a"), true, "1,2345")])).toEqual([]);
+        expect(filasAGenerar([fila(necesidad("a"), true, "1,2345")])).toEqual([]);
         expect(ordenesPropuestas([fila(necesidad("a"), false)])).toEqual([]);
     });
 

@@ -39,6 +39,9 @@ import "./GenerarOrdenes.css";
 type InfoBusqueda = { total: number; pedidoCompleto: boolean; aFaltas: boolean; almacenId: string };
 type LineaManual = { articulo: OpcionArticuloFabricado | null; cantidad: string };
 
+const textoSeGeneraran = (n: number): string =>
+    n === 1 ? "Se generará 1 orden" : `Se generarán ${n} órdenes`;
+
 const lineaManualVacia: LineaManual = { articulo: null, cantidad: "" };
 
 /**
@@ -189,7 +192,7 @@ export const GenerarOrdenes = () => {
             </section>
 
             <section className="resumen-generar" aria-label="Resumen">
-                <h3>Se generarán {propuestas.length === 1 ? "1 orden" : `${propuestas.length} órdenes`}</h3>
+                <h3>{textoSeGeneraran(propuestas.length)}</h3>
                 {propuestas.length > 0 && (
                     <table className="tabla-generar tabla-resumen">
                         <thead>
@@ -229,8 +232,9 @@ export const GenerarOrdenes = () => {
             {generadas && (
                 <section className="generadas" aria-label="Órdenes generadas">
                     <h3>
-                        {generadas.ordenes.length === 1 ? "Orden generada" : `${generadas.ordenes.length} órdenes generadas`}
-                        {generadas.lanzar ? " y lanzadas" : ""}
+                        {generadas.ordenes.length === 1
+                            ? `Orden generada${generadas.lanzar ? " y lanzada" : ""}`
+                            : `${generadas.ordenes.length} órdenes generadas${generadas.lanzar ? " y lanzadas" : ""}`}
                     </h3>
                     <ul>
                         {generadas.ordenes.map((o) => (
@@ -251,9 +255,9 @@ export const GenerarOrdenes = () => {
                     nombre="confirmarGenerarOrdenes"
                     abierto={true}
                     titulo={confirmando.lanzar ? "Generar y lanzar" : "Generar órdenes"}
-                    mensaje={`Se ${propuestas.length === 1 ? "generará 1 orden" : `generarán ${propuestas.length} órdenes`} de producción`
+                    mensaje={`${textoSeGeneraran(propuestas.length)} de producción`
                         + ` (${propuestas.map((o) => `${o.articuloId}: ${formatearCantidad(o.cantidad)}`).join(", ")})`
-                        + `${confirmando.lanzar ? " y se lanzarán" : ""}. ¿Continuar?`}
+                        + `${confirmando.lanzar ? (propuestas.length === 1 ? " y se lanzará" : " y se lanzarán") : ""}. ¿Continuar?`}
                     labelAceptar={confirmando.lanzar ? "Generar y lanzar" : "Generar"}
                     onCerrar={() => setConfirmando(null)}
                     onAceptar={() => generar(confirmando.lanzar)}

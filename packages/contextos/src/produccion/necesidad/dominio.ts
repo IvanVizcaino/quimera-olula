@@ -152,11 +152,15 @@ export const erroresSeleccion = (filas: FilaPropuesta[]): string[] =>
         return motivo ? [`${f.necesidad.articuloId}: ${motivo}`] : [];
     });
 
+/** «A fabricar» de la fila si vale (número positivo con 3 decimales como mucho), o `null`. */
+const cantidadValida = (f: FilaPropuesta): number | null =>
+    motivoAFabricarNoValido(f.aFabricar) ? null : cantidadDesdeTexto(f.aFabricar);
+
 /** Lo que se manda a `produccion.orden.generar`: las filas elegidas (con cantidad válida). */
 export const filasAGenerar = (filas: FilaPropuesta[]): FilaGenerar[] =>
     seleccionadas(filas).flatMap((f) => {
-        const cantidad = cantidadDesdeTexto(f.aFabricar);
-        if (cantidad === null || cantidad <= 0) return [];
+        const cantidad = cantidadValida(f);
+        if (cantidad === null) return [];
         return [{
             articuloId: f.necesidad.articuloId,
             cantidad,
@@ -171,8 +175,8 @@ export const filasAGenerar = (filas: FilaPropuesta[]): FilaGenerar[] =>
 export const ordenesPropuestas = (filas: FilaPropuesta[]): OrdenPropuesta[] => {
     const porArticulo = new Map<string, OrdenPropuesta>();
     for (const fila of seleccionadas(filas)) {
-        const cantidad = cantidadDesdeTexto(fila.aFabricar);
-        if (cantidad === null || cantidad <= 0) continue;
+        const cantidad = cantidadValida(fila);
+        if (cantidad === null) continue;
         const n = fila.necesidad;
         const orden = porArticulo.get(n.articuloId)
             ?? { articuloId: n.articuloId, descripcion: n.descripcion, cantidad: 0, filas: 0, pedidos: [], lanzable: true };
