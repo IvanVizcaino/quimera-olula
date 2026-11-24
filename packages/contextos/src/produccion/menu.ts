@@ -12,4 +12,9 @@ export const menuProduccion = {
         regla: "produccion.tipo_centro_coste",
         plugin: "produccion",
     },
+    "Producción/Centros de coste": {
+        url: "/produccion/centros_coste",
+        regla: "produccion.centro_coste",
+        plugin: "produccion",
+    },
 };
