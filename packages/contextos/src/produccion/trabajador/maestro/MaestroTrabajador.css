@@ -1,0 +1,33 @@
+.FormTrabajador {
+    quimera-input[nombre="id"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="nombre"] {
+        grid-column: span 8;
+    }
+
+    quimera-select[nombre="seccionId"] {
+        grid-column: span 8;
+    }
+
+    quimera-checkbox[nombre="deBaja"] {
+        grid-column: span 4;
+        align-self: end;
+    }
+}
+
+.SeccionesTrabajador {
+    margin-top: var(--espacio-m, 1rem);
+
+    .anadir-seccion {
+        display: flex;
+        gap: var(--espacio-s, 0.5rem);
+        align-items: end;
+        margin-bottom: var(--espacio-s, 0.5rem);
+
+        quimera-select {
+            flex: 1;
+        }
+    }
+}

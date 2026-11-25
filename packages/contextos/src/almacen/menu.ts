@@ -17,6 +17,17 @@ export const menuAlmacen = {
         regla: "almacen.peso_medida",
         plugin: "pesos_medidas",
     },
+    "Almacén/Inventario": { alias: ["inventarios", "recuento", "regularización"], url: "/almacen/inventarios", regla: "almacen.inventario" },
+    "Almacén/Informe inventario": {
+        alias: ["informe de inventario", "existencias por almacén"],
+        url: "/almacen/informe_inventario",
+        regla: "almacen.informe_inventario",
+    },
+    "Almacén/Informe inventario valorado": {
+        alias: ["inventario valorado", "valoración de stock"],
+        url: "/almacen/informe_inventario_valorado",
+        regla: "almacen.informe_inventario_valorado",
+    },
     "Almacén/Transferencias de Stock": { url: "/almacen/transferencias", regla: "almacen.transferencia_stock.leer" },
     // Operación
     "Almacén/Órdenes": { url: "/almacen/ordenes", regla: "almacen.orden.leer", plugin: "sga" },

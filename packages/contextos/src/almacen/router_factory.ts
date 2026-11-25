@@ -2,6 +2,8 @@ import { ConfiguracionAlmacen } from "./configuracion/ConfiguracionAlmacen.tsx"
 import { MaestroAlmacen } from "./almacen/vistas/maestro/MaestroAlmacen.tsx"
 import { MaestroConDetalleArticulo } from "./articulo/maestro/MaestroConDetalleArticulo.tsx"
 import { MaestroConDetalleCaja } from "./caja/maestro/MaestroConDetalleCaja.tsx"
+import { InformeInventario, InformeInventarioValorado } from "./informe_inventario/InformeInventario.tsx"
+import { MaestroConDetalleInventario } from "./inventario/maestro/MaestroConDetalleInventario.tsx"
 import { MaestroFamilia } from "./familia/vistas/maestro/MaestroFamilia.tsx"
 import { MaestroOrden } from "./orden/vistas/maestro/MaestroOrden.tsx"
 import { MaestroConDetalleStock } from "./stock/maestro/MaestroConDetalleStock.tsx"
@@ -27,6 +29,9 @@ export class RouterFactoryAlmacenOlula {
                 "almacen/almacenes": MaestroAlmacen,
                 "almacen/familias": MaestroFamilia,
                 "almacen/pesos_medidas": MaestroConDetallePesoMedida,
+                "almacen/inventarios": MaestroConDetalleInventario,
+                "almacen/informe_inventario": InformeInventario,
+                "almacen/informe_inventario_valorado": InformeInventarioValorado,
                 "almacen/ordenes": MaestroOrden,
                 "almacen/pedidos_compra": MaestroConDetallePedidoCompra,
                 "almacen/pedidos_venta": MaestroPedidoVenta,

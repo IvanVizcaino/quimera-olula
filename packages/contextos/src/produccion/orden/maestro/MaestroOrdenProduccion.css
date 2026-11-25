@@ -1,0 +1,57 @@
+.FormOrdenProduccion {
+    quimera-input,
+    quimera-date,
+    quimera-autocompletar {
+        grid-column: span 6;
+    }
+
+    quimera-input[nombre="descripcion"],
+    quimera-textarea,
+    quimera-autocompletar[nombre="articuloId"],
+    .subtitulo-lote {
+        grid-column: span 12;
+    }
+
+    .subtitulo-lote {
+        margin: var(--espacio-s, 0.5rem) 0 0;
+    }
+
+    .nota-orden {
+        color: var(--color-texto-secundario, #666);
+        font-size: 0.9em;
+        margin: var(--espacio-xs, 0.25rem) 0;
+    }
+
+    .fila-acciones-orden {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--espacio-s, 0.5rem);
+    }
+
+    .LoteOrdenProduccion .maestro-botones {
+        margin-bottom: var(--espacio-s, 0.5rem);
+    }
+
+    .estado-lote {
+        grid-column: span 6;
+        display: flex;
+        flex-direction: column;
+        gap: var(--espacio-xs, 0.25rem);
+
+        .etiqueta-campo {
+            font-size: var(--tamaño-letra-xs, 0.8em);
+            color: var(--color-texto-secundario, #666);
+        }
+
+        .etiqueta-estado {
+            align-self: flex-start;
+        }
+    }
+}
+
+.estado-orden {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--espacio-xs, 0.25rem);
+}

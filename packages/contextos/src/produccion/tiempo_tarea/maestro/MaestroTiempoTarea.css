@@ -1,0 +1,16 @@
+.FormTiempoTarea {
+    quimera-select[nombre="tipoCentroId"],
+    quimera-input[nombre="costeInicial"],
+    quimera-input[nombre="costeUnidad"] {
+        grid-column: span 4;
+    }
+
+    quimera-select[nombre="tareaProcesoId"] {
+        grid-column: span 8;
+    }
+
+    quimera-autocompletar,
+    quimera-input[nombre="articuloId"] {
+        grid-column: span 12;
+    }
+}

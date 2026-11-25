@@ -86,6 +86,12 @@ describe("ficha de informe", () => {
         expect(cambiosFicha(pestaña, previa, actual)).toEqual({ cliente_id: "000001", acumulado: true });
     });
 
+    test("un campo vaciado que queda a null se envía como null, no como \"null\"", () => {
+        const previa: FichaInforme = { ...fichaNueva(pestaña), id: "1", descripcion: "D", cliente_id: "000001" };
+        const actual = { ...previa, cliente_id: null as unknown as string };
+        expect(cambiosFicha(pestaña, previa, actual)).toEqual({ cliente_id: null });
+    });
+
     test("el meta convierte las casillas a booleano y aplica las reglas de la pestaña", () => {
         const meta = metaFichaInforme<FichaInforme>(pestaña);
         const ficha = { ...fichaNueva(pestaña), acumulado: "false", limite: "5" } as unknown as FichaInforme;
