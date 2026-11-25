@@ -1,12 +1,13 @@
-import { Inventario, LineaInventario } from "../../diseño.ts";
+import { Inventario, LineaInventario } from "../diseño.ts";
 
 export type EstadoDetalleInventario =
     | "INICIAL"
     | "ABIERTO"
     | "BORRANDO"
     | "CREANDO_LINEA"
+    | "CAMBIANDO_LINEA"
     | "BORRANDO_LINEA"
-    | "CARGANDO_LECTURAS"
+    | "CARGANDO_FICHERO"
     | "REGULARIZANDO_RESTO";
 
 export type ContextoDetalleInventario = {

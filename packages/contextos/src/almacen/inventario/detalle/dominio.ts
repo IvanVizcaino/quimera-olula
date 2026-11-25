@@ -1,7 +1,7 @@
 import { ProcesarContexto } from "@olula/lib/diseño.ts";
 import { MetaModelo } from "@olula/lib/dominio.ts";
-import { Inventario, LineaInventario } from "../../diseño.ts";
-import { getInventario, getLineasInventario } from "../../infraestructura.ts";
+import { Inventario, LineaInventario } from "../diseño.ts";
+import { getInventario, getLineasInventario } from "../infraestructura.ts";
 import { ContextoDetalleInventario, EstadoDetalleInventario } from "./diseño.ts";
 
 type ProcesarDetalle = ProcesarContexto<EstadoDetalleInventario, ContextoDetalleInventario>;
@@ -63,3 +63,14 @@ export const activarLinea: ProcesarDetalle = async (contexto, payload) => ({
     ...contexto,
     lineaActiva: payload as LineaInventario,
 });
+
+/** Pasa a `estado` solo si hay una línea seleccionada (cambiar o borrar). */
+export const conLineaActiva = (estado: EstadoDetalleInventario): ProcesarDetalle =>
+    async (contexto) => (contexto.lineaActiva ? { ...contexto, estado } : contexto);
+
+/** Totales de las líneas: cantidad contada y diferencia con el stock anterior. */
+export const totalesLineas = (lineas: LineaInventario[]) => {
+    const contado = lineas.reduce((total, l) => total + l.cantidadFinal, 0);
+    const anterior = lineas.reduce((total, l) => total + l.cantidadInicial, 0);
+    return { lineas: lineas.length, contado, diferencia: contado - anterior };
+};

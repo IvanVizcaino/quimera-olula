@@ -1,0 +1,62 @@
+.CargarFicheroInventario {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+    min-width: min(42rem, 90vw);
+
+    p {
+        margin: 0;
+        color: var(--color-texto-secundario);
+    }
+
+    .selector-fichero {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+    }
+
+    quimera-formulario {
+        quimera-select,
+        quimera-checkbox {
+            grid-column: span 6;
+        }
+    }
+
+    .error-fichero {
+        color: var(--color-error, #b3261e);
+    }
+
+    .ResultadoCargaInventario {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+        max-height: 40vh;
+        overflow: auto;
+
+        .resumen-carga {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: var(--espaciado-xs) var(--espaciado-s);
+            border-bottom: 1px solid var(--color-borde-sutil);
+        }
+
+        td.numero {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .tabla-rechazadas td:last-child {
+            color: var(--color-error, #b3261e);
+        }
+    }
+}

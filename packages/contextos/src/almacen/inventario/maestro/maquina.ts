@@ -1,6 +1,6 @@
 import { Maquina } from "@olula/lib/diseño.ts";
 import { ListaActivaEntidades } from "@olula/lib/ListaActivaEntidades.js";
-import { Inventario } from "../../diseño.ts";
+import { Inventario } from "../diseño.ts";
 import {
     ampliarInventarios,
     incluirInventarioCreadoPorId,

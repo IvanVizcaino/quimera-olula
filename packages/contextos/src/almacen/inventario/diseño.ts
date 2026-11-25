@@ -32,13 +32,46 @@ export interface NuevaLineaInventario extends Modelo {
     motivo: string;
 }
 
-export interface LecturasInventario extends Modelo {
-    contenido: string;
-    separador: string;
+/** Separador del CSV/TXT: "" = que lo detecte el servidor. */
+export type SeparadorFichero = "" | "|" | ";" | "," | "\t";
+
+export interface OpcionesCargaFichero {
+    separador: SeparadorFichero;
     ignorarPrimeraLinea: boolean;
+    /** Valida y resume sin grabar nada. */
+    simular: boolean;
+    /** Carga las filas válidas aunque haya rechazadas. */
+    omitirRechazadas: boolean;
 }
 
-export type ResultadoCargaLecturas = { lecturas: number; lineas: number };
+/** Fila del fichero que el servidor no acepta, con su número y el motivo. */
+export interface LineaRechazada {
+    linea: number;
+    referencia: string;
+    cantidad: string;
+    motivo: string;
+}
+
+/** Artículo leído del fichero: suma de sus lecturas y stock actual. */
+export interface ArticuloLeido {
+    articuloId: string;
+    descripcion: string | null;
+    lecturas: number;
+    cantidad: number;
+    cantidadActual: number;
+}
+
+/**
+ * Resultado de cargar (o simular) un fichero. `cargado` es falso al simular
+ * o si hay rechazadas y no se ha pedido omitirlas: entonces no se graba nada.
+ */
+export interface ResultadoCargaFichero {
+    cargado: boolean;
+    lecturas: number;
+    lineas: number;
+    articulos: ArticuloLeido[];
+    rechazadas: LineaRechazada[];
+}
 
 export type GetInventario = (id: string) => Promise<Inventario>;
 export type GetInventarios = (criteria: Criteria) => RespuestaLista<Inventario>;
@@ -48,8 +81,14 @@ export type DeleteInventario = (id: string) => Promise<void>;
 export type GetLineasInventario = (id: string) => Promise<LineaInventario[]>;
 export type PostLineaInventario = (id: string, linea: NuevaLineaInventario) => Promise<string>;
 export type DeleteLineaInventario = (id: string, lineaId: string) => Promise<void>;
-export type PostLecturasInventario = (
+export type CambiarLineaInventario = (
     id: string,
-    lecturas: LecturasInventario
-) => Promise<ResultadoCargaLecturas>;
+    linea: LineaInventario,
+    cambios: NuevaLineaInventario
+) => Promise<string>;
+export type PostFicheroInventario = (
+    id: string,
+    fichero: File,
+    opciones: OpcionesCargaFichero
+) => Promise<ResultadoCargaFichero>;
 export type PatchRegularizarRestoInventario = (id: string) => Promise<number>;

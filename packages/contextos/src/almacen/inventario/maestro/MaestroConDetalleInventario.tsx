@@ -7,17 +7,17 @@ import { criteriaDefecto, formatearFechaString } from "@olula/lib/dominio.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
 import { useEffect, useMemo } from "react";
-import { Inventario } from "../../diseño.ts";
+import { Inventario } from "../diseño.ts";
 import { CrearInventario } from "../crear/CrearInventario.tsx";
 import { DetalleInventario } from "../detalle/DetalleInventario.tsx";
 import { getMaquina } from "./maquina.ts";
 
 const metaTablaInventario: MetaTabla<Inventario> = [
-    { id: "id", cabecera: "Código" },
-    { id: "almacenId", cabecera: "Almacén" },
-    { id: "fecha", cabecera: "Fecha", render: (i: Inventario) => formatearFechaString(i.fecha) },
-    { id: "hora", cabecera: "Hora" },
-    { id: "observaciones", cabecera: "Observaciones" },
+    { id: "id", cabecera: "Código", estilo: "secundario" },
+    { id: "almacen", cabecera: "Almacén", esTitulo: true, render: (i: Inventario) => i.almacen ?? i.almacenId },
+    { id: "fecha", cabecera: "Fecha", tipo: "fecha" },
+    { id: "hora", cabecera: "Hora", prioridad: "baja", render: (i: Inventario) => i.hora?.slice(0, 8) ?? "" },
+    { id: "observaciones", cabecera: "Descripción", prioridad: "media", render: (i: Inventario) => i.observaciones ?? "" },
 ];
 
 export const MaestroConDetalleInventario = () => {
@@ -49,7 +49,7 @@ export const MaestroConDetalleInventario = () => {
                         <Listado<Inventario>
                             metaTabla={metaTablaInventario}
                             criteria={inventarios.criteria}
-                            modoInicial="tarjetas"
+                            modoInicial="tabla"
                             tarjeta={TarjetaInventario}
                             entidades={inventarios.lista}
                             totalEntidades={inventarios.total}
@@ -83,7 +83,10 @@ const TarjetaInventario = (inventario: Inventario) => (
             {inventario.id} · {inventario.almacen ?? inventario.almacenId}
         </div>
         <div className="tarjeta-inventario-fecha">
-            {formatearFechaString(inventario.fecha)} {inventario.hora}
+            {formatearFechaString(inventario.fecha)} {inventario.hora?.slice(0, 8)}
         </div>
+        {inventario.observaciones && (
+            <div className="tarjeta-inventario-descripcion">{inventario.observaciones}</div>
+        )}
     </div>
 );

@@ -5,6 +5,8 @@ import {
 } from "#/almacen/stock/infraestructura.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import {
+    ArticuloLeido,
+    CambiarLineaInventario,
     CambiosInventario,
     DeleteInventario,
     DeleteLineaInventario,
@@ -13,12 +15,14 @@ import {
     GetLineasInventario,
     Inventario,
     LineaInventario,
+    LineaRechazada,
+    OpcionesCargaFichero,
     PatchInventario,
     PatchRegularizarRestoInventario,
+    PostFicheroInventario,
     PostInventario,
-    PostLecturasInventario,
     PostLineaInventario,
-    ResultadoCargaLecturas,
+    ResultadoCargaFichero,
 } from "./diseño.ts";
 
 const baseUrl = `/almacen/inventario`;
@@ -115,16 +119,70 @@ export const deleteLineaInventario: DeleteLineaInventario = async (id, lineaId) 
     );
 };
 
-export const postLecturasInventario: PostLecturasInventario = async (id, lecturas) =>
-    RestAPI.query<object, ResultadoCargaLecturas>(
-        `${baseUrl}/${id}/lecturas`,
-        {
-            contenido: lecturas.contenido,
-            separador: lecturas.separador,
-            ignorar_primera_linea: lecturas.ignorarPrimeraLinea,
-        },
+/**
+ * Una línea no se puede cambiar en el servidor (Eneboo tampoco deja cambiar
+ * la cantidad en edición): se borra y se vuelve a crear con la nueva
+ * cantidad, con lo que el stock se recalcula igual. Las lecturas de fichero
+ * de esa línea se pierden con el borrado.
+ */
+export const cambiarLineaInventario: CambiarLineaInventario = async (id, linea, cambios) => {
+    await deleteLineaInventario(id, linea.id);
+    return postLineaInventario(id, { ...cambios, articuloId: linea.articuloId });
+};
+
+interface ArticuloLeidoApi {
+    articulo_id: string;
+    descripcion: string | null;
+    lecturas: number;
+    cantidad: number;
+    cantidad_actual: number;
+}
+
+export interface ResultadoCargaFicheroApi {
+    cargado: boolean;
+    lecturas: number;
+    lineas: number;
+    articulos: ArticuloLeidoApi[];
+    rechazadas: LineaRechazada[];
+}
+
+const articuloLeidoDesdeApi = (api: ArticuloLeidoApi): ArticuloLeido => ({
+    articuloId: api.articulo_id,
+    descripcion: api.descripcion,
+    lecturas: api.lecturas,
+    cantidad: api.cantidad,
+    cantidadActual: api.cantidad_actual,
+});
+
+export const resultadoCargaFicheroDesdeApi = (
+    api: ResultadoCargaFicheroApi
+): ResultadoCargaFichero => ({
+    cargado: api.cargado,
+    lecturas: api.lecturas,
+    lineas: api.lineas,
+    articulos: (api.articulos ?? []).map(articuloLeidoDesdeApi),
+    rechazadas: (api.rechazadas ?? []).map((r) => ({ ...r, cantidad: String(r.cantidad ?? "") })),
+});
+
+/** Formulario multipart de `POST /almacen/inventario/<id>/fichero`. */
+export const cargaFicheroAFormData = (fichero: File, opciones: OpcionesCargaFichero): FormData => {
+    const formData = new FormData();
+    formData.append("fichero", fichero, fichero.name);
+    if (opciones.separador) formData.append("separador", opciones.separador);
+    formData.append("ignorar_primera_linea", String(opciones.ignorarPrimeraLinea));
+    formData.append("simular", String(opciones.simular));
+    formData.append("omitir_rechazadas", String(opciones.omitirRechazadas));
+    return formData;
+};
+
+export const postFicheroInventario: PostFicheroInventario = async (id, fichero, opciones) => {
+    const respuesta = await RestAPI.query<FormData, ResultadoCargaFicheroApi>(
+        `${baseUrl}/${id}/fichero`,
+        cargaFicheroAFormData(fichero, opciones),
         "Error al cargar el fichero de inventario"
     );
+    return resultadoCargaFicheroDesdeApi(respuesta);
+};
 
 export const patchRegularizarRestoInventario: PatchRegularizarRestoInventario = async (id) => {
     const respuesta = await RestAPI.patch(

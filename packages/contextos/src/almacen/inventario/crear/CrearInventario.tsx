@@ -6,7 +6,7 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useMemo } from "react";
-import { postInventario } from "../../infraestructura.ts";
+import { postInventario } from "../infraestructura.ts";
 import { metaNuevoInventario, nuevoInventarioInicial } from "./crear.ts";
 
 export const CrearInventario = ({

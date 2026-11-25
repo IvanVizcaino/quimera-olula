@@ -2,8 +2,8 @@ import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmac
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useCallback } from "react";
-import { Inventario } from "../../diseño.ts";
-import { patchRegularizarRestoInventario } from "../../infraestructura.ts";
+import { Inventario } from "../diseño.ts";
+import { patchRegularizarRestoInventario } from "../infraestructura.ts";
 
 /**
  * Regulariza a 0 los artículos con stock en el almacén que no tienen línea

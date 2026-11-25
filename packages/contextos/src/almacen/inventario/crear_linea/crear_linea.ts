@@ -1,5 +1,5 @@
 import { MetaModelo, stringNoVacio } from "@olula/lib/dominio.ts";
-import { NuevaLineaInventario } from "../../diseño.ts";
+import { NuevaLineaInventario } from "../diseño.ts";
 
 export const metaNuevaLineaInventario: MetaModelo<NuevaLineaInventario> = {
     campos: {

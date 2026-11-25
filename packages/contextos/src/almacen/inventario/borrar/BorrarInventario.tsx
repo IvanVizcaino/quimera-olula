@@ -2,8 +2,8 @@ import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmac
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useCallback } from "react";
-import { Inventario } from "../../diseño.ts";
-import { deleteInventario } from "../../infraestructura.ts";
+import { Inventario } from "../diseño.ts";
+import { deleteInventario } from "../infraestructura.ts";
 
 export const BorrarInventario = ({
     inventario,

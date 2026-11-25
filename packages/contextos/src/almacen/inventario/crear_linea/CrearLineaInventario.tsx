@@ -6,8 +6,8 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
 import { useCallback, useMemo } from "react";
-import { Inventario } from "../../diseño.ts";
-import { postLineaInventario } from "../../infraestructura.ts";
+import { Inventario } from "../diseño.ts";
+import { postLineaInventario } from "../infraestructura.ts";
 import { metaNuevaLineaInventario, nuevaLineaInventarioVacia } from "./crear_linea.ts";
 
 export const CrearLineaInventario = ({
