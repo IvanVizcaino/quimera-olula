@@ -89,13 +89,18 @@ export const DetalleInforme = ({
                             label="Resultado"
                             key="tab-resultado"
                             children={
-                                <TabResultado
-                                    pestaña={pestaña}
-                                    ficha={ficha}
-                                    resultado={resultado}
-                                    modo={modo}
-                                    emitir={emitir}
-                                />
+                                pestaña.Resultado ? (
+                                    // La key reinicia el resultado propio al cambiar la ficha o sus criterios.
+                                    <pestaña.Resultado key={JSON.stringify(ficha)} pestaña={pestaña} ficha={ficha} />
+                                ) : (
+                                    <TabResultado
+                                        pestaña={pestaña}
+                                        ficha={ficha}
+                                        resultado={resultado}
+                                        modo={modo}
+                                        emitir={emitir}
+                                    />
+                                )
                             }
                         />,
                     ]}
