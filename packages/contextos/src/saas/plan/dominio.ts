@@ -1,5 +1,5 @@
 import { aImporte, importeValido, textoANumero } from "../comun/dominio.js";
-import { Catalogo, ModuloCatalogo } from "../catalogo/diseño.js";
+import { Catalogo, LimiteCatalogo, ModuloCatalogo } from "../catalogo/diseño.js";
 import { ModoMcp, ModoModulo, MODULO_MCP, Plan, PlanLimite, PlanModulo, Precio } from "./diseño.js";
 
 export const etiquetaModo: Record<ModoModulo, string> = {
@@ -173,3 +173,98 @@ export const sustituirPlan = (planes: Plan[], plan: Plan): Plan[] =>
     ordenarPlanes(planes.some((p) => p.id === plan.id)
         ? planes.map((p) => (p.id === plan.id ? plan : p))
         : [...planes, plan]);
+
+// Rejillas de módulos y límites del detalle
+
+/** Texto comparable para el buscador: minúsculas y sin tildes. */
+export const normalizarBusqueda = (texto: string): string =>
+    texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+const coincide = (texto: string, campos: string[]): boolean => {
+    const buscado = normalizarBusqueda(texto);
+    return buscado === "" || campos.some((c) => normalizarBusqueda(c).includes(buscado));
+};
+
+export type FiltroModo = "todos" | ModoModulo;
+
+export const etiquetaFiltroModo: Record<FiltroModo, string> = {
+    todos: "Todos",
+    incluido: "Incluidos",
+    extra: "Extra",
+    no_disponible: "No disponibles",
+};
+
+/** Módulos del catálogo que casan con el buscador (nombre, id o descripción) y el filtro de modo. */
+export const filtrarModulosPlan = (
+    plan: Plan, modulos: ModuloCatalogo[], texto: string, filtro: FiltroModo
+): ModuloCatalogo[] =>
+    modulos.filter((m) => {
+        const pm = moduloDePlan(plan, m.id);
+        if (!pm) return false;
+        if (filtro !== "todos" && pm.modo !== filtro) return false;
+        return coincide(texto, [m.nombre, m.id, m.descripcion]);
+    });
+
+export const recuentoModos = (plan: Plan): Record<FiltroModo, number> => ({
+    todos: plan.modulos.length,
+    incluido: modulosIncluidos(plan).length,
+    extra: modulosExtra(plan).length,
+    no_disponible: plan.modulos.filter((m) => m.modo === "no_disponible").length,
+});
+
+/** La casilla de la tarjeta: lo incluido pasa a no disponible y lo demás (extra o no disponible) a incluido. */
+export const alternarIncluido = (plan: Plan, moduloId: string, modulos: ModuloCatalogo[]): Plan => {
+    const pm = moduloDePlan(plan, moduloId);
+    if (!pm) return plan;
+    return cambiarModoModulo(plan, moduloId, pm.modo === "incluido" ? "no_disponible" : "incluido", modulos);
+};
+
+/** Dependencias de un módulo ofrecido (incluido o extra) que el plan no ofrece: nombres del catálogo. */
+export const dependenciasSinCubrir = (plan: Plan, modulo: ModuloCatalogo, modulos: ModuloCatalogo[]): string[] => {
+    const pm = moduloDePlan(plan, modulo.id);
+    if (!pm || pm.modo === "no_disponible") return [];
+    return modulo.dependeDe
+        .filter((id) => (moduloDePlan(plan, id)?.modo ?? "no_disponible") === "no_disponible")
+        .map((id) => modulos.find((m) => m.id === id)?.nombre ?? id);
+};
+
+export type FiltroLimite = "todos" | "ilimitados" | "con_tope" | "ampliables";
+
+export const etiquetaFiltroLimite: Record<FiltroLimite, string> = {
+    todos: "Todos",
+    ilimitados: "Ilimitados",
+    con_tope: "Con tope",
+    ampliables: "Ampliables",
+};
+
+const cumpleFiltroLimite = (pl: PlanLimite, filtro: FiltroLimite): boolean => {
+    switch (filtro) {
+        case "ilimitados": return pl.valor === null;
+        case "con_tope": return pl.valor !== null;
+        case "ampliables": return pl.ampliable;
+        default: return true;
+    }
+};
+
+export const filtrarLimitesPlan = (
+    plan: Plan, limites: LimiteCatalogo[], texto: string, filtro: FiltroLimite
+): LimiteCatalogo[] =>
+    limites.filter((l) => {
+        const pl = plan.limites.find((x) => x.limiteId === l.id);
+        return !!pl && cumpleFiltroLimite(pl, filtro) && coincide(texto, [l.nombre, l.id, l.unidad]);
+    });
+
+export const recuentoLimites = (plan: Plan): Record<FiltroLimite, number> => ({
+    todos: plan.limites.length,
+    ilimitados: plan.limites.filter((l) => cumpleFiltroLimite(l, "ilimitados")).length,
+    con_tope: plan.limites.filter((l) => cumpleFiltroLimite(l, "con_tope")).length,
+    ampliables: plan.limites.filter((l) => cumpleFiltroLimite(l, "ampliables")).length,
+});
+
+/** Lo que muestra la tarjeta del límite: «Ilimitado», «Sin incluir» (0) o «5 usuarios al mes». */
+export const resumenLimite = (limite: LimiteCatalogo, pl: PlanLimite): string => {
+    if (pl.valor === null) return "Ilimitado";
+    if (pl.valor === 0) return "Sin incluir";
+    const sufijo = limite.tipo === "consumo_mensual" ? " al mes" : "";
+    return `${String(pl.valor).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} ${limite.unidad}${sufijo}`;
+};

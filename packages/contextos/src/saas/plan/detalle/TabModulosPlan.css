@@ -1,14 +1,61 @@
 .TabModulosPlan {
-    .modulo-plan-fila {
+    h4 {
         display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--color-borde, #e0e0e0);
+        align-items: baseline;
+        gap: 8px;
+        margin: 12px 0 8px;
+        .recuento-categoria { font-weight: 400; font-size: 0.85em; color: var(--color-texto-secundario); }
     }
-    .modulo-plan-info { flex: 1 1 200px; }
-    .modulo-plan-nombre { font-weight: 600; }
-    .modulo-plan-detalle, .ayuda-precio-extra { font-size: 0.85em; opacity: 0.75; }
-    quimera-select, quimera-input { min-width: 150px; }
+
+    /* Casilla de incluido, arriba a la derecha de la tarjeta. */
+    .tarjeta-plan-check {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: grid;
+        place-items: center;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        border: 2px solid var(--color-borde-fuerte);
+        border-radius: 6px;
+        background: var(--color-superficie);
+        color: var(--color-texto-menu);
+        cursor: pointer;
+        &:hover { border-color: var(--color-primario); }
+        &:focus-visible { outline: 2px solid var(--color-borde-focus); outline-offset: 2px; }
+        &[aria-checked="true"] { background: var(--color-primario); border-color: var(--color-primario); }
+    }
+    .tarjeta-plan.abierta .tarjeta-plan-check { top: 22px; right: 14px; }
+
+    .tarjeta-plan.modo-incluido {
+        border-color: var(--color-primario);
+        background: color-mix(in srgb, var(--color-primario) 8%, var(--color-superficie));
+        .tarjeta-plan-icono { background: var(--color-primario); color: var(--color-texto-menu); }
+        .tarjeta-plan-estado { color: var(--color-primario-texto); font-weight: 600; }
+    }
+    .tarjeta-plan.modo-extra {
+        border-style: dashed;
+        border-color: var(--color-advertencia);
+        .tarjeta-plan-icono { color: var(--color-advertencia-oscuro); background: color-mix(in srgb, var(--color-advertencia) 15%, var(--color-superficie)); }
+        .tarjeta-plan-estado { color: var(--color-advertencia-oscuro); font-weight: 600; }
+    }
+    .tarjeta-plan.modo-no_disponible:not(.abierta) {
+        .tarjeta-plan-icono, .tarjeta-plan-nombre { opacity: 0.55; }
+    }
+
+    .aviso-dependencia {
+        display: inline-grid;
+        place-items: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--color-advertencia);
+        color: var(--color-texto-menu);
+        font-weight: 700;
+        font-size: 0.85em;
+    }
+
+    .selector-segmentado button.activo.opcion-extra { background: var(--color-advertencia); border-color: var(--color-advertencia); }
+    .selector-segmentado button.activo.opcion-no_disponible { background: var(--color-texto-secundario); border-color: var(--color-texto-secundario); }
 }

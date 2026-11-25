@@ -1,0 +1,46 @@
+.DemoModulo {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+
+    .demo-aviso {
+        margin: 0;
+        padding: 6px 12px;
+        font-size: 0.85em;
+        background: color-mix(in srgb, var(--color-advertencia) 18%, var(--color-superficie));
+        color: var(--color-texto-primario);
+        border-bottom: 1px solid var(--color-advertencia);
+    }
+
+    .demo-pantallas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 6px 12px 0;
+        border-bottom: 1px solid var(--color-borde-sutil);
+
+        a {
+            padding: 6px 12px;
+            border-radius: 8px 8px 0 0;
+            color: var(--color-texto-secundario);
+            text-decoration: none;
+            font-size: 0.9em;
+            border-bottom: 2px solid transparent;
+            &:hover { color: var(--color-texto-primario); }
+            &.active { color: var(--color-primario-texto); border-bottom-color: var(--color-primario); font-weight: 600; }
+        }
+    }
+
+    .demo-contenido {
+        flex: 1;
+        min-height: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.demo-sin-datos {
+    padding: 24px;
+    color: var(--color-texto-secundario);
+}

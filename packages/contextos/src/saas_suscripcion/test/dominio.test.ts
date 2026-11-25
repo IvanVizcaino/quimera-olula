@@ -11,6 +11,8 @@ import {
 
 const precio = (m: string, a: string) => ({ mensual: m, anual: a });
 
+const FICHA = { categoria: "contexto" as const, descripcionLarga: "", caracteristicas: [], palabrasClave: [] };
+
 const catalogo: Catalogo = {
     limites: [
         { id: "usuarios", nombre: "Usuarios", unidad: "usuarios", tipo: "recuento", orden: 10 },
@@ -19,10 +21,10 @@ const catalogo: Catalogo = {
         { id: "llamadas_mcp", nombre: "Llamadas", unidad: "llamadas", tipo: "consumo_mensual", orden: 50 },
     ],
     modulos: [
-        { id: "ventas", nombre: "Ventas", descripcion: "", dependeDe: [], precio: precio("0.00", "0.00"), contratableSuelto: false, orden: 10 },
-        { id: "almacen", nombre: "Almacén", descripcion: "Stock", dependeDe: [], precio: precio("10.00", "100.00"), contratableSuelto: true, orden: 30 },
-        { id: "tpv", nombre: "TPV", descripcion: "Cajas", dependeDe: ["ventas", "almacen"], precio: precio("20.00", "200.00"), contratableSuelto: true, orden: 70 },
-        { id: "ia", nombre: "Asistente IA", descripcion: "", dependeDe: [], precio: precio("0.00", "0.00"), contratableSuelto: false, orden: 110 },
+        { id: "ventas", nombre: "Ventas", descripcion: "", dependeDe: [], precio: precio("0.00", "0.00"), contratableSuelto: false, orden: 10, ...FICHA },
+        { id: "almacen", nombre: "Almacén", descripcion: "Stock", dependeDe: [], precio: precio("10.00", "100.00"), contratableSuelto: true, orden: 30, ...FICHA },
+        { id: "tpv", nombre: "TPV", descripcion: "Cajas", dependeDe: ["ventas", "almacen"], precio: precio("20.00", "200.00"), contratableSuelto: true, orden: 70, ...FICHA },
+        { id: "ia", nombre: "Asistente IA", descripcion: "", dependeDe: [], precio: precio("0.00", "0.00"), contratableSuelto: false, orden: 110, ...FICHA },
     ],
     planes: [],
     extras: [

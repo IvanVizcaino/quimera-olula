@@ -3,9 +3,9 @@ import { componentesVisibles, dashboardPorDefecto, problemaComponente } from "./
 import { CLAVES_MODULO, DASHBOARDS_POR_DEFECTO } from "./por_defecto.ts";
 
 describe("dashboards por defecto", () => {
-  test("hay Inicio y uno por módulo del menú", () => {
+  test("hay Inicio, uno por módulo del menú y el del backoffice SaaS", () => {
     expect(Object.keys(DASHBOARDS_POR_DEFECTO).sort()).toEqual(
-      ["inicio", ...CLAVES_MODULO].sort()
+      ["inicio", "saas", ...CLAVES_MODULO].sort()
     );
   });
 

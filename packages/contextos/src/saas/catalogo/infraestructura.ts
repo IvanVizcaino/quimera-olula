@@ -28,6 +28,9 @@ interface ModuloCatalogoApi {
     plugin?: string | null;
     variante?: string | null;
     variantes?: string[];
+    descripcion_larga?: string | null;
+    caracteristicas?: string[];
+    palabras_clave?: string[];
 }
 
 interface ExtraCatalogoApi {
@@ -77,6 +80,9 @@ export const moduloCatalogoDesdeApi = (m: ModuloCatalogoApi): ModuloCatalogo => 
     plugin: m.plugin ?? null,
     variante: m.variante ?? null,
     variantes: m.variantes ?? [],
+    descripcionLarga: m.descripcion_larga ?? "",
+    caracteristicas: m.caracteristicas ?? [],
+    palabrasClave: m.palabras_clave ?? [],
 });
 
 export const extraDesdeApi = (e: ExtraCatalogoApi): ExtraCatalogo => ({
@@ -115,6 +121,9 @@ export const putModulo = async (m: ModuloCatalogo): Promise<ModuloCatalogo> => {
             contratable_suelto: m.contratableSuelto,
             publico: m.publico,
             aporta: m.aporta,
+            descripcion_larga: m.descripcionLarga,
+            caracteristicas: m.caracteristicas,
+            palabras_clave: m.palabrasClave,
             ...(m.plugin ? { variante: m.variante } : {}),
         },
         "Error al guardar el módulo"

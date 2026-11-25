@@ -2,6 +2,7 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
 import { QSelect } from "@olula/componentes/atomos/qselect.tsx";
+import { QTextArea } from "@olula/componentes/atomos/qtextarea.tsx";
 import { QModal } from "@olula/componentes/index.js";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useForm } from "@olula/lib/useForm.js";
@@ -54,6 +55,10 @@ export const EditarModuloCatalogo = ({
                         </p>
                     </>
                 )}
+                <h4>Ficha en «Módulos disponibles»</h4>
+                <QTextArea label="Descripción larga" {...uiProps("descripcionLarga")} rows={3} />
+                <QTextArea label="Características (una por línea)" {...uiProps("caracteristicas")} rows={4} />
+                <QInput label="Palabras clave para el buscador (separadas por comas)" {...uiProps("palabrasClave")} />
                 <h4>Aporta al límite</h4>
                 {limites.map((l) => (
                     <QInput key={l.id} label={`${l.nombre} (${l.unidad})`}

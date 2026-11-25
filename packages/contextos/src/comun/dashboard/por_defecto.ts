@@ -19,6 +19,10 @@ const RECIBOS_PENDIENTES = [
   { campo: "estado_recibo", operador: "in", valor: ["Emitido", "Devuelto"] },
 ];
 
+const EMPRESAS_ACTIVAS = [{ campo: "estado", operador: "=", valor: "activo" }];
+const EMPRESAS_INACTIVAS = [{ campo: "estado", operador: "in", valor: ["suspendido", "baja"] }];
+const FACTURAS_PAGADAS = [{ campo: "estado", operador: "=", valor: "pagada" }];
+
 const componente = (
   id: string,
   tipo: TipoComponente,
@@ -26,6 +30,12 @@ const componente = (
   [x, y, w, h]: [number, number, number, number],
   consulta: ConsultaComponente
 ): ComponenteDashboard => ({ id, tipo, titulo, x, y, w, h, consultas: [consulta], opciones: {} });
+
+/** Importes que el nombre de la medida no delata (`mrr`): se fija el formato. */
+const enMoneda = (c: ComponenteDashboard): ComponenteDashboard => ({
+  ...c,
+  opciones: { ...c.opciones, formato: "moneda" },
+});
 
 const facturadoMes = (recurso: string, titulo: string, x: number) =>
   componente("facturado_mes", "tarjeta", titulo, [x, 0, 3, 2], {
@@ -322,6 +332,134 @@ export const DASHBOARDS_POR_DEFECTO: Record<string, DashboardPorDefecto> = {
         periodo: "fecha:ultimos_12_meses",
         comparar: "año_anterior",
         limite: 100,
+      }),
+    ],
+  },
+  // Backoffice del SaaS (olula_saas_admin): recursos saas.* sobre la BD central.
+  saas: {
+    nombre: "Resumen del SaaS",
+    componentes: [
+      componente("empresas_activas", "tarjeta", "Empresas activas", [0, 0, 3, 2], {
+        recurso: "saas.empresa",
+        metricas: "conteo",
+        filtros: EMPRESAS_ACTIVAS,
+      }),
+      componente("empresas_inactivas", "tarjeta", "Empresas inactivas", [3, 0, 3, 2], {
+        recurso: "saas.empresa",
+        metricas: "conteo",
+        filtros: EMPRESAS_INACTIVAS,
+      }),
+      enMoneda(
+        componente("mrr", "tarjeta", "Ingreso mensual recurrente (MRR)", [6, 0, 3, 2], {
+          recurso: "saas.empresa",
+          metricas: "suma:mrr",
+        })
+      ),
+      enMoneda(
+        componente("facturado_total", "tarjeta", "Total facturado", [9, 0, 3, 2], {
+          recurso: "saas.factura",
+          metricas: "suma:total",
+          filtros: FACTURAS_PAGADAS,
+        })
+      ),
+      componente("en_prueba", "tarjeta", "Empresas en prueba", [0, 2, 3, 2], {
+        recurso: "saas.empresa",
+        metricas: "conteo",
+        filtros: [{ campo: "estado_suscripcion", operador: "=", valor: "prueba" }],
+      }),
+      componente("de_pago", "tarjeta", "Empresas de pago", [3, 2, 3, 2], {
+        recurso: "saas.empresa",
+        metricas: "suma:de_pago",
+      }),
+      enMoneda(
+        componente("cobrado_mes", "tarjeta", "Cobrado este mes", [6, 2, 3, 2], {
+          recurso: "saas.factura",
+          metricas: "suma:total",
+          filtros: FACTURAS_PAGADAS,
+          periodo: "fecha:este_mes",
+          comparar: "periodo_anterior",
+        })
+      ),
+      enMoneda(
+        componente("pendiente_cobro", "tarjeta", "Pendiente de cobro", [9, 2, 3, 2], {
+          recurso: "saas.factura",
+          metricas: "suma:total",
+          filtros: [{ campo: "estado", operador: "in", valor: ["pendiente", "fallida", "devuelta"] }],
+        })
+      ),
+      enMoneda(
+        componente("facturacion_mensual", "temporal", "Facturación mensual", [0, 4, 8, 8], {
+          recurso: "saas.factura",
+          metricas: "suma:total",
+          filtros: FACTURAS_PAGADAS,
+          agrupar: "fecha:mes",
+          periodo: "fecha:ultimos_12_meses",
+          comparar: "año_anterior",
+          limite: 100,
+        })
+      ),
+      componente("empresas_estado", "circular", "Empresas por estado", [8, 4, 4, 8], {
+        recurso: "saas.empresa",
+        metricas: "conteo",
+        agrupar: "estado",
+        limite: 10,
+      }),
+      componente("altas_mes", "temporal", "Altas de empresas por mes", [0, 12, 8, 8], {
+        recurso: "saas.empresa",
+        metricas: "conteo",
+        agrupar: "fecha_alta:mes",
+        periodo: "fecha_alta:ultimos_12_meses",
+        limite: 100,
+      }),
+      componente("suscripciones_estado", "circular", "Suscripciones por estado", [8, 12, 4, 8], {
+        recurso: "saas.empresa",
+        metricas: "conteo",
+        agrupar: "estado_suscripcion",
+        limite: 10,
+      }),
+      enMoneda(
+        componente("mrr_plan", "ranking", "Ingreso mensual por plan", [0, 20, 4, 8], {
+          recurso: "saas.empresa",
+          metricas: "suma:mrr",
+          agrupar: "plan",
+          limite: 10,
+        })
+      ),
+      componente("pruebas", "tabla", "Pruebas que terminan antes", [4, 20, 4, 8], {
+        recurso: "saas.empresa",
+        columnas: "nombre,nombre_plan,fin_prueba,mrr_prueba",
+        filtros: [{ campo: "estado_suscripcion", operador: "=", valor: "prueba" }],
+        orden: "fin_prueba:asc",
+        limite: 8,
+      }),
+      componente("impagos", "tabla", "Impagos", [8, 20, 4, 8], {
+        recurso: "saas.empresa",
+        columnas: "nombre,nombre_plan,impagada_desde,mrr",
+        filtros: [{ campo: "estado_suscripcion", operador: "in", valor: ["impagada", "solo_lectura"] }],
+        orden: "impagada_desde:asc",
+        limite: 8,
+      }),
+      enMoneda(
+        componente("top_empresas", "ranking", "Empresas que más han pagado", [0, 28, 4, 8], {
+          recurso: "saas.factura",
+          metricas: "suma:total",
+          filtros: FACTURAS_PAGADAS,
+          agrupar: "empresa",
+          limite: 8,
+        })
+      ),
+      componente("consumo_mes", "barras", "Consumo del mes", [4, 28, 4, 8], {
+        recurso: "saas.consumo",
+        metricas: "suma:cantidad",
+        agrupar: "limite",
+        periodo: "mes:este_mes",
+        limite: 10,
+      }),
+      componente("ultimas_altas", "tabla", "Últimas altas", [8, 28, 4, 8], {
+        recurso: "saas.empresa",
+        columnas: "nombre,fecha_alta,nombre_plan,estado",
+        orden: "fecha_alta:desc",
+        limite: 8,
       }),
     ],
   },

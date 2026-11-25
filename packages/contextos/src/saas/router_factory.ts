@@ -1,3 +1,5 @@
+import { PaginaDashboard, PaginaDashboardModulo } from "../comun/dashboard/vistas/pagina/PaginaDashboard.tsx";
+import { PaginaDashboards } from "../comun/dashboard/vistas/PaginaDashboards.tsx";
 import { MaestroConDetalleCredencialExterna } from "../comun/credencial_externa/maestro/MaestroConDetalleCredencialExterna.tsx";
 import { PantallaCatalogo } from "./catalogo/maestro/PantallaCatalogo.js";
 import { PantallaPasarelas } from "./pasarela/maestro/PantallaPasarelas.js";
@@ -12,5 +14,9 @@ export class RouterFactorySaas {
         "saas/pasarelas": PantallaPasarelas,
         "comun/credencial-externa": MaestroConDetalleCredencialExterna,
         "comun/credencial-externa/:id": MaestroConDetalleCredencialExterna,
+        // Dashboards editables (el de por defecto del backoffice es la clave `saas`).
+        "comun/dashboard": PaginaDashboards,
+        "comun/dashboard/:id": PaginaDashboard,
+        "dashboard/:clave": PaginaDashboardModulo,
     };
 }

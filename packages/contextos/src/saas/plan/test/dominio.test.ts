@@ -3,6 +3,8 @@ import { Plan } from "../diseño.ts";
 import {
     cambiarLimite, cambiarModoMcp, cambiarModoModulo, cambiarPrecioExtra, completarPlan, duplicarPlan,
     planModificado, planNuevo, planParaGuardar, problemasPlan, sustituirPlan, valorLimiteDesdeTexto,
+    alternarIncluido, dependenciasSinCubrir, filtrarLimitesPlan, filtrarModulosPlan, recuentoLimites,
+    recuentoModos, resumenLimite,
 } from "../dominio.ts";
 import { planAApi, planDesdeApi } from "../infraestructura.ts";
 
@@ -10,6 +12,7 @@ const modulo = (id: string, contratableSuelto = true): ModuloCatalogo => ({
     id, nombre: id, descripcion: "", dependeDe: [], precio: { mensual: "5.00", anual: "50.00" },
     contratableSuelto, publico: true, aporta: {}, orden: 0,
     categoria: "contexto", plugin: null, variante: null, variantes: [],
+    descripcionLarga: "", caracteristicas: [], palabrasClave: [],
 });
 
 const catalogo = {
@@ -185,5 +188,73 @@ describe("mapeo con la API", () => {
         expect(cuerpo).not.toHaveProperty("avisos");
         const { id: _id, avisos: _avisos, ...resto } = api;
         expect(cuerpo).toEqual(resto);
+    });
+});
+
+describe("rejilla de módulos", () => {
+    const conAlmacen = {
+        ...catalogo,
+        modulos: [
+            ...catalogo.modulos,
+            { ...modulo("almacen"), nombre: "Almacén", dependeDe: ["compras"], descripcion: "Stock y ubicaciones" },
+        ],
+    };
+    const base = planNuevo("p", "P", conAlmacen);
+    const plan = cambiarModoModulo(alternarIncluido(base, "ventas", conAlmacen.modulos), "compras", "extra", conAlmacen.modulos);
+
+    test("el buscador ignora tildes y mayúsculas y mira nombre, id y descripción", () => {
+        const ids = (texto: string) => filtrarModulosPlan(plan, conAlmacen.modulos, texto, "todos").map((m) => m.id);
+        expect(ids("almacen")).toEqual(["almacen"]);
+        expect(ids("  STOCK ")).toEqual(["almacen"]);
+        expect(ids("")).toEqual(["ventas", "compras", "mcp", "almacen"]);
+    });
+
+    test("filtra por modo y cuenta cada modo", () => {
+        expect(filtrarModulosPlan(plan, conAlmacen.modulos, "", "incluido").map((m) => m.id)).toEqual(["ventas"]);
+        expect(filtrarModulosPlan(plan, conAlmacen.modulos, "", "extra").map((m) => m.id)).toEqual(["compras"]);
+        expect(recuentoModos(plan)).toEqual({ todos: 4, incluido: 1, extra: 1, no_disponible: 2 });
+    });
+
+    test("la casilla alterna incluido y no disponible, y un extra pasa a incluido sin precio especial", () => {
+        expect(alternarIncluido(plan, "ventas", conAlmacen.modulos).modulos[0].modo).toBe("no_disponible");
+        const conPrecio = cambiarPrecioExtra(plan, "compras", "mensual", "3");
+        const incluido = alternarIncluido(conPrecio, "compras", conAlmacen.modulos).modulos[1];
+        expect(incluido).toMatchObject({ modo: "incluido", precio: null });
+    });
+
+    test("avisa de las dependencias que el plan no ofrece", () => {
+        const almacen = conAlmacen.modulos[3];
+        expect(dependenciasSinCubrir(plan, almacen, conAlmacen.modulos)).toEqual([]);
+        const conAlmacenIncluido = alternarIncluido(base, "almacen", conAlmacen.modulos);
+        expect(dependenciasSinCubrir(conAlmacenIncluido, almacen, conAlmacen.modulos)).toEqual(["compras"]);
+        expect(dependenciasSinCubrir(base, almacen, conAlmacen.modulos)).toEqual([]);
+    });
+});
+
+describe("rejilla de límites", () => {
+    const limites = [
+        ...catalogo.limites,
+        { id: "consultas_ia", nombre: "Consultas al asistente", unidad: "consultas", tipo: "consumo_mensual" as const, alSuperar: "avisar" as const, umbralAviso: 80, orden: 2 },
+    ];
+    const plan = cambiarLimite(
+        cambiarLimite(planNuevo("p", "P", { ...catalogo, limites }), "usuarios", { valor: 5, ampliable: true }),
+        "consultas_ia", { valor: null },
+    );
+
+    test("filtra y cuenta ilimitados, con tope y ampliables", () => {
+        const ids = (f: Parameters<typeof filtrarLimitesPlan>[3], texto = "") =>
+            filtrarLimitesPlan(plan, limites, texto, f).map((l) => l.id);
+        expect(ids("ilimitados")).toEqual(["consultas_ia"]);
+        expect(ids("con_tope")).toEqual(["usuarios"]);
+        expect(ids("ampliables")).toEqual(["usuarios"]);
+        expect(ids("todos", "asistente")).toEqual(["consultas_ia"]);
+        expect(recuentoLimites(plan)).toEqual({ todos: 2, ilimitados: 1, con_tope: 1, ampliables: 1 });
+    });
+
+    test("resume el valor del límite", () => {
+        expect(resumenLimite(limites[0], plan.limites[0])).toBe("5 usuarios");
+        expect(resumenLimite(limites[1], plan.limites[1])).toBe("Ilimitado");
+        expect(resumenLimite(limites[1], { limiteId: "consultas_ia", valor: 1500, ampliable: false })).toBe("1.500 consultas al mes");
+        expect(resumenLimite(limites[0], { limiteId: "usuarios", valor: 0, ampliable: false })).toBe("Sin incluir");
     });
 });
