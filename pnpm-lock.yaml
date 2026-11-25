@@ -421,6 +421,21 @@ importers:
         specifier: workspace:*
         version: link:../../packages/contextos/lib
 
+  apps/olula_max:
+    dependencies:
+      '@olula/componentes':
+        specifier: workspace:*
+        version: link:../../packages/componentes
+      '@olula/ctx':
+        specifier: workspace:*
+        version: link:../../packages/contextos
+      '@olula/lib':
+        specifier: workspace:*
+        version: link:../../packages/contextos/lib
+      '@olula/olula':
+        specifier: workspace:*
+        version: link:../olula
+
   apps/olula_saas:
     dependencies:
       '@olula/componentes':
