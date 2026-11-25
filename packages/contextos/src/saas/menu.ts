@@ -1,5 +1,7 @@
 export const menuSaas = {
     "SaaS": { icono: "fichero" },
+    "SaaS/Resumen": { url: "/dashboard/saas" },
+    "SaaS/Dashboards": { url: "/comun/dashboard" },
     "SaaS/Empresas": { url: "/saas/empresas", regla: "saas.tenant" },
     "SaaS/Planes": { url: "/saas/planes", regla: "saas.catalogo" },
     "SaaS/Catálogo": { url: "/saas/catalogo", regla: "saas.catalogo" },
