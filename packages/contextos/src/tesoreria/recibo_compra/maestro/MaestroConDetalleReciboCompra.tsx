@@ -1,6 +1,6 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
-import { MetaTabla } from "@olula/componentes/index.js";
+import { MetaTabla, QEtiqueta } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
 import {
     filtroFechas,
@@ -19,7 +19,11 @@ import {
     ESTADOS_RECIBO_COMPRA_DEFECTO,
     opcionesEstadoReciboCompra,
 } from "../dominio.js";
-import { estadosDesdeFiltro, filtroEstadoReciboVenta } from "../../recibo_venta/dominio.js";
+import {
+    estadosDesdeFiltro,
+    filtroEstadoReciboVenta,
+    varianteEstadoReciboVenta,
+} from "../../recibo_venta/dominio.js";
 import { recibosSeleccionados } from "./maestro.js";
 import "./MaestroConDetalleReciboCompra.css";
 import { getMaquina } from "./maquina.js";
@@ -31,7 +35,16 @@ const metaTablaReciboCompra: MetaTabla<ReciboCompra> = [
     { id: 'idFiscal', cabecera: 'ID Fiscal' },
     { id: 'fechaEmision', cabecera: 'F. Emisión', tipo: 'fecha' },
     { id: 'fechaVencimiento', cabecera: 'F. Vencimiento', tipo: 'fecha' },
-    { id: 'estado', cabecera: 'Estado' },
+    {
+        id: 'estado',
+        cabecera: 'Estado',
+        // Como en recibos de cobro: emitido neutro, pagado en verde, devuelto en rojo, remesado en ámbar.
+        render: (recibo: ReciboCompra) => (
+            <QEtiqueta variante={varianteEstadoReciboVenta(recibo.estado)}>
+                {recibo.estado}
+            </QEtiqueta>
+        ),
+    },
     { id: 'importe', cabecera: 'Importe', tipo: 'moneda' },
 ];
 
