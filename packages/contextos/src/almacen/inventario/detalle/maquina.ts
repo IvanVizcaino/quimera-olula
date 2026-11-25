@@ -21,7 +21,7 @@ export const getMaquina: () => Maquina<EstadoDetalleInventario, ContextoDetalleI
         regularizar_resto_solicitado: "REGULARIZANDO_RESTO",
     },
     BORRANDO: {
-        inventario_borrado: [publicar("inventario_borrado", (ctx) => ctx.inventario), "INICIAL"],
+        inventario_borrado: [publicar("inventario_borrado", (ctx) => ctx.inventario.id), "INICIAL"],
         borrado_cancelado: "ABIERTO",
     },
     CREANDO_LINEA: {

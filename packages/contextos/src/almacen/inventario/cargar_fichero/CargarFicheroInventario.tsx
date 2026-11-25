@@ -8,7 +8,7 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { EmitirEvento } from "@olula/lib/diseño.js";
 import { formatearNumero } from "@olula/lib/dominio.ts";
 import { useCallback, useContext, useState } from "react";
-import { Inventario, OpcionesCargaFichero, ResultadoCargaFichero, SeparadorFichero } from "../diseño.ts";
+import { Inventario, OpcionesCargaFichero, ResultadoCargaFichero } from "../diseño.ts";
 import { postFicheroInventario } from "../infraestructura.ts";
 import "./CargarFicheroInventario.css";
 import {
@@ -18,12 +18,14 @@ import {
     opcionesCargaIniciales,
     opcionesSeparador,
     resumenCarga,
+    separadorAOpcion,
+    separadorDesdeOpcion,
 } from "./cargar_fichero.ts";
 
-type Accion = "comprobar" | "cargar" | "cargar_validas";
+type Accion = "simular" | "cargar" | "cargar_validas";
 
 const opcionesAccion: Record<Accion, Partial<OpcionesCargaFichero>> = {
-    comprobar: { simular: true, omitirRechazadas: false },
+    simular: { simular: true, omitirRechazadas: false },
     cargar: { simular: false, omitirRechazadas: false },
     cargar_validas: { simular: false, omitirRechazadas: true },
 };
@@ -70,7 +72,7 @@ export const CargarFicheroInventario = ({
                     postFicheroInventario(inventario.id, origen, { ...opciones, ...opcionesAccion[accion] })
                 );
                 setResultado(respuesta);
-                setSimulado(accion === "comprobar");
+                setSimulado(accion === "simular");
                 if (respuesta.cargado) setCargado(true);
             } catch {
                 // El error ya se muestra en el modal de error.
@@ -131,11 +133,11 @@ export const CargarFicheroInventario = ({
                     <QSelect
                         label="Separador (CSV/TXT)"
                         nombre="separador"
-                        valor={opciones.separador}
+                        valor={separadorAOpcion(opciones.separador)}
                         opciones={opcionesSeparador}
                         deshabilitado={!esTexto}
                         onChange={(opcion) =>
-                            setOpciones({ ...opciones, separador: (opcion?.valor ?? "") as SeparadorFichero })
+                            setOpciones({ ...opciones, separador: separadorDesdeOpcion(opcion?.valor) })
                         }
                     />
                     <QCheckbox
@@ -147,8 +149,8 @@ export const CargarFicheroInventario = ({
                 </quimera-formulario>
 
                 <div className="botones maestro-botones">
-                    <QBoton variante="borde" onClick={() => enviar("comprobar")} deshabilitado={!puedeEnviar}>
-                        Comprobar
+                    <QBoton variante="borde" onClick={() => enviar("simular")} deshabilitado={!puedeEnviar}>
+                        Simular
                     </QBoton>
                     <QBoton onClick={() => enviar("cargar")} deshabilitado={!puedeEnviar}>
                         Cargar
@@ -185,7 +187,7 @@ const ResultadoCarga = ({
                 <table className="tabla-rechazadas">
                     <thead>
                         <tr>
-                            <th>Fila</th>
+                            <th className="numero">Fila</th>
                             <th>Referencia</th>
                             <th>Cantidad</th>
                             <th>Motivo</th>
@@ -212,9 +214,9 @@ const ResultadoCarga = ({
                         <tr>
                             <th>Referencia</th>
                             <th>Descripción</th>
-                            <th>Lecturas</th>
-                            <th>Cantidad</th>
-                            <th>Stock anterior</th>
+                            <th className="numero">Lecturas</th>
+                            <th className="numero">Cantidad</th>
+                            <th className="numero">Stock actual</th>
                         </tr>
                     </thead>
                     <tbody>

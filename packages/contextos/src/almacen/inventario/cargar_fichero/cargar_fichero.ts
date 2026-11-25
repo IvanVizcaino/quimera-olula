@@ -14,13 +14,24 @@ export const formatoFichero = (nombre: string): FormatoFichero | null => {
     return null;
 };
 
-export const opcionesSeparador: { valor: SeparadorFichero; descripcion: string }[] = [
-    { valor: "", descripcion: "Detectar" },
+/** En el desplegable "auto" es detectar (QSelect toma "" como vacío). */
+const SEPARADOR_DETECTAR = "auto";
+
+export const opcionesSeparador: { valor: string; descripcion: string }[] = [
+    { valor: SEPARADOR_DETECTAR, descripcion: "Detectar" },
     { valor: "|", descripcion: "Barra vertical |" },
     { valor: ";", descripcion: "Punto y coma ;" },
     { valor: ",", descripcion: "Coma ," },
     { valor: "\t", descripcion: "Tabulador" },
 ];
+
+export const separadorAOpcion = (separador: SeparadorFichero): string =>
+    separador || SEPARADOR_DETECTAR;
+
+export const separadorDesdeOpcion = (valor: string | undefined): SeparadorFichero =>
+    opcionesSeparador.some((o) => o.valor === valor) && valor !== SEPARADOR_DETECTAR
+        ? (valor as SeparadorFichero)
+        : "";
 
 export const opcionesCargaIniciales = (): OpcionesCargaFichero => ({
     separador: "",
@@ -47,7 +58,7 @@ export const resumenCarga = (resultado: ResultadoCargaFichero, simulado: boolean
             : `Cargado: ${lecturas} de ${articulos}, ${lineas}.`;
     }
     if (simulado) {
-        return `Comprobación (no se ha grabado nada): ${lecturas} de ${articulos}, ${rechazadas}.`;
+        return `Simulación (no se ha grabado nada): ${lecturas} de ${articulos}, ${rechazadas}.`;
     }
     return resultado.rechazadas.length
         ? `No se ha cargado nada: ${rechazadas}. Corrija el fichero o cargue solo las válidas.`

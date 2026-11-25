@@ -8,6 +8,8 @@ import {
     formatoFichero,
     opcionesCargaIniciales,
     resumenCarga,
+    separadorAOpcion,
+    separadorDesdeOpcion,
 } from "../cargar_fichero/cargar_fichero.ts";
 import { contextoDetalleInventarioInicial, totalesLineas } from "../detalle/dominio.ts";
 import { getMaquina } from "../detalle/maquina.ts";
@@ -117,7 +119,7 @@ describe("Carga de fichero del inventario", () => {
         expect(resumenCarga(resultado({ cargado: true, lecturas: 2, lineas: 1, articulos }), false))
             .toBe("Cargado: 2 lecturas válidas de 1 artículo, 1 línea regularizada.");
         expect(resumenCarga(resultado({ lecturas: 2, articulos, rechazadas }), true))
-            .toBe("Comprobación (no se ha grabado nada): 2 lecturas válidas de 1 artículo, 1 fila rechazada.");
+            .toBe("Simulación (no se ha grabado nada): 2 lecturas válidas de 1 artículo, 1 fila rechazada.");
         expect(resumenCarga(resultado({ lecturas: 2, articulos, rechazadas }), false))
             .toContain("No se ha cargado nada: 1 fila rechazada");
         expect(resumenCarga(resultado({ cargado: true, lecturas: 1200, lineas: 1, articulos, rechazadas }), false))
@@ -154,5 +156,16 @@ describe("Carga de fichero del inventario", () => {
         expect(conOpciones.get("ignorar_primera_linea")).toBe("true");
         expect(conOpciones.get("simular")).toBe("true");
         expect(conOpciones.get("omitir_rechazadas")).toBe("true");
+    });
+});
+
+describe("Separador del fichero", () => {
+    test("el desplegable usa 'auto' para detectar y lo envía vacío", () => {
+        expect(separadorAOpcion("")).toBe("auto");
+        expect(separadorAOpcion(";")).toBe(";");
+        expect(separadorDesdeOpcion("auto")).toBe("");
+        expect(separadorDesdeOpcion("\t")).toBe("\t");
+        expect(separadorDesdeOpcion("x")).toBe("");
+        expect(separadorDesdeOpcion(undefined)).toBe("");
     });
 });
