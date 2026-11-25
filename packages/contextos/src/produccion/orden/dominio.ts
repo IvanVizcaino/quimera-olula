@@ -245,3 +245,19 @@ export const filtroPedidosCliente = (texto: string, clienteId?: string, codigo?:
     if (clienteId) filtro.push(["cliente_id", "=", clienteId]);
     return filtro;
 };
+
+/** Nombre del PDF de la hoja de orden (el mismo que da el servidor). */
+export const nombreHojaOrden = (id: string, hasta?: string): string => {
+    const desde = id.trim();
+    const fin = hasta?.trim();
+    return fin && fin !== desde ? `ordenes-${desde}-${fin}.pdf` : `orden-${desde}.pdf`;
+};
+
+/** Rango de la impresión de hojas: «desde» obligatorio y «hasta» (opcional) no anterior. */
+export const motivoRangoHojasNoValido = (desde: string, hasta: string): string | null => {
+    const d = desde.trim();
+    const h = hasta.trim();
+    if (!d) return "Indique la orden desde la que imprimir";
+    if (h && h < d) return "La orden «hasta» no puede ser anterior a la orden «desde»";
+    return null;
+};

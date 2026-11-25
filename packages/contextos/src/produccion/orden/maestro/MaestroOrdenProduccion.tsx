@@ -4,6 +4,7 @@ import { filtroFechas, MetaFiltro } from "@olula/componentes/maestro/maestroFilt
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Criteria } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { fechaDdMmAaaa } from "../../comun/dominio.ts";
 import { MaestroSimple } from "../../comun/maestro_simple/MaestroSimple.tsx";
@@ -12,6 +13,7 @@ import { DetalleOrden } from "../detalle/DetalleOrden.tsx";
 import { OrdenProduccion } from "../diseño.ts";
 import { EstadoOrden } from "../EstadoOrden.tsx";
 import { ESTADOS_ORDEN, formatearCantidad } from "../dominio.ts";
+import { ImprimirHojasOrden } from "../imprimir_hojas/ImprimirHojasOrden.tsx";
 import { getOrden, getOrdenes } from "../infraestructura.ts";
 import "./MaestroOrdenProduccion.css";
 
@@ -70,7 +72,9 @@ const consultas = { getUno: getOrden, getLista: getOrdenes };
 /** Producción > Órdenes de producción (`pr_ordenesproduccion` con su lote). */
 export const MaestroOrdenProduccion = () => {
     const navegar = useNavigate();
+    const [imprimiendo, setImprimiendo] = useState(false);
     return (
+    <>
     <MaestroSimple<OrdenProduccion>
         clase="MaestroOrdenProduccion"
         titulo="Órdenes de producción"
@@ -80,7 +84,10 @@ export const MaestroOrdenProduccion = () => {
         consultas={consultas}
         criteriaBase={criteriaBase}
         accionesExtra={
-            <QBoton variante="borde" onClick={() => navegar("/produccion/generar_ordenes")}>Generar órdenes</QBoton>
+            <>
+                <QBoton variante="borde" onClick={() => navegar("/produccion/generar_ordenes")}>Generar órdenes</QBoton>
+                <QBoton variante="borde" onClick={() => setImprimiendo(true)}>Imprimir varias hojas</QBoton>
+            </>
         }
         tarjeta={(o) => (
             <div key={o.id}>
@@ -91,5 +98,7 @@ export const MaestroOrdenProduccion = () => {
         crear={(publicar) => <CrearOrden publicar={publicar} />}
         detalle={(id, publicar) => <DetalleOrden id={id} publicar={publicar} />}
     />
+    {imprimiendo && <ImprimirHojasOrden cerrar={() => setImprimiendo(false)} />}
+    </>
     );
 };

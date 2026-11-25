@@ -198,3 +198,12 @@ export const postTerminarOrden: PostTerminarOrden = async (id, trabajadorId) => 
 export const postSacarProcesoOrden: PostSacarProcesoOrden = async (id) => {
     await RestAPI.post(`${url(id)}/sacar_proceso`, {}, "Error al sacar el proceso de la orden");
 };
+
+/** Hoja de orden (PDF): la de `id` o, con `hasta`, las de `id` a `hasta` (como mucho 200). */
+export const urlHojaOrden = (id: string, hasta?: string): string => {
+    const fin = hasta?.trim();
+    return `${url(id.trim())}/report${fin && fin !== id.trim() ? `?hasta=${encodeURIComponent(fin)}` : ""}`;
+};
+
+export const getHojaOrden = async (id: string, hasta?: string): Promise<Blob> =>
+    RestAPI.blob(urlHojaOrden(id, hasta), "Error al imprimir la hoja de orden");
