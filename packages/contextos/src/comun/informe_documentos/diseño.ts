@@ -76,6 +76,17 @@ export interface PestañaInforme {
     ajustar?: (ficha: FichaInforme, campo: string) => FichaInforme;
     /** Botones de cálculo; por defecto «Calcular detalle» y «Calcular resumen». */
     modos?: ModoCalculo[];
+    /**
+     * Pestaña Resultado propia, para informes cuyo resultado no es una lista
+     * de documentos (p. ej. el inventario, agrupado por almacén). Calcula y
+     * descarga por su cuenta; sin ella se usa la común.
+     */
+    Resultado?: ComponentType<PropsResultadoInforme>;
+}
+
+export interface PropsResultadoInforme {
+    pestaña: PestañaInforme;
+    ficha: FichaInforme;
 }
 
 export type TipoColumnaResultado =

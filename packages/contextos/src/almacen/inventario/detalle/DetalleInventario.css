@@ -1,0 +1,50 @@
+.DetalleInventario {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+
+    quimera-formulario {
+        quimera-input[nombre="id"],
+        quimera-input[nombre="fecha"],
+        quimera-input[nombre="hora"] {
+            grid-column: span 2;
+        }
+
+        quimera-input[nombre="almacen"] {
+            grid-column: span 6;
+        }
+
+        quimera-input[nombre="observaciones"] {
+            grid-column: span 12;
+        }
+    }
+
+    .LineasInventario {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+
+        .cabecera-lineas {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--espaciado-s);
+
+            h4 {
+                margin: 0;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .DetalleInventario quimera-formulario quimera-input {
+        grid-column: span 12 !important;
+    }
+}
+
+.CambiarLineaInventario .aviso-inventario {
+    color: var(--color-texto-secundario);
+    margin: var(--espaciado-s) 0 0;
+}

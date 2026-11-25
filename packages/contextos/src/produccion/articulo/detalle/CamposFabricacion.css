@@ -1,0 +1,33 @@
+.CamposFabricacion {
+    quimera-checkbox[nombre="fabricado"] {
+        grid-column: span 4;
+        align-self: end;
+    }
+
+    quimera-select[nombre="tipoProcesoId"] {
+        grid-column: span 8;
+    }
+
+    .avisos-fabricacion {
+        margin-bottom: var(--espacio-s, 0.5rem);
+
+        ul {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+    }
+
+    .nota,
+    .motivo-fabricacion {
+        color: var(--color-texto-secundario, #666);
+        font-size: 0.9em;
+    }
+
+    .motivo-fabricacion {
+        color: var(--color-error, #b00020);
+    }
+
+    .ComponentesFabricacion {
+        margin-top: var(--espacio-m, 1rem);
+    }
+}

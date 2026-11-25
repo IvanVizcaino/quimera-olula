@@ -53,8 +53,10 @@ export const fichaDesdeApi =
         return ficha;
     };
 
-const valorApi = (campo: CampoInforme | undefined, valor: ValorCriterio) => {
+const valorApi = (campo: CampoInforme | undefined, valor: ValorCriterio | null | undefined) => {
     if (campo?.tipo === "casilla") return aBooleano(valor);
+    // Un input vaciado puede dejar null en el modelo: no enviarlo como "null".
+    if (valor === null || valor === undefined) return null;
     const texto = typeof valor === "string" ? valor.trim() : String(valor);
     if (texto === "") return null;
     if (campo?.tipo === "decimal") return Number(texto.replace(",", "."));

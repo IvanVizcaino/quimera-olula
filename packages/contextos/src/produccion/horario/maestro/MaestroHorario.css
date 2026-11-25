@@ -1,0 +1,23 @@
+.FormHorario {
+    quimera-input[nombre="id"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 8;
+    }
+
+    quimera-input[nombre^="hora"] {
+        grid-column: span 3;
+    }
+
+    quimera-input[nombre="tiempo"] {
+        grid-column: span 4;
+    }
+}
+
+.FormHorario .aviso-horas {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--color-error, #b42318);
+}

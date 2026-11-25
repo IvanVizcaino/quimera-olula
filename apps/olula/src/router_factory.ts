@@ -9,6 +9,7 @@ import { RouterFactoryCrmOlula } from '#/crm/router_factory.ts';
 import { RouterFactoryEmpresaOlula } from '#/empresa/router_factory.ts';
 import { RouterFactoryFiscalOlula } from '#/fiscal/router_factory.ts';
 import { RouterFactoryPrediccionesOlula } from '#/predicciones/router_factory.ts';
+import { RouterFactoryProduccionOlula } from '#/produccion/router_factory.ts';
 import { RouterFactoryProyectosOlula } from '#/proyectos/router_factory.ts';
 import { RouterFactoryRrhh } from '#/rrhh/router_factory.ts';
 import { RouterFactoryTesoreriaOlula } from '#/tesoreria/router_factory.ts';
@@ -28,6 +29,7 @@ export class RouterFactoryOlula {
     Contabilidad = RouterFactoryContabilidadOlula;
     Fiscal = RouterFactoryFiscalOlula;
     Almacen = RouterFactoryAlmacenOlula;
+    Produccion = RouterFactoryProduccionOlula;
     Crm = RouterFactoryCrmOlula;
     Empresa = RouterFactoryEmpresaOlula;
     Tpv = RouterFactoryTpvOlula;
