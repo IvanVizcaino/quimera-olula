@@ -1,0 +1,98 @@
+.PegarExcelPlanProduccion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(900px, 90vw);
+
+    p {
+        margin: 0;
+        color: var(--color-texto-secundario);
+    }
+
+    quimera-textarea textarea {
+        width: 100%;
+        box-sizing: border-box;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.85rem;
+        white-space: pre;
+        overflow: auto;
+        min-height: 200px;
+        resize: vertical;
+    }
+
+    .pegado-contadores {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .pegado-contador {
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        background: var(--color-superficie-sunken);
+    }
+
+    .pegado-contador.pegado-ok {
+        background: var(--color-exito-claro);
+        color: var(--color-exito-oscuro);
+    }
+
+    .pegado-contador.pegado-ko {
+        background: var(--color-error-claro);
+        color: var(--color-error-oscuro);
+    }
+
+    .pegado-error-global {
+        color: var(--color-error-oscuro);
+        background: var(--color-error-suave);
+        border: 1px solid var(--color-error);
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-weight: 600;
+    }
+
+    .pegado-scroll {
+        overflow: auto;
+        max-height: 40vh;
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: 6px;
+    }
+
+    table {
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        width: 100%;
+    }
+
+    th, td {
+        border-bottom: 1px solid var(--color-borde-sutil);
+        padding: 4px 8px;
+        text-align: left;
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        background: var(--color-superficie-sunken);
+    }
+
+    th.pegado-num, td.pegado-num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    tr.pegado-erronea td {
+        background: var(--color-error-suave);
+        color: var(--color-error-texto);
+    }
+
+    tr.pegado-erronea td.pegado-motivo {
+        font-weight: 600;
+    }
+
+    .botones {
+        margin: 0;
+    }
+}

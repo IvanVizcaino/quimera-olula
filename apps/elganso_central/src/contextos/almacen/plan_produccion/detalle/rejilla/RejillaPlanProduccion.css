@@ -1,0 +1,187 @@
+.RejillaPlanProduccion {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s, 12px);
+    min-width: 0;
+
+    .rejilla-barra {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--espaciado-s, 8px) var(--espaciado-m, 16px);
+    }
+
+    .rejilla-grupo {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .rejilla-guardado {
+        margin-left: auto;
+        align-items: center;
+    }
+
+    .rejilla-aviso {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--color-advertencia-oscuro);
+        background: var(--color-advertencia-claro);
+    }
+
+    .rejilla-aviso::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-advertencia);
+    }
+
+    .rejilla-solo-lector {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .rejilla-scroll {
+        overflow: auto;
+        max-height: 65vh;
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: 6px;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 0.85rem;
+        width: max-content;
+        min-width: 100%;
+    }
+
+    th, td {
+        border-right: 1px solid var(--color-borde-sutil);
+        border-bottom: 1px solid var(--color-borde-sutil);
+        padding: 0 6px;
+        white-space: nowrap;
+        background: var(--color-superficie);
+    }
+
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--color-superficie-sunken);
+        padding: 6px;
+        text-align: left;
+    }
+
+    th.rejilla-talla, th.rejilla-total {
+        text-align: right;
+    }
+
+    /* Referencia fija al desplazar en horizontal */
+    .rejilla-ref {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        min-width: 110px;
+        font-weight: 600;
+    }
+
+    thead th.rejilla-ref {
+        z-index: 3;
+    }
+
+    .rejilla-desc {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    td.rejilla-numero {
+        text-align: right;
+        padding: 0;
+        font-variant-numeric: tabular-nums;
+    }
+
+    td.rejilla-total, th.rejilla-total {
+        font-weight: 700;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        background: var(--color-superficie-sunken);
+    }
+
+    /* Talla que la referencia no tiene: rayado gris, no editable */
+    td.rejilla-sin-talla {
+        background:
+            repeating-linear-gradient(
+                135deg,
+                var(--color-superficie-sunken) 0 4px,
+                var(--color-borde-sutil) 4px 5px
+            );
+        cursor: not-allowed;
+    }
+
+    /* Fila de totales fija abajo */
+    tfoot td {
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
+        font-weight: 700;
+        background: var(--color-superficie-sunken);
+        border-top: 2px solid var(--color-borde-fuerte);
+        padding: 6px;
+    }
+
+    tfoot td.rejilla-numero, tfoot td.rejilla-total {
+        text-align: right;
+    }
+
+    tfoot td.rejilla-ref {
+        z-index: 3;
+    }
+
+    td.rejilla-accion, th.rejilla-accion {
+        padding: 0 4px;
+        border-right: none;
+    }
+
+    /* Celda editable: caja blanca visible, distinta de la casilla sin talla */
+    input.rejilla-celda {
+        width: 44px;
+        box-sizing: border-box;
+        margin: 2px;
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: 3px;
+        text-align: right;
+        padding: 3px 5px;
+        background: var(--color-superficie);
+        color: var(--color-texto-primario);
+        font: inherit;
+        font-variant-numeric: tabular-nums;
+    }
+
+    input.rejilla-celda::placeholder {
+        color: var(--color-texto-deshabilitado);
+        opacity: 0.6;
+    }
+
+    input.rejilla-celda:hover {
+        border-color: var(--color-borde-fuerte);
+    }
+
+    input.rejilla-celda:focus {
+        outline: 2px solid var(--color-focus, var(--color-primario));
+        outline-offset: -1px;
+    }
+}
