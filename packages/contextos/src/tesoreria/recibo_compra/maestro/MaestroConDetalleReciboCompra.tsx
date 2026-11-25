@@ -2,7 +2,12 @@ import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { MetaTabla } from "@olula/componentes/index.js";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
+import {
+    filtroFechas,
+    MetaFiltro,
+} from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
 import { MaestroDetalle } from "@olula/componentes/maestro/MaestroDetalle.tsx";
+import { ClausulaFiltro, Criteria } from "@olula/lib/diseño.ts";
 import { criteriaDefecto, formatearMoneda, plugin } from "@olula/lib/dominio.js";
 import { listaActivaEntidadesInicial } from "@olula/lib/ListaActivaEntidades.js";
 import { getUrlParams, useUrlParams } from "@olula/lib/url-params.js";
@@ -10,6 +15,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { DetalleReciboCompra } from "../detalle/DetalleReciboCompra.js";
 import { ReciboCompra } from "../diseño.js";
+import {
+    ESTADOS_RECIBO_COMPRA_DEFECTO,
+    opcionesEstadoReciboCompra,
+} from "../dominio.js";
+import { estadosDesdeFiltro, filtroEstadoReciboVenta } from "../../recibo_venta/dominio.js";
 import { recibosSeleccionados } from "./maestro.js";
 import "./MaestroConDetalleReciboCompra.css";
 import { getMaquina } from "./maquina.js";
@@ -25,9 +35,50 @@ const metaTablaReciboCompra: MetaTabla<ReciboCompra> = [
     { id: 'importe', cabecera: 'Importe', tipo: 'moneda' },
 ];
 
+// Filtros como en recibos de cobro: el estado con una casilla por estado y, por defecto, los pendientes.
+const metaFiltroReciboCompra: MetaFiltro = {
+    codigo: {
+        id: "codigo",
+        label: "Código",
+        filtro: (v) => (v ? ["codigo", "~", v as string] : null),
+    },
+    nombre_proveedor: {
+        id: "nombre_proveedor",
+        label: "Proveedor",
+        filtro: (v) => (v ? ["nombre_proveedor", "~", v as string] : null),
+    },
+    id_fiscal: {
+        id: "id_fiscal",
+        label: "ID Fiscal",
+        filtro: (v) => (v ? ["id_fiscal", "~", v as string] : null),
+    },
+    fecha_vencimiento: {
+        id: "fecha_vencimiento",
+        label: "F. Vencimiento",
+        tipo: "intervalo_fechas",
+        filtro: (v) => filtroFechas("fecha_vencimiento", v),
+    },
+    estado: {
+        id: "estado",
+        label: "Estado",
+        tipo: "multiseleccion",
+        opciones: opcionesEstadoReciboCompra,
+        filtro: filtroEstadoReciboVenta,
+        fromFiltro: estadosDesdeFiltro,
+    },
+};
+
+const criteriaRecibosPendientes = (): Criteria => ({
+    ...criteriaDefecto,
+    filtro: [
+        ["estado", "in", ESTADOS_RECIBO_COMPRA_DEFECTO as unknown as string],
+    ] as ClausulaFiltro[],
+    paginacion: { ...criteriaDefecto.paginacion },
+});
+
 export const MaestroConDetalleReciboCompra = () => {
 
-    const criteriaBase = useMemo(() => criteriaDefecto, []);
+    const criteriaBase = useMemo(criteriaRecibosPendientes, []);
 
     const { id, criteria } = getUrlParams();
     const criteriaInicial = criteria.filtro.length > 0 ? criteria : criteriaBase;
@@ -68,6 +119,7 @@ export const MaestroConDetalleReciboCompra = () => {
                         <h2>Recibos de pago</h2>
                         <Listado<ReciboCompra>
                             metaTabla={metaTablaReciboCompra}
+                            metaFiltro={metaFiltroReciboCompra}
                             criteria={recibos.criteria}
                             modoInicial="tabla"
                             tarjeta={TarjetaReciboCompra}
