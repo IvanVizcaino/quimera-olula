@@ -32,6 +32,16 @@ export interface NuevaLineaInventario extends Modelo {
     motivo: string;
 }
 
+/**
+ * Cambios de una línea (`PATCH …/linea/<id>`). La ubicación se guarda en las
+ * lecturas de la línea.
+ */
+export interface CambiosLineaInventario extends Modelo {
+    cantidad: number;
+    motivo: string;
+    ubicacion: string;
+}
+
 /** Separador del CSV/TXT: "" = que lo detecte el servidor. */
 export type SeparadorFichero = "" | "|" | ";" | "," | "\t";
 
@@ -81,10 +91,10 @@ export type DeleteInventario = (id: string) => Promise<void>;
 export type GetLineasInventario = (id: string) => Promise<LineaInventario[]>;
 export type PostLineaInventario = (id: string, linea: NuevaLineaInventario) => Promise<string>;
 export type DeleteLineaInventario = (id: string, lineaId: string) => Promise<void>;
-export type CambiarLineaInventario = (
+export type PatchLineaInventario = (
     id: string,
     linea: LineaInventario,
-    cambios: NuevaLineaInventario
+    cambios: CambiosLineaInventario
 ) => Promise<string>;
 export type PostFicheroInventario = (
     id: string,

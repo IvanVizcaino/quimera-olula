@@ -84,6 +84,8 @@ export interface RegularizacionStockApi {
     cantidad_final: number;
     motivo: string | null;
     inventario_id: string | null;
+    lecturas?: number;
+    ubicacion?: string | null;
 }
 
 export const regularizacionStockDesdeApi = (api: RegularizacionStockApi): RegularizacionStock => ({
@@ -98,6 +100,8 @@ export const regularizacionStockDesdeApi = (api: RegularizacionStockApi): Regula
     cantidadFinal: api.cantidad_final,
     motivo: api.motivo,
     inventarioId: api.inventario_id,
+    lecturas: api.lecturas ?? 0,
+    ubicacion: api.ubicacion ?? null,
 });
 
 /** Fecha local (no UTC) en formato ISO "AAAA-MM-DD". */
