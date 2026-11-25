@@ -1,4 +1,4 @@
-// Producción (F2: maestros de planta; F3: maestros de procesos; F4: órdenes de producción; F5: tareas; F6: generar órdenes; F7: Terminal de planta). Las tablas pr_* solo existen donde está la producción de
+// Producción (F2: maestros de planta; F3: maestros de procesos; F4: órdenes de producción; F5: tareas; F6: generar órdenes; F7: Terminal de planta; F8: trazabilidad de lotes). Las tablas pr_* solo existen donde está la producción de
 // Eneboo (hispanicfiber): además de la regla de cada maestro, el plugin `produccion` activo.
 export const menuProduccion = {
     "Producción": { icono: "menu_produccion", area: "Operaciones", plugin: "produccion" },
@@ -24,6 +24,12 @@ export const menuProduccion = {
         alias: ["terminal", "terminal de producción", "declarar producción", "tramos", "consumos por lote", "lector de código de barras"],
         url: "/produccion/terminal",
         regla: "produccion.terminal",
+        plugin: "produccion",
+    },
+    "Producción/Trazabilidad de lotes": {
+        alias: ["trazabilidad", "lotes", "hacia atrás", "hacia delante", "origen del lote", "entradas y salidas de lote"],
+        url: "/produccion/trazabilidad",
+        regla: "produccion.trazabilidad",
         plugin: "produccion",
     },
     "Producción/Secciones": {
