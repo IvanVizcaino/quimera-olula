@@ -1,0 +1,15 @@
+.CrearPlanProduccion {
+    quimera-input[nombre="id"] {
+        grid-column: span 4;
+    }
+
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 8;
+    }
+
+    quimera-date[nombre="fecha"],
+    quimera-date[nombre="fechaSolicitada"],
+    quimera-date[nombre="fechaProveedor"] {
+        grid-column: span 4;
+    }
+}

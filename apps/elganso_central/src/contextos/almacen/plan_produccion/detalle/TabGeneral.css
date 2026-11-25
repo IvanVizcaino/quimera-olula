@@ -1,0 +1,32 @@
+.TabGeneral {
+    quimera-input[nombre="descripcion"] {
+        grid-column: span 9;
+    }
+
+    quimera-select[nombre="estado"] {
+        grid-column: span 3;
+    }
+
+    quimera-date[nombre="fecha"],
+    quimera-date[nombre="fechaSolicitada"],
+    quimera-date[nombre="fechaProveedor"] {
+        grid-column: span 4;
+    }
+
+    /* Destino común: se aplica a todas las líneas */
+    quimera-autocompletar[nombre="proveedorId"] {
+        grid-column: span 6;
+    }
+
+    quimera-select[nombre="almacenId"] {
+        grid-column: span 3;
+    }
+
+    quimera-date[nombre="fechaEntrega"] {
+        grid-column: span 3;
+    }
+
+    quimera-textarea[nombre="observaciones"] {
+        grid-column: span 12;
+    }
+}
