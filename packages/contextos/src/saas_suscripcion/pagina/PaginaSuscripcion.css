@@ -152,6 +152,15 @@
         font-size: var(--tamaño-letra-s);
     }
 
+    .susc-complementos-cabecera {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        a { font-size: 0.9em; }
+    }
+
     .susc-complementos ul {
         list-style: none;
         padding: 0;

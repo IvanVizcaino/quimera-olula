@@ -6,6 +6,8 @@ import {
 
 const p = (m: string, a: string) => ({ mensual: m, anual: a });
 
+const FICHA = { categoria: "contexto" as const, descripcionLarga: "", caracteristicas: [], palabrasClave: [] };
+
 const catalogo: Catalogo = {
     limites: [
         { id: "usuarios", nombre: "Usuarios", unidad: "usuarios", tipo: "recuento", orden: 10 },
@@ -13,8 +15,8 @@ const catalogo: Catalogo = {
         { id: "llamadas_mcp", nombre: "Llamadas", unidad: "llamadas", tipo: "consumo_mensual", orden: 50 },
     ],
     modulos: [
-        { id: "ventas", nombre: "Ventas", descripcion: "", dependeDe: [], precio: p("0", "0"), contratableSuelto: false, orden: 10 },
-        { id: "tpv", nombre: "TPV", descripcion: "", dependeDe: [], precio: p("0", "0"), contratableSuelto: true, orden: 70 },
+        { id: "ventas", nombre: "Ventas", descripcion: "", dependeDe: [], precio: p("0", "0"), contratableSuelto: false, orden: 10, ...FICHA },
+        { id: "tpv", nombre: "TPV", descripcion: "", dependeDe: [], precio: p("0", "0"), contratableSuelto: true, orden: 70, ...FICHA },
     ],
     planes: [
         {

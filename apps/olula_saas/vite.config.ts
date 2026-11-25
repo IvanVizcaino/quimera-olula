@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 
+import { fileURLToPath } from "node:url";
 import { mergeConfig } from "vite";
 import config from "../../vite.config.ts";
 
@@ -14,6 +15,15 @@ export default mergeConfig(config, {
     },
     server: {
         allowedHosts: true,
+    },
+    // Dos páginas: la app y la demo de los módulos («Módulos disponibles» › Probar).
+    build: {
+        rollupOptions: {
+            input: {
+                main: fileURLToPath(new URL("./index.html", import.meta.url)),
+                demo: fileURLToPath(new URL("./demo.html", import.meta.url)),
+            },
+        },
     },
     test: {
         setupFiles: ["../../setupTests.ts"]

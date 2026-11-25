@@ -32,7 +32,14 @@ export interface ModuloCatalogo {
     precio: PrecioPeriodo;
     contratableSuelto: boolean;
     orden: number;
+    categoria: CategoriaModulo;
+    /** Ficha comercial («Módulos disponibles»). */
+    descripcionLarga: string;
+    caracteristicas: string[];
+    palabrasClave: string[];
 }
+
+export type CategoriaModulo = "contexto" | "plugin" | "servicio";
 
 export type ModoModuloPlan = "incluido" | "extra" | "no_disponible";
 
@@ -218,7 +225,45 @@ export interface NuevoMandato extends Modelo {
     iban: string;
 }
 
+// ----- Módulos disponibles -----
+
+/** Situación de un módulo para la empresa. */
+export type EstadoModuloEmpresa =
+    /** Ya lo tiene (por el plan, como extra o de cortesía). */
+    | "activo"
+    /** Su plan lo vende como extra: se añade a la suscripción. */
+    | "disponible"
+    /** Su plan no lo ofrece, pero otro plan público sí. */
+    | "otro_plan"
+    /** Ningún plan público lo ofrece. */
+    | "no_disponible";
+
+export interface FichaModuloEmpresa {
+    modulo: ModuloCatalogo;
+    estado: EstadoModuloEmpresa;
+    /** Solo activo: plan, extra o cortesía. */
+    origen: string | null;
+    /** Disponible: precio del extra en el plan actual. Otro plan: precio en ese plan (null = incluido). */
+    precio: PrecioPeriodo | null;
+    /** Otro plan: el más barato que lo incluye u ofrece. */
+    planAlternativo: PlanCatalogo | null;
+    /** Disponible: módulos de los que depende que el plan no permite añadir (nombres). */
+    faltan: string[];
+}
+
+export interface RecomendacionModulo {
+    moduloId: string;
+    motivo: string;
+}
+
+export interface RespuestaRecomendador {
+    /** "ia" o "palabras" (sin IA disponible o si ha fallado). */
+    origen: string;
+    recomendaciones: RecomendacionModulo[];
+}
+
 export type GetMiSuscripcion = () => Promise<MiSuscripcion>;
+export type PostRecomendar = (necesidad: string) => Promise<RespuestaRecomendador>;
 export type GetCatalogo = () => Promise<Catalogo>;
 export type PostPresupuesto = (objetivo: Objetivo) => Promise<Presupuesto>;
 export type PostCambiar = (objetivo: Objetivo) => Promise<ResultadoCambio>;

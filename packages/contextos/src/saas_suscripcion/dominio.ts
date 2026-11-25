@@ -2,9 +2,9 @@ import { ERR_IBAN_NO_VALIDO, ibanValido } from "@olula/lib/iban.ts";
 import { formatearMoneda, formatearNumero, MetaModelo } from "@olula/lib/dominio.ts";
 import { AccionError, ErrorLimite } from "@olula/lib/errores_limite.ts";
 import {
-    AvisoSuscripcion, Catalogo, Cuota, DerechoLimite, EstadoSuscripcionSaas, ExtraCatalogo, Factura,
-    ModuloCatalogo, NuevoMandato, Objetivo, Periodicidad, PlanCatalogo, PrecioPeriodo, Presupuesto,
-    Suscripcion, SuscripcionWhoami, Exceso, LimitePlan,
+    AvisoSuscripcion, Catalogo, CategoriaModulo, Cuota, DerechoLimite, EstadoModuloEmpresa, EstadoSuscripcionSaas,
+    ExtraCatalogo, Factura, FichaModuloEmpresa, MiSuscripcion, ModuloCatalogo, NuevoMandato, Objetivo, Periodicidad,
+    PlanCatalogo, PrecioPeriodo, Presupuesto, RecomendacionModulo, Suscripcion, SuscripcionWhoami, Exceso, LimitePlan,
 } from "./diseño.ts";
 
 export const PLAN_LEGADO = "legado";
@@ -420,3 +420,140 @@ export const accionErrorSuscripcion = (_error: ErrorLimite, puedeVerSuscripcion:
     puedeVerSuscripcion
         ? { texto: "Ver mi suscripción", url: RUTA_SUSCRIPCION }
         : { texto: "Pide a tu administrador que revise la suscripción de la empresa." };
+
+// ---------------------------------------------------------------- módulos disponibles
+
+export const RUTA_MODULOS = "/ajustes/modulos";
+
+export const etiquetaEstadoModulo: Record<EstadoModuloEmpresa, string> = {
+    activo: "Activo",
+    disponible: "Disponible",
+    otro_plan: "En otro plan",
+    no_disponible: "No disponible",
+};
+
+export const etiquetaCategoriaModulo: Record<CategoriaModulo, string> = {
+    contexto: "Módulos",
+    plugin: "Funcionalidades",
+    servicio: "Servicios",
+};
+
+const precioModuloEnPlan = (plan: PlanCatalogo, modulo: ModuloCatalogo): PrecioPeriodo | null => {
+    const mp = plan.modulos.find((m) => m.moduloId === modulo.id);
+    return mp?.modo === "extra" ? mp.precio ?? modulo.precio : null;
+};
+
+/** Plan público, distinto del actual, más barato (al mes) que incluye u ofrece el módulo. */
+const planAlternativo = (catalogo: Catalogo, planActualId: string, moduloId: string): PlanCatalogo | null =>
+    ordenarPlanes(catalogo.planes)
+        .filter((p) => p.id !== planActualId
+            && p.modulos.some((m) => m.moduloId === moduloId && m.modo !== "no_disponible"))
+        .sort((a, b) => Number(a.precio.mensual) - Number(b.precio.mensual))[0] ?? null;
+
+/** Módulos de los que depende que no están y no se pueden añadir como extra en el plan. */
+const dependenciasImposibles = (plan: PlanCatalogo, modulo: ModuloCatalogo, presentes: Set<string>, catalogo: Catalogo): string[] =>
+    modulo.dependeDe
+        .filter((id) => !presentes.has(id) && plan.modulos.find((m) => m.moduloId === id)?.modo !== "extra")
+        .map((id) => nombreModulo(catalogo, id));
+
+export const fichaModuloEmpresa = (mi: MiSuscripcion, catalogo: Catalogo, modulo: ModuloCatalogo): FichaModuloEmpresa => {
+    const base = { modulo, origen: null, precio: null, planAlternativo: null, faltan: [] };
+    const derecho = mi.derechos.modulos.find((m) => m.id === modulo.id);
+    if (derecho) return { ...base, estado: "activo", origen: derecho.origen };
+    const plan = mi.plan;
+    if (plan && mi.suscripcion) {
+        const precio = precioModuloEnPlan(plan, modulo);
+        if (precio) {
+            const presentes = modulosPresentes(plan, objetivoDeSuscripcion(mi.suscripcion));
+            return { ...base, estado: "disponible", precio, faltan: dependenciasImposibles(plan, modulo, presentes, catalogo) };
+        }
+    }
+    const alternativo = planAlternativo(catalogo, plan?.id ?? "", modulo.id);
+    if (alternativo) {
+        return { ...base, estado: "otro_plan", planAlternativo: alternativo, precio: precioModuloEnPlan(alternativo, modulo) };
+    }
+    return { ...base, estado: "no_disponible" };
+};
+
+/** Una ficha por módulo público del catálogo, en el orden del catálogo. */
+export const fichasModulos = (mi: MiSuscripcion, catalogo: Catalogo): FichaModuloEmpresa[] =>
+    [...catalogo.modulos].sort((a, b) => a.orden - b.orden).map((m) => fichaModuloEmpresa(mi, catalogo, m));
+
+/**
+ * Lo que hay que contratar para tener el módulo: en el plan actual, el módulo y las
+ * dependencias que también se venden como extra; en otro plan, el cambio de plan (y el
+ * módulo si allí es extra). null si ya lo tiene, no se puede o le faltan dependencias.
+ */
+export const objetivoParaModulo = (mi: MiSuscripcion, catalogo: Catalogo, ficha: FichaModuloEmpresa): Objetivo | null => {
+    if (!mi.suscripcion) return null;
+    const actual = objetivoDeSuscripcion(mi.suscripcion);
+    const conModulo = (objetivo: Objetivo, plan: PlanCatalogo): Objetivo | null => {
+        const presentes = modulosPresentes(plan, objetivo);
+        if (presentes.has(ficha.modulo.id)) return objetivo;
+        if (dependenciasImposibles(plan, ficha.modulo, presentes, catalogo).length) return null;
+        const añadir = [...ficha.modulo.dependeDe.filter((id) => !presentes.has(id)), ficha.modulo.id];
+        return normalizarObjetivo({ ...objetivo, modulos: [...objetivo.modulos, ...añadir] });
+    };
+    if (ficha.estado === "disponible" && mi.plan) return conModulo(actual, mi.plan);
+    if (ficha.estado === "otro_plan" && ficha.planAlternativo) {
+        return conModulo(objetivoConPlan(actual, ficha.planAlternativo, catalogo), ficha.planAlternativo);
+    }
+    return null;
+};
+
+/** Texto comparable para el buscador: minúsculas y sin tildes. */
+export const normalizarBusqueda = (texto: string): string =>
+    texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+
+export type FiltroModulos = "todos" | EstadoModuloEmpresa;
+
+export const etiquetaFiltroModulos: Record<FiltroModulos, string> = {
+    todos: "Todos",
+    activo: "Activos",
+    disponible: "Para añadir",
+    otro_plan: "En otros planes",
+    no_disponible: "No disponibles",
+};
+
+/** Cada palabra buscada tiene que aparecer en el nombre, las descripciones, características o palabras clave. */
+export const filtrarFichas = (fichas: FichaModuloEmpresa[], texto: string, filtro: FiltroModulos): FichaModuloEmpresa[] => {
+    const palabras = normalizarBusqueda(texto).split(/\s+/).filter(Boolean);
+    return fichas.filter((f) => {
+        if (filtro !== "todos" && f.estado !== filtro) return false;
+        if (!palabras.length) return true;
+        const m = f.modulo;
+        const pajar = normalizarBusqueda([m.nombre, m.id, m.descripcion, m.descripcionLarga, ...m.caracteristicas, ...m.palabrasClave].join(" "));
+        return palabras.every((p) => pajar.includes(p));
+    });
+};
+
+export const recuentoFichas = (fichas: FichaModuloEmpresa[]): Record<FiltroModulos, number> => {
+    const r: Record<FiltroModulos, number> = { todos: fichas.length, activo: 0, disponible: 0, otro_plan: 0, no_disponible: 0 };
+    for (const f of fichas) r[f.estado] += 1;
+    return r;
+};
+
+/** «+20,00 €/mes», «Incluido en Pro», «Con el plan Pro (+15,00 €/mes)»… */
+export const textoPrecioFicha = (f: FichaModuloEmpresa, p: Periodicidad): string => {
+    switch (f.estado) {
+        case "activo":
+            return f.origen === "plan" ? "Incluido en tu plan" : f.origen === "cortesia" ? "De cortesía" : "Contratado";
+        case "disponible":
+            return f.precio ? `+${textoImportePeriodo(f.precio[p], p)}` : "";
+        case "otro_plan":
+            if (!f.planAlternativo) return "";
+            return f.precio
+                ? `Con el plan ${f.planAlternativo.nombre} (+${textoImportePeriodo(f.precio[p], p)})`
+                : `Incluido en el plan ${f.planAlternativo.nombre}`;
+        default:
+            return "No se ofrece en ningún plan";
+    }
+};
+
+/** Recomendaciones del recomendador ya resueltas a fichas (las que no existan se descartan). */
+export const fichasRecomendadas = (
+    fichas: FichaModuloEmpresa[], recomendaciones: RecomendacionModulo[],
+): { ficha: FichaModuloEmpresa; motivo: string }[] =>
+    recomendaciones
+        .map((r) => ({ ficha: fichas.find((f) => f.modulo.id === r.moduloId), motivo: r.motivo }))
+        .filter((x): x is { ficha: FichaModuloEmpresa; motivo: string } => x.ficha !== undefined);

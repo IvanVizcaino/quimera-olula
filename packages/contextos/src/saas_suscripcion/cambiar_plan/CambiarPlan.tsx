@@ -1,17 +1,18 @@
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
-import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QEtiqueta } from "@olula/componentes/atomos/qetiqueta.tsx";
 import { EmitirEvento } from "@olula/lib/diseño.ts";
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router";
 import { Catalogo, MiSuscripcion, Objetivo, Periodicidad } from "../diseño.ts";
 import {
     ahorroAnual, claveObjetivo, extrasOfrecidos, importeEuros, limitesDePlan, modulosDePlan,
     modulosExtraOfrecidos, modulosPresentes, motivoModuloBloqueado, objetivoConExtra, objetivoConModulo,
     objetivoConPeriodicidad, objetivoConPlan, objetivoDeSuscripcion, ordenarPlanes, puedeConfirmarCambio,
-    textoImportePeriodo, textoPrecioPlan, textoPrueba,
+    RUTA_MODULOS, textoImportePeriodo, textoPrecioPlan, textoPrueba,
 } from "../dominio.ts";
 import { PresupuestoCambio } from "./PresupuestoCambio.tsx";
 import { usePresupuesto } from "./presupuesto.ts";
+import { TarjetaModuloOpcional } from "./TarjetaModuloOpcional.tsx";
 
 /**
  * Comparador de planes y complementos. El objetivo que se está armando vive aquí (es estado
@@ -111,28 +112,20 @@ export const CambiarPlan = ({
 
             {plan && modulosExtra.length > 0 && (
                 <div className="susc-complementos">
-                    <h4>Módulos opcionales con {plan.nombre}</h4>
-                    <ul>
-                        {modulosExtra.map((m) => {
-                            const motivo = motivoModuloBloqueado(m, presentes, catalogo);
-                            const marcado = objetivo.modulos.includes(m.id);
-                            return (
-                                <li key={m.id}>
-                                    <QCheckbox
-                                        label={`${m.nombre} (+${textoImportePeriodo(m.precio, periodicidad)})`}
-                                        nombre={`modulo_${m.id}`}
-                                        valor={marcado}
-                                        deshabilitado={deshabilitado || (!marcado && motivo !== null)}
-                                        onChange={(valor) =>
-                                            setObjetivo((o) => objetivoConModulo(o, m.id, valor === "true", plan, catalogo))}
-                                    />
-                                    <span className="susc-secundario">
-                                        {!marcado && motivo ? `${m.descripcion}. ${motivo}.` : m.descripcion}
-                                    </span>
-                                </li>
-                            );
-                        })}
-                    </ul>
+                    <div className="susc-complementos-cabecera">
+                        <h4>Módulos opcionales con {plan.nombre}</h4>
+                        <Link to={RUTA_MODULOS}>Ver todos los módulos</Link>
+                    </div>
+                    <div className="rejilla-modulos compacta">
+                        {modulosExtra.map((m) => (
+                            <TarjetaModuloOpcional key={m.id} modulo={m} periodicidad={periodicidad}
+                                marcado={objetivo.modulos.includes(m.id)}
+                                motivo={motivoModuloBloqueado(m, presentes, catalogo)}
+                                deshabilitado={deshabilitado}
+                                onCambiar={(marcado) =>
+                                    setObjetivo((o) => objetivoConModulo(o, m.id, marcado, plan, catalogo))} />
+                        ))}
+                    </div>
                 </div>
             )}
 

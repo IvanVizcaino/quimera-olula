@@ -1,0 +1,70 @@
+.PaginaModulos {
+    .modulos-cabecera {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        h2 { margin: 0 0 4px; }
+        p { margin: 0; }
+    }
+
+    .recomendador-modulos {
+        border: 1px solid var(--color-borde-sutil);
+        border-radius: 14px;
+        padding: 16px;
+        background: linear-gradient(135deg,
+            color-mix(in srgb, var(--color-primario) 10%, var(--color-superficie)),
+            var(--color-superficie));
+
+        h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+        .recomendador-formulario {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 8px 12px;
+            quimera-input { flex: 1 1 320px; }
+        }
+        .recomendador-origen, .recomendador-vacio { font-size: 0.85em; color: var(--color-texto-secundario); margin: 12px 0 8px; }
+        .recomendador-error { color: var(--color-error-texto); margin: 8px 0 0; }
+        .rejilla-modulos { margin-bottom: 0; }
+    }
+
+    .modulos-barra {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--color-superficie);
+        padding: 8px 0;
+
+        .modulos-buscador {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1 1 260px;
+            color: var(--color-texto-secundario);
+            quimera-input { flex: 1; }
+        }
+        .modulos-filtros { display: flex; flex-wrap: wrap; gap: 6px; }
+        .modulos-filtros button {
+            border: 1px solid var(--color-borde-sutil);
+            background: var(--color-superficie);
+            color: var(--color-texto-primario);
+            border-radius: 999px;
+            padding: 4px 12px;
+            font: inherit;
+            font-size: 0.85em;
+            cursor: pointer;
+            &:hover { border-color: var(--color-primario); }
+            &.activo { background: var(--color-primario); border-color: var(--color-primario); color: var(--color-texto-menu); }
+            &:focus-visible { outline: 2px solid var(--color-borde-focus); outline-offset: 2px; }
+            .recuento { opacity: 0.7; margin-left: 2px; }
+        }
+    }
+
+    .modulos-categoria h3 { margin: 8px 0 10px; }
+}
