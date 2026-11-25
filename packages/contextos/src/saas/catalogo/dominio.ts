@@ -34,6 +34,10 @@ export const modulosDeCategoria = (modulos: ModuloCatalogo[], categoria: Categor
 
 export const claveAporta = (limiteId: string): `aporta_${string}` => `aporta_${limiteId}`;
 
+/** Texto del formulario a lista: un elemento por separador, sin vacíos ni espacios sobrantes. */
+export const textoALista = (texto: string, separador: string): string[] =>
+    texto.split(separador).map((t) => t.trim()).filter((t) => t !== "");
+
 export const moduloAForm = (modulo: ModuloCatalogo, limites: LimiteCatalogo[]): FormModulo => {
     const form: FormModulo = {
         nombre: modulo.nombre,
@@ -43,6 +47,9 @@ export const moduloAForm = (modulo: ModuloCatalogo, limites: LimiteCatalogo[]): 
         contratableSuelto: modulo.contratableSuelto,
         publico: modulo.publico,
         variante: modulo.variante ?? "",
+        descripcionLarga: modulo.descripcionLarga,
+        caracteristicas: modulo.caracteristicas.join("\n"),
+        palabrasClave: modulo.palabrasClave.join(", "),
     };
     for (const l of limites) {
         form[claveAporta(l.id)] = numeroATexto(modulo.aporta[l.id]);
@@ -66,6 +73,9 @@ export const formAModulo = (base: ModuloCatalogo, form: FormModulo, limites: Lim
         publico: form.publico,
         aporta,
         variante: base.plugin ? form.variante : base.variante,
+        descripcionLarga: form.descripcionLarga.trim(),
+        caracteristicas: textoALista(form.caracteristicas, "\n"),
+        palabrasClave: textoALista(form.palabrasClave, ","),
     };
 };
 
@@ -78,6 +88,9 @@ export const metaModulo = (limites: LimiteCatalogo[]): MetaModelo<FormModulo> =>
         contratableSuelto: { tipo: "checkbox" },
         publico: { tipo: "checkbox" },
         variante: { requerido: false },
+        descripcionLarga: { requerido: false },
+        caracteristicas: { requerido: false },
+        palabrasClave: { requerido: false },
         ...Object.fromEntries(limites.map((l) => [
             claveAporta(l.id),
             {
@@ -226,3 +239,6 @@ export const textoGrupoIva = (g: GrupoIvaProducto): string => {
     const porcentaje = Number.isFinite(n) ? String(n) : g.iva;
     return `${g.descripcion} (${porcentaje} %)`;
 };
+
+// Iconos: compartidos con la app de las empresas («Módulos disponibles»).
+export { iconoLimite, iconoModulo } from "../../saas_comun/iconos.ts";

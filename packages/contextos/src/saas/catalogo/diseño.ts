@@ -31,6 +31,10 @@ export interface ModuloCatalogo extends Entidad {
     plugin: string | null;
     variante: string | null;
     variantes: string[];
+    /** Ficha comercial de «Módulos disponibles» (app de las empresas). */
+    descripcionLarga: string;
+    caracteristicas: string[];
+    palabrasClave: string[];
 }
 
 export type CategoriaModulo = "contexto" | "plugin" | "servicio";
@@ -66,6 +70,11 @@ export type FormModulo = {
     publico: boolean;
     /** Solo plugins. */
     variante: string;
+    descripcionLarga: string;
+    /** Una característica por línea. */
+    caracteristicas: string;
+    /** Separadas por comas. */
+    palabrasClave: string;
     /** Una entrada por límite del catálogo: "aporta_<limite_id>". */
     [aporta: `aporta_${string}`]: string;
 };

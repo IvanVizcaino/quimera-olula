@@ -1,14 +1,17 @@
 .TabLimitesPlan {
-    .limite-plan-fila {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 0;
-        border-bottom: 1px solid var(--color-borde, #e0e0e0);
+    .rejilla-plan { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+
+    .tarjeta-plan.limite-ilimitado .tarjeta-plan-valor { color: var(--color-exito); }
+    .tarjeta-plan.limite-sin_incluir .tarjeta-plan-valor { color: var(--color-texto-deshabilitado); }
+    .tarjeta-plan.limite-con_tope .tarjeta-plan-icono,
+    .tarjeta-plan.limite-ilimitado .tarjeta-plan-icono { background: var(--color-primario); color: var(--color-texto-menu); }
+
+    .insignia-ampliable {
+        border: 1px solid var(--color-primario);
+        color: var(--color-primario-texto);
+        border-radius: 999px;
+        padding: 0 6px;
+        font-weight: 600;
     }
-    .limite-plan-info { flex: 1 1 200px; }
-    .limite-plan-nombre { font-weight: 600; }
-    .limite-plan-detalle { font-size: 0.85em; opacity: 0.75; }
-    quimera-input { min-width: 120px; }
+    .tarjeta-plan-precios quimera-checkbox { flex: 0 0 auto; }
 }
