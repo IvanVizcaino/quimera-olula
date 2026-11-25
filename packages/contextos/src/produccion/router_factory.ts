@@ -4,6 +4,7 @@ import { MaestroCentroCoste } from "./centro_coste/maestro/MaestroCentroCoste.ts
 import { ConfigProduccion } from "./config/maestro/ConfigProduccion.tsx";
 import { GenerarOrdenes } from "./necesidad/generar/GenerarOrdenes.tsx";
 import { MaestroOrdenProduccion } from "./orden/maestro/MaestroOrdenProduccion.tsx";
+import { InformeTareas } from "./informe_tareas/InformeTareas.tsx";
 import { MaestroHorario } from "./horario/maestro/MaestroHorario.tsx";
 import { MaestroSeccion } from "./seccion/maestro/MaestroSeccion.tsx";
 import { MaestroTiempoTarea } from "./tiempo_tarea/maestro/MaestroTiempoTarea.tsx";
@@ -22,6 +23,7 @@ export class RouterFactoryProduccionOlula {
         "produccion/tareas": MaestroTareaProduccion,
         "produccion/terminal": TerminalProduccion,
         "produccion/trazabilidad": TrazabilidadLotes,
+        "produccion/informe_tareas": InformeTareas,
         "produccion/secciones": MaestroSeccion,
         "produccion/trabajadores": MaestroTrabajador,
         "produccion/tipos_centro_coste": MaestroTipoCentroCoste,

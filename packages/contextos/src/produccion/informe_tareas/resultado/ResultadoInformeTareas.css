@@ -1,0 +1,97 @@
+.ResultadoInformeTareas {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+
+    h3,
+    h4,
+    p {
+        margin: 0;
+    }
+
+    .ayuda,
+    .criterios {
+        color: var(--color-texto-secundario);
+    }
+
+    .grupo-tareas {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+        overflow-x: auto;
+
+        h4 small {
+            display: block;
+            font-weight: normal;
+            color: var(--color-texto-secundario);
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875em;
+    }
+
+    th {
+        white-space: nowrap;
+    }
+
+    td.codigo {
+        white-space: nowrap;
+    }
+
+    td.cliente {
+        max-width: 12em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding: var(--espaciado-xs) var(--espaciado-s);
+        border-bottom: 1px solid var(--color-borde-sutil);
+    }
+
+    .numero {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    tfoot td {
+        font-weight: 600;
+        border-bottom: none;
+    }
+
+    .negativa {
+        color: var(--color-error, #b00020);
+    }
+
+    .total-informe {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: var(--espaciado-m);
+        margin: 0;
+        padding: var(--espaciado-s);
+        border-top: 2px solid var(--color-borde-sutil);
+        font-variant-numeric: tabular-nums;
+
+        div {
+            display: flex;
+            gap: var(--espaciado-xs);
+        }
+
+        dt {
+            color: var(--color-texto-secundario);
+        }
+
+        dd {
+            margin: 0;
+            font-weight: 700;
+        }
+    }
+}
