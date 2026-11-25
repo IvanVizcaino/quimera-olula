@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { componentesSinTarea, criteriaArticulosFabricados, fabricacionVacia, validarFabricacion } from "../dominio.ts";
+import {
+    componentesPorLotes,
+    componentesSinTarea,
+    criteriaArticulosFabricados,
+    fabricacionVacia,
+    faltaPorLotes,
+    validarFabricacion,
+} from "../dominio.ts";
 import { cambiosFabricacionAApi, fabricacionDesdeApi } from "../infraestructura.ts";
 
 describe("fabricación del artículo", () => {
@@ -42,5 +49,28 @@ describe("selector de artículos fabricados", () => {
         expect(criteriaArticulosFabricados("cam").filtro).toEqual(
             { and: [["fabricado", "=", "true"], { or: [["id", "~", "cam"], ["descripcion", "~", "cam"]] }] });
         expect(criteriaArticulosFabricados("", "CAMISA").filtro).toEqual([["id", "=", "CAMISA"]]);
+    });
+
+    it("lee por_lotes del artículo y de cada componente (sin él, falso)", () => {
+        const a = fabricacionDesdeApi({
+            id: "TELA", descripcion: "Tela", fabricado: true, tipo_proceso_id: "P", tipo_proceso: "Proceso", por_lotes: false,
+            componentes: [
+                { id: 1, articulo_id: "HILO", descripcion: "Hilo", cantidad: 2, tarea_proceso_id: 7, tarea: "Tejer", codigo_tarea: "T", por_lotes: true },
+                { id: 2, articulo_id: "TINTE", descripcion: "Tinte", cantidad: 1, tarea_proceso_id: null, tarea: null, codigo_tarea: null },
+            ],
+            avisos: ["Debe ir por lotes: tiene componentes por lotes (HILO)"],
+        });
+        expect(a.porLotes).toBe(false);
+        expect(a.componentes.map((c) => c.porLotes)).toEqual([true, false]);
+        expect(componentesPorLotes(a.componentes).map((c) => c.articuloId)).toEqual(["HILO"]);
+        expect(fabricacionVacia().porLotes).toBe(false);
+    });
+
+    it("un fabricado con componentes por lotes tiene que ir por lotes", () => {
+        const comp = { id: "1", articuloId: "HILO", descripcion: "", cantidad: 1, tareaProcesoId: "", tarea: "", codigoTarea: "", porLotes: true };
+        expect(faltaPorLotes({ fabricado: "true", porLotes: false, componentes: [comp] })).toBe(true);
+        expect(faltaPorLotes({ fabricado: true, porLotes: true, componentes: [comp] })).toBe(false);
+        expect(faltaPorLotes({ fabricado: false, porLotes: false, componentes: [comp] })).toBe(false);
+        expect(faltaPorLotes({ fabricado: true, porLotes: false, componentes: [{ ...comp, porLotes: false }] })).toBe(false);
     });
 });

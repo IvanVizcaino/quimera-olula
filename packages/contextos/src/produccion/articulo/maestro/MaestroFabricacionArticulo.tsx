@@ -13,6 +13,7 @@ const metaTabla: MetaTabla<FabricacionArticulo> = [
     { id: "descripcion", cabecera: "Descripción", estilo: "destacado" },
     { id: "fabricado", cabecera: "Fabricado", ancho: "12%", render: (a) => siONada(a.fabricado) },
     { id: "tipo_proceso_id", cabecera: "Tipo de proceso", render: (a) => a.tipoProceso || a.tipoProcesoId },
+    { id: "por_lotes", cabecera: "Por lotes", ancho: "12%", render: (a) => siONada(a.porLotes) },
 ];
 
 const consultas = { getUno: getFabricacionArticulo, getLista: getFabricacionArticulos };

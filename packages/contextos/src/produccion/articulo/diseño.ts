@@ -11,6 +11,8 @@ export interface ComponenteFabricacion extends Entidad {
     tareaProcesoId: string;
     tarea: string;
     codigoTarea: string;
+    /** `articulos.porlotes` del componente. */
+    porLotes: boolean;
 }
 
 /**
@@ -23,10 +25,15 @@ export interface FabricacionArticulo extends Entidad {
     fabricado: boolean | string;
     tipoProcesoId: string;
     tipoProceso: string;
+    /** `articulos.porlotes`: un fabricado con componentes por lotes también tiene que ir por lotes. */
+    porLotes: boolean;
     /** Solo en el detalle. */
     sinStock: boolean;
     componentes: ComponenteFabricacion[];
-    /** Lo que falta para poder fabricarlo (componentes sin tarea, tipo de proceso incompleto...). */
+    /**
+     * Lo que falta para poder fabricarlo (componentes sin tarea, tipo de proceso incompleto, que no
+     * vaya por lotes teniendo componentes por lotes...).
+     */
     avisos: string[];
 }
 
