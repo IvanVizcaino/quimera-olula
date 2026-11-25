@@ -42,3 +42,23 @@ export type GetLotes = (criteria: Criteria) => RespuestaLista<Lote>;
 /** «Revisar lote»: recalcula sus cantidades con sus movimientos; devuelve cuántos lotes ha revisado. */
 export type RevisarLote = (id: string) => Promise<number>;
 export type RevisarLotes = () => Promise<number>;
+
+/**
+ * Formato de la etiqueta de lote (`eti_lote` de Eneboo): «3x9» = 90 × 30 mm (el de siempre) y
+ * «2,5x6» = 60 × 25 mm.
+ */
+export type FormatoEtiquetaLote = "3x9" | "2,5x6";
+
+/** Lo que se pide al imprimir etiquetas: copias (1–500), formato y cantidad (`null`: la decide el servidor). */
+export interface OpcionesEtiquetaLote {
+    copias: number;
+    formato: FormatoEtiquetaLote;
+    cantidad: number | null;
+}
+
+/** Formulario del modal de etiquetas (como se teclea). */
+export interface FormEtiquetaLote {
+    copias: string;
+    formato: FormatoEtiquetaLote;
+    cantidad: string;
+}

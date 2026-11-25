@@ -435,3 +435,16 @@ export const filtroListaTerminal = (centroId: string | null): ClausulaFiltro[] =
 
 /** Clave de `localStorage` del centro de coste del puesto. */
 export const CLAVE_CENTRO_PUESTO = "olula.produccion.terminal.centro";
+
+/**
+ * ¿Se pregunta «¿Imprimir etiqueta?» tras procesar la tarea? Solo en la tarea final (la que da
+ * el producto del lote) y cuando se ha declarado algo: al terminar o pausar con un tramo, o al
+ * iniciar una tarea que se termina en un paso. Al iniciar o reanudar sin terminar, no.
+ */
+export const preguntarEtiqueta = (
+    tarea: { final: boolean },
+    procesada: "terminar" | "pausar" | "guardar" | "iniciada" | "terminada_en_un_paso",
+): boolean => tarea.final && (procesada === "terminar" || procesada === "pausar" || procesada === "terminada_en_un_paso");
+
+/** Nombre del PDF de la etiqueta de una tarea (el que da el servidor). */
+export const nombreEtiquetaTarea = (id: string): string => `etiqueta-${id}.pdf`;

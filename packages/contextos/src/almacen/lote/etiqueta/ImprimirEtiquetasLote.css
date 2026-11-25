@@ -1,0 +1,16 @@
+quimera-modal[nombre="imprimirEtiquetasLote"] {
+    quimera-input,
+    quimera-select {
+        grid-column: span 12;
+    }
+
+    .nota-etiqueta {
+        color: var(--color-texto-secundario, #666);
+        font-size: 0.9em;
+        margin: var(--espacio-xs, 0.25rem) 0;
+    }
+
+    .nota-etiqueta.aviso {
+        color: var(--color-error, #b00020);
+    }
+}

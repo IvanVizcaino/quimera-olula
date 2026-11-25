@@ -6,6 +6,7 @@ import { MetaTabla } from "@olula/componentes/index.js";
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
 import { ContextoError } from "@olula/lib/contexto.ts";
 import { Entidad } from "@olula/lib/diseño.ts";
+import { puede } from "@olula/lib/dominio.ts";
 import { useContext, useState } from "react";
 import { AccionesCicloVida, cabeAccion, motivoAccion } from "../../comun/ciclo_vida.ts";
 import { fechaDdMmAaaa } from "../../comun/dominio.ts";
@@ -22,6 +23,9 @@ import {
 } from "../dominio.ts";
 import { deleteLoteOrden, patchLoteOrden, postLoteOrden } from "../infraestructura.ts";
 import { ModalLoteOrden } from "./ModalLoteOrden.tsx";
+import { ImprimirEtiquetasLote } from "#/almacen/lote/etiqueta/ImprimirEtiquetasLote.tsx";
+import { nombreEtiquetaLote } from "#/almacen/lote/dominio.ts";
+import { getEtiquetaLote } from "#/almacen/lote/infraestructura.ts";
 
 const metaTablaLotes: MetaTabla<LoteOrden> = [
     { id: "id", cabecera: "Lote", estilo: "secundario" },
@@ -72,6 +76,7 @@ export const LoteOrdenProduccion = ({
     const { intentar } = useContext(ContextoError);
     const [edicion, setEdicion] = useState<Edicion | null>(null);
     const [quitando, setQuitando] = useState<LoteOrden | null>(null);
+    const [etiquetas, setEtiquetas] = useState<LoteOrden | null>(null);
     // Los lotes solo se tocan con la orden pendiente y sin lanzar.
     const pendiente = orden.estado === "PTE" && !orden.lanzada;
     const lote = loteUnico(orden);
@@ -126,6 +131,9 @@ export const LoteOrdenProduccion = ({
             {lote && (
                 <>
                     <div className="maestro-botones">
+                        {puede("almacen.lote") && (
+                            <QBoton variante="borde" onClick={() => setEtiquetas(lote)}>Imprimir etiquetas</QBoton>
+                        )}
                         <QBoton
                             deshabilitado={!cabeAccion(acciones, COMANDO.cambiarLote, pendiente)}
                             onClick={() => setEdicion({ titulo: `Cambiar lote ${lote.id}`, lote, inicial: formDesdeLote(lote) })}
@@ -180,6 +188,15 @@ export const LoteOrdenProduccion = ({
                     descripcionArticulo={edicion.lote ? edicion.lote.descripcion : undefined}
                     guardar={guardar}
                     cerrar={() => setEdicion(null)}
+                />
+            )}
+
+            {etiquetas && (
+                <ImprimirEtiquetasLote
+                    titulo={`Imprimir etiquetas del lote ${etiquetas.id}`}
+                    nombreFichero={nombreEtiquetaLote(etiquetas.id)}
+                    cargar={(opciones) => getEtiquetaLote(etiquetas.id, opciones)}
+                    cerrar={() => setEtiquetas(null)}
                 />
             )}
 

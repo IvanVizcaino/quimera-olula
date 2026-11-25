@@ -14,8 +14,18 @@ import { plugin, puede } from "@olula/lib/dominio.ts";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Lote, ProduccionLote } from "../diseño.ts";
-import { etiquetaEstadoLote, fechaDdMmAaaa, formatearCantidad, loteVacio, mensajeRevisados, textoArticulo, tituloLote } from "../dominio.ts";
-import { getLote, revisarLote } from "../infraestructura.ts";
+import {
+    etiquetaEstadoLote,
+    fechaDdMmAaaa,
+    formatearCantidad,
+    loteVacio,
+    mensajeRevisados,
+    nombreEtiquetaLote,
+    textoArticulo,
+    tituloLote,
+} from "../dominio.ts";
+import { ImprimirEtiquetasLote } from "../etiqueta/ImprimirEtiquetasLote.tsx";
+import { getEtiquetaLote, getLote, revisarLote } from "../infraestructura.ts";
 import "../maestro/MaestroLote.css";
 
 const getMaquina = getMaquinaDetalleSimple(getLote, loteVacio);
@@ -52,10 +62,12 @@ export const DetalleLote = ({ id, publicar = async () => {} }: { id?: string; pu
     const { intentar } = useContext(ContextoError);
     const [revisando, setRevisando] = useState(false);
     const [mensaje, setMensaje] = useState("");
+    const [etiquetas, setEtiquetas] = useState(false);
     const navegar = useNavigate();
 
     useEffect(() => {
         setMensaje("");
+        setEtiquetas(false);
         emitir("id_cambiado", id, true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
@@ -91,14 +103,15 @@ export const DetalleLote = ({ id, publicar = async () => {} }: { id?: string; pu
             cerrarDetalle={() => emitir("entidad_deseleccionada", null, true)}
         >
             <div className="DetalleLote">
-                {puede("almacen.lote.revisar") && (
-                    <div className="fila-acciones-lote">
-                        {mensaje && <span className="nota-lote" role="status">{mensaje}</span>}
+                <div className="fila-acciones-lote">
+                    {mensaje && <span className="nota-lote" role="status">{mensaje}</span>}
+                    <QBoton variante="borde" onClick={() => setEtiquetas(true)}>Imprimir etiquetas</QBoton>
+                    {puede("almacen.lote.revisar") && (
                         <QBoton deshabilitado={revisando} onClick={revisar}>
                             {revisando ? "Revisando..." : "Revisar lote"}
                         </QBoton>
-                    </div>
-                )}
+                    )}
+                </div>
                 <Tabs key={lote.id}>
                     {[
                         <Tab key="tab-datos-lote" label="Datos">
@@ -115,6 +128,17 @@ export const DetalleLote = ({ id, publicar = async () => {} }: { id?: string; pu
                     ]}
                 </Tabs>
             </div>
+            {etiquetas && (
+                <ImprimirEtiquetasLote
+                    titulo={`Imprimir etiquetas del lote ${lote.id}`}
+                    ayudaCantidad={p
+                        ? "Vacía: lo fabricado o, si aún no hay nada, la cantidad del lote."
+                        : "Vacía: lo que hay en almacén."}
+                    nombreFichero={nombreEtiquetaLote(lote.id)}
+                    cargar={(opciones) => getEtiquetaLote(lote.id, opciones)}
+                    cerrar={() => setEtiquetas(false)}
+                />
+            )}
         </Detalle>
     );
 };
