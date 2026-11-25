@@ -2,7 +2,7 @@ import { cambiosFicha, fichaAApi, fichaDesdeApi, fichaNueva } from "#/comun/info
 import { describe, expect, test } from "vitest";
 import { criteriosResultado, importe, nombreFicheroInventario } from "../dominio.ts";
 import { resultadoInventarioDesdeApi } from "../infraestructura.ts";
-import { ajustarInventario, INFORME_INVENTARIO } from "../pestañas.ts";
+import { ajustarInventario, INFORME_INVENTARIO, INFORME_INVENTARIO_VALORADO } from "../pestañas.ts";
 
 const api = {
     titulo: "Inventario Valorado de Almacenes",
@@ -26,10 +26,12 @@ const api = {
 
 describe("Fichas del informe de inventario", () => {
     test("la ficha nueva lleva los valores por defecto de Eneboo", () => {
-        const ficha = fichaNueva(INFORME_INVENTARIO);
+        const ficha = fichaNueva(INFORME_INVENTARIO_VALORADO);
         expect(ficha.actual).toBe(true);
         expect(ficha.incluir_sin_stock).toBe(true);
         expect(ficha.orden_almacen).toBe("No ordenar");
+        expect(ficha.tipo_valoracion).toBe("Coste medio");
+        expect(ficha.por_pvp).toBe("0");
     });
 
     test("el informe sin valorar no tiene criterios de valoración", () => {
@@ -39,13 +41,15 @@ describe("Fichas del informe de inventario", () => {
         expect(fichaAApi(INFORME_INVENTARIO, fichaNueva(INFORME_INVENTARIO))).not.toHaveProperty("tipo_valoracion");
     });
 
-    test("a la API: vacíos a null y casillas booleanas", () => {
-        const ficha = { ...fichaNueva(INFORME_INVENTARIO), descripcion: "Todo" };
-        expect(fichaAApi(INFORME_INVENTARIO, ficha)).toMatchObject({
+    test("a la API: vacíos a null, casillas booleanas y % sobre PVP numérico", () => {
+        const ficha = { ...fichaNueva(INFORME_INVENTARIO_VALORADO), descripcion: "Todo", por_pvp: "12,5" };
+        const enviada = fichaAApi(INFORME_INVENTARIO_VALORADO, ficha);
+        expect(enviada).toMatchObject({
             descripcion: "Todo",
             almacen_id: null,
             a_fecha: null,
             actual: true,
+            por_pvp: 12.5,
             orden_articulo: "No ordenar",
         });
     });
@@ -94,7 +98,7 @@ describe("Resultado del informe de inventario", () => {
         expect(criteriosResultado(resultado)).toBe("Stock a 24/11/2026 · Valoración: PVP + 10 % · 1.234 artículos");
         expect(importe(1234.5)).toBe("1.234,50");
         expect(importe(null)).toBe("");
-        expect(nombreFicheroInventario(INFORME_INVENTARIO, { descripcion: "Almacén Algeciras" }, "xlsx"))
-            .toBe("inventario-almacen-algeciras.xlsx");
+        expect(nombreFicheroInventario(INFORME_INVENTARIO_VALORADO, { descripcion: "Almacén Algeciras" }, "xlsx"))
+            .toBe("inventario-valorado-almacen-algeciras.xlsx");
     });
 });

@@ -4,7 +4,9 @@ import { ControlAlmacen, ControlFamilia } from "./controles.tsx";
 import { ResultadoInventario } from "./resultado/ResultadoInventario.tsx";
 
 /**
- * Criterios de `i_inventario` de Eneboo, en filas como su formulario. Los nombres son los de la API.
+ * Criterios de `i_inventario` de Eneboo, en filas como su formulario. Las dos
+ * pantallas comparten las fichas (la misma tabla); el informe sin valorar no
+ * enseña la valoración. Los nombres son los de la API.
  */
 
 const opciones = (valores: string[]) => valores.map((valor) => ({ valor, descripcion: valor }));
@@ -17,6 +19,7 @@ export const ORDENES_ARTICULO = [
     { valor: "Descripcion", descripcion: "Descripción" },
 ];
 export const SENTIDOS = opciones(["Ascendente", "Descendente"]);
+export const VALORACIONES = opciones(["Coste medio", "PVP", "Coste Prov."]);
 
 const combo = (id: string, label: string, valores: CampoInforme["opciones"]): CampoInforme => ({
     id,
@@ -67,6 +70,23 @@ export const INFORME_INVENTARIO: PestañaInforme = {
     regla: "almacen.informe_inventario",
     filas: filasComunes,
     inicial: INICIAL,
+    ajustar: ajustarInventario,
+    Resultado: ResultadoInventario,
+};
+
+export const INFORME_INVENTARIO_VALORADO: PestañaInforme = {
+    clave: "inventario_valorado",
+    titulo: "Informe inventario valorado",
+    url: "/almacen/informe/inventario_valorado",
+    regla: "almacen.informe_inventario_valorado",
+    filas: [
+        ...filasComunes,
+        [
+            combo("tipo_valoracion", "Valoración", VALORACIONES),
+            { id: "por_pvp", label: "% sobre PVP", tipo: "decimal" },
+        ],
+    ],
+    inicial: { ...INICIAL, tipo_valoracion: "Coste medio", por_pvp: "0" },
     ajustar: ajustarInventario,
     Resultado: ResultadoInventario,
 };

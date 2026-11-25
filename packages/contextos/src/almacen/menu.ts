@@ -20,6 +20,11 @@ export const menuAlmacen = {
         url: "/almacen/informe_inventario",
         regla: "almacen.informe_inventario",
     },
+    "Almacén/Informe inventario valorado": {
+        alias: ["inventario valorado", "valoración de stock"],
+        url: "/almacen/informe_inventario_valorado",
+        regla: "almacen.informe_inventario_valorado",
+    },
     "Almacén/Transferencias de Stock": { url: "/almacen/transferencias", regla: "almacen.transferencia_stock.leer" },
     "Almacén/Órdenes": { url: "/almacen/ordenes", regla: "almacen.orden.leer", plugin: "sga" },
     "Almacén/Pedidos de Compra": { url: "/almacen/pedidos_compra", regla: "almacen.pedido_compra.leer", plugin: "sga" },
