@@ -76,16 +76,9 @@ quimera-autocompletar {
             min-height: var(--altura-control);
             box-sizing: border-box;
 
+            /* El aspecto del enlace es el de `.enlace-ficha` (qenlace_ficha.css) */
             .enlace-solo-lectura {
-                display: inline;
-                margin-left: var(--espaciado-xxs);
-                color: var(--color-texto-secundario);
-                pointer-events: auto;
-                vertical-align: middle;
-
-                &:hover {
-                    color: var(--color-texto-primario);
-                }
+                display: inline-flex;
             }
         }
 

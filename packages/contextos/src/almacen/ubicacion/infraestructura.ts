@@ -26,7 +26,8 @@ export interface StockUbicacionItemApi {
     ubicacion_id: string;
     ubicacion: string;
     articulo: string;
-    articulo_id: string;
+    /** Referencia del artículo. */
+    sku: string;
     cantidad_fisica: number;
 }
 
@@ -157,7 +158,7 @@ const stockUbicacionItemFromApi = (api: StockUbicacionItemApi): StockUbicacionIt
     ubicacionId: api.ubicacion_id,
     ubicacion: api.ubicacion,
     articulo: api.articulo,
-    articuloId: api.articulo_id,
+    articuloId: api.sku,
     cantidadFisica: api.cantidad_fisica,
 });
 

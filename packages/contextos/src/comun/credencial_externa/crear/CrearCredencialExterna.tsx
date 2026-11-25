@@ -6,8 +6,9 @@ import { EmitirEvento } from "@olula/lib/diseño.js";
 import { useFocus } from "@olula/lib/useFocus.ts";
 import { useForm } from "@olula/lib/useForm.js";
 import { useModelo } from "@olula/lib/useModelo.ts";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Empresa } from "../../componentes/empresa.js";
+import { getConfiguracionCredenciales } from "../configuracion.js";
 import { CamposSecreto } from "../componentes/CamposSecreto.js";
 import { CategoriaCredencialExterna, SecretoCredencialExterna, TipoAuthCredencialExterna } from "../diseño.js";
 import {
@@ -45,10 +46,13 @@ export const CrearCredencialExterna = ({
     categoriaFiltro: CategoriaCredencialExterna;
     publicar: EmitirEvento;
 }) => {
-    const { modelo: credencial, uiProps, valido, set } = useModelo(
-        metaNuevaCredencialExterna,
-        categoriaFiltro === "llm" ? nuevaCredencialExternaVaciaLlm : nuevaCredencialExternaVaciaConector
-    );
+    const { empresaFija } = getConfiguracionCredenciales();
+    // Referencia estable (ver useModelo); con empresa fija ya viene rellena.
+    const inicial = useMemo(() => {
+        const base = categoriaFiltro === "llm" ? nuevaCredencialExternaVaciaLlm : nuevaCredencialExternaVaciaConector;
+        return empresaFija ? { ...base, empresaId: empresaFija } : base;
+    }, [categoriaFiltro, empresaFija]);
+    const { modelo: credencial, uiProps, valido, set } = useModelo(metaNuevaCredencialExterna, inicial);
 
     const opcionesProveedor = opcionesProveedorPorCategoria(categoriaFiltro);
 
@@ -107,10 +111,12 @@ export const CrearCredencialExterna = ({
                     {esOtroProveedor && (
                         <QInput label="Nombre del proveedor" {...proveedorProps} />
                     )}
-                    <Empresa
-                        valor={empresaIdProps.valor}
-                        onChange={(opcion) => empresaIdProps.onChange?.(opcion?.valor ?? "")}
-                    />
+                    {!empresaFija && (
+                        <Empresa
+                            valor={empresaIdProps.valor}
+                            onChange={(opcion) => empresaIdProps.onChange?.(opcion?.valor ?? "")}
+                        />
+                    )}
                     {categoriaFiltro === "conector" && (
                         <QSelect
                             label="Ámbito"

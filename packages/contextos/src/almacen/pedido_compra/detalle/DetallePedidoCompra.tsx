@@ -1,3 +1,4 @@
+import { urlListado } from "#/almacen/comun/fichas.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Detalle } from "@olula/componentes/detalle/Detalle.tsx";
 import { Tab, Tabs } from "@olula/componentes/detalle/tabs/Tabs.tsx";
@@ -65,6 +66,7 @@ export const DetallePedidoCompra = ({
                     <QBoton onClick={() => emitir("leer_albaran_solicitado")}>
                         Leer albarán
                     </QBoton>
+                    <QBoton variante="borde" enlace={urlListado.ordenesDePedidoCompra(ctx.pedido.id)}>Ver órdenes</QBoton>
                 </div>
 
                 <Tabs children={[

@@ -1,3 +1,4 @@
+import { almacenDeTrabajo, parametroUrl } from "#/almacen/comun/preferencias.ts";
 import { Maquina, ProcesarContexto } from "@olula/lib/diseño.ts";
 import { Reposicion } from "./diseño.ts";
 import { marcarNecesidad, reposicionVacia, seleccionInicial } from "./dominio.ts";
@@ -20,15 +21,24 @@ export const contextoReposicionInicial: ContextoReposicion = {
     seleccion: [],
 };
 
+/** Con el almacén del enlace o el de trabajo. */
+export const contextoReposicionDeEntrada = (): ContextoReposicion => ({
+    ...contextoReposicionInicial,
+    almacenId: parametroUrl("almacen_id") ?? almacenDeTrabajo.obtener() ?? "",
+});
+
 type ProcesarReposicion = ProcesarContexto<EstadoReposicion, ContextoReposicion>;
 
-const cambiarAlmacen: ProcesarReposicion = async (ctx, payload) => ({
-    ...ctx,
-    estado: "INICIAL",
-    almacenId: (payload as string) ?? "",
-    reposicion: reposicionVacia,
-    seleccion: [],
-});
+const cambiarAlmacen: ProcesarReposicion = async (ctx, payload) => {
+    almacenDeTrabajo.fijar(payload as string);
+    return {
+        ...ctx,
+        estado: "INICIAL",
+        almacenId: (payload as string) ?? "",
+        reposicion: reposicionVacia,
+        seleccion: [],
+    };
+};
 
 const calcular: ProcesarReposicion = async (ctx) => {
     const reposicion = await generarReposicion(ctx.almacenId, true);

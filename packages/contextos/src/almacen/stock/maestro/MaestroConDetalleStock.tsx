@@ -1,4 +1,6 @@
-import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
+import { filtroAlmacen } from "#/almacen/comun/componentes/FiltroAlmacen.tsx";
+import { criteriaInicialSga } from "#/almacen/comun/preferencias.ts";
+import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { Articulo } from "#/almacen/comun/componentes/Articulo.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.ts";
 import { Listado } from "@olula/componentes/maestro/Listado.js";
@@ -17,7 +19,7 @@ export const MaestroConDetalleStock = () => {
 
     const { ctx, emitir } = useMaquina(getMaquina, {
         estado: "INICIAL",
-        stocks: listaActivaEntidadesInicial<StockItem>(id, criteria),
+        stocks: listaActivaEntidadesInicial<StockItem>(id, criteriaInicialSga(criteria, criteriaDefecto)),
     });
 
     useUrlParams(ctx.stocks.activo, ctx.stocks.criteria);
@@ -68,19 +70,7 @@ const metaFiltro: MetaFiltro = {
             />
         ),
     },
-    almacen: {
-        id: "almacen",
-        campo: "almacen_id",
-        label: "Almacén",
-        filtro: (v) => (v ? ["almacen_id", "=", v as string] : null),
-        render: (valor, onChange) => (
-        <Almacen
-            nombre="almacen_id"
-            valor={(valor as string) ?? ""}
-            onChange={(opcion) => onChange(opcion?.valor ?? "")}
-        />
-        ),
-    },
+    almacen: filtroAlmacen(),
     fisica: {
         id: "fisica",
         label: "Cantidad física",

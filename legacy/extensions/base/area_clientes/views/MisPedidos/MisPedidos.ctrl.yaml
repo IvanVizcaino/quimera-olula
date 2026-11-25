@@ -16,7 +16,7 @@ bunch:
     - _type: set
       path: filtroVisible
       value:
-        const: true
+        toggleStatePath: filtroVisible
   onPedidosFilterChanged:
     - _type: set
       path: filtroVisible

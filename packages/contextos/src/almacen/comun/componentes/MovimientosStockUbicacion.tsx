@@ -1,3 +1,5 @@
+import { urlFicha } from "#/almacen/comun/fichas.ts";
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { Fragment, useEffect, useState } from "react";
 import { DesgloseCajaStockUbicacion, MoviStockUbicacion } from "#/almacen/ubicacion/diseño.ts";
@@ -52,7 +54,11 @@ const TablaMovimientosPlana = ({ movimientos }: { movimientos: MoviStockUbicacio
                 <tr key={m.id}>
                     <td>{m.fechaHora.toLocaleString("es-ES")}</td>
                     <td>{m.lote}</td>
-                    <td>{m.caja ?? "Sin caja"}</td>
+                    <td>
+                        {m.caja
+                            ? <ValorConEnlace href={urlFicha.caja(m.idCaja)} etiqueta={`Abrir caja ${m.caja}`}>{m.caja}</ValorConEnlace>
+                            : "Sin caja"}
+                    </td>
                     <td>{m.concepto}</td>
                     <td>{m.cantidad.toLocaleString("es-ES")}</td>
                 </tr>
@@ -97,7 +103,11 @@ const CajasArticulo = ({
                     return (
                         <Fragment key={clave}>
                             <tr>
-                                <td>{grupo.caja ?? "Sin caja"}</td>
+                                <td>
+                                    {grupo.caja
+                                        ? <ValorConEnlace href={urlFicha.caja(grupo.idCaja)} etiqueta={`Abrir caja ${grupo.caja}`}>{grupo.caja}</ValorConEnlace>
+                                        : "Sin caja"}
+                                </td>
                                 <td>{grupo.cantidad.toLocaleString("es-ES")}</td>
                                 <td>
                                     <QBoton

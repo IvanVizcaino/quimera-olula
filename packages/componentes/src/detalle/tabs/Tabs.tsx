@@ -14,14 +14,20 @@ interface TabsProps {
   children: HijoTab[];
   className?: string;
   tabInicial?: number;
+  /** Al cambiar de pestaña (p. ej. para recordarla). */
+  onCambio?: (indice: number) => void;
 }
 
 const Tab: React.FC<TabProps> = ({ children }) => {
   return <div>{children}</div>;
 };
 
-const Tabs: React.FC<TabsProps> = ({ children, className, tabInicial = 0 }) => {
-  const [activeTab, setActiveTab] = React.useState(tabInicial);
+const Tabs: React.FC<TabsProps> = ({ children, className, tabInicial = 0, onCambio }) => {
+  const [activeTab, setActivaInterna] = React.useState(tabInicial);
+  const setActiveTab = (nueva: number) => {
+    setActivaInterna(nueva);
+    onCambio?.(nueva);
+  };
   const [showArrows, setShowArrows] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
 

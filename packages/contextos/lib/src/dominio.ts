@@ -947,11 +947,31 @@ export const configuracion = (ruta: string): boolean => {
 
     try {
         const whoAmI = JSON.parse(raw) as {
-            config?: Record<string, Record<string, boolean>>;
+            config?: Record<string, Record<string, unknown>>;
         };
         return whoAmI.config?.[contexto]?.[clave] === true;
     } catch {
         return false;
+    }
+};
+
+/**
+ * Fuentes con las que el servidor calcula el precio y el descuento por
+ * defecto de las líneas de venta, en orden (plugin `precio_articulo`). Por
+ * ejemplo `["precios_articulos", "tarifa_grupo", "ficha_articulo"]`.
+ */
+export const fuentesPrecioArticulo = (): string[] => {
+    const raw = localStorage.getItem("whoami");
+    if (!raw) return [];
+
+    try {
+        const whoAmI = JSON.parse(raw) as {
+            config?: { ventas?: { precio_articulo?: unknown } };
+        };
+        const fuentes = whoAmI.config?.ventas?.precio_articulo;
+        return Array.isArray(fuentes) ? fuentes.filter((f): f is string => typeof f === "string") : [];
+    } catch {
+        return [];
     }
 };
 

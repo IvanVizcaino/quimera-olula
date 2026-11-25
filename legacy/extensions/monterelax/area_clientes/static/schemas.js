@@ -42,6 +42,7 @@ export default parent => ({
       { key: "Parcial", value: "Servido parcial" },
       { key: "Anulado", value: "Anulado" },
     ]),
+    estado: Field.Text("estado", "Estado"),
   }),
   //.filter(() => ["publico", "eq", true])
   //.order(() => ({ field: "descripcion", direction: "ASC" })),

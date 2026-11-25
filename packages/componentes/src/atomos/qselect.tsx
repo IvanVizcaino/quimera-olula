@@ -2,7 +2,8 @@ import { useLayoutEffect, useRef } from "react";
 import { flushSync } from "react-dom";
 import "./_forminput.css";
 import { Etiqueta, FormFieldProps, Validacion, useEditando } from "./_forminput.tsx";
-import { QIcono } from "./qicono.tsx";
+import { EnlaceFicha } from "./qenlace_ficha.tsx";
+import { urlEnlace } from "./url_enlace.ts";
 
 type Opcion = { valor: string; descripcion: string;[dato: string]: unknown };
 
@@ -53,11 +54,7 @@ export const QSelect = ({
     const descripcion = opciones
       .flat()
       .find((o) => o.valor === valor)?.descripcion;
-    const enlaceHref = enlace && valor
-      ? enlace.includes("{id}")
-        ? enlace.replace("{id}", encodeURIComponent(valor))
-        : `${enlace.replace(/\/$/, "")}/${valor}`
-      : null;
+    const enlaceHref = urlEnlace(enlace, valor);
     return (
       <quimera-select solo-lectura="" nombre={nombre} condensado={condensado}>
         <label>
@@ -65,15 +62,11 @@ export const QSelect = ({
           <span className="valor-solo-lectura">
             {descripcion || "—"}
             {enlaceHref && (
-              <a
-                className="enlace-solo-lectura"
+              <EnlaceFicha
                 href={enlaceHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Abrir ${label ?? "ficha"}`}
-              >
-                <QIcono nombre="arriba_derecha" tamaño="sm" />
-              </a>
+                className="enlace-solo-lectura"
+                etiqueta={`Abrir ${label ?? "ficha"}${descripcion ? ` ${descripcion}` : ""}`}
+              />
             )}
           </span>
         </label>

@@ -1,3 +1,4 @@
+import { urlListado } from "#/almacen/comun/fichas.ts";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { QCheckbox } from "@olula/componentes/atomos/qcheckbox.tsx";
 import { QInput } from "@olula/componentes/atomos/qinput.tsx";
@@ -57,6 +58,7 @@ export const DetalleTipoUbicacion = ({
             <div className="DetalleTipoUbicacion">
                 <div className="maestro-botones">
                     <QBoton onClick={() => emitir("borrado_solicitado")}>Borrar</QBoton>
+                    <QBoton variante="borde" enlace={urlListado.ubicacionesDeTipo(id ?? "")}>Ver ubicaciones</QBoton>
                 </div>
                 <quimera-formulario>
                     <QInput label="Código" {...modelo.uiProps("codigo")} maxLength={10} />

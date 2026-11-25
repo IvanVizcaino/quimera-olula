@@ -1,3 +1,7 @@
+import { filtroAlmacen } from "#/almacen/comun/componentes/FiltroAlmacen.tsx";
+import { criteriaInicialSga } from "#/almacen/comun/preferencias.ts";
+import { getMetaFiltroDefecto, MetaFiltro } from "@olula/componentes/maestro/maestroFiltros/MaestroFiltrosActivoControlado.js";
+import { criteriaDefecto } from "@olula/lib/dominio.js";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { useMaquina } from "@olula/componentes/hook/useMaquina.js";
 import { Listado } from "@olula/componentes/maestro/Listado.tsx";
@@ -11,12 +15,17 @@ import { DetalleUbicacion } from "../detalle/DetalleUbicacion.tsx";
 import { metaTablaUbicacion } from "./diseño.ts";
 import { getMaquina } from "./maquina.ts";
 
+const metaFiltroUbicacion: MetaFiltro = {
+    almacen: filtroAlmacen(),
+    ...getMetaFiltroDefecto(metaTablaUbicacion),
+};
+
 export const MaestroConDetalleUbicacion = () => {
     const { id, criteria } = getUrlParams();
 
     const { ctx, emitir } = useMaquina(getMaquina, {
         estado: "INICIAL",
-        ubicaciones: listaActivaEntidadesInicial<Ubicacion>(id, criteria),
+        ubicaciones: listaActivaEntidadesInicial<Ubicacion>(id, criteriaInicialSga(criteria, criteriaDefecto)),
     });
 
     useUrlParams(ctx.ubicaciones.activo, ctx.ubicaciones.criteria);
@@ -34,6 +43,7 @@ export const MaestroConDetalleUbicacion = () => {
                         <h2>Ubicaciones</h2>
                         <Listado<Ubicacion>
                             metaTabla={metaTablaUbicacion}
+                            metaFiltro={metaFiltroUbicacion}
                             criteria={ctx.ubicaciones.criteria}
                             modoInicial="tabla"
                             tarjeta={TarjetaUbicacion}

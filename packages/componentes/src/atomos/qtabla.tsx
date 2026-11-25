@@ -1,3 +1,5 @@
+import { ContenidoConEnlace } from "./qenlace_ficha.tsx";
+import { etiquetaEnlace } from "./url_enlace.ts";
 import { Entidad, Orden, Paginacion } from "@olula/lib/diseño.ts";
 import {
   calcularPaginacionSimplificada,
@@ -32,6 +34,12 @@ type MetaColumna<T extends Entidad> = {
   /** Énfasis visual: `destacado` en negrita (cliente, total), `secundario` en gris (código). */
   estilo?: "destacado" | "secundario";
   render?: (entidad: T) => string | ReactNode;
+  /**
+   * La celda lleva a la ficha de otra entidad: URL (o null si esta fila no tiene). La tabla pinta el
+   * valor y `EnlaceFicha` (↗); el clic en la flecha no selecciona la fila. Así una columna de enlace
+   * se declara aquí y su aspecto se cambia en un único sitio (qenlace_ficha.css).
+   */
+  enlace?: (entidad: T) => string | null | undefined;
 };
 
 export type MetaTabla<T extends Entidad> = MetaColumna<T>[];
@@ -62,11 +70,13 @@ const cabecera = <T extends Entidad>(
 const fila = <T extends Entidad>(entidad: Entidad, metaTabla: MetaTabla<T>) => {
   const renderColumna = ({
     id,
+    cabecera: titulo,
     render,
     tipo,
     divisa,
     ancho,
     estilo,
+    enlace,
   }: MetaColumna<T>) => {
     let datos = render?.(entidad as T) ?? (entidad[id] as unknown);
 
@@ -94,6 +104,8 @@ const fila = <T extends Entidad>(entidad: Entidad, metaTabla: MetaTabla<T>) => {
       datos = datos ? "Sí" : "No";
     }
 
+    const href = enlace?.(entidad as T) ?? null;
+
     return (
       <td
         key={[entidad.id, id].join("-")}
@@ -101,7 +113,9 @@ const fila = <T extends Entidad>(entidad: Entidad, metaTabla: MetaTabla<T>) => {
         data-estilo={estilo}
         style={ancho ? { width: ancho } : undefined}
       >
-        {datos as string}
+        <ContenidoConEnlace href={href} etiqueta={etiquetaEnlace(titulo, datos)}>
+          {datos as string}
+        </ContenidoConEnlace>
       </td>
     );
   };

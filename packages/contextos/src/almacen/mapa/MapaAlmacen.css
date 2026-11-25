@@ -1,0 +1,1119 @@
+/*
+ * MapaAlmacen.css — mapa del almacén (planta SVG por zona, alzado de pasillo, capas).
+ *
+ * Formulario (12 columnas, ancho limitado por PaginaProceso):
+ *   almacén 3 · zona 3 · capa 3 · vista 3
+ * Barras (campos + botón al lado): [rotación según 8 · días 4] Recalcular
+ *                                  [recorrido de la orden 8]   Ver recorrido
+ *
+ * Los tonos `tono-*` valen para celdas SVG (fill) y para botones/muestras (background).
+ * Solo tokens de tema (`--color-texto-primario`, `--color-borde-fuerte`...): los que no existen
+ * en el tema (`--color-texto`, `--color-borde`) no se usan, para que el modo oscuro funcione.
+ */
+
+.MapaAlmacen {
+    --mapa-texto: var(--color-texto-primario);
+    --mapa-borde: var(--color-borde-fuerte);
+    --mapa-borde-sutil: var(--color-borde-sutil);
+    --mapa-foco: var(--color-texto-primario);
+
+    /* Vacío y sin dato: gris medio, que se distinga del fondo blanco (y del gris oscuro en modo oscuro) */
+    --tono-vacio: var(--color-borde-sutil);
+    --tono-parcial: var(--color-primario-claro);
+    --tono-lleno: var(--mg-3, #5f6a72);
+    --tono-a: var(--color-exito);
+    --tono-b: var(--color-advertencia);
+    --tono-c: var(--color-error);
+    --tono-sin-dato: var(--color-borde-sutil);
+    --tono-sin-ubicaciones: transparent;
+    --tono-ok: var(--color-exito-claro);
+    --tono-rota-mas: var(--color-advertencia);
+    --tono-rota-menos: var(--color-primario-claro);
+    --tono-picking: var(--color-exito);
+    --tono-bajo-minimo: var(--color-error);
+    --tono-activa: var(--color-exito-claro);
+    --tono-parcial-bloqueada: var(--color-advertencia-claro);
+    --tono-bloqueada: var(--color-error);
+    --tono-mezcla: var(--color-texto-secundario);
+    --tono-clase-0: #3b82c4;
+    --tono-clase-1: #e07b39;
+    --tono-clase-2: #4aa564;
+    --tono-clase-3: #9b59b6;
+    --tono-clase-4: #c9a227;
+    --tono-clase-5: #2bb3b1;
+
+    > quimera-formulario {
+        /* el hueco con los botones lo da el gap de PaginaProceso */
+        padding-bottom: 0;
+
+        [nombre="almacenId"],
+        [nombre="zonaId"],
+        [nombre="capa"],
+        [nombre="vista"] {
+            grid-column: span 3;
+        }
+    }
+
+    /* Campos con su botón al lado: rotación + Recalcular, orden + Ver recorrido */
+    > .mapa-barra {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: var(--espaciado-m, 1rem);
+
+        > .mapa-barra-campos {
+            flex: 0 1 28rem;
+            min-width: 16rem;
+        }
+
+        quimera-formulario {
+            padding-bottom: 0;
+        }
+
+        [nombre="origen"],
+        [nombre="ordenId"] {
+            grid-column: span 8;
+        }
+
+        [nombre="dias"] {
+            grid-column: span 4;
+        }
+
+        > .botones {
+            margin: 0;
+            padding-bottom: var(--espaciado-xs, 0.25rem);
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    /* Cuatro selects de span 3 quedan demasiado estrechos: dos por fila */
+    .MapaAlmacen > quimera-formulario [nombre] {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 768px) {
+    .MapaAlmacen > quimera-formulario [nombre] {
+        grid-column: 1 / -1;
+    }
+
+    .MapaAlmacen > .mapa-barra > .mapa-barra-campos {
+        flex-basis: 100%;
+    }
+}
+
+/* ─── Tonos ─────────────────────────────────────────────── */
+
+.MapaAlmacen {
+    .tono-vacio { --tono: var(--tono-vacio); }
+    .tono-parcial { --tono: var(--tono-parcial); }
+    .tono-lleno { --tono: var(--tono-lleno); }
+    .tono-a { --tono: var(--tono-a); }
+    .tono-b { --tono: var(--tono-b); }
+    .tono-c { --tono: var(--tono-c); }
+    .tono-sin-dato { --tono: var(--tono-sin-dato); }
+    .tono-sin-ubicaciones { --tono: var(--tono-sin-ubicaciones); }
+    .tono-ok { --tono: var(--tono-ok); }
+    .tono-rota-mas { --tono: var(--tono-rota-mas); }
+    .tono-rota-menos { --tono: var(--tono-rota-menos); }
+    .tono-picking { --tono: var(--tono-picking); }
+    .tono-bajo-minimo { --tono: var(--tono-bajo-minimo); }
+    .tono-activa { --tono: var(--tono-activa); }
+    .tono-parcial-bloqueada { --tono: var(--tono-parcial-bloqueada); }
+    .tono-bloqueada { --tono: var(--tono-bloqueada); }
+    .tono-mezcla { --tono: var(--tono-mezcla); }
+    .tono-clase-0 { --tono: var(--tono-clase-0); }
+    .tono-clase-1 { --tono: var(--tono-clase-1); }
+    .tono-clase-2 { --tono: var(--tono-clase-2); }
+    .tono-clase-3 { --tono: var(--tono-clase-3); }
+    .tono-clase-4 { --tono: var(--tono-clase-4); }
+    .tono-clase-5 { --tono: var(--tono-clase-5); }
+}
+
+/* ─── Leyenda ───────────────────────────────────────────── */
+
+.MapaAlmacen .mapa-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-xs) var(--espaciado-l);
+    margin: 0;
+    padding: var(--espaciado-s) var(--espaciado-m);
+    list-style: none;
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+    background: var(--color-superficie-sunken);
+    border: 1px solid var(--mapa-borde-sutil);
+    border-radius: var(--redondeo-borde-s);
+
+    li {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+        line-height: 1.3;
+    }
+}
+
+.MapaAlmacen .mapa-muestra {
+    flex: none;
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 3px;
+    background: var(--tono);
+    border: 1px solid var(--mapa-borde);
+}
+
+.MapaAlmacen .mapa-muestra.tono-sin-ubicaciones {
+    border-style: dashed;
+}
+
+.MapaAlmacen .mapa-muestra-recorrido {
+    background: none;
+    border: none;
+    border-top: 3px solid var(--mapa-texto);
+    height: 0;
+    border-radius: 0;
+}
+
+.MapaAlmacen .mapa-aviso {
+    margin: 0;
+    color: var(--color-advertencia-oscuro);
+    font-weight: var(--grosor-letra-5);
+}
+
+/* ─── Planta ────────────────────────────────────────────── */
+
+/* Planta (izquierda) y alzado del pasillo (derecha) en la misma línea */
+.MapaAlmacen .mapa-vistas {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--espaciado-m);
+
+    > .mapa-zonas {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    > .mapa-panel-alzado,
+    > .mapa-editor-planta {
+        flex: 0 1 auto;
+        min-width: 18rem;
+        max-width: 55%;
+        position: sticky;
+        top: var(--espaciado-m);
+    }
+
+    /* Editor más alto que la ventana: se desplaza dentro para no perder Guardar */
+    > .mapa-editor-planta {
+        max-height: calc(100vh - 2 * var(--espaciado-m));
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 1024px) {
+    .MapaAlmacen .mapa-vistas {
+        flex-direction: column;
+        align-items: stretch;
+
+        > .mapa-panel-alzado,
+        > .mapa-editor-planta {
+            min-width: 0;
+            position: static;
+            max-height: none;
+            overflow-y: visible;
+        }
+
+        > .mapa-panel-alzado {
+            max-width: none;
+            min-width: 0;
+            position: static;
+        }
+    }
+}
+
+.MapaAlmacen .mapa-zonas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-m);
+    align-items: flex-start;
+}
+
+.MapaAlmacen .mapa-zona {
+    max-width: 100%;
+    box-sizing: border-box;
+    background: var(--color-superficie-elevada);
+    border: 1px solid var(--mapa-borde-sutil);
+    border-radius: var(--redondeo-borde-m);
+    box-shadow: var(--sombra-xs);
+    padding: var(--espaciado-m);
+
+    h3 {
+        margin: 0 0 var(--espaciado-s);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--espaciado-s);
+        font-size: var(--tamaño-letra-m);
+        font-weight: var(--grosor-letra-6);
+        color: var(--mapa-texto);
+    }
+
+    > p {
+        margin: 0;
+        color: var(--color-texto-secundario);
+    }
+}
+
+.MapaAlmacen .mapa-zona-funcion {
+    font-weight: var(--grosor-letra-4);
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+}
+
+.MapaAlmacen .mapa-planta-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.MapaAlmacen .mapa-planta {
+    display: block;
+
+    .mapa-pasillo-suelo {
+        fill: var(--color-fondo);
+        stroke: var(--mapa-borde);
+        stroke-dasharray: 2 2;
+        stroke-width: 0.5;
+        cursor: pointer;
+    }
+
+    .mapa-pasillo-suelo:hover {
+        fill: var(--color-superficie-sunken);
+    }
+
+    .mapa-pasillo.seleccionado .mapa-pasillo-suelo {
+        fill: var(--color-primario-claro);
+        stroke: var(--mapa-texto);
+        stroke-dasharray: none;
+        stroke-width: 1;
+    }
+
+    .mapa-pasillo-codigo {
+        font-size: 10px;
+        font-weight: 700;
+        text-anchor: middle;
+        fill: var(--mapa-texto);
+    }
+
+    .mapa-celda {
+        fill: var(--tono);
+        stroke: var(--mapa-borde);
+        stroke-width: 0.5;
+        cursor: pointer;
+    }
+
+    .mapa-celda.tono-sin-ubicaciones {
+        stroke-dasharray: 2 2;
+    }
+
+    .mapa-celda:hover {
+        stroke: var(--mapa-texto);
+        stroke-width: 1.5;
+    }
+
+    .mapa-celda.seleccionada {
+        stroke: var(--mapa-texto);
+        stroke-width: 2.5;
+        stroke-dasharray: none;
+    }
+
+    /* Halo claro/oscuro del tema para que la línea se lea sobre celdas oscuras y claras */
+    .mapa-recorrido {
+        fill: none;
+        stroke: var(--mapa-texto);
+        stroke-width: 1.75;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        pointer-events: none;
+        filter: drop-shadow(0 0 1px var(--color-superficie)) drop-shadow(0 0 1px var(--color-superficie));
+    }
+
+    .mapa-parada circle {
+        fill: var(--mapa-texto);
+        stroke: var(--color-superficie);
+        stroke-width: 1;
+    }
+
+    /* Dejar: anillo en vez de círculo lleno, para no depender solo del color */
+    .mapa-parada-dejar circle {
+        fill: var(--color-primario);
+        stroke: var(--mapa-texto);
+        stroke-width: 1.5;
+    }
+
+    .mapa-parada text {
+        font-size: 8px;
+        font-weight: 700;
+        fill: var(--color-superficie);
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+    }
+}
+
+.MapaAlmacen .mapa-sueltas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-s);
+    margin-top: var(--espaciado-m);
+}
+
+.MapaAlmacen .mapa-planta-scroll + .mapa-sueltas {
+    padding-top: var(--espaciado-m);
+    border-top: 1px dashed var(--mapa-borde-sutil);
+}
+
+.MapaAlmacen .mapa-ficha {
+    min-height: 2rem;
+    padding: var(--espaciado-xxs) var(--espaciado-s);
+    border-radius: var(--redondeo-borde-xs);
+    border: 1px solid var(--mapa-borde);
+    background: var(--tono);
+    color: var(--mapa-texto);
+    font: inherit;
+    font-size: var(--tamaño-letra-s);
+    cursor: pointer;
+}
+
+/* Texto blanco sobre los tonos saturados de más contraste */
+.MapaAlmacen .mapa-ficha:is(.tono-lleno, .tono-mezcla, .tono-c, .tono-bajo-minimo, .tono-bloqueada, .tono-clase-0, .tono-clase-3) {
+    color: #fff;
+}
+
+/* ─── Paneles: alzado y ubicación ───────────────────────── */
+
+.MapaAlmacen .mapa-panel {
+    box-sizing: border-box;
+    background: var(--color-superficie-elevada);
+    border: 1px solid var(--mapa-borde-sutil);
+    border-radius: var(--redondeo-borde-m);
+    box-shadow: var(--sombra-xs);
+    padding: var(--espaciado-m);
+}
+
+.MapaAlmacen .mapa-panel-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espaciado-m);
+    margin-bottom: var(--espaciado-s);
+
+    h3 {
+        margin: 0;
+        font-size: var(--tamaño-letra-m);
+        font-weight: var(--grosor-letra-6);
+        color: var(--mapa-texto);
+    }
+}
+
+.MapaAlmacen .mapa-detalle-articulos {
+    list-style: none;
+    margin: 0 0 var(--espaciado-s);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xs);
+    line-height: var(--altura-linea-normal, 1.45);
+
+    .mapa-detalle-stock {
+        margin-left: var(--espaciado-m);
+        color: var(--color-texto-secundario);
+        white-space: nowrap;
+    }
+}
+
+.MapaAlmacen .mapa-detalle-clases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaciado-s) var(--espaciado-l, 1.5rem);
+    margin: 0 0 var(--espaciado-m);
+
+    > div {
+        display: flex;
+        align-items: center;
+        gap: var(--espaciado-s);
+    }
+
+    dt {
+        color: var(--color-texto-secundario);
+        font-size: var(--tamaño-letra-s);
+    }
+
+    dd {
+        margin: 0;
+        font-weight: 600;
+    }
+}
+
+.MapaAlmacen .mapa-alzado {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-l);
+
+    h4 {
+        margin: 0 0 var(--espaciado-s);
+        font-size: var(--tamaño-letra-s);
+        font-weight: var(--grosor-letra-6);
+        color: var(--color-texto-secundario);
+    }
+}
+
+.MapaAlmacen .mapa-alzado-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: var(--espaciado-xxs);
+}
+
+.MapaAlmacen .mapa-alzado-rejilla {
+    border-collapse: collapse;
+
+    th {
+        font-size: var(--tamaño-letra-xs);
+        font-weight: var(--grosor-letra-5);
+        color: var(--color-texto-secundario);
+        padding: 0 var(--espaciado-xs);
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 3px;
+        border-left: 2px solid var(--mapa-borde);
+        border-bottom: 2px solid var(--mapa-borde);
+    }
+}
+
+.MapaAlmacen .mapa-alzado-modulo {
+    display: flex;
+    gap: 3px;
+    min-width: 2.5rem;
+    height: 1.75rem;
+}
+
+.MapaAlmacen .mapa-hueco {
+    flex: 1;
+    min-width: 1.5rem;
+    padding: 0;
+    font-size: var(--tamaño-letra-xs, 0.75rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--mapa-texto);
+    border: 1px solid var(--mapa-borde);
+    border-radius: 3px;
+    background: var(--tono);
+    cursor: pointer;
+}
+
+.MapaAlmacen .mapa-hueco:hover,
+.MapaAlmacen .mapa-ficha:hover {
+    outline: 1px solid var(--mapa-foco);
+    outline-offset: 0;
+    filter: brightness(0.93);
+}
+
+.MapaAlmacen .mapa-hueco.seleccionada,
+.MapaAlmacen .mapa-ficha.seleccionada {
+    outline: 3px solid var(--mapa-foco);
+    outline-offset: 1px;
+}
+
+.MapaAlmacen .mapa-hueco:focus-visible,
+.MapaAlmacen .mapa-ficha:focus-visible {
+    outline: 3px solid var(--color-accion, var(--color-primario-oscuro));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--color-superficie);
+    position: relative;
+    z-index: 1;
+}
+
+/* Táctil: objetivos más grandes */
+@media (pointer: coarse) {
+    .MapaAlmacen .mapa-alzado-modulo {
+        height: 2.75rem;
+    }
+
+    .MapaAlmacen .mapa-hueco {
+        min-width: 2rem;
+    }
+
+    .MapaAlmacen .mapa-ficha {
+        min-height: 2.75rem;
+        padding-inline: var(--espaciado-m);
+    }
+}
+
+@media (max-width: 768px) {
+    .MapaAlmacen .mapa-zona,
+    .MapaAlmacen .mapa-panel {
+        padding: var(--espaciado-s);
+    }
+
+    .MapaAlmacen .mapa-zonas {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.MapaAlmacen .mapa-planta .mapa-celda:focus-visible {
+    outline: none;
+    stroke: var(--color-borde-focus, var(--color-primario));
+    stroke-width: 2.5;
+}
+
+/* Letra ABC sobre el color, para no depender solo de él */
+.MapaAlmacen .mapa-planta .mapa-celda-letra {
+    font-size: 9px;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: central;
+    fill: var(--mapa-texto);
+    pointer-events: none;
+}
+
+/* Muestras de la leyenda para las paradas del recorrido */
+.MapaAlmacen .mapa-muestra-parada {
+    border-radius: 50%;
+}
+
+.MapaAlmacen .mapa-muestra-parada.mapa-parada-recoger {
+    background: var(--mapa-texto);
+}
+
+.MapaAlmacen .mapa-muestra-parada.mapa-parada-dejar {
+    background: var(--color-primario);
+    border: 2px solid var(--mapa-texto);
+}
+
+/* ─── Planta real (sga_planta.md): SVG en metros ─────────── */
+/* Las coordenadas son metros: los trazos no escalan (vector-effect) y los textos van en metros. */
+
+.MapaAlmacen > .mapa-botones-planta {
+    margin: 0;
+}
+
+.MapaAlmacen .mapa-zona-planta {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.MapaAlmacen .mapa-planta-real-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.MapaAlmacen .mapa-planta-escala {
+    margin: var(--espaciado-xs) 0 0;
+    font-size: var(--tamaño-letra-xs, 0.75rem);
+    color: var(--color-texto-secundario);
+}
+
+.MapaAlmacen .mapa-planta-real {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-width: 20rem;
+
+    /* Textos en metros: halo del color de la nave para que se lean sobre celdas y elementos */
+    text {
+        paint-order: stroke;
+        stroke: var(--color-superficie);
+        stroke-width: 0.15px;
+        stroke-linejoin: round;
+    }
+
+    rect, line, polyline, circle {
+        vector-effect: non-scaling-stroke;
+    }
+
+    .mapa-nave {
+        fill: var(--color-superficie);
+        stroke: var(--mapa-texto);
+        stroke-width: 2;
+    }
+
+    .mapa-rejilla line {
+        stroke: var(--mapa-borde-sutil);
+        stroke-width: 0.5;
+    }
+
+    .mapa-rejilla line.marcada {
+        stroke: var(--mapa-borde);
+        stroke-width: 0.75;
+    }
+
+    /* Línea intermitente: se puede pasar (muelle, puerta, otro), como el suelo de los pasillos.
+       Continua: no se puede (columna, oficina). Así lo trata el cálculo de distancias. */
+    .mapa-elemento rect {
+        fill: var(--color-borde-sutil);
+        fill-opacity: 0.6;
+        stroke: var(--color-texto-secundario);
+        stroke-width: 1;
+        stroke-dasharray: 4 2;
+    }
+
+    .mapa-elemento-columna rect,
+    .mapa-elemento-oficina rect {
+        stroke-width: 1.5;
+        stroke-dasharray: none;
+    }
+
+    .mapa-elemento-columna rect {
+        fill: var(--color-texto-secundario);
+    }
+
+    .mapa-elemento-muelle rect {
+        fill: var(--color-primario-claro);
+    }
+
+    .mapa-elemento text {
+        font-size: 0.8px;
+        text-anchor: middle;
+        dominant-baseline: central;
+        fill: var(--mapa-texto);
+        pointer-events: none;
+    }
+
+    .mapa-pasillo-contorno {
+        fill: none;
+        stroke: none;
+    }
+
+    .mapa-pasillo-suelo {
+        fill: var(--color-fondo);
+        stroke: var(--color-texto-secundario);
+        stroke-width: 1;
+        stroke-dasharray: 3 2;
+        cursor: pointer;
+    }
+
+    .mapa-pasillo-suelo:hover {
+        fill: var(--color-superficie-sunken);
+    }
+
+    .mapa-pasillo-real.seleccionado .mapa-pasillo-suelo {
+        fill: var(--color-primario-claro);
+        stroke: var(--mapa-texto);
+        stroke-dasharray: none;
+        stroke-width: 1;
+    }
+
+    .mapa-pasillo-real.atenuado {
+        opacity: 0.35;
+    }
+
+    .mapa-pasillo-rotulo {
+        font-size: 0.9px;
+        font-weight: 700;
+        text-anchor: middle;
+        dominant-baseline: central;
+        fill: var(--mapa-texto);
+        pointer-events: none;
+    }
+
+    .mapa-pasillo-flecha {
+        stroke: var(--color-texto-secundario);
+        stroke-width: 1.5;
+        pointer-events: none;
+    }
+
+    .mapa-flecha-punta {
+        fill: var(--color-texto-secundario);
+    }
+
+    .mapa-celda {
+        fill: var(--tono);
+        stroke: var(--color-texto-secundario);
+        stroke-width: 0.75;
+        cursor: pointer;
+    }
+
+    .mapa-celda.tono-sin-ubicaciones {
+        stroke-dasharray: 2 2;
+    }
+
+    .mapa-celda:hover {
+        stroke: var(--mapa-texto);
+        stroke-width: 1.5;
+    }
+
+    .mapa-celda.seleccionada {
+        stroke: var(--mapa-texto);
+        stroke-width: 2.5;
+        stroke-dasharray: none;
+    }
+
+    .mapa-celda:focus-visible {
+        outline: none;
+        stroke: var(--color-borde-focus, var(--color-primario));
+        stroke-width: 2.5;
+    }
+
+    .mapa-celda-letra {
+        font-size: 0.7px;
+        font-weight: 700;
+        text-anchor: middle;
+        dominant-baseline: central;
+        fill: var(--mapa-texto);
+        pointer-events: none;
+    }
+
+    .mapa-recorrido {
+        fill: none;
+        stroke: var(--mapa-texto);
+        stroke-width: 1.75;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-dasharray: 6 3;
+        pointer-events: none;
+        filter: drop-shadow(0 0 1px var(--color-superficie)) drop-shadow(0 0 1px var(--color-superficie));
+    }
+
+    .mapa-parada circle {
+        fill: var(--mapa-texto);
+        stroke: var(--color-superficie);
+        stroke-width: 1;
+    }
+
+    .mapa-parada-dejar circle {
+        fill: var(--color-primario);
+        stroke: var(--mapa-texto);
+        stroke-width: 1.5;
+    }
+
+    .mapa-parada text {
+        font-size: 0.8px;
+        font-weight: 700;
+        fill: var(--color-superficie);
+        stroke: none;
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+    }
+}
+
+/* Sin el contorno de foco del navegador: abarca todo el grupo SVG (rótulo, flecha) y sale un
+   recuadro redondeado más ancho que el pasillo. La selección y el foco se marcan con el trazo. */
+.MapaAlmacen .mapa-planta-real {
+    .mapa-pasillo-real:focus,
+    .mapa-elemento:focus,
+    .mapa-celda:focus {
+        outline: none;
+    }
+
+    /* Pasillo seleccionado (su alzado abierto): recuadro azul en su contorno */
+    .mapa-pasillo-real.seleccionado .mapa-pasillo-contorno {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
+    }
+}
+
+/* Edición: las piezas se arrastran; la elegida se marca */
+.MapaAlmacen .mapa-planta-real.editando {
+    /* Solo al editar: en lectura el dedo debe poder desplazar la página */
+    touch-action: none;
+
+    .mapa-pasillo-real,
+    .mapa-elemento {
+        cursor: grab;
+    }
+
+    .mapa-pasillo-real:active,
+    .mapa-elemento:active {
+        cursor: grabbing;
+    }
+
+    .mapa-pasillo-real .mapa-pasillo-contorno {
+        fill: transparent;
+        stroke: var(--mapa-borde);
+        stroke-width: 1;
+    }
+
+    .mapa-pasillo-suelo,
+    .mapa-celda {
+        cursor: inherit;
+    }
+
+    .elegido .mapa-pasillo-contorno,
+    .mapa-elemento.elegido rect {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
+    }
+
+    .elegido .mapa-pasillo-contorno {
+        stroke-dasharray: none;
+    }
+
+    .mapa-pasillo-real:hover .mapa-pasillo-contorno,
+    .mapa-elemento:hover rect {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 2;
+    }
+
+    /* Con teclado, el foco se marca en el contorno de la pieza (como "elegido", sin recuadro aparte) */
+    .mapa-pasillo-real:focus-visible .mapa-pasillo-contorno,
+    .mapa-elemento:focus-visible rect {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
+    }
+
+    .mapa-pasillo-real:focus-visible .mapa-pasillo-contorno {
+        stroke-dasharray: none;
+    }
+}
+
+@media (max-width: 768px) {
+    /* En móvil se desplaza en horizontal antes que encoger los textos hasta lo ilegible */
+    .MapaAlmacen .mapa-planta-real {
+        min-width: 40rem;
+    }
+}
+
+.MapaAlmacen .mapa-editor-planta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-m);
+    width: 24rem;
+    max-width: 100%;
+
+    fieldset {
+        min-width: 0;
+        margin: 0;
+        padding: var(--espaciado-s) var(--espaciado-m) 0;
+        border: 1px solid var(--mapa-borde-sutil);
+        border-radius: var(--redondeo-borde-s);
+    }
+
+    legend {
+        padding: 0 var(--espaciado-xs);
+        font-weight: var(--grosor-letra-6);
+        color: var(--mapa-texto);
+    }
+
+    quimera-formulario {
+        padding-bottom: var(--espaciado-s);
+
+        [nombre] {
+            grid-column: span 6;
+        }
+
+        /* Etiquetas largas ("Fondo de estantería (m)"): una por fila; X/Y y ancho/largo, por parejas */
+        [nombre="elementoNombre"],
+        [nombre="elementoTipo"],
+        [nombre="metrosNivel"],
+        [nombre^="planta-"],
+        [nombre^="pasillo-"] {
+            grid-column: 1 / -1;
+        }
+    }
+
+    .botones {
+        flex-wrap: wrap;
+        margin: 0;
+        padding-bottom: var(--espaciado-s);
+    }
+
+    h4 {
+        margin: 0 0 var(--espaciado-xs);
+        font-size: var(--tamaño-letra-s);
+        font-weight: var(--grosor-letra-6);
+        color: var(--color-texto-secundario);
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .mapa-editor-sin-colocar li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+    }
+
+    .mapa-editor-ayuda,
+    .mapa-editor-nota {
+        margin: 0;
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-texto-secundario);
+    }
+
+    .mapa-editor-nota {
+        padding-bottom: var(--espaciado-s);
+    }
+
+    .mapa-editor-avisos {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+    }
+
+    .mapa-editor-avisos li {
+        padding-left: var(--espaciado-s);
+        border-left: 3px solid var(--color-advertencia);
+        color: var(--color-advertencia-oscuro);
+        font-size: var(--tamaño-letra-s);
+    }
+
+    .mapa-editor-acciones {
+        border-top: 1px solid var(--mapa-borde-sutil);
+        padding-top: var(--espaciado-s);
+    }
+}
+
+@media (max-width: 1024px) {
+    .MapaAlmacen .mapa-vistas > .mapa-editor-planta {
+        width: auto;
+        max-width: none;
+    }
+
+    /* Con el panel a todo el ancho caben las medidas por parejas */
+    .MapaAlmacen .mapa-editor-planta quimera-formulario [nombre^="planta-"],
+    .MapaAlmacen .mapa-editor-planta quimera-formulario [nombre^="pasillo-"] {
+        grid-column: span 6;
+    }
+}
+
+/* Las barras de rotación y recorrido se ocultan mientras se edita la planta */
+.MapaAlmacen > .mapa-barra[hidden] {
+    display: none;
+}
+
+/* ─── Distancia real (sga_distancias.md) ─────────────────── */
+
+/* Avisos de zonas con accesibilidad estimada (fórmula) */
+.MapaAlmacen .mapa-avisos-calculo {
+    margin: 0;
+    padding: var(--espaciado-xs) var(--espaciado-m);
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-xxs);
+    border-left: 3px solid var(--color-advertencia);
+    background: var(--color-superficie-sunken);
+    border-radius: var(--redondeo-borde-xs);
+
+    li {
+        font-size: var(--tamaño-letra-s);
+        color: var(--color-advertencia-oscuro);
+    }
+}
+
+.MapaAlmacen .mapa-leyenda .mapa-leyenda-calculo {
+    font-style: italic;
+}
+
+.MapaAlmacen .mapa-detalle-distancia {
+    margin: var(--espaciado-s) 0 0;
+    font-size: var(--tamaño-letra-s);
+    color: var(--color-texto-secundario);
+}
+
+/* Puntos de salida y de entrada: borde más oscuro y grueso (intermitente si es transitable) */
+.MapaAlmacen .mapa-planta-real {
+    /* Puntos de salida y de entrada: trazo más oscuro y grueso; la línea sigue intermitente si es
+       transitable (y la segunda línea del texto dice «salida»/«entrada») */
+    .mapa-elemento.uso-salida rect,
+    .mapa-elemento.uso-entrada rect {
+        stroke: var(--mapa-texto);
+    }
+
+    .mapa-elemento-ficha rect {
+        fill: var(--tono);
+        stroke: var(--mapa-borde);
+        stroke-width: 1;
+    }
+
+    .mapa-elemento-ficha[role="button"] {
+        cursor: pointer;
+    }
+
+    .mapa-elemento-ficha[role="button"]:hover rect {
+        stroke: var(--mapa-texto);
+        stroke-width: 2;
+    }
+
+    /* Después del hover: la ficha seleccionada conserva su marca aunque el puntero esté encima */
+    .mapa-elemento-ficha.seleccionada rect {
+        stroke: var(--color-accion, var(--color-primario-oscuro));
+        stroke-width: 3;
+    }
+
+    .mapa-elemento-ficha:focus {
+        outline: none;
+    }
+
+    /* Foco de teclado como en las celdas del alzado, distinto del azul de la seleccionada */
+    .mapa-elemento-ficha:focus-visible rect {
+        stroke: var(--color-borde-focus, var(--color-primario));
+        stroke-width: 3;
+    }
+
+    /* 0.6 m = ~10 px a 16 px/m (0.5 quedaba en 8 px); cabe en la ficha de 0.8 m de alto */
+    .mapa-elemento-ficha text {
+        font-size: 0.6px;
+        font-weight: 600;
+        text-anchor: middle;
+        dominant-baseline: central;
+        fill: var(--mapa-texto);
+        pointer-events: none;
+    }
+
+    /* Texto blanco sobre los tonos saturados, como .mapa-ficha (sin halo claro alrededor) */
+    .mapa-elemento-ficha:is(.tono-lleno, .tono-mezcla, .tono-c, .tono-bajo-minimo, .tono-bloqueada, .tono-clase-0, .tono-clase-3) text {
+        fill: #fff;
+        stroke: none;
+    }
+}
+
+.MapaAlmacen .mapa-planta-real.editando .mapa-elemento-fichas {
+    pointer-events: none;
+}
+
+.MapaAlmacen .mapa-editor-ubicaciones {
+    padding-bottom: var(--espaciado-s);
+
+    li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--espaciado-s);
+    }
+
+    ul:not(:empty) {
+        padding-bottom: var(--espaciado-xs);
+    }
+
+    /* El .botones del editor ya lleva padding-bottom; el del contenedor basta */
+    .botones {
+        padding-bottom: 0;
+    }
+}
+
+/* Con el prefijo del editor: la regla genérica `quimera-formulario [nombre]` (span 6) pesa más que
+   un selector suelto, y el select con "MUELLE-01 · Zona" necesita la fila entera */
+.MapaAlmacen .mapa-editor-planta .mapa-editor-ubicaciones quimera-formulario [nombre="elementoUbicacion"] {
+    grid-column: 1 / -1;
+}
+
+/* Segunda línea del elemento: punto de salida o de entrada */
+.MapaAlmacen .mapa-planta-real .mapa-elemento .mapa-elemento-uso {
+    font-size: 0.6px;
+    font-style: italic;
+}
+
+/* Recorrido por el camino real: línea continua (la recta entre paradas es discontinua) */
+.MapaAlmacen .mapa-planta-real .mapa-recorrido.por-camino {
+    stroke-dasharray: none;
+}

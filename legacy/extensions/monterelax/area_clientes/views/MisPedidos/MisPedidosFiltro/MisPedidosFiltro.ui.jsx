@@ -16,7 +16,7 @@ function MisPedidosFiltro() {
         }}
       >
         <Filter.Schema id="referencia" label="Referencia de cliente" />
-        <Filter.Schema id="servido" label="Estado" />
+        <Filter.Schema id="servido" label="Servido" />
       </FilterBox>
     </Quimera.Template>
   );

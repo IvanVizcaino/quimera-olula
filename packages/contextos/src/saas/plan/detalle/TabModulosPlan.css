@@ -1,0 +1,14 @@
+.TabModulosPlan {
+    .modulo-plan-fila {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--color-borde, #e0e0e0);
+    }
+    .modulo-plan-info { flex: 1 1 200px; }
+    .modulo-plan-nombre { font-weight: 600; }
+    .modulo-plan-detalle, .ayuda-precio-extra { font-size: 0.85em; opacity: 0.75; }
+    quimera-select, quimera-input { min-width: 150px; }
+}

@@ -1,3 +1,5 @@
+import { ContenidoConEnlace } from "../atomos/qenlace_ficha.tsx";
+import { etiquetaEnlace } from "../atomos/url_enlace.ts";
 import { Entidad } from "@olula/lib/diseño.ts";
 import {
   formatearFechaDate,
@@ -207,7 +209,14 @@ export const QTarjetaMetatabla = <T extends Entidad>({
     <CampoTarjetaMetatabla
       id={columna.id}
       cabecera={columna.cabecera}
-      valor={valorColumna(entidad, columna, placeholderVacio)}
+      valor={
+        <ContenidoConEnlace
+          href={columna.enlace?.(entidad)}
+          etiqueta={etiquetaEnlace(columna.cabecera, entidad[columna.id])}
+        >
+          {valorColumna(entidad, columna, placeholderVacio)}
+        </ContenidoConEnlace>
+      }
       clases={
         esDetalle ? "qtarjeta-metatabla-campo-detalle" : claseCampo(columna)
       }

@@ -32,6 +32,15 @@ export type ElementoMenu = ElementoMenuPadre | ElementoMenuHijo;
 
 export type MenuContextFactory = { menu: ElementoMenu };
 
+
+// Como Object.groupBy (mismo orden de claves), que no existe hasta Node 21 ni en
+// Safari < 17.4.
+const agrupar = <T,>(lista: T[], clave: (item: T) => string): Record<string, T[]> =>
+    lista.reduce<Record<string, T[]>>((grupos, item) => {
+        (grupos[clave(item)] ??= []).push(item);
+        return grupos;
+    }, {});
+
 export const crearMenu = (factory: Record<string, MenuContextFactory>) => {
     const formatearNombre = (i: ElementoMenu) => ({ ...i, nombre: i.nombre.split('/').pop()?.trim() });
     const agruparPorNombre = (i: ElementoMenu) => i.nombre.split('/')[0];
@@ -39,7 +48,7 @@ export const crearMenu = (factory: Record<string, MenuContextFactory>) => {
     const factorias = Object.values(factory);
     const menus = factorias.map(v => (v as MenuContextFactory)?.menu).filter(Boolean).flat();
     const items = menus.map(m => Object.entries(m).map(([k, v]) => ({ nombre: k, ...v }))).flat();
-    const itemsAgrupados = Object.entries(Object.groupBy(items, agruparPorNombre)).map(([k, v]) => ({ ...((v ?? []).filter(i => i.nombre === k)[0]), subelementos: (v ?? []).filter(i => i.nombre !== k).map(formatearNombre) }));
+    const itemsAgrupados = Object.entries(agrupar(items, agruparPorNombre)).map(([k, v]) => ({ ...((v ?? []).filter(i => i.nombre === k)[0]), subelementos: (v ?? []).filter(i => i.nombre !== k).map(formatearNombre) }));
 
     itemsAgrupados.sort((a, b) => (a.posicion ?? Infinity) - (b.posicion ?? Infinity));
 

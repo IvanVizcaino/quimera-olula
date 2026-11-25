@@ -1,3 +1,6 @@
+import { ValorConEnlace } from "@olula/componentes/atomos/qenlace_ficha.tsx";
+import { urlFicha } from "#/almacen/comun/fichas.ts";
+import { useEffect } from "react";
 import { Almacen } from "#/almacen/comun/componentes/Almacen.tsx";
 import { QBoton } from "@olula/componentes/atomos/qboton.tsx";
 import { MetaTabla, QTabla } from "@olula/componentes/atomos/qtabla.tsx";
@@ -6,14 +9,21 @@ import { Entidad } from "@olula/lib/diseño.ts";
 import { Link } from "react-router";
 import { NecesidadReposicion } from "./diseño.ts";
 import {
-    necesidadSeleccionable, puedeGenerarSeleccion, puedeGenerarTraspaso, textoOrigenes, todasSeleccionadas,
+    necesidadSeleccionable, ParteSituacion, puedeGenerarSeleccion, puedeGenerarTraspaso, situacion,
+    textoArticulo, todasSeleccionadas,
 } from "./dominio.ts";
-import { contextoReposicionInicial, getMaquina } from "./maquina.ts";
+import { contextoReposicionDeEntrada, getMaquina } from "./maquina.ts";
 import "#/comun/estilos/pagina_proceso.css";
 import "./ReposicionPicking.css";
 
 export const ReposicionPicking = () => {
-    const { ctx, emitir } = useMaquina(getMaquina, contextoReposicionInicial);
+    const { ctx, emitir } = useMaquina(getMaquina, contextoReposicionDeEntrada());
+
+    // Con almacén de trabajo o un enlace, se calcula de entrada (es una simulación: no crea nada).
+    useEffect(() => {
+        if (ctx.almacenId) emitir("calculo_solicitado");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const { estado, almacenId, reposicion, seleccion } = ctx;
 
     return (
@@ -89,12 +99,38 @@ export const ReposicionPicking = () => {
 
 type FilaNecesidad = Entidad & NecesidadReposicion;
 
+const flechaSituacion: Record<ParteSituacion["tipo"], string> = { fisico: "", entrante: "↓", saliente: "↑" };
+const nombreSituacion: Record<ParteSituacion["tipo"], string> = {
+    fisico: "Físico", entrante: "Entrante", saliente: "Saliente",
+};
+
+const Situacion = ({ necesidad }: { necesidad: NecesidadReposicion }) => (
+    <span className="situacion">
+        {situacion(necesidad).map((p, i) => (
+            <span key={p.tipo} className={`situacion-${p.tipo}`} title={nombreSituacion[p.tipo]}>
+                {i > 0 && <span className="situacion-separador" aria-hidden="true"> / </span>}
+                {flechaSituacion[p.tipo] && <span aria-hidden="true">{flechaSituacion[p.tipo]} </span>}
+                <span className="sr-only">{nombreSituacion[p.tipo]} </span>
+                {p.cantidad.toLocaleString("es-ES")}
+            </span>
+        ))}
+    </span>
+);
+
 const columnasNecesidades: MetaTabla<FilaNecesidad> = [
-    { id: "articuloId", cabecera: "Artículo", estilo: "destacado" },
-    { id: "ubicacion", cabecera: "Ubicación de picking" },
-    { id: "fisico", cabecera: "Físico", tipo: "numero" },
-    { id: "entrante", cabecera: "Entrante", tipo: "numero" },
-    { id: "saliente", cabecera: "Saliente", tipo: "numero" },
+    {
+        id: "articuloId",
+        cabecera: "Artículo",
+        estilo: "destacado",
+        render: (n) => textoArticulo(n),
+        enlace: (n) => urlFicha.articulo(n.articuloId),
+    },
+    { id: "ubicacion", cabecera: "Ubicación de picking", enlace: (n) => urlFicha.pickingFijo(n.pickingFijoId) },
+    {
+        id: "situacion",
+        cabecera: "Situación",
+        render: (n) => <Situacion necesidad={n} />,
+    },
     { id: "disponible", cabecera: "Disponible", tipo: "numero", estilo: "destacado" },
     { id: "minimo", cabecera: "Mínimo", tipo: "numero" },
     { id: "maximo", cabecera: "Máximo", tipo: "numero" },
@@ -104,7 +140,16 @@ const columnasNecesidades: MetaTabla<FilaNecesidad> = [
         id: "origenes",
         cabecera: "Orígenes",
         ancho: "25%",
-        render: (n) => (n.origenes.length ? textoOrigenes(n) : "Sin stock en reserva"),
+        render: (n) => (n.origenes.length
+            ? n.origenes.map((o, i) => (
+                <span key={o.ubicacionId}>
+                    {i > 0 && ", "}
+                    <ValorConEnlace href={urlFicha.ubicacion(o.ubicacionId)} etiqueta={`Abrir ubicación ${o.ubicacion}`}>
+                        {o.ubicacion} ({o.cantidad.toLocaleString("es-ES")})
+                    </ValorConEnlace>
+                </span>
+            ))
+            : "Sin stock en reserva"),
     },
 ];
 

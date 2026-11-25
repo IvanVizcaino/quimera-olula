@@ -1,0 +1,45 @@
+/*
+ * Enlace a la ficha de otra entidad: el icono ↗ detrás del valor. Es el único sitio del estilo de
+ * estos enlaces en campos, tablas y paneles (doc sga_ergonomia.md, punto 0).
+ */
+.enlace-ficha {
+    display: inline-flex;
+    align-items: center;
+    /* Zona de clic de 24 px (icono de 16 px + 4 px de relleno por lado) sin cambiar el hueco que
+       ocupa: el relleno se compensa con margen negativo, así que el icono no se mueve ni crece la línea */
+    padding: 4px;
+    margin: -4px -4px -4px calc(var(--espaciado-xxs) - 4px);
+    color: var(--color-texto-secundario);
+    line-height: 1;
+    vertical-align: middle;
+    pointer-events: auto;
+    border-radius: var(--redondeo-borde-xs);
+
+    &:hover {
+        color: var(--color-texto-primario);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-borde-focus, var(--color-primario));
+        outline-offset: 1px;
+    }
+}
+
+/* Valor con su enlace, sin partir la línea entre los dos */
+.valor-con-enlace {
+    white-space: nowrap;
+}
+
+/* En celdas de tabla: el valor se recorta con «…» y la flecha no se pierde */
+.contenido-con-enlace {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+.contenido-con-enlace-valor {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
