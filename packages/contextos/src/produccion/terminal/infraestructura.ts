@@ -1,3 +1,5 @@
+import { OpcionesEtiquetaLote } from "#/almacen/lote/diseño.ts";
+import { queryEtiquetaLote } from "#/almacen/lote/dominio.ts";
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import { Criteria } from "@olula/lib/diseño.ts";
 import { criteriaDefecto } from "@olula/lib/dominio.ts";
@@ -234,3 +236,13 @@ export const patchTramo = async (id: string, tramoId: string, cuerpo: CuerpoEdit
 export const deleteTramo = async (id: string, tramoId: string): Promise<void> => {
     await RestAPI.delete(`${urlTarea(id)}/tramo/${enc(tramoId)}`, "Error al borrar el tramo");
 };
+
+/**
+ * Etiqueta del lote de la orden de una tarea (PDF; regla `produccion.terminal`). Sin cantidad,
+ * la del servidor (regla `cantidad_etiqueta`: lo acumulado en la tarea o, sin nada, la del lote).
+ */
+export const urlEtiquetaTarea = (id: string, opciones: OpcionesEtiquetaLote): string =>
+    `${urlTerminal}/tarea/${enc(id)}/etiqueta?${queryEtiquetaLote(opciones)}`;
+
+export const getEtiquetaTarea = async (id: string, opciones: OpcionesEtiquetaLote): Promise<Blob> =>
+    RestAPI.blob(urlEtiquetaTarea(id, opciones), "Error al imprimir la etiqueta");

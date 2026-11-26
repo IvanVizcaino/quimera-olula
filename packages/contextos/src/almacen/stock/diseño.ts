@@ -43,6 +43,10 @@ export interface RegularizacionStock extends Entidad {
     cantidadFinal: number;
     motivo: string | null;
     inventarioId: string | null;
+    /** Lecturas de fichero de la línea de inventario (`lecturasinvetariocsv`). */
+    lecturas: number;
+    /** Ubicación común de esas lecturas (null si no hay o si tienen varias). */
+    ubicacion: string | null;
 }
 
 export interface NuevaRegularizacionStock extends Modelo {

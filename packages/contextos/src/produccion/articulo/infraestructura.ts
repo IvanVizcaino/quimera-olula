@@ -25,6 +25,7 @@ export interface ComponenteFabricacionApi {
     tarea_proceso_id: string | number | null;
     tarea: string | null;
     codigo_tarea: string | null;
+    por_lotes?: boolean | null;
 }
 
 export interface FabricacionArticuloApi {
@@ -33,6 +34,7 @@ export interface FabricacionArticuloApi {
     fabricado: boolean | null;
     tipo_proceso_id: string | null;
     tipo_proceso: string | null;
+    por_lotes?: boolean | null;
     sin_stock?: boolean | null;
     componentes?: ComponenteFabricacionApi[];
     avisos?: string[];
@@ -46,6 +48,7 @@ const componenteDesdeApi = (api: ComponenteFabricacionApi): ComponenteFabricacio
     tareaProcesoId: api.tarea_proceso_id === null || api.tarea_proceso_id === undefined ? "" : String(api.tarea_proceso_id),
     tarea: api.tarea ?? "",
     codigoTarea: api.codigo_tarea ?? "",
+    porLotes: !!api.por_lotes,
 });
 
 export const fabricacionDesdeApi = (api: FabricacionArticuloApi): FabricacionArticulo => ({
@@ -54,6 +57,7 @@ export const fabricacionDesdeApi = (api: FabricacionArticuloApi): FabricacionArt
     fabricado: !!api.fabricado,
     tipoProcesoId: api.tipo_proceso_id ?? "",
     tipoProceso: api.tipo_proceso ?? "",
+    porLotes: !!api.por_lotes,
     sinStock: !!api.sin_stock,
     componentes: (api.componentes ?? []).map(componenteDesdeApi),
     avisos: api.avisos ?? [],

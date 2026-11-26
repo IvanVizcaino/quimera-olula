@@ -2,7 +2,7 @@ import { procesarEvento } from "@olula/lib/dominio.js";
 import { describe, expect, test } from "vitest";
 import { nuevaRegularizacionInicial } from "../../stock/regularizar/regularizar.ts";
 import { fechaLocalAApi } from "../../stock/infraestructura.ts";
-import { lineaACambios } from "../cambiar_linea/cambiar_linea.ts";
+import { avisoLecturas, lineaACambios } from "../cambiar_linea/cambiar_linea.ts";
 import {
     ficheroDesdeTexto,
     formatoFichero,
@@ -14,7 +14,11 @@ import {
 import { contextoDetalleInventarioInicial, totalesLineas } from "../detalle/dominio.ts";
 import { getMaquina } from "../detalle/maquina.ts";
 import { LineaInventario, ResultadoCargaFichero } from "../diseño.ts";
-import { cargaFicheroAFormData, resultadoCargaFicheroDesdeApi } from "../infraestructura.ts";
+import {
+    cambiosLineaAApi,
+    cargaFicheroAFormData,
+    resultadoCargaFicheroDesdeApi,
+} from "../infraestructura.ts";
 
 const linea = (id: string, inicial: number, final: number): LineaInventario => ({
     id,
@@ -28,6 +32,8 @@ const linea = (id: string, inicial: number, final: number): LineaInventario => (
     cantidadFinal: final,
     motivo: null,
     inventarioId: "000001",
+    lecturas: 0,
+    ubicacion: null,
 });
 
 const resultado = (cambios: Partial<ResultadoCargaFichero>): ResultadoCargaFichero => ({
@@ -87,12 +93,33 @@ describe("Detalle del inventario", () => {
         expect(totalesLineas([])).toEqual({ lineas: 0, contado: 0, diferencia: 0 });
     });
 
-    test("el cambio de línea parte de la cantidad contada y el motivo", () => {
-        expect(lineaACambios({ ...linea("1", 2, 5), motivo: "Recuento" })).toEqual({
-            articuloId: "REF1",
+    test("el cambio de línea parte de la cantidad contada, el motivo y la ubicación", () => {
+        expect(lineaACambios({ ...linea("1", 2, 5), motivo: "Recuento", ubicacion: "E1" })).toEqual({
             cantidad: 5,
             motivo: "Recuento",
+            ubicacion: "E1",
         });
+    });
+
+    test("el PATCH de la línea solo lleva lo que cambia", () => {
+        const original = { ...linea("1", 2, 5), motivo: "Recuento", ubicacion: "E1" };
+        expect(cambiosLineaAApi(original, { cantidad: 5, motivo: "Recuento", ubicacion: "E1" })).toEqual({});
+        expect(cambiosLineaAApi(original, { cantidad: 8, motivo: " Rotos ", ubicacion: "E1" })).toEqual({
+            cantidad: 8,
+            motivo: "Rotos",
+        });
+        expect(cambiosLineaAApi(original, { cantidad: 5, motivo: "", ubicacion: "" })).toEqual({
+            motivo: null,
+            ubicacion: null,
+        });
+        expect(cambiosLineaAApi(linea("2", 0, 3), { cantidad: 3, motivo: "", ubicacion: "P1" })).toEqual({
+            ubicacion: "P1",
+        });
+    });
+
+    test("el aviso de lecturas dice que se conservan", () => {
+        expect(avisoLecturas(1)).toContain("1 lectura de fichero");
+        expect(avisoLecturas(3)).toContain("3 lecturas de fichero, que se conservan");
     });
 });
 

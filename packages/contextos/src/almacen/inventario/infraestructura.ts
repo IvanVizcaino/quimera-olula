@@ -6,8 +6,8 @@ import {
 import { RestAPI } from "@olula/lib/api/rest_api.ts";
 import {
     ArticuloLeido,
-    CambiarLineaInventario,
     CambiosInventario,
+    CambiosLineaInventario,
     DeleteInventario,
     DeleteLineaInventario,
     GetInventario,
@@ -18,6 +18,7 @@ import {
     LineaRechazada,
     OpcionesCargaFichero,
     PatchInventario,
+    PatchLineaInventario,
     PatchRegularizarRestoInventario,
     PostFicheroInventario,
     PostInventario,
@@ -120,14 +121,31 @@ export const deleteLineaInventario: DeleteLineaInventario = async (id, lineaId) 
 };
 
 /**
- * Una línea no se puede cambiar en el servidor (Eneboo tampoco deja cambiar
- * la cantidad en edición): se borra y se vuelve a crear con la nueva
- * cantidad, con lo que el stock se recalcula igual. Las lecturas de fichero
- * de esa línea se pierden con el borrado.
+ * Cuerpo del `PATCH` de una línea: solo lo que cambia. Motivo y ubicación
+ * vacíos se envían como null (se vacían).
  */
-export const cambiarLineaInventario: CambiarLineaInventario = async (id, linea, cambios) => {
-    await deleteLineaInventario(id, linea.id);
-    return postLineaInventario(id, { ...cambios, articuloId: linea.articuloId });
+export const cambiosLineaAApi = (linea: LineaInventario, cambios: CambiosLineaInventario) => {
+    const api: { cantidad?: number; motivo?: string | null; ubicacion?: string | null } = {};
+    if (Number(cambios.cantidad) !== linea.cantidadFinal) api.cantidad = Number(cambios.cantidad);
+    const motivo = cambios.motivo.trim() || null;
+    if (motivo !== (linea.motivo ?? null)) api.motivo = motivo;
+    const ubicacion = cambios.ubicacion.trim() || null;
+    if (ubicacion !== (linea.ubicacion ?? null)) api.ubicacion = ubicacion;
+    return api;
+};
+
+/**
+ * Cambia la línea en el servidor en una sola operación: conserva sus lecturas
+ * de fichero (si la cantidad ya no es su suma, el servidor añade una lectura
+ * de ajuste) y recalcula el stock.
+ */
+export const patchLineaInventario: PatchLineaInventario = async (id, linea, cambios) => {
+    await RestAPI.patch(
+        `${baseUrl}/${id}/linea/${linea.id}`,
+        cambiosLineaAApi(linea, cambios),
+        "Error al cambiar la línea de inventario"
+    );
+    return linea.id;
 };
 
 interface ArticuloLeidoApi {

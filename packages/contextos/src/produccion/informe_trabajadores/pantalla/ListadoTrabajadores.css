@@ -1,0 +1,86 @@
+.ListadoTrabajadores {
+    display: flex;
+    flex-direction: column;
+    gap: var(--espaciado-s);
+    padding: 0 var(--espaciado-m) var(--espaciado-m);
+
+    h2 {
+        margin: var(--espaciado-s) 0 0;
+    }
+
+    h3,
+    h4,
+    p {
+        margin: 0;
+    }
+
+    .filtros-listado {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+
+        quimera-select {
+            grid-column: span 4;
+        }
+    }
+
+    .maestro-botones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--espaciado-s);
+    }
+
+    .aviso-listado {
+        color: var(--color-error, #b00020);
+    }
+
+    .criterios {
+        color: var(--color-texto-secundario);
+    }
+
+    .resultado-listado {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-s);
+    }
+
+    .grupo-seccion {
+        display: flex;
+        flex-direction: column;
+        gap: var(--espaciado-xs);
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    th:first-child {
+        width: 10em;
+    }
+
+    th:last-child {
+        width: 8em;
+    }
+
+    th,
+    td {
+        text-align: left;
+        padding: var(--espaciado-xs) var(--espaciado-s);
+        border-bottom: 1px solid var(--color-borde-sutil);
+    }
+
+    tfoot td {
+        font-weight: 600;
+        border-bottom: none;
+        color: var(--color-texto-secundario);
+    }
+}
+
+@media (max-width: 768px) {
+    .ListadoTrabajadores .filtros-listado quimera-select {
+        grid-column: span 12;
+    }
+}

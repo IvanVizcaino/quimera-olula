@@ -4,11 +4,14 @@ import { MaestroCentroCoste } from "./centro_coste/maestro/MaestroCentroCoste.ts
 import { ConfigProduccion } from "./config/maestro/ConfigProduccion.tsx";
 import { GenerarOrdenes } from "./necesidad/generar/GenerarOrdenes.tsx";
 import { MaestroOrdenProduccion } from "./orden/maestro/MaestroOrdenProduccion.tsx";
+import { InformeTareas } from "./informe_tareas/InformeTareas.tsx";
+import { ListadoTrabajadores } from "./informe_trabajadores/pantalla/ListadoTrabajadores.tsx";
 import { MaestroHorario } from "./horario/maestro/MaestroHorario.tsx";
 import { MaestroSeccion } from "./seccion/maestro/MaestroSeccion.tsx";
 import { MaestroTiempoTarea } from "./tiempo_tarea/maestro/MaestroTiempoTarea.tsx";
 import { TerminalProduccion } from "./terminal/pantalla/TerminalProduccion.tsx";
 import { MaestroTareaProduccion } from "./tarea/maestro/MaestroTareaProduccion.tsx";
+import { TrazabilidadLotes } from "./trazabilidad/pantalla/TrazabilidadLotes.tsx";
 import { MaestroTipoProceso } from "./tipo_proceso/maestro/MaestroTipoProceso.tsx";
 import { MaestroTipoTarea } from "./tipo_tarea/maestro/MaestroTipoTarea.tsx";
 import { MaestroTipoCentroCoste } from "./tipo_centro_coste/maestro/MaestroTipoCentroCoste.tsx";
@@ -20,8 +23,11 @@ export class RouterFactoryProduccionOlula {
         "produccion/generar_ordenes": GenerarOrdenes,
         "produccion/tareas": MaestroTareaProduccion,
         "produccion/terminal": TerminalProduccion,
+        "produccion/trazabilidad": TrazabilidadLotes,
+        "produccion/informe_tareas": InformeTareas,
         "produccion/secciones": MaestroSeccion,
         "produccion/trabajadores": MaestroTrabajador,
+        "produccion/listado_trabajadores": ListadoTrabajadores,
         "produccion/tipos_centro_coste": MaestroTipoCentroCoste,
         "produccion/centros_coste": MaestroCentroCoste,
         "produccion/horarios": MaestroHorario,

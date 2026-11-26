@@ -21,6 +21,7 @@ const metaTablaLineas: MetaTabla<LineaInventario> = [
         },
     },
     { id: "motivo", cabecera: "Motivo", prioridad: "baja", render: (l) => l.motivo ?? "" },
+    { id: "ubicacion", cabecera: "Ubicación", prioridad: "baja", render: (l) => l.ubicacion ?? "" },
 ];
 
 /** Líneas del inventario en modo tabla: cada una regulariza un artículo. */

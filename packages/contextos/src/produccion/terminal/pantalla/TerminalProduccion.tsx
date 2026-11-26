@@ -1,4 +1,5 @@
 import { EtiquetaEstado } from "#/comun/componentes/etiqueta_estado/EtiquetaEstado.tsx";
+import { ImprimirEtiquetasLote } from "#/almacen/lote/etiqueta/ImprimirEtiquetasLote.tsx";
 import { QModalConfirmacion } from "@olula/componentes/moleculas/qmodalconfirmacion.tsx";
 import { MouseEvent, useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -17,10 +18,19 @@ import {
     estadoTerminalInicial,
     formatearCodigoTarea,
     motivoOperarioNoValido,
+    nombreEtiquetaTarea,
+    preguntarEtiqueta,
     textoError,
     transicionTerminal,
 } from "../dominio.ts";
-import { getConfigTerminal, getTareaTerminal, getTrabajadorPorCodigo, postDeshacerTarea, postIniciarTarea } from "../infraestructura.ts";
+import {
+    getConfigTerminal,
+    getEtiquetaTarea,
+    getTareaTerminal,
+    getTrabajadorPorCodigo,
+    postDeshacerTarea,
+    postIniciarTarea,
+} from "../infraestructura.ts";
 import { LectorCodigo } from "../lector/LectorCodigo.tsx";
 import { ListaTareasTerminal } from "../lista/ListaTareasTerminal.tsx";
 import { TramosTarea } from "../tramos/TramosTarea.tsx";
@@ -71,6 +81,8 @@ export const TerminalProduccion = () => {
     const [conLista, setConLista] = useState(() => leerLocal(CLAVE_LISTA) !== "false");
     const [verPuesto, setVerPuesto] = useState(false);
     const [deshaciendo, setDeshaciendo] = useState(false);
+    /** Tarea final recién declarada de la que se ofrece imprimir la etiqueta del lote. */
+    const [etiqueta, setEtiqueta] = useState<{ id: string; loteId: string } | null>(null);
     const refOperario = useRef<HTMLInputElement>(null);
     const refTarea = useRef<HTMLInputElement>(null);
     const refRaiz = useRef<HTMLDivElement>(null);
@@ -90,8 +102,8 @@ export const TerminalProduccion = () => {
 
     // Foco de vuelta al lector tras cada cambio de paso o mensaje.
     useEffect(() => {
-        if (!ocupado && !deshaciendo) enfocar();
-    }, [estado.paso, estado.mensaje, estado.tarea?.id, ocupado, deshaciendo, enfocar]);
+        if (!ocupado && !deshaciendo && !etiqueta) enfocar();
+    }, [estado.paso, estado.mensaje, estado.tarea?.id, ocupado, deshaciendo, etiqueta, enfocar]);
 
     const recargar = () => setVersion((v) => v + 1);
     const error = (texto: string) => enviar({ tipo: "error", texto });
@@ -128,8 +140,12 @@ export const TerminalProduccion = () => {
         try {
             await postIniciarTarea(tarea.id, estado.operario.codigo);
             const despues = await getTareaTerminal(tarea.id).catch(() => null);
-            const texto = despues?.estado === "TERMINADA" ? "iniciada y terminada" : tarea.estado === "EN PAUSA" ? "reanudada" : "iniciada";
+            const terminada = despues?.estado === "TERMINADA";
+            const texto = terminada ? "iniciada y terminada" : tarea.estado === "EN PAUSA" ? "reanudada" : "iniciada";
             enviar({ tipo: "procesada", tarea: { id: tarea.id, descripcion: tarea.descripcion }, texto: `Tarea ${tarea.id} ${texto}` });
+            if (preguntarEtiqueta(tarea, terminada ? "terminada_en_un_paso" : "iniciada")) {
+                setEtiqueta({ id: tarea.id, loteId: tarea.loteId });
+            }
             setCodigoTarea("");
             recargar();
         } catch (e) {
@@ -190,6 +206,7 @@ export const TerminalProduccion = () => {
             ? `Tarea ${tarea.id} terminada (${config.usarTramos ? "tramo de " : ""}${c})`
             : `Tramo de ${c} declarado. Tarea ${tarea.id} en pausa`;
         enviar({ tipo: "procesada", tarea: { id: tarea.id, descripcion: tarea.descripcion }, texto });
+        if (preguntarEtiqueta(tarea, envio)) setEtiqueta({ id: tarea.id, loteId: tarea.loteId });
     };
 
     const editarTramo = (tramo: TramoTerminal) => enviar({ tipo: "abrir_consumos", modo: { tipo: "editar", tramo } });
@@ -402,6 +419,18 @@ export const TerminalProduccion = () => {
                     <ListaTareasTerminal centroId={centro} version={version} actual={tarea?.id ?? null} onElegir={elegirDeLista} />
                 )}
             </div>
+
+            {etiqueta && (
+                <ImprimirEtiquetasLote
+                    titulo="¿Imprimir etiqueta?"
+                    mensaje={`Etiqueta del lote ${etiqueta.loteId || "de la orden"} (tarea ${etiqueta.id}).`}
+                    ayudaCantidad="Cantidad vacía: lo declarado en la tarea."
+                    nombreFichero={nombreEtiquetaTarea(etiqueta.id)}
+                    cargar={(opciones) => getEtiquetaTarea(etiqueta.id, opciones)}
+                    cerrar={() => setEtiqueta(null)}
+                    labelCancelar="No"
+                />
+            )}
 
             {deshaciendo && estado.ultima && (
                 <QModalConfirmacion

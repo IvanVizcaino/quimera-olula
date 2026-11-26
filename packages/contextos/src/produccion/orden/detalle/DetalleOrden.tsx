@@ -22,10 +22,12 @@ import {
     COMANDO,
     formatearCantidad,
     metaOrden,
+    nombreHojaOrden,
     ordenVacia,
     tituloOrden,
 } from "../dominio.ts";
-import { deleteOrden, getAccionesOrden, getOrden, patchOrden, postLanzarOrden } from "../infraestructura.ts";
+import { deleteOrden, getAccionesOrden, getHojaOrden, getOrden, patchOrden, postLanzarOrden } from "../infraestructura.ts";
+import { abrirPdf } from "../../comun/pdf.ts";
 import { SacarProcesoOrden } from "../sacar_proceso/SacarProcesoOrden.tsx";
 import { TerminarOrden } from "../terminar/TerminarOrden.tsx";
 import { LoteOrdenProduccion } from "./LoteOrdenProduccion.tsx";
@@ -49,6 +51,7 @@ export const DetalleOrden = ({ id, publicar = async () => {} }: { id?: string; p
     const [acciones, setAcciones] = useState<AccionesCicloVida | null>(null);
     const [operacion, setOperacion] = useState<"terminar" | "sacar" | null>(null);
     const [lanzando, setLanzando] = useState(false);
+    const [imprimiendo, setImprimiendo] = useState(false);
     const { intentar } = useContext(ContextoError);
 
     useEffect(() => {
@@ -82,6 +85,19 @@ export const DetalleOrden = ({ id, publicar = async () => {} }: { id?: string; p
             await recargar();
         }
     }, [intentar, orden.id, recargar]);
+
+    // «Imprimir hoja»: la hoja de orden en PDF (cabecera, lote, tareas con su código de barras
+    // y los componentes de cada una), en una pestaña nueva.
+    const imprimirHoja = useCallback(async () => {
+        setImprimiendo(true);
+        try {
+            await intentar(() => abrirPdf(() => getHojaOrden(orden.id), nombreHojaOrden(orden.id)));
+        } catch {
+            // `intentar` ya muestra el error.
+        } finally {
+            setImprimiendo(false);
+        }
+    }, [intentar, orden.id]);
 
     const autoGuardar = useCallback(
         async (cambiada: OrdenProduccion) => {
@@ -121,6 +137,9 @@ export const DetalleOrden = ({ id, publicar = async () => {} }: { id?: string; p
                 <div className="fila-acciones-orden">
                     <IndicadorGuardado modificado={modelo.modificado} error={modelo.errorGuardado} guardados={modelo.guardados} />
                     <div className="maestro-botones">
+                        <QBoton variante="borde" deshabilitado={imprimiendo} onClick={imprimirHoja}>
+                            {imprimiendo ? "Imprimiendo..." : "Imprimir hoja"}
+                        </QBoton>
                         <span title={motivoAccion(acciones, COMANDO.lanzar)}>
                             <QBoton deshabilitado={!motor.lanzar || lanzando} onClick={lanzar}>
                                 {lanzando ? "Lanzando..." : "Lanzar"}

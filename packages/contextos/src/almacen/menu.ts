@@ -28,6 +28,11 @@ export const menuAlmacen = {
         url: "/almacen/informe_inventario_valorado",
         regla: "almacen.informe_inventario_valorado",
     },
+    "Almacén/Lotes": {
+        alias: ["lotes", "caducidades", "revisar lotes", "trazabilidad"],
+        url: "/almacen/lotes",
+        regla: "almacen.lote",
+    },
     "Almacén/Transferencias de Stock": { url: "/almacen/transferencias", regla: "almacen.transferencia_stock.leer" },
     // Operación
     "Almacén/Órdenes": { url: "/almacen/ordenes", regla: "almacen.orden.leer", plugin: "sga" },

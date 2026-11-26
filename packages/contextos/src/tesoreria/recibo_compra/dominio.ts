@@ -46,3 +46,14 @@ export const cuentaUltimoPagoCompra = (
         ? { id: ultimo.cuentaPagoId, nombre: ultimo.nombreCuentaPago }
         : null;
 };
+
+/** Estados del recibo de proveedor (`recibosprov.estado`), para el filtro del maestro. */
+export const ESTADOS_RECIBO_COMPRA = ["Emitido", "Pagado", "Devuelto", "Remesado"] as const;
+
+/** Por defecto se ven los pendientes, como en recibos de cobro: todos menos los pagados. */
+export const ESTADOS_RECIBO_COMPRA_DEFECTO = ESTADOS_RECIBO_COMPRA.filter((estado) => estado !== "Pagado");
+
+export const opcionesEstadoReciboCompra = ESTADOS_RECIBO_COMPRA.map((estado) => ({
+    valor: estado,
+    descripcion: estado,
+}));

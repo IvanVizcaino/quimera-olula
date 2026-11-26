@@ -5,7 +5,11 @@
     }
 
     quimera-select[nombre="tipoProcesoId"] {
-        grid-column: span 8;
+        grid-column: span 5;
+    }
+
+    quimera-input[nombre="porLotes"] {
+        grid-column: span 3;
     }
 
     .avisos-fabricacion {

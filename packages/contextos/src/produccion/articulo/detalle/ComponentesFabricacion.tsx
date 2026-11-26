@@ -5,7 +5,7 @@ import { ContextoError } from "@olula/lib/contexto.ts";
 import { puede } from "@olula/lib/dominio.ts";
 import { useContext, useEffect, useState } from "react";
 import { OpcionMaestro } from "../../comun/componentes/SelectorMaestro.tsx";
-import { criteriaTodos } from "../../comun/dominio.ts";
+import { criteriaTodos, siONada } from "../../comun/dominio.ts";
 import { nombreTarea, opcionTareaProceso } from "../../tipo_proceso/dominio.ts";
 import { getTareasProceso } from "../../tipo_proceso/infraestructura.ts";
 import { ComponenteFabricacion, FabricacionArticulo } from "../diseño.ts";
@@ -59,6 +59,7 @@ export const ComponentesFabricacion = ({
         { id: "articuloId", cabecera: "Componente", estilo: "secundario", ancho: "18%" },
         { id: "descripcion", cabecera: "Descripción" },
         { id: "cantidad", cabecera: "Cantidad", tipo: "numero", ancho: "10%" },
+        { id: "porLotes", cabecera: "Por lotes", ancho: "12%", render: (c) => siONada(c.porLotes) },
         {
             id: "tarea",
             cabecera: "Se consume en",
