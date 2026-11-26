@@ -13,6 +13,7 @@ const tpv: ModuloCatalogo = {
     precio: { mensual: "20.00", anual: "200.00" }, contratableSuelto: true, publico: true,
     aporta: { puntos_tpv: 1 }, orden: 70,
     categoria: "contexto", plugin: null, variante: null, variantes: [],
+    descripcionLarga: "Vende en tu tienda", caracteristicas: ["Cobro rápido", "Cierre de caja"], palabrasClave: ["tienda", "caja"],
 };
 
 const centroCoste: ModuloCatalogo = {
@@ -20,6 +21,17 @@ const centroCoste: ModuloCatalogo = {
     precio: { mensual: "0.00", anual: "0.00" }, publico: false,
     categoria: "plugin", plugin: "centro_coste", variante: "activo", variantes: ["activo", "inactivo"],
 };
+
+describe("ficha del módulo", () => {
+    test("características una por línea y palabras clave por comas, sin vacíos", () => {
+        const form = moduloAForm(tpv, limites);
+        expect(form.caracteristicas).toBe("Cobro rápido\nCierre de caja");
+        expect(form.palabrasClave).toBe("tienda, caja");
+        const vuelta = formAModulo(tpv, { ...form, caracteristicas: " Uno \n\n Dos ", palabrasClave: "a, ,b ," }, limites);
+        expect(vuelta.caracteristicas).toEqual(["Uno", "Dos"]);
+        expect(vuelta.palabrasClave).toEqual(["a", "b"]);
+    });
+});
 
 describe("módulo", () => {
     test("moduloAForm lleva una entrada por límite del catálogo", () => {

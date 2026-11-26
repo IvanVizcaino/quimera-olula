@@ -3,8 +3,8 @@ import { normalizarIban } from "@olula/lib/iban.ts";
 import {
     Catalogo, Cuota, Derechos, ExtraCatalogo, Factura, GetCatalogo, GetMiSuscripcion, LimiteCatalogo,
     LimitePlan, MandatoSepa, MiSuscripcion, ModuloCatalogo, ModuloPlan, Objetivo, Periodicidad, PlanCatalogo,
-    PostCambiar, PostCancelar, PostMandatoSepa, PostPagar, PostPortal, PostPresupuesto, PrecioPeriodo,
-    Presupuesto, ResultadoCambio, ResultadoPago, Suscripcion,
+    PostCambiar, PostCancelar, PostMandatoSepa, PostPagar, PostPortal, PostPresupuesto, PostRecomendar, PrecioPeriodo,
+    Presupuesto, RespuestaRecomendador, ResultadoCambio, ResultadoPago, Suscripcion,
 } from "./diseño.ts";
 import { normalizarObjetivo } from "./dominio.ts";
 
@@ -21,7 +21,8 @@ interface LimiteCatalogoApi {
 
 interface ModuloCatalogoApi {
     id: string; nombre: string; descripcion: string; depende_de: string[]; precio: PrecioApi;
-    contratable_suelto: boolean; orden: number;
+    contratable_suelto: boolean; orden: number; categoria?: ModuloCatalogo["categoria"];
+    descripcion_larga?: string | null; caracteristicas?: string[]; palabras_clave?: string[];
 }
 
 interface ModuloPlanApi {
@@ -123,6 +124,8 @@ export const catalogoDesdeApi = (c: CatalogoApi): Catalogo => ({
     modulos: c.modulos.map((m): ModuloCatalogo => ({
         id: m.id, nombre: m.nombre, descripcion: m.descripcion, dependeDe: m.depende_de ?? [],
         precio: precioDesdeApi(m.precio), contratableSuelto: m.contratable_suelto, orden: m.orden,
+        categoria: m.categoria ?? "contexto", descripcionLarga: m.descripcion_larga ?? "",
+        caracteristicas: m.caracteristicas ?? [], palabrasClave: m.palabras_clave ?? [],
     })),
     planes: c.planes.map(planDesdeApi),
     extras: c.extras.map((e): ExtraCatalogo => ({
@@ -250,3 +253,17 @@ export const postCancelar: PostCancelar = async (cancelar) => {
     await RestAPI.query(`${URL_MI_SUSCRIPCION}/cancelar`, { cancelar },
         cancelar ? "Error al cancelar la suscripción" : "Error al reanudar la suscripción");
 };
+
+interface RespuestaRecomendadorApi {
+    origen: string;
+    recomendaciones: { modulo_id: string; motivo: string }[];
+}
+
+export const recomendacionesDesdeApi = (r: RespuestaRecomendadorApi): RespuestaRecomendador => ({
+    origen: r.origen,
+    recomendaciones: (r.recomendaciones ?? []).map((x) => ({ moduloId: x.modulo_id, motivo: x.motivo })),
+});
+
+export const postRecomendar: PostRecomendar = async (necesidad) =>
+    recomendacionesDesdeApi(await RestAPI.query<{ necesidad: string }, RespuestaRecomendadorApi>(
+        `${URL_MI_SUSCRIPCION}/recomendar`, { necesidad }, "No se han podido recomendar módulos"));

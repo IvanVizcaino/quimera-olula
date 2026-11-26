@@ -1,0 +1,67 @@
+.FichaModulo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 720px;
+
+    &.vista-demo { max-width: none; height: 100%; }
+
+    /* Cabecera en una sola línea: icono, resumen (recortado si no cabe), situación y precio.
+       Se fijan márgenes y relleno porque el estilo global de <header> añade los suyos. */
+    .ficha-modulo-cabecera {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        margin: 0;
+        padding: 0 0 8px;
+        min-height: 0;
+        border-bottom: 1px solid var(--color-borde-sutil);
+        white-space: nowrap;
+        font-size: 0.9em;
+    }
+    .ficha-modulo-icono {
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background: var(--color-superficie-sunken);
+        color: var(--color-primario-texto);
+        &.estado-activo { background: var(--color-primario); color: var(--color-texto-menu); }
+    }
+    .ficha-modulo-resumen {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--color-texto-primario);
+    }
+    .ficha-modulo-precio { flex: 0 0 auto; color: var(--color-texto-secundario); }
+    .ficha-modulo-estado {
+        flex: 0 0 auto;
+        font-size: 0.9em;
+        border-radius: 999px;
+        padding: 0 8px;
+        font-weight: 600;
+        background: var(--color-superficie-sunken);
+        &.estado-activo { background: color-mix(in srgb, var(--color-exito) 18%, var(--color-superficie)); color: var(--color-exito-oscuro); }
+        &.estado-disponible { background: color-mix(in srgb, var(--color-primario) 15%, var(--color-superficie)); color: var(--color-primario-texto); }
+        &.estado-otro_plan { background: color-mix(in srgb, var(--color-advertencia) 15%, var(--color-superficie)); color: var(--color-advertencia-oscuro); }
+    }
+
+    .ficha-modulo-descripcion { margin: 0; line-height: 1.5; }
+    .ficha-modulo-caracteristicas {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 6px 16px;
+        li { display: flex; align-items: flex-start; gap: 6px; color: var(--color-texto-primario); }
+        quimera-icono { color: var(--color-exito); flex: 0 0 auto; margin-top: 2px; }
+    }
+    .ficha-modulo-detalle { margin: 0; font-size: 0.9em; color: var(--color-texto-secundario); }
+
+    .ficha-modulo-botones { justify-content: flex-end; flex-wrap: wrap; }
+}

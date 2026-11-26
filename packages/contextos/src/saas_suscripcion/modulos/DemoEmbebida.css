@@ -1,0 +1,72 @@
+.DemoEmbebida {
+    position: relative;
+    flex: 1;
+    min-height: 60vh;
+    border: 1px solid var(--color-borde-sutil);
+    border-radius: 10px;
+    overflow: hidden;
+
+    iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 60vh;
+        border: 0;
+        display: block;
+        opacity: 0;
+        transition: opacity 0.25s;
+    }
+    /* Mientras carga, el iframe se aparta fuera de la vista (con su tamaño, para que la demo
+       se maquete bien): Chrome pinta de gris un iframe a medio cargar aunque esté oculto o
+       transparente, y taparía el esqueleto. */
+    &:not(.lista) iframe {
+        position: absolute;
+        top: 0;
+        left: -200vw;
+    }
+    &.lista iframe { opacity: 1; }
+
+    .demo-esqueleto {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 0 16px 16px;
+        background: var(--color-superficie);
+    }
+    .esq-fila { display: flex; justify-content: space-between; align-items: center; }
+    .esq-tarjetas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+    .esq {
+        border-radius: 6px;
+        background-color: var(--color-superficie-sunken, #eef0f2);
+        background-image: linear-gradient(90deg,
+            transparent 0%,
+            rgb(255 255 255 / 0.55) 50%,
+            transparent 100%);
+        background-size: 200% 100%;
+        animation: esqueleto-brillo 1.4s ease-in-out infinite;
+    }
+    .esq-aviso { height: 28px; margin: 0 -16px; border-radius: 0; }
+    .esq-titulo { width: 180px; height: 24px; }
+    .esq-boton { width: 110px; height: 30px; }
+    .esq-tarjeta { height: 72px; }
+    .esq-linea { height: 32px; }
+
+    .demo-esqueleto-texto {
+        margin: 8px 0 0;
+        text-align: center;
+        font-size: 0.9em;
+        color: var(--color-texto-secundario);
+    }
+}
+
+@keyframes esqueleto-brillo {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .DemoEmbebida .esq { animation: none; }
+}

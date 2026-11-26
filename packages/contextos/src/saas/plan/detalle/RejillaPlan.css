@@ -1,0 +1,145 @@
+/* Rejillas de módulos y límites del detalle del plan (TabModulosPlan, TabLimitesPlan). */
+
+.barra-rejilla-plan {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+
+    .buscador-rejilla-plan {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 1 1 220px;
+        color: var(--color-texto-secundario);
+        quimera-input { flex: 1; }
+    }
+
+    .filtros-rejilla-plan {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}
+
+.filtros-rejilla-plan button,
+.selector-segmentado button {
+    border: 1px solid var(--color-borde-sutil);
+    background: var(--color-superficie);
+    color: var(--color-texto-primario);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font: inherit;
+    font-size: 0.85em;
+    cursor: pointer;
+
+    &:hover { border-color: var(--color-primario); }
+    &.activo {
+        background: var(--color-primario);
+        border-color: var(--color-primario);
+        color: var(--color-texto-menu);
+    }
+    &:focus-visible { outline: 2px solid var(--color-borde-focus); outline-offset: 2px; }
+
+    .recuento { opacity: 0.7; margin-left: 2px; }
+}
+
+.rejilla-plan-vacia { color: var(--color-texto-secundario); font-style: italic; }
+
+.rejilla-plan {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    /* La tarjeta abierta ocupa la fila entera: las siguientes rellenan el hueco que deja. */
+    grid-auto-flow: dense;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.tarjeta-plan {
+    position: relative;
+    border: 1px solid var(--color-borde-sutil);
+    border-radius: 10px;
+    background: var(--color-superficie);
+    transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+
+    &:hover { border-color: var(--color-primario); }
+
+    /* Abierta: ocupa la fila entera para que quepa la configuración. */
+    &.abierta {
+        grid-column: 1 / -1;
+        border-color: var(--color-primario);
+        box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primario) 20%, transparent);
+    }
+
+    .tarjeta-plan-cabecera {
+        all: unset;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        width: 100%;
+        padding: 12px;
+        cursor: pointer;
+        border-radius: 10px;
+        &:focus-visible { outline: 2px solid var(--color-borde-focus); outline-offset: -2px; }
+    }
+    &.abierta .tarjeta-plan-cabecera {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+        padding-right: 48px;
+    }
+
+    .tarjeta-plan-icono {
+        display: grid;
+        place-items: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--color-superficie-sunken);
+        color: var(--color-texto-secundario);
+    }
+    .tarjeta-plan-nombre { font-weight: 600; line-height: 1.2; padding-right: 24px; }
+    &.abierta .tarjeta-plan-nombre { flex: 1; }
+    .tarjeta-plan-valor { font-size: 1.15em; font-weight: 700; }
+    .tarjeta-plan-estado {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8em;
+        color: var(--color-texto-secundario);
+    }
+
+    .tarjeta-plan-config {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0 12px;
+        padding: 12px 0;
+        border-top: 1px solid var(--color-borde-sutil);
+        p { margin: 0; }
+    }
+    .tarjeta-plan-descripcion { color: var(--color-texto-primario); }
+    .tarjeta-plan-detalle { font-size: 0.85em; color: var(--color-texto-secundario); }
+    .tarjeta-plan-aviso { font-size: 0.85em; color: var(--color-advertencia-oscuro); }
+    .tarjeta-plan-precios {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 12px;
+        quimera-input { min-width: 150px; flex: 0 1 200px; }
+        .tarjeta-plan-detalle { flex-basis: 100%; }
+    }
+}
+
+.selector-segmentado {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    .selector-segmentado-etiqueta { font-size: 0.85em; color: var(--color-texto-secundario); min-width: 70px; }
+    > div { display: flex; flex-wrap: wrap; gap: 6px; }
+}
